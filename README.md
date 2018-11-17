@@ -18,6 +18,3 @@ Then connect the board to your PC, and run:
 `particle flash --usb firmware.bin` 
 
 This will flash the firmware onto the board. 
-
-## Notes about CAN 
-CAN requires us to acknowledge all messages or the node that's sending will retransmit unacknowledged frames over and over. So in order to account for buffer overflow, we should take steps to acknowledge all the telemetry data. 
