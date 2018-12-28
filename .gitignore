@@ -1,0 +1,6 @@
+.vscode/
+*.properties
+*.code-workspace
+target/
+*.cpp 
+# Just because the compiler creates .cpp

@@ -14,7 +14,7 @@
  * @param rxQueueSize the queue size for received messages, default 32
  * @param txQueueSize the queue size for transmitted messages, default 32
  */
-CANChannel can(CAN_D1_D2);
+CANChannel can(CAN_D1_D2, 64);
 
 /**
  * For reference, the CANMessage object (sent and received by 
@@ -41,5 +41,8 @@ void loop() {
     // Causes are probably wrong baud rate or the Particle is alone
     Serial.println("CAN Bus error");
   }
-
+  // Data is available in the can receive queue
+  if (can.available() > 0) {
+    
+  }
 }
