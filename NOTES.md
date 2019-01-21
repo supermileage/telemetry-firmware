@@ -79,6 +79,22 @@ There are a couple caveats regarding the `Particle.publish()` functionality, eve
 
 Another option is to use [this library](https://github.com/rickkas7/PublishQueueAsyncRK), which seems promising. Will investigate. 
 
+# MBed compilation 
+
+Set up the environment:
+
+`mbed new .`
+
+Fix the includePaths:
+
+`mbed export -i vscode_gcc_arm -m lpc1768`
+
+Compile with:
+
+`mbed compile -t GCC_ARM -m lpc1768`
+
+Optionally, add `--flash` at the end in order to flash it to the board.
+
 ---
 ### Signals
 Name | Type | Bits | Factor | Offset | Byte Order
