@@ -59,19 +59,7 @@ void loop() {
     float y = tele.interpret<float>(val, 4, 7);
 
     if (Particle.connected()) {
-      Particle.publish("Payload", String(x));
+      Particle.publish("Payload", String(x) + " " + String(y), PUBLIC, NO_ACK);
     }
   }
-}
-
-/**
- * Take an array of bytes and rebuild it as a float. 
- * Expects little-endian.
- */
-float decode_message(uint8_t *arr, int start, int end) {
-  uint8_t n[4];
-  for (int i = start, a = 0; i <= end; i++, a++) {
-    n[a] = arr[i];
-  }
-  return *(float *)n;
 }
