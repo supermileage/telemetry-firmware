@@ -1,5 +1,5 @@
 .vscode/
-*.properties
+demo/
 *.code-workspace
 target/
 *.bin
