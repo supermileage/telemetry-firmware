@@ -26,6 +26,7 @@ Gps gps = Gps(&Serial1);
 
 // Set a timer to fire callback every millisecond
 Timer timer = Timer(1, onSerialData);
+
 CANMessage msg;
 
 // Extra helper global variables
@@ -86,10 +87,9 @@ void loop() {
       } else {
         Serial.println("Velocity is not a number");
       }
-      if (getGPRMCGPSString() != NULL) {
+      if (getGPRMCGPSString(true) != NULL) {
         Serial.println("Publishing location");
-        Serial.println(*getGPRMCGPSString());
-        Particle.publish("Location", *getGPRMCGPSString(), PUBLIC, WITH_ACK);
+        Particle.publish("Location", *getGPRMCGPSString(false), PUBLIC, WITH_ACK);
         Serial.println("Location published");
       } else {
         Serial.println("GPS not locked");
@@ -105,7 +105,20 @@ void onSerialData() {
   gps.onSerialData();
 }
 
-String * getGPRMCGPSString() {
+String * getGPRMCGPSString(bool call) {
+  Serial.println("Getting GPS data");
+  // Resend the command options just in case the GPS module was reset
+  if (call) {
+    gps.sendCommand(PMTK_SET_BAUD_9600);
+    gps.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ);
+    gps.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
+    gps.sendCommand(PMTK_ENABLE_WAAS);
+    gps.sendCommand(PGCMD_ANTENNA);
+    gps.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA);
+    for (int i = 0; i < 7; i++) {
+      Serial.println(gps.data[i]);
+    }
+  }
   // Data is okay
   // Is this always deterministic? It should be
   if (gps.data[4].charAt(18) == 'A') {

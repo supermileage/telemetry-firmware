@@ -50,7 +50,6 @@ void Gps::end()
 void Gps::sendCommand(const char* data)
 {
     this->_serial->println(data);
-    delay(250);
 }
 
 
