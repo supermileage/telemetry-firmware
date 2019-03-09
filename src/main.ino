@@ -7,7 +7,7 @@
  * for the Supermileage telemetry project.
  */
 const int GPS_SERIAL_BAUD = 9600;
-const int CAN_BAUD_RATE   = 1000000;
+const int CAN_BAUD_RATE   = 500000;
 const unsigned long RATE  = 2000; // in milliseconds. note that it should probably be 
                                   // > 2000 ms because the particle publishes at ~1 event/s
 const int TIMEOUT_T   = 500;
@@ -53,8 +53,10 @@ void setup() {
 
 void loop() {
   unsigned long curr_time_ms = millis();
-  if (curr_time_ms - time_ms >= RATE) { // Fire events every time we desire
-    Serial.println("Battery");
+
+  if (curr_time_ms - time_ms >= RATE) {
+    // Sine wave stuff, for testing
+    Serial.println("Sine wave");
     Serial.print("expected: ");
     x = sin(ff);
     ff = ff + 0.4;
@@ -68,24 +70,33 @@ void loop() {
     Serial.println(x_resp);
     Serial.print("tderrors: ");
     Serial.println(errors);
-    // Serial.println("Throttle");
-    // tele.change_timeout(500);
-    // uint64_t throttle = tele.poll(1);
-    // tele.change_timeout(1000);
+    Serial.println("Battery");
+
+    // Battery stuff
+    tele.change_timeout(500);
+    // Send a message with header 0x201, first byte 20
+    tele.adjust(msg, 0x201, false, 8, {20, 0, 0, 0, 0, 0, 0, 0});
+    uint64_t batt = tele.poll(0x241, msg);
+    tele.change_timeout(1000);
+    float batt_resp = tele.interpret<float>(batt, 2, 5);
+    Serial.print("Battery voltage: ");
+    Serial.println(batt_resp);
+
+    // IoT stuff
     if (Particle.connected()) {
       if (!isnan(x_resp + 1)) {
-        Serial.println("Publishing power");
+        Serial.println("Publishing random value");
         Particle.publish("Power", String(x_resp + 1), PUBLIC, WITH_ACK);
-        Serial.println("Published power");
+        Serial.println("Published random value");
       } else {
-        Serial.println("Power is not a number");
+        Serial.println("Random value is not a number");
       }
-      if (true) { // TODO velocity value !isnan("10")
-        Serial.println("Publishing velocity");
-        Particle.publish("Velocity", String(random(10)), PUBLIC, WITH_ACK);
-        Serial.println("Published velocity");
+      if (!isnan(batt_resp)) {
+        Serial.println("Publishing battery voltage");
+        Particle.publish("Velocity", String(batt_resp), PUBLIC, WITH_ACK);
+        Serial.println("Published battery voltage");
       } else {
-        Serial.println("Velocity is not a number");
+        Serial.println("Battery voltage is not a number");
       }
       if (getGPRMCGPSString(true) != NULL) {
         Serial.println("Publishing location");
@@ -94,12 +105,10 @@ void loop() {
       } else {
         Serial.println("GPS not locked");
       }
-      // This is a future object, testing it will cause it to block
     }
     time_ms = millis();
   }
 }
-
 
 void onSerialData() {
   gps.onSerialData();
