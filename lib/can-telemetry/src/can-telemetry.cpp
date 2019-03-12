@@ -8,10 +8,11 @@
  * @param timeout   timeout before returning sentinel values
  * @param debug     debug flag 
  */
-CANTelemetry::CANTelemetry(CANChannel &channel, int node_id, int timeout) {
+CANTelemetry::CANTelemetry(CANChannel &channel, int node_id, int timeout, bool debug) {
     _can = &channel;
     _node_id = node_id;
     _timeout = (unsigned long)timeout;
+    _debug = debug;
     // Build the default message with current node ID
     CANMessage _def;
     _def.id = node_id;
@@ -45,17 +46,18 @@ uint64_t CANTelemetry::poll(uint32_t filter) {
 }
 
 /**
- * Takes an existing CANMessage object and adjusts its parameters.
+ * Creates a new CANMessage object with the given parameters.
  * This is intended to be a helper method so that it's easier to 
- * adjust messages on the fly for multiple poll options.
+ * create messages on the fly for multiple poll options.
  * @param msg   CANMessage object, passed by reference
  * @param id    id to change the message to
  * @param rtr   whether this is a remote frame
  * @param len   length of the data
  * @param nums  initializer list of the data
  */
-void CANTelemetry::adjust(CANMessage &msg, uint32_t id, bool rtr, 
+CANMessage CANTelemetry::createMsg(uint32_t id, bool rtr, 
                           uint8_t len, std::initializer_list<uint8_t> nums) {
+    CANMessage msg;
     msg.id = id;
     msg.rtr = rtr;
     msg.len = len;
@@ -63,12 +65,15 @@ void CANTelemetry::adjust(CANMessage &msg, uint32_t id, bool rtr,
     for (int n : nums) {
         msg.data[i] = n;
         i++;
+        // Max length of message
+        if (i == 8) break;
     }
     // Set the rest of the values to 0
     while (i != 8) {
         msg.data[i] = 0;
         i++;
     }
+    return msg;
 }
 
 /**
@@ -112,18 +117,18 @@ uint64_t CANTelemetry::_poll(uint32_t filter, CANMessage msg, POLL_MODE mode) {
         unsigned long t_stamp = millis();
         while (true) {
             if (_can->receive(response)) {
-                Serial.println("Received response");
+                if (_debug) Serial.println("Received");
                 _set_mask();
                 return _decode(response.data, response.len);
             }
             if (millis() - t_stamp >= _timeout) {
-                Serial.println("Timeout");
+                if (_debug) Serial.println("Timeout");
                 _set_mask();
                 return -1;
             }
         }
     } else {
-        Serial.println("CAN error");
+        if (_debug) Serial.println("CAN error");
         heartbeat();
         _set_mask();
         return -1;

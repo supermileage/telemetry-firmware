@@ -8,9 +8,6 @@ CANChannel can(CAN_D1_D2);
 // Initialize the telemetry object, node id 0
 CANTelemetry tele(can, 0);
 
-// Global message object 
-CANMessage msg;
-
 unsigned long time_ms;
 
 void setup() {
@@ -22,7 +19,7 @@ void setup() {
 
 void loop() {
     // Build a CANMessage
-    tele.adjust(msg, 0x054, true, 8, {0, 0, 0});
+    CANMessage msg = tele.createMsg(0x054, true, 8, {0, 0, 0});
     uint64_t val = tele.poll(0x054, msg); // Filter for 0x054
     // Interpret the bytes as a float
     float ret_float = tele.interpret<float>(val, 0, 3);

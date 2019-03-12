@@ -27,8 +27,6 @@ Gps gps = Gps(&Serial1);
 // Set a timer to fire callback every millisecond
 Timer timer = Timer(1, onSerialData);
 
-CANMessage msg;
-
 // Extra helper global variables
 float ff = 0;
 float x = 0;
@@ -62,8 +60,7 @@ void loop() {
     ff = ff + 0.4;
     Serial.println(x);
     unsigned char * p = reinterpret_cast<unsigned char *>(&x);
-    tele.adjust(msg, 300, false, 8, {*(p + 3), *(p + 2), *(p + 1), *p});
-    uint64_t battery_emu = tele.poll(400, msg);
+    uint64_t battery_emu = tele.poll(400, tele.createMsg(300, false, 8, {*(p + 3), *(p + 2), *(p + 1), *p}));
     float x_resp = tele.interpret<float>(battery_emu, 3, 0);
     int errors = tele.interpret<int>(battery_emu, 4, 7);
     Serial.print("response: ");
@@ -75,13 +72,15 @@ void loop() {
     // Battery stuff
     tele.change_timeout(500);
     // Send a message with header 0x201, first byte 20
-    tele.adjust(msg, 0x201, false, 8, {20, 0, 0, 0, 0, 0, 0, 0});
-    uint64_t batt = tele.poll(0x241, msg);
+    uint64_t batt = tele.poll(0x241, tele.createMsg(0x201, false, 8, {20, 0, 0, 0, 0, 0, 0, 0}));
     tele.change_timeout(1000);
     float batt_resp = tele.interpret<float>(batt, 2, 5);
     Serial.print("Battery voltage: ");
     Serial.println(batt_resp);
 
+    // GPS stuff
+    String * gps = getGPRMCGPSString(true);
+    
     // IoT stuff
     if (Particle.connected()) {
       if (!isnan(x_resp + 1)) {
@@ -98,9 +97,9 @@ void loop() {
       } else {
         Serial.println("Battery voltage is not a number");
       }
-      if (getGPRMCGPSString(true) != NULL) {
+      if (gps != NULL) {
         Serial.println("Publishing location");
-        Particle.publish("Location", *getGPRMCGPSString(false), PUBLIC, WITH_ACK);
+        Particle.publish("Location", *gps, PUBLIC, WITH_ACK);
         Serial.println("Location published");
       } else {
         Serial.println("GPS not locked");

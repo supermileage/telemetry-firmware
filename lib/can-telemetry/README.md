@@ -16,10 +16,11 @@ See the [examples](examples) folder for more details.
 
 ## Documentation
 
-`CANTelemetry(CANChannel &channel, int node_id, int timeout)`
+`CANTelemetry(CANChannel &channel, int node_id, int timeout, bool debug)`
 - `channel` - the CAN channel object
 - `node_id` - the ID of this telemetry module on the bus
 - `timeout` - the desired timeout before we stop listening for a response (optional, default 1000 ms)
+- `debug` - will print messages to serial if specified (optional, defaul false)
 
 `init()`
 - Sets a mask to filter out all messages. Call this immediately following `begin()` on the CAN object.
@@ -30,14 +31,13 @@ See the [examples](examples) folder for more details.
 
 If a `msg` is not specified, the polling method will default to passive polling (useful for if there's already a constant stream of a particular message)
 
-`void adjust(CANMessage &msg, uint32_t id, bool rtr, uint8_t len, std::initializer_list<uint8_t> nums)`
-- `msg` - CANMessage to modify
-- `id` - ID to change the msg to 
+`CANMessage createMsg(uint32_t id, bool rtr, uint8_t len, std::initializer_list<uint8_t> nums)`
+- `id` - ID to set the message to
 - `rtr` - RTR bit option
 - `len` - length of the data (optional, default 0)
 - `nums` - initializer list of the data (optional, default empty)
 
-Note on `initializer_list`: it allows you to pass in parameters using curly braces, without declaring it elsewhere. Therefore, `adjust(msg, 5, true, 8, {0, 1, 2, 3, 4, 5, 6, 7});` is perfectly valid.
+Note on `initializer_list`: it allows you to pass in parameters using curly braces, without declaring it elsewhere. Therefore, `createMsg(msg, 5, true, 8, {0, 1, 2, 3, 4, 5, 6, 7});` is perfectly valid.
 
 `heartbeat()`
 - Sends a heartbeat packet to the bus and returns 1 if no error is returned. 0 otherwise. 

@@ -12,7 +12,8 @@ enum POLL_MODE {
 class CANTelemetry {
 public:
     // Set up the telemetry object
-    CANTelemetry(CANChannel &channel, int node_id, int timeout = 1000);
+    CANTelemetry(CANChannel &channel, int node_id, int timeout = 1000, 
+                bool debug = false);
 
     // Initialize the telemetry module
     void init();
@@ -21,8 +22,8 @@ public:
     uint64_t poll(uint32_t filter, CANMessage msg);
     uint64_t poll(uint32_t filter); 
 
-    // Takes an existing message and adjusts it 
-    void adjust(CANMessage &msg, uint32_t id, bool rtr, uint8_t len = 0, 
+    // Creates a new CAN message with the parameters given
+    CANMessage createMsg(uint32_t id, bool rtr, uint8_t len = 0, 
                 std::initializer_list<uint8_t> nums = {});
 
     // Checks the error status of the bus
@@ -39,6 +40,7 @@ private:
     int _node_id;
     unsigned long _timeout;
     CANMessage _default;
+    bool _debug;
 
     uint64_t _poll(uint32_t filter, CANMessage msg, POLL_MODE mode);
     uint64_t _decode(uint8_t * arr, int len);
