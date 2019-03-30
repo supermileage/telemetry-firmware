@@ -4,3 +4,4 @@ demo/
 target/
 *.bin
 access-link.txt
+*.pdf
