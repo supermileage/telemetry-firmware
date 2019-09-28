@@ -16,9 +16,9 @@ git submodule update
 
 Generally, using the CLI compiler is easier along with the cloud compile feature. Assuming you have the Particle CLI installed, run the following command in the root directory:
 
-`particle compile electron src --saveTo firmware.bin` 
+`particle compile electron . --saveTo firmware.bin` 
 
-This will build a `firmware.bin` file to your root directory, which you can then flash onto the Particle board. 
+This will build a `firmware.bin` file to your root directory, which you can then flash onto the Particle board. Note that you need the current directory because it will recursively search for code to compile.  
 
 Once you have the .bin file, put the Particle board in DFU mode:
 
@@ -32,3 +32,7 @@ Then connect the board to your PC, and run:
 `particle flash --usb firmware.bin` 
 
 This will flash the firmware onto the board. 
+
+## Using Workbench
+
+Particle Workbench has all this functionality built-in, so it abstracts away a lot of the hassle of learning the CLI. Use that if you're unsure. 
