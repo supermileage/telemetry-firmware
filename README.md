@@ -1,3 +1,17 @@
+## Cloning
+
+Since we're using submodules for the can-telemetry library (not the others, because they contain changes specific to this project), we must also clone them when originally cloning this module. 
+
+```
+git clone --recurse-submodules https://github.com/supermileage/particle-io-canbus.git
+```
+
+Or, if it's already cloned:
+```
+git submodule init
+git submodule update
+```
+
 ## flashing firmware onto the board
 
 Generally, using the CLI compiler is easier along with the cloud compile feature. Assuming you have the Particle CLI installed, run the following command in the root directory:

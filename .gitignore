@@ -1,8 +1,10 @@
 .vscode/
-main.cpp # because the output isn't cleaned up
 demo/
 *.code-workspace
 target/
 *.bin
 access-link.txt
 *.pdf
+
+# Ignore compiler output
+main.cpp
