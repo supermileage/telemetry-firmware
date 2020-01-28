@@ -5,7 +5,7 @@
 
 const int GPS_SERIAL_BAUD = 9600;
 const int CAN_BAUD_RATE   = 500000;
-const unsigned long RATE  = 5000; // in milliseconds. note that it should probably be 
+const unsigned long RATE  = 10000; // in milliseconds. note that it should probably be 
                                   // > 2000 ms because the particle publishes at ~1 event/s
 const int TIMEOUT_T   = 500;
 const int NODE_ID     = 1;
@@ -78,7 +78,7 @@ void loop() {
     String gprmc = getGPRMCGPSString();
     String gpvtc = getGPVTGGPSString();
 
-    printNMEAStrings();
+    // printNMEAStrings();
 
     // if (gps != NULL) {
     //   Serial.println("GPS data fine");
@@ -98,17 +98,18 @@ void loop() {
     // x += 0.2;
     // y = sin(x);
 
+    String time = String(Time.now());
+
     // IoT stuff
     if (Particle.connected()) {
-
       if (gprmc != "") {
         Serial.println("Publishing location");
-        Particle.publish("PROTO-Location", gprmc, PUBLIC, WITH_ACK);
+        Particle.publish("PROTO-Location", createPayload(time, gprmc), PUBLIC, WITH_ACK);
       }
       
       if (gpvtc != "") {
         Serial.println("Publishing velocity");
-        Particle.publish("PROTO-Speed", gpvtc, PUBLIC, WITH_ACK);
+        Particle.publish("PROTO-Speed", createPayload(time, gpvtc), PUBLIC, WITH_ACK);
       }
       // if (tele.interpret<int>(batt_soc, 0, 0) == 0x01 
       //     && tele.interpret<int>(batt_onl, 0, 0) == 0x01) { 
@@ -142,6 +143,12 @@ void loop() {
     time_ms = millis();
   }
   }
+}
+
+String createPayload(String t, String data) {
+  t.concat("||");
+  t.concat(data);
+  return t;
 }
 
 void onSerialData() {
