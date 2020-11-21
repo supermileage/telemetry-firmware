@@ -1,10 +1,11 @@
 #include "DataGenerator.h"
+#include "JsonMaker.h"
 
 #define BLINK_INTERVAL_OFF 1800
 #define BLINK_INTERVAL_ON 200
 #define PUBLISH_INTERVAL 30000
 
-
+JsonMaker json_maker;
 DataGenerator data_generator;
 
 uint32_t last_blink = 0; // Time of last blink
@@ -17,49 +18,6 @@ boolean led_state = LOW;
 void proto_response(const char *event, const char *data) {
     Serial.println("Received Message on ID: " + String(event) + " - Message Data: " + String(data));
 }
-
-/**
- * Creates a JSON string for updating Web Console
- * 
- * Precondition: id is not null
- * 
- * @param id : the ID of the sensor
- * @param value : the value to be updated to the ID
- * @return a JSON object represented as a JSON string.
- **/
-String makeJSON(String id, int value){
-    
-    char buf[500]; // Allocate 500 bytes of memory for string
-
-    // EXAMPLE
-    memset(buf, 0, sizeof(buf)); //Clear array
-    JSONBufferWriter writer(buf, sizeof(buf) - 1); // Create JSONBufferWriter object called writer
-    writer.beginObject();
-        writer.name("time").value((int)Time.now());
-        writer.name("d").beginArray();
-            writer.beginObject();
-                writer.name("t").value(id);
-                writer.name("d").value(value);
-            writer.endObject();
-        writer.endArray();
-    writer.endObject();
-    
-    /* Expected Output:
-    {
-        "time":Time.now(),
-        "d":[
-            {
-                "t":"PROTO-SPARK",
-                "d":num
-            }
-        ]
-    }
-    */
-
-    //Converts character array to a string
-    return String(buf);
-}
-
 
 void setup() {
 
@@ -91,7 +49,9 @@ void loop() {
     if (millis() - last_publish >= PUBLISH_INTERVAL){
         last_publish = millis();
         // Call makeJSON function
-        String to_publish = makeJSON("PROTO-RPM", data_generator.get());
+        json_maker.clear();
+        json_maker.add("PROTO-RPM", data_generator.get());
+        String to_publish = json_maker.get();
         Particle.publish("Proto", to_publish, PRIVATE);
         Serial.println("Sent message to ID: Proto - Message Data: " + to_publish);
     }
