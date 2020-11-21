@@ -1,148 +1,99 @@
-#include "can-telemetry.h"
-#include "Particle-GPS.h"
-#include "SparkFunMAX31855k.h"
-#include <math.h>
+#include "DataGenerator.h"
 
-const int GPS_SERIAL_BAUD = 9600;
-const int CAN_BAUD_RATE   = 500000;
-const unsigned long RATE  = 3000; // in milliseconds. note that it should probably be 
-                                  // > 2000 ms because the particle publishes at ~1 event/s
-const int TIMEOUT_T   = 500;
-const int NODE_ID     = 1;
+#define BLINK_INTERVAL_OFF 1800
+#define BLINK_INTERVAL_ON 200
+#define PUBLISH_INTERVAL 30000
 
-const int TEMP_1 = D5;
-const int TEMP_2 = D6;
 
-// Allow polling before data works
-SYSTEM_THREAD(ENABLED);
+DataGenerator data_generator;
 
-CANChannel can(CAN_D1_D2);
-CANTelemetry tele(can, NODE_ID, TIMEOUT_T);
-// Time
-unsigned long time_ms;
+uint32_t last_blink = 0; // Time of last blink
+uint32_t last_publish = 0; // Time of last publish
+boolean led_state = LOW;
 
-// Create the GPS instance using TX/RX on the Electron
-Gps gps(&Serial1);
+//SYSTEM_MODE(MANUAL);
 
-// Set a timer to fire callback every millisecond
-Timer timer(1, onSerialData);
+// Handler for any new message on ID "Proto"
+void proto_response(const char *event, const char *data) {
+    Serial.println("Received Message on ID: " + String(event) + " - Message Data: " + String(data));
+}
 
-// Thermocouple stuff, B1 and B2 are arbitrary, we don't need it
-SparkFunMAX31855k thermo1(&SPI, TEMP_1);
-SparkFunMAX31855k thermo2(&SPI, TEMP_2);
+/**
+ * Creates a JSON string for updating Web Console
+ * 
+ * Precondition: id is not null
+ * 
+ * @param id : the ID of the sensor
+ * @param value : the value to be updated to the ID
+ * @return a JSON object represented as a JSON string.
+ **/
+String makeJSON(String id, int value){
+    
+    char buf[500]; // Allocate 500 bytes of memory for string
+
+    // EXAMPLE
+    memset(buf, 0, sizeof(buf)); //Clear array
+    JSONBufferWriter writer(buf, sizeof(buf) - 1); // Create JSONBufferWriter object called writer
+    writer.beginObject();
+        writer.name("time").value((int)Time.now());
+        writer.name("d").beginArray();
+            writer.beginObject();
+                writer.name("t").value(id);
+                writer.name("d").value(value);
+            writer.endObject();
+        writer.endArray();
+    writer.endObject();
+    
+    /* Expected Output:
+    {
+        "time":Time.now(),
+        "d":[
+            {
+                "t":"PROTO-SPARK",
+                "d":num
+            }
+        ]
+    }
+    */
+
+    //Converts character array to a string
+    return String(buf);
+}
 
 
 void setup() {
-  SPI.begin();
-  // Init the GPS
-  gps.begin(GPS_SERIAL_BAUD);
-  // Request all data
-  gps.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA);
-  // Start the timer
-  timer.start();
-  // Set up serial output (probably can disable)
-  Serial.begin(GPS_SERIAL_BAUD);
-  // Begin CAN bus
-  can.begin(CAN_BAUD_RATE);
-  // Initialize the telemetry library
-  tele.init();
-  // Mark the time of completion
-  time_ms = millis();
-}
 
+    Serial.begin(9600);
+    pinMode(D7, OUTPUT);
+
+    // Subscribe to any new messages on ID "Proto"
+    Particle.subscribe("hook-response/Proto", proto_response, MY_DEVICES);
+
+    // Setup function only runs after Boron connected in (default) Automatic mode
+    Serial.println("Particle Connected!");
+
+}
 
 void loop() {
-  unsigned long curr_time_ms = millis();
 
-  if (curr_time_ms - time_ms >= RATE) {
-    Serial.println("Battery");
-    // Battery stuff
-    // Send a message with header 0x201, first byte 20
-    uint64_t batt_soc = tele.poll(0x241, tele.createMsg(0x201, false, 8, {0x1A, 0, 0, 0, 0, 0, 0, 0}));
-    int batt_soc_resp = 0;
-    if (tele.interpret<int>(batt_soc, 0, 0) == 0x01) {
-      batt_soc_resp = tele.interpret<int>(batt_soc, 2, 5);
-      Serial.print("Battery SOC: ");
-      Serial.println(batt_soc_resp);
-    }
-    uint64_t batt_onl = tele.poll(0x241, tele.createMsg(0x201, false, 8, {0x18, 0, 0, 0, 0, 0, 0, 0}));
-    int batt_onl_resp = tele.interpret<int>(batt_onl, 2, 3);
-    Serial.print("Online status: ");
-    Serial.println(batt_onl_resp);
-
-    // GPS stuff
-    String * gps = getGPRMCGPSString(true);
-
-    // Temperature stuff
-    float temp1 = thermo1.readTempC();
-    float temp2 = thermo2.readTempC();
-    if (!isnan(temp1)) {
-      Serial.print("Temperature1 ");
-      Serial.println(temp1);
-    }
-    if (!isnan(temp2)) {
-      Serial.print("Temperature2 ");
-      Serial.println(temp2);
+    digitalWrite(D7, led_state);
+    
+    // Blink the LED
+    if (led_state & (millis() - last_blink >= BLINK_INTERVAL_ON)){
+        led_state = LOW;
+        last_blink = millis();
+    }else if(!led_state & (millis() - last_blink >= BLINK_INTERVAL_OFF)){
+        led_state = HIGH;
+        last_blink = millis();
     }
 
-    // IoT stuff
-    if (Particle.connected()) {
-      if (tele.interpret<int>(batt_soc, 0, 0) == 0x01 
-          && tele.interpret<int>(batt_onl, 0, 0) == 0x01) { 
-        Serial.println("Publishing SOC/Onl value");
-        String soc = String(batt_soc_resp);
-        String onl = String(batt_onl_resp);
-        String batt_payload = soc + " " + onl;
-        Particle.publish("Power", batt_payload, PUBLIC, WITH_ACK);
-        Serial.println("Published SOC/Onl value");
-      } else {
-        Serial.println("Invalid SOC or onl value");
-      }
-      if (!isnan(temp1) && !isnan(temp2)) {
-        Serial.println("Publishing temperature values");
-        String t1 = String(temp1);
-        String t2 = String(temp2);
-        String t_tot = t1 + " " + t2;
-        Particle.publish("Temperature", t_tot, PUBLIC, WITH_ACK);
-        Serial.println("Published temp values");
-      } else {
-        Serial.println("Invalid temp values");
-      }
-      if (gps != NULL) {
-        Serial.println("Publishing location");
-        Particle.publish("Location", *gps, PUBLIC, WITH_ACK);
-        Serial.println("Location published");
-      } else {
-        Serial.println("GPS not locked");
-      }
+    // Publish a message to Proto
+    if (millis() - last_publish >= PUBLISH_INTERVAL){
+        last_publish = millis();
+        // Call makeJSON function
+        String to_publish = makeJSON("PROTO-RPM", data_generator.get());
+        Particle.publish("Proto", to_publish, PRIVATE);
+        Serial.println("Sent message to ID: Proto - Message Data: " + to_publish);
     }
-    time_ms = millis();
-  }
-}
 
-void onSerialData() {
-  gps.onSerialData();
-}
-
-String * getGPRMCGPSString(bool call) {
-  Serial.println("\nGetting GPS data");
-  // Resend the command options just in case the GPS module was reset
-  if (call) {
-    gps.sendCommand(PMTK_SET_BAUD_9600);
-    gps.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ);
-    gps.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
-    gps.sendCommand(PMTK_ENABLE_WAAS);
-    gps.sendCommand(PGCMD_ANTENNA);
-    gps.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA);
-    for (int i = 0; i < 7; i++) {
-      Serial.println(gps.data[i]);
-    }
-  }
-  // Data is okay
-  // Is this always deterministic? It should be
-  if (gps.data[4].charAt(18) == 'A') {
-    return &gps.data[4];
-  } else {
-    return NULL;
-  }
 }
