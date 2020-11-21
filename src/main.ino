@@ -12,8 +12,6 @@ uint32_t last_blink = 0; // Time of last blink
 uint32_t last_publish = 0; // Time of last publish
 boolean led_state = LOW;
 
-//SYSTEM_MODE(MANUAL);
-
 // Handler for any new message on ID "Proto"
 void proto_response(const char *event, const char *data) {
     Serial.println("Received Message on ID: " + String(event) + " - Message Data: " + String(data));
@@ -49,9 +47,11 @@ void loop() {
     if (millis() - last_publish >= PUBLISH_INTERVAL){
         last_publish = millis();
         // Call makeJSON function
-        json_maker.clear();
+        json_maker.init();
         json_maker.add("PROTO-RPM", data_generator.get());
+        json_maker.add("PROTO-SPARK", data_generator.get());
         String to_publish = json_maker.get();
+        Serial.println("to-publish: " + to_publish);
         Particle.publish("Proto", to_publish, PRIVATE);
         Serial.println("Sent message to ID: Proto - Message Data: " + to_publish);
     }

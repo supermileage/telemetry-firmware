@@ -5,34 +5,70 @@
 #include "Particle.h"
 #line 1 "/Users/silviu/github/telemetry-firmware/src/JsonMaker.ino"
 #include "JsonMaker.h"
-#line 2 "/Users/silviu/github/telemetry-firmware/src/JsonMaker.ino"
-#define BUFF_SIZE 1024
 
-char buf[BUFF_SIZE];
-JSONBufferWriter writer(buf, sizeof(buf) - 1); // Create JSONBufferWriter object called writer
-
+/**
+ *  Constructor 
+ **/
+#line 6 "/Users/silviu/github/telemetry-firmware/src/JsonMaker.ino"
 JsonMaker::JsonMaker(){
+    // Clear Buffer and JSONBufferWriter object
+    memset(buf, 0, sizeof(buf));
+    this->writer = new JSONBufferWriter(buf, sizeof(buf) - 1);
+
     Time.zone(-8);
-    clear();
+    init();
 }
 
-void JsonMaker::clear(){
-    memset(buf, 0, sizeof(buf)); //Clear array
-    writer.beginObject();
-    writer.name("time").value((int)Time.now());
-    writer.name("d").beginArray();
+/**
+ * Deletes the JSONBufferWriter object if it is not null and creates
+ * a new writer object. The buffer is cleared. Init JSON string.
+*/
+void JsonMaker::init(){
+    // Destroy previous JSONBufferWriter object, clear mem, and create new one
+    if(this->writer != NULL) delete this->writer;
+    memset(buf, 0, sizeof(buf));
+    this->writer = new JSONBufferWriter(buf, sizeof(buf) - 1);
+
+    writer->beginObject();
+    writer->name("time").value((int)Time.now());
+    writer->name("d").beginArray();
 }
 
+/**
+ * Add a new object to the buffer with an int value
+ * 
+ * @param id: the id for the value
+ * @param value: the integer value corresponding to its id
+*/
 void JsonMaker::add(String id, int value){
-    writer.beginObject();
-    writer.name("t").value(id);
-    writer.name("d").value(value);
-    writer.endObject();
+    writer->beginObject();
+    writer->name("t").value(id);
+    writer->name("d").value(value);
+    writer->endObject();
 }
 
+/**
+ * Adds a new object to the buffer with a string value.
+ * 
+ * @param id: the id for the value
+ * @param value: the string value corresponding to its id
+ * */
+
+void JsonMaker::add(String id, String value){
+    writer->beginObject();
+    writer->name("t").value(id);
+    writer->name("d").value(value);
+    writer->endObject();
+}
+
+/**
+ * Ends the JSON object and returns its string representation
+ * 
+ * @return a JSON string
+ **/
 String JsonMaker::get(){
-    writer.endArray();
-    writer.endObject();
+    writer->endArray();
+    writer->endObject();
     return String(buf);
 }
 

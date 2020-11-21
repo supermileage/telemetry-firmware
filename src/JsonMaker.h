@@ -1,16 +1,19 @@
+#include "Particle.h"
+#define BUFF_SIZE 1024
+
 class JsonMaker {
     public:
-        //Constructor
         JsonMaker();
 
-        // Clear the char buffer and initialize
-        void clear();
+        void init();
 
-        //Add id and value if id not present, otherwise replace value to the id
         void add(String id, int value);
+        void add(String id, String value);
 
-        //Get the JSON string
         String get();
-    private:
 
+    private:
+        JSONBufferWriter* writer;
+        char buf[BUFF_SIZE];
+    
 };
