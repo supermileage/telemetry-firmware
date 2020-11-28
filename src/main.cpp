@@ -1,14 +1,16 @@
 #include "Particle.h"
 #include "Arduino.h"
-#include "DataGenerator.h"
 #include "JsonMaker.h"
+#include "Sensor_RSSI.h"
+#include "Sensor_ECU.h"
 
 #define BLINK_INTERVAL_OFF 1800
 #define BLINK_INTERVAL_ON 200
-#define PUBLISH_INTERVAL 30000
+#define PUBLISH_INTERVAL 5000
 
 JsonMaker json_maker;
-DataGenerator data_generator;
+Sensor_RSSI rssi;
+Sensor_ECU ecu(&Serial1);
 
 uint32_t last_blink = 0; // Time of last blink
 uint32_t last_publish = 0; // Time of last publish
@@ -50,12 +52,14 @@ void loop() {
         last_publish = millis();
         // Call makeJSON function
         json_maker.init();
-        json_maker.add("PROTO-RPM", data_generator.get());
-        json_maker.add("PROTO-SPARK", data_generator.get());
-        String to_publish = json_maker.get();
-        Serial.println("to-publish: " + to_publish);
-        Particle.publish("Proto", to_publish, PRIVATE);
-        Serial.println("Sent message to ID: Proto - Message Data: " + to_publish);
+        int start = millis();
+        json_maker.add("RSSI", rssi.get());
+        //Particle.publish("Proto", to_publish, PRIVATE);
+        Serial.println("Time elapsed for rssi.get(): " + String(millis() - start) + "ms");
+        start = millis();
+        json_maker.add("RPM", ecu.getRPM());
+        Serial.println("Time elapsed for ecu.getRPM(): " + String(millis() - start) + "ms");
+        Serial.println("JSON Test:\n" + json_maker.get());
     }
 
 }
