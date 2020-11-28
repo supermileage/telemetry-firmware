@@ -11,6 +11,7 @@ class JsonMaker {
 
         void add(String id, int value);
         void add(String id, String value);
+        void add(String id, float value);
 
         String get();
 

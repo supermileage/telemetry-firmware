@@ -54,6 +54,19 @@ void JsonMaker::add(String id, String value){
 }
 
 /**
+ * Adds a new object to the buffer with a string value.
+ * 
+ * @param id: the id for the value
+ * @param value: the float value corresponding to its id
+ **/
+void JsonMaker::add(String id, float value){
+    writer->beginObject();
+    writer->name("t").value(id);
+    writer->name("d").value(value);
+    writer->endObject();
+}
+
+/**
  * Ends the JSON object and returns its string representation
  * 
  * @return a JSON string
