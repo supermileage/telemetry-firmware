@@ -1,3 +1,5 @@
+#include "Particle.h"
+#include "Arduino.h"
 #include "DataGenerator.h"
 #include "JsonMaker.h"
 

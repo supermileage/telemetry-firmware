@@ -1,3 +1,4 @@
+#include "Particle.h"
 #include "Arduino.h"
 
 class DataGenerator {

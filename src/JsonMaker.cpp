@@ -1,15 +1,8 @@
-/******************************************************/
-//       THIS IS A GENERATED FILE - DO NOT EDIT       //
-/******************************************************/
-
-#include "Particle.h"
-#line 1 "/Users/silviu/github/telemetry-firmware/src/JsonMaker.ino"
 #include "JsonMaker.h"
 
 /**
  *  Constructor 
  **/
-#line 6 "/Users/silviu/github/telemetry-firmware/src/JsonMaker.ino"
 JsonMaker::JsonMaker(){
     // Clear Buffer and JSONBufferWriter object
     memset(buf, 0, sizeof(buf));
@@ -22,7 +15,7 @@ JsonMaker::JsonMaker(){
 /**
  * Deletes the JSONBufferWriter object if it is not null and creates
  * a new writer object. The buffer is cleared. Init JSON string.
-*/
+ **/
 void JsonMaker::init(){
     // Destroy previous JSONBufferWriter object, clear mem, and create new one
     if(this->writer != NULL) delete this->writer;
@@ -39,7 +32,7 @@ void JsonMaker::init(){
  * 
  * @param id: the id for the value
  * @param value: the integer value corresponding to its id
-*/
+ **/
 void JsonMaker::add(String id, int value){
     writer->beginObject();
     writer->name("t").value(id);
@@ -52,8 +45,7 @@ void JsonMaker::add(String id, int value){
  * 
  * @param id: the id for the value
  * @param value: the string value corresponding to its id
- * */
-
+ **/
 void JsonMaker::add(String id, String value){
     writer->beginObject();
     writer->name("t").value(id);

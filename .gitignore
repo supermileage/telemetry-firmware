@@ -7,5 +7,3 @@ access-link.txt
 *.pdf
 .DS_STORE
 
-# Ignore compiler output
-main.cpp

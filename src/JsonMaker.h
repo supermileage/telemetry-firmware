@@ -1,4 +1,6 @@
 #include "Particle.h"
+#include "Arduino.h"
+
 #define BUFF_SIZE 1024
 
 class JsonMaker {
