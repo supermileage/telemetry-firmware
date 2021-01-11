@@ -15,6 +15,7 @@ JsonMaker json_maker;
 Sensor_RSSI rssi;
 Sensor_ECU ecu(&Serial1);
 
+
 uint32_t last_blink = 0; // Time of last blink
 uint32_t last_publish = 0; // Time of last publish
 boolean led_state = LOW;
@@ -36,7 +37,7 @@ void setup() {
     Particle.subscribe("hook-response/Proto", proto_response, MY_DEVICES);
 
     // Setup function only runs after Boron connected in (default) Automatic mode
-    //Serial.println("Particle Connected!");
+    Serial.println("Particle Connected!");
 
 }
 
@@ -70,3 +71,4 @@ void onSerialData()
 {
     ecu.onSerialData();
 }
+
