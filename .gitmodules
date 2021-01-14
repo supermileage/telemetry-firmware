@@ -1,3 +1,0 @@
-[submodule "lib/can-telemetry"]
-	path = lib/can-telemetry
-	url = https://github.com/lcfyi/can-telemetry.git

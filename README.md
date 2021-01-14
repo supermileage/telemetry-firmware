@@ -36,3 +36,17 @@ This will flash the firmware onto the board.
 ## Using Workbench
 
 Particle Workbench has all this functionality built-in, so it abstracts away a lot of the hassle of learning the CLI. Use that if you're unsure. 
+
+## Building With Docker
+
+Build the image, tagged as `particle`:
+
+```bash
+docker build -t particle .
+```
+
+In your current directory, invoke the image and output to `out`:
+
+```bash
+docker run --rm -it -v $(pwd):/app -v $(pwd)/out:/out particle:latest
+```
