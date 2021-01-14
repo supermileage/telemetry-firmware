@@ -1,4 +1,4 @@
-name: Build Firmware (v1.5.2)
+name: Build Firmware, Electron (v1.5.2)
 on: [push]
 jobs:
   build:
@@ -10,10 +10,16 @@ jobs:
         password: ${{ secrets.CR_PAT }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: app
 
       - name: Build
         run: |
-          make all PLATFORM=electron APPDIR=app TARGET_DIR=out
+          cd /firmware/main && make all PLATFORM=electron APPDIR=$GITHUB_WORKSPACE/app TARGET_DIR=/out
+
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: firmware
+          path: /out
