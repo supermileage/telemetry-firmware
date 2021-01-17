@@ -11,7 +11,7 @@ class DataQueue {
         /**
          * Contructor
          * */
-        DataQueue();
+        DataQueue(void);
 
         /**
          * Adds an integer value and its ID into the data queue.
@@ -60,10 +60,9 @@ class DataQueue {
         void publish(String event, PublishFlags flag1, PublishFlags flag2);
 
     private:
-
-        PublishQueueAsync* publishQueue;
-        JsonMaker* jsonMaker;
+        PublishQueueAsyncRetained* publishQueue;
         uint8_t publishQueueRetainedBuffer[16384];
+        JsonMaker jsonMaker;
 };
 
 #endif
