@@ -5,9 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/supermileage/particle-v1.5.2
-      credentials:
-        username: ${{ secrets.CR_LOGIN }}
-        password: ${{ secrets.CR_PAT }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
