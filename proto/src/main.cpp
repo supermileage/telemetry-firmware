@@ -58,7 +58,7 @@ void loop() {
     if (millis() - last_publish >= PUBLISH_INTERVAL){
         last_publish = millis();
         //Call makeJSON function
-        json_maker.init();
+        // json_maker.init();
         //json_maker.add("RSSI", rssi.get());
         json_maker.add("PROTO-RPM", ecu.getRPM());
         json_maker.add("PROTO-SPARK", ecu.getSpark());

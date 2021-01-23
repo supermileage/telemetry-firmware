@@ -1,8 +1,8 @@
-name: Build Firmware, Electron (v1.5.2)
+name: Build Firmware
 on: [push, pull_request]
 
 jobs:
-  build:
+  build-urban:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/supermileage/particle-v1.5.2
@@ -10,13 +10,53 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
+          submodules: recursive
           path: app
+          fetch-depth: 5
+
+      - name: Diff directory
+        if: steps.changed.outputs.changed == 'true'
+        uses: marceloprado/has-changed-path@v1
+        id: changed
+        with:
+          paths: urban
 
       - name: Build
         run: |
-          cd /firmware/main && make all PLATFORM=electron APPDIR=$GITHUB_WORKSPACE/app TARGET_DIR=/out
+          cd /firmware/main && make all PLATFORM=electron APPDIR=$GITHUB_WORKSPACE/app/urban TARGET_DIR=/out
 
       - name: Upload
+        if: steps.changed.outputs.changed == 'true'
+        uses: actions/upload-artifact@v2
+        with:
+          name: firmware
+          path: /out
+
+  build-proto:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/supermileage/particle-v1.5.2
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          path: app
+          fetch-depth: 5
+
+      - name: Diff directory
+        uses: marceloprado/has-changed-path@v1
+        id: changed
+        with:
+          paths: proto
+
+      - name: Build
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          cd /firmware/main && make all PLATFORM=electron APPDIR=$GITHUB_WORKSPACE/app/proto TARGET_DIR=/out
+
+      - name: Upload
+        if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: firmware
