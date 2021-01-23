@@ -34,7 +34,6 @@ void setup() {
 }
 
 void loop() {
-
     digitalWrite(D7, led_state);
     
     // Blink the LED
