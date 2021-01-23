@@ -4,16 +4,11 @@ on: [push, pull_request]
 jobs:
   build-urban:
     runs-on: ubuntu-latest
-    env:
-      PATH_DIR: app
-    container:
-      image: ghcr.io/supermileage/particle-v1.5.2
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
           submodules: recursive
-          path: ${{ env.PATH_DIR }}
           fetch-depth: 5
 
       - name: Diff Source
@@ -21,41 +16,32 @@ jobs:
         id: changed
         with:
           paths: urban
-        env:
-          SOURCE: ${{ env.PATH_DIR }}
       
       - name: Diff Libraries
         uses: marceloprado/has-changed-path@v1
         id: lib-changed
         with:
           paths: lib
-        env:
-          SOURCE: ${{ env.PATH_DIR }}
 
       - name: Build
         if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         run: |
-          cd /firmware/main && make all PLATFORM=electron APPDIR=$GITHUB_WORKSPACE/${{ env.PATH_DIR }}/urban TARGET_DIR=/out
+          make urban
 
       - name: Upload
         if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: firmware
-          path: /out
+          path: output
 
   build-proto:
     runs-on: ubuntu-latest
-    env:
-      PATH_DIR: app
-    container:
-      image: ghcr.io/supermileage/particle-v1.5.2
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
           submodules: recursive
-          path: ${{ env.PATH_DIR }}
           fetch-depth: 5
 
       - name: Diff Source
@@ -63,25 +49,21 @@ jobs:
         id: changed
         with:
           paths: proto
-        env:
-          SOURCE: ${{ env.PATH_DIR }}
       
       - name: Diff Libraries
         uses: marceloprado/has-changed-path@v1
         id: lib-changed
         with:
           paths: lib
-        env:
-          SOURCE: ${{ env.PATH_DIR }}
 
       - name: Build
         if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         run: |
-          cd /firmware/main && make all PLATFORM=electron APPDIR=$GITHUB_WORKSPACE/${{ env.PATH_DIR }}/proto TARGET_DIR=/out
+          make proto
 
       - name: Upload
         if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: firmware
-          path: /out
+          path: output
