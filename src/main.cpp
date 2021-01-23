@@ -1,8 +1,6 @@
 #include "Particle.h"
 #include "Arduino.h"
-#include "JsonMaker.h"
-#include "Sensor_RSSI.h"
-#include "Sensor_ECU.h"
+#include "DataQueue.h"
 
 #define BLINK_INTERVAL_OFF 1800
 #define BLINK_INTERVAL_ON 200
@@ -10,17 +8,11 @@
 
 SYSTEM_THREAD(ENABLED);
 
-void onSerialData();
-JsonMaker json_maker;
-Sensor_RSSI rssi;
-Sensor_ECU ecu(&Serial1);
-
+DataQueue* queue;
 
 uint32_t last_blink = 0; // Time of last blink
 uint32_t last_publish = 0; // Time of last publish
 boolean led_state = LOW;
-
-Timer timer(1, onSerialData);
 
 // Handler for any new message on ID "Proto"
 void proto_response(const char *event, const char *data) {
@@ -28,10 +20,10 @@ void proto_response(const char *event, const char *data) {
 }
 
 void setup() {
+    Serial.begin(9600);
     pinMode(D7, OUTPUT);
 
-    ecu.begin();
-    timer.start();
+    queue = new DataQueue();
 
     // Subscribe to any new messages on ID "Proto"
     Particle.subscribe("hook-response/Proto", proto_response, MY_DEVICES);
@@ -57,18 +49,11 @@ void loop() {
     //Publish a message to Proto
     if (millis() - last_publish >= PUBLISH_INTERVAL){
         last_publish = millis();
-        //Call makeJSON function
-        json_maker.init();
-        //json_maker.add("RSSI", rssi.get());
-        json_maker.add("PROTO-RPM", ecu.getRPM());
-        json_maker.add("PROTO-SPARK", ecu.getSpark());
-        Particle.publish("Proto", json_maker.get(), PRIVATE, WITH_ACK);
+
+        queue->add("PROTO-RPM", random(0, 10));
+        queue->add("PROTO-SPARK", random(0, 10));
+        long time0 = millis();
+        queue->publish("Proto", PRIVATE, WITH_ACK);
+        Serial.println(millis() - time0);
     }
-
 }
-
-void onSerialData()
-{
-    ecu.onSerialData();
-}
-
