@@ -1,10 +1,15 @@
 #ifndef DATAQUEUE_H
 #define DATAQUEUE_H
 
-#define BUFFER_SIZE 16384
+#define BUFFER_SIZE 5000
 
 #include "PublishQueueAsyncRK.h"
 #include "JsonMaker.h"
+
+/**
+ * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
+ * main code, or this object may fail in unpredictable ways.
+ **/
 
 class DataQueue {
 

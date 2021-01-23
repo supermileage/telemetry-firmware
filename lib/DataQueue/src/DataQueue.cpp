@@ -1,7 +1,6 @@
 #include "DataQueue.h"
 
 DataQueue::DataQueue() {
-	SYSTEM_THREAD(ENABLED);
 	init();
 }
 
@@ -27,5 +26,4 @@ void DataQueue::init() {
 	publishQueue = new PublishQueueAsyncRetained(publishQueueRetainedBuffer, uint16_t(sizeof(publishQueueRetainedBuffer)));
 	jsonMaker = new JsonMaker();
 	publishQueue->setup();
-	jsonMaker->refresh();
 }

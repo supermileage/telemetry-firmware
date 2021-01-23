@@ -33,18 +33,12 @@ String JsonMaker::get() {
 
 void JsonMaker::refresh() {
     if(this->writer != NULL) delete this->writer;
-    memset(buf, 0, sizeof(buf));
-    this->writer = new JSONBufferWriter(buf, sizeof(buf) - 1);
-
-    writer->beginObject();
-    writer->name("time").value((int)Time.now());
-    writer->name("d").beginArray();
+    init();
 }
 
 void JsonMaker::init() {
     memset(buf, 0, sizeof(buf));
     this->writer = new JSONBufferWriter(buf, sizeof(buf) - 1);
-    Time.zone(-8);
 
     writer->beginObject();
     writer->name("time").value((int)Time.now());
