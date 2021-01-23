@@ -32,7 +32,7 @@ jobs:
         if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
-          name: firmware
+          name: urban-${{ github.sha }}
           path: output
 
   build-proto:
@@ -65,5 +65,5 @@ jobs:
         if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
-          name: firmware
+          name: proto-${{ github.sha }}
           path: output

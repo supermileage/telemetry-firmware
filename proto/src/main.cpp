@@ -38,7 +38,6 @@ void setup() {
 
     // Setup function only runs after Boron connected in (default) Automatic mode
     Serial.println("Particle Connected!");
-
 }
 
 void loop() {
