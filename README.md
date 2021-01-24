@@ -25,6 +25,8 @@ Common libraries are carried over and compiled using a symlink. For POSIX OSes, 
 git clone --recurse-submodules -c core.symlinks=true https://github.com/supermileage/telemetry-firmware.git
 ```
 
+**IMPORTANT**: you need administrator permissions for this, so make sure you clone it in a command prompt ran as admin.
+
 ## Building
 
 All options should generate a `.bin` file, which will be your application firmware payload for flashing.
