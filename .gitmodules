@@ -1,0 +1,6 @@
+[submodule "lib/PublishQueueAsyncRK"]
+	path = lib/PublishQueueAsyncRK
+	url = https://github.com/rickkas7/PublishQueueAsyncRK.git
+[submodule "lib/Particle-GPS"]
+	path = lib/Particle-GPS
+	url = https://github.com/porrey/Particle-GPS.git

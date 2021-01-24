@@ -1,23 +1,69 @@
-name: Build Firmware, Electron (v1.5.2)
+name: Build Firmware
 on: [push, pull_request]
 
 jobs:
-  build:
+  build-urban:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/supermileage/particle-v1.5.2
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
-          path: app
+          submodules: recursive
+          fetch-depth: 5
+
+      - name: Diff Source
+        uses: marceloprado/has-changed-path@v1
+        id: changed
+        with:
+          paths: urban
+      
+      - name: Diff Libraries
+        uses: marceloprado/has-changed-path@v1
+        id: lib-changed
+        with:
+          paths: lib
 
       - name: Build
+        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         run: |
-          cd /firmware/main && make all PLATFORM=electron APPDIR=$GITHUB_WORKSPACE/app TARGET_DIR=/out
+          make urban
 
       - name: Upload
+        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
-          name: firmware
-          path: /out
+          name: urban-${{ github.sha }}
+          path: output
+
+  build-proto:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 5
+
+      - name: Diff Source
+        uses: marceloprado/has-changed-path@v1
+        id: changed
+        with:
+          paths: proto
+      
+      - name: Diff Libraries
+        uses: marceloprado/has-changed-path@v1
+        id: lib-changed
+        with:
+          paths: lib
+
+      - name: Build
+        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        run: |
+          make proto
+
+      - name: Upload
+        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        uses: actions/upload-artifact@v2
+        with:
+          name: proto-${{ github.sha }}
+          path: output
