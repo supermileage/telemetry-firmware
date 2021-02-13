@@ -6,4 +6,4 @@ target/
 access-link.txt
 *.pdf
 .DS_STORE
-
+output/

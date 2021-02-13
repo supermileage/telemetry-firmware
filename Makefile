@@ -3,17 +3,17 @@ OUTPUT_DIR := output
 
 .PHONY: urban proto pull-image clean
 
-urban: pull-image
+urban: clean pull-image
 	$(call print, COMPILING URBAN FIRMWARE)
 	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
-		make all PLATFORM=electron APPDIR=/app/urban TARGET_DIR=/$(OUTPUT_DIR)
+		make all PLATFORM=boron APPDIR=/app/urban TARGET_DIR=/$(OUTPUT_DIR) v=0
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 
-proto: pull-image
+proto: clean pull-image
 	$(call print, COMPILING PROTO FIRMWARE)
 	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
-		make all PLATFORM=electron APPDIR=/app/proto TARGET_DIR=/$(OUTPUT_DIR)
+		make all PLATFORM=boron APPDIR=/app/proto TARGET_DIR=/$(OUTPUT_DIR) v=0
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 
