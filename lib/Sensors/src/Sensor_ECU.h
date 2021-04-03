@@ -9,7 +9,7 @@ public:
 
   void flush();
 
-  void onSerialData();
+  void handle();
 
   // Getters
   time_t getTimestamp();

@@ -29,7 +29,7 @@ void Sensor_ECU::flush()
     }
 }
 
-void Sensor_ECU::onSerialData()
+void Sensor_ECU::handle()
 {
     if (this->_serial->available() < 27)
     {

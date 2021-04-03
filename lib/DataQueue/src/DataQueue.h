@@ -3,7 +3,7 @@
 
 #define BUFFER_SIZE 5000
 
-#include "PublishQueueAsyncRK.h"
+//#include "PublishQueueAsyncRK.h"
 #include "JsonMaker.h"
 
 /**
@@ -67,7 +67,7 @@ class DataQueue {
         void publish(String event, PublishFlags flag1, PublishFlags flag2);
 
     private:
-        PublishQueueAsyncRetained* publishQueue;
+        //PublishQueueAsyncRetained* publishQueue;
         JsonMaker* jsonMaker;
         uint8_t publishQueueRetainedBuffer[BUFFER_SIZE];
 

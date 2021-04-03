@@ -18,12 +18,12 @@ void DataQueue::add(String id, float value) {
 
 void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	String payload = jsonMaker->get();
-	publishQueue->publish(event, payload, flag1, flag2);
+	//publishQueue->publish(event, payload, flag1, flag2);
 	jsonMaker->refresh();
 }
 
 void DataQueue::init() {
-	publishQueue = new PublishQueueAsyncRetained(publishQueueRetainedBuffer, uint16_t(sizeof(publishQueueRetainedBuffer)));
+	//publishQueue = new PublishQueueAsyncRetained(publishQueueRetainedBuffer, uint16_t(sizeof(publishQueueRetainedBuffer)));
 	jsonMaker = new JsonMaker();
-	publishQueue->setup();
+	//publishQueue->setup();
 }
