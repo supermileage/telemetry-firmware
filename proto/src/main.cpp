@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "JsonMaker.h"
 #include "Sensor_ECU.h"
+#include "SparkFun_u-blox_GNSS_Arduino_Library.h"
 
 #define PUBLISH_INTERVAL_SECONDS 10
 
