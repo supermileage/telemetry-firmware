@@ -1,7 +1,6 @@
 #include "Particle.h"
 #include "Arduino.h"
 #include "JsonMaker.h"
-#include "Sensor_RSSI.h"
 #include "Sensor_ECU.h"
 
 #define BLINK_INTERVAL_OFF 1800
@@ -12,7 +11,6 @@ SYSTEM_THREAD(ENABLED);
 
 void onSerialData();
 JsonMaker json_maker;
-Sensor_RSSI rssi;
 Sensor_ECU ecu(&Serial1);
 
 
@@ -58,8 +56,6 @@ void loop() {
     if (millis() - last_publish >= PUBLISH_INTERVAL){
         last_publish = millis();
         //Call makeJSON function
-        // json_maker.init();
-        //json_maker.add("RSSI", rssi.get());
         json_maker.add("PROTO-RPM", ecu.getRPM());
         json_maker.add("PROTO-SPARK", ecu.getSpark());
         Particle.publish("Proto", json_maker.get(), PRIVATE, WITH_ACK);
@@ -69,6 +65,6 @@ void loop() {
 
 void onSerialData()
 {
-    ecu.onSerialData();
+    ecu.handle();
 }
 
