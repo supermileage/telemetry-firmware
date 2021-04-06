@@ -33,12 +33,12 @@ void loop() {
         last_publish = millis();
         // Call makeJSON function
         json_maker.refresh();
-        json_maker.add("PROTO-ECT", ecu.get("ect"));
-        json_maker.add("PROTO-IAT", ecu.get("iam"));
-        json_maker.add("PROTO-RPM", ecu.get("rpm"));
-        json_maker.add("PROTO-UBADC", ecu.get("ubadc"));
-        json_maker.add("PROTO-O2S", ecu.get("o2s"));
-        json_maker.add("PROTO-SPARK", ecu.get("spark"));
+        json_maker.add("PROTO-ECT", ecu.getECT());
+        json_maker.add("PROTO-IAT", ecu.getIAT());
+        json_maker.add("PROTO-RPM", ecu.getRPM());
+        json_maker.add("PROTO-UBADC", ecu.getUbAdc());
+        json_maker.add("PROTO-O2S", ecu.getO2S());
+        json_maker.add("PROTO-SPARK", ecu.getSpark());
         // Particle.publish("Proto", json_maker.get(), PRIVATE, WITH_ACK);
         Serial.println("New JSON Message: " + json_maker.get());
     }

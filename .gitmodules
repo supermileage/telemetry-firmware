@@ -1,12 +1,12 @@
 [submodule "lib/PublishQueueAsyncRK"]
 	path = lib/PublishQueueAsyncRK
-	url = git@github.com:rickkas7/PublishQueueAsyncRK.git
+	url = https://github.com/rickkas7/PublishQueueAsyncRK.git
 [submodule "lib/Particle-GPS"]
 	path = lib/Particle-GPS
 	url = https://github.com/porrey/Particle-GPS.git
 [submodule "lib/SparkFun_GNSS"]
 	path = lib/SparkFun_GNSS
-	url = git@github.com:sparkfun/SparkFun_u-blox_GNSS_Arduino_Library.git
+	url = https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library.git
 [submodule "lib/SparkFun_MAX31855K"]
 	path = lib/SparkFun_MAX31855K
-	url = git@github.com:sparkfun/SparkFun_MAX31855K_Thermocouple_Breakout_Arduino_Library.git
+	url = https://github.com/sparkfun/SparkFun_MAX31855K_Thermocouple_Breakout_Arduino_Library.git
