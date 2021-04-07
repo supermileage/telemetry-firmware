@@ -10,3 +10,6 @@
 [submodule "lib/SparkFun_MAX31855K"]
 	path = lib/SparkFun_MAX31855K
 	url = https://github.com/sparkfun/SparkFun_MAX31855K_Thermocouple_Breakout_Arduino_Library.git
+[submodule "lib/MicroNMEA"]
+	path = lib/MicroNMEA
+	url = https://github.com/stevemarple/MicroNMEA.git
