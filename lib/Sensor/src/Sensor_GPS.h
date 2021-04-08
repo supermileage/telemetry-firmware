@@ -10,11 +10,11 @@ class Sensor_GPS {
         void begin();
         void handle();
 
-        time_t getTimestamp();
         double getLatitude();
         double getLongitude();
         double getAltitude();
         double getSpeed();
+        uint8_t getNumSatellites();
 
     private:
         SFE_UBLOX_GNSS GPS;
@@ -26,4 +26,5 @@ class Sensor_GPS {
         double longitude;
         double altitude;
         double speed;
+        uint8_t SIV;
 };

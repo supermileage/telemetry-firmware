@@ -48,10 +48,11 @@ void loop() {
         Serial.println("New JSON Message: " + json_maker.get());
 
         // Unsure how to output current position sentence, however all the components are there
-        Serial.println("GPS Latitude: " + String(gps.getLatitude()));
-        Serial.println("GPS Longitude: " + String(gps.getLongitude()));
-        Serial.println("GPS Altitude: " + String(gps.getAltitude()));
-        Serial.println("GPS Speed: " + String(gps.getSpeed()));
+        Serial.println("GPS Latitude: " + String(gps.getLatitude()) + " deg");
+        Serial.println("GPS Longitude: " + String(gps.getLongitude()) + " deg");
+        Serial.print("GPS Altitude: "); Serial.print(gps.getAltitude()); Serial.println("m above sea level");
+        Serial.print("GPS Speed: "); Serial.print(gps.getSpeed()); Serial.println(" km/h");
+        Serial.print("GPS Satellites in View: "); Serial.println(gps.getNumSatellites());
     }
 
 
