@@ -1,3 +1,4 @@
+
 #include "Sensor_ECU.h"
 
 Sensor_ECU::Sensor_ECU(USARTSerial *serial)
@@ -29,7 +30,7 @@ void Sensor_ECU::flush()
     }
 }
 
-void Sensor_ECU::onSerialData()
+void Sensor_ECU::handle()
 {
     if (this->_serial->available() < 27)
     {
@@ -131,3 +132,4 @@ float Sensor_ECU::_interpretValue(uint8_t high, uint8_t low, float factor, float
 {
     return (float)((int)high * 256 + (int)low) * factor + offset;
 }
+

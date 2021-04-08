@@ -4,3 +4,9 @@
 [submodule "lib/Particle-GPS"]
 	path = lib/Particle-GPS
 	url = https://github.com/porrey/Particle-GPS.git
+[submodule "lib/SparkFun_GNSS"]
+	path = lib/SparkFun_GNSS
+	url = https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library.git
+[submodule "lib/SparkFun_MAX31855K"]
+	path = lib/SparkFun_MAX31855K
+	url = https://github.com/sparkfun/SparkFun_MAX31855K_Thermocouple_Breakout_Arduino_Library.git

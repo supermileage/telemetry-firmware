@@ -1,73 +1,51 @@
 #include "Particle.h"
 #include "Arduino.h"
 #include "JsonMaker.h"
-#include "Sensor_RSSI.h"
 #include "Sensor_ECU.h"
+#include "SparkFun_u-blox_GNSS_Arduino_Library.h"
 
-#define BLINK_INTERVAL_OFF 1800
-#define BLINK_INTERVAL_ON 200
-#define PUBLISH_INTERVAL 10000
+#define PUBLISH_INTERVAL_SECONDS 10
 
 SYSTEM_THREAD(ENABLED);
 
-void onSerialData();
 JsonMaker json_maker;
-Sensor_RSSI rssi;
 Sensor_ECU ecu(&Serial1);
 
+uint32_t last_publish = 0;
 
-uint32_t last_blink = 0; // Time of last blink
-uint32_t last_publish = 0; // Time of last publish
-boolean led_state = LOW;
-
-Timer timer(1, onSerialData);
-
-// Handler for any new message on ID "Proto"
-void proto_response(const char *event, const char *data) {
-    Serial.println("Received Message on ID: " + String(event) + " - Message Data: " + String(data));
-}
 
 void setup() {
+    Serial.begin(115200);
     pinMode(D7, OUTPUT);
 
     ecu.begin();
-    timer.start();
 
-    // Subscribe to any new messages on ID "Proto"
-    Particle.subscribe("hook-response/Proto", proto_response, MY_DEVICES);
-
-    // Setup function only runs after Boron connected in (default) Automatic mode
     Serial.println("Particle Connected!");
 }
 
 void loop() {
 
-    digitalWrite(D7, led_state);
+    // Check for full data frame from ECU in UART bugger
+    ecu.handle();
     
-    // Blink the LED
-    if (led_state & (millis() - last_blink >= BLINK_INTERVAL_ON)){
-        led_state = LOW;
-        last_blink = millis();
-    }else if(!led_state & (millis() - last_blink >= BLINK_INTERVAL_OFF)){
-        led_state = HIGH;
-        last_blink = millis();
-    }
-
-    //Publish a message to Proto
-    if (millis() - last_publish >= PUBLISH_INTERVAL){
+    // Publish a message on the interval
+    if (millis() - last_publish >= PUBLISH_INTERVAL_SECONDS*1000){
         last_publish = millis();
-        //Call makeJSON function
-        // json_maker.init();
-        //json_maker.add("RSSI", rssi.get());
+        // Call makeJSON function
+        json_maker.refresh();
+        json_maker.add("PROTO-ECT", ecu.getECT());
+        json_maker.add("PROTO-IAT", ecu.getIAT());
         json_maker.add("PROTO-RPM", ecu.getRPM());
+        json_maker.add("PROTO-UBADC", ecu.getUbAdc());
+        json_maker.add("PROTO-O2S", ecu.getO2S());
         json_maker.add("PROTO-SPARK", ecu.getSpark());
-        Particle.publish("Proto", json_maker.get(), PRIVATE, WITH_ACK);
+        // Particle.publish("Proto", json_maker.get(), PRIVATE, WITH_ACK);
+        Serial.println("New JSON Message: " + json_maker.get());
     }
 
+
+
 }
 
-void onSerialData()
-{
-    ecu.onSerialData();
-}
+
 
