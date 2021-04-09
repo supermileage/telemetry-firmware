@@ -1,7 +1,6 @@
+#include "SensorEcu.h"
 
-#include "Sensor_ECU.h"
-
-Sensor_ECU::Sensor_ECU(USARTSerial *serial)
+SensorEcu::SensorEcu(USARTSerial *serial)
 {
     this->_serial = serial;
     this->_time = 0;
@@ -17,12 +16,12 @@ Sensor_ECU::Sensor_ECU(USARTSerial *serial)
     this->_ubadc = 0;
 }
 
-void Sensor_ECU::begin()
+void SensorEcu::begin()
 {
     this->_serial->begin(115200, SERIAL_8N1);
 }
 
-void Sensor_ECU::flush()
+void SensorEcu::flush()
 {
     while (this->_serial->available())
     {
@@ -30,7 +29,7 @@ void Sensor_ECU::flush()
     }
 }
 
-void Sensor_ECU::handle()
+void SensorEcu::handle()
 {
     if (this->_serial->available() < 27)
     {
@@ -73,62 +72,62 @@ void Sensor_ECU::handle()
     }
 }
 
-time_t Sensor_ECU::getTimestamp()
+time_t SensorEcu::getTimestamp()
 {
     return this->_time;
 }
 
-float Sensor_ECU::getRPM()
+float SensorEcu::getRPM()
 {
     return this->_rpm;
 }
 
-float Sensor_ECU::getMap()
+float SensorEcu::getMap()
 {
     return this->_map;
 }
 
-float Sensor_ECU::getTPS()
+float SensorEcu::getTPS()
 {
     return this->_tps;
 }
 
-float Sensor_ECU::getECT()
+float SensorEcu::getECT()
 {
     return this->_ect;
 }
 
-float Sensor_ECU::getIAT()
+float SensorEcu::getIAT()
 {
     return this->_iat;
 }
 
-float Sensor_ECU::getO2S()
+float SensorEcu::getO2S()
 {
     return this->_o2s;
 }
 
-float Sensor_ECU::getSpark()
+float SensorEcu::getSpark()
 {
     return this->_spark;
 }
 
-float Sensor_ECU::getFuelPW1()
+float SensorEcu::getFuelPW1()
 {
     return this->_fuelpw1;
 }
 
-float Sensor_ECU::getFuelPW2()
+float SensorEcu::getFuelPW2()
 {
     return this->_fuelpw2;
 }
 
-float Sensor_ECU::getUbAdc()
+float SensorEcu::getUbAdc()
 {
     return this->_ubadc;
 }
 
-float Sensor_ECU::_interpretValue(uint8_t high, uint8_t low, float factor, float offset)
+float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset)
 {
     return (float)((int)high * 256 + (int)low) * factor + offset;
 }
