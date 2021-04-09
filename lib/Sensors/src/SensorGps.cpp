@@ -8,8 +8,7 @@ SensorGps::SensorGps(uint16_t updateInterval) {
 void SensorGps::begin() {
     Wire.begin();
     
-    if(_gps->begin()) Serial.println("GPS initialized!");
-    else Serial.println("Could not initialize GPS!");
+    _gps->begin();
 
     _lastUpdate = millis();
 
@@ -21,7 +20,7 @@ void SensorGps::begin() {
 void SensorGps::handle() {
     
     if(millis() > _lastUpdate + _updateInterval) {
-        _lastUpdate = millis(); //Update the timer
+        _lastUpdate = millis();
 
         _latitude = _gps->getLatitude() * 0.0000001;
         _longitude = _gps->getLongitude() * 0.0000001;

@@ -13,7 +13,7 @@ SensorEcu ecu(&Serial1);
 SensorGps gps(1000);
 SensorThermo thermoA(&SPI, A5, 1000);
 
-uint32_t last_publish = 0;
+uint32_t lastPublish = 0;
 
 
 void setup() {
@@ -34,8 +34,8 @@ void loop() {
     thermoA.handle();
 
     // Publish a message on the interval
-    if (millis() - last_publish >= PUBLISH_INTERVAL_SECONDS*1000){
-        last_publish = millis();
+    if (millis() - lastPublish >= PUBLISH_INTERVAL_SECONDS*1000){
+        lastPublish = millis();
         // Call makeJSON function
         jsonMaker.refresh();
         jsonMaker.add("PROTO-ECT", ecu.getECT());
