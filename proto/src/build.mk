@@ -1,0 +1,2 @@
+INCLUDE_DIRS += $(SOURCE_PATH)/lib/Adafruit-MAX31855/
+INCLUDE_DIRS += $(SOURCE_PATH)/lib/Adafruit-BusIO/
