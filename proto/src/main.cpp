@@ -53,7 +53,7 @@ void loop() {
         Serial.print("GPS Altitude: "); Serial.print(gps.getAltitude()); Serial.println("m above sea level");
         Serial.print("GPS Speed: "); Serial.print(gps.getSpeed()); Serial.println(" km/h");
         Serial.print("GPS Satellites in View: "); Serial.println(gps.getNumSatellites());
-        Serial.print("Current Temperature (Thermo1): "); Serial.print(thermoA.getTemp()); Serial.println("C");
+        //Serial.print("Current Temperature (Thermo1): "); Serial.print(thermoA.getTemp()); Serial.println("C");
     }
 
 
