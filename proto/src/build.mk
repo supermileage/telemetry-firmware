@@ -7,5 +7,7 @@ APPSOURCES=$(call target_files,$(USRSRC_SLASH),*.cpp)
 APPSOURCES+=$(call target_files,$(USRSRC_SLASH),*.c)
  
 # Custom stuff can be added here
-INCLUDE_DIRS += $(APPDIR)/lib/Adafruit-MAX31855/
-INCLUDE_DIRS += $(APPDIR)/lib/Adafruit-BusIO/
+INCLUDE_DIRS += $(SOURCE_PATH)lib/Adafruit-MAX31855/
+INCLUDE_DIRS += $(SOURCE_PATH)lib/Adafruit-BusIO/
+CPPSRC += $(call target_files,lib/Adafruit-MAX31855/,*.cpp)
+CPPSRC += $(call target_files,lib/Adafruit-BusIO/,*.cpp)
