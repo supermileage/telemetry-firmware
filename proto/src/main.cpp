@@ -18,7 +18,6 @@ uint32_t lastPublish = 0;
 
 void setup() {
     Serial.begin(115200);
-    pinMode(D7, OUTPUT);
 
     ecu.begin();
     gps.begin();
@@ -46,13 +45,7 @@ void loop() {
         jsonMaker.add("PROTO-SPARK", ecu.getSpark());
         // Particle.publish("Proto", jsonMaker.get(), PRIVATE, WITH_ACK);
         Serial.println("New JSON Message: " + jsonMaker.get());
-
-        // Unsure how to output current position sentence, however all the components are there
-        Serial.println("GPS Latitude: " + String(gps.getLatitude()) + " deg");
-        Serial.println("GPS Longitude: " + String(gps.getLongitude()) + " deg");
-        Serial.print("GPS Altitude: "); Serial.print(gps.getAltitude()); Serial.println("m above sea level");
-        Serial.print("GPS Speed: "); Serial.print(gps.getSpeed()); Serial.println(" km/h");
-        Serial.print("GPS Satellites in View: "); Serial.println(gps.getNumSatellites());
+        Serial.println(gps.getSentence());
         Serial.print("Current Temperature (Thermo1): "); Serial.print(thermoA.getTemp()); Serial.println("C");
     }
 

@@ -15,9 +15,7 @@ void SensorThermo::begin() {
 void SensorThermo::handle() {
     if(millis() > _lastUpdate + _updateInterval) {
         _lastUpdate = millis();
-        long unsigned int start = micros();
         _temp = _probe->readCelsius();
-        Serial.println("Thermo read: " + String(micros() - start) + "us");
     }
 }
 

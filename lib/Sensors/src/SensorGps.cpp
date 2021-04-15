@@ -1,5 +1,8 @@
 #include "SensorGps.h"
 
+char sentenceBuffer[128];
+String completeSentence = "";
+
 SensorGps::SensorGps(uint16_t updateInterval) {
     _updateInterval = updateInterval;
     _gps = new SFE_UBLOX_GNSS();
@@ -7,52 +10,41 @@ SensorGps::SensorGps(uint16_t updateInterval) {
 
 void SensorGps::begin() {
     Wire.begin();
-    
+
     _gps->begin();
+    // Disable all NMEA messages we don't want
+    _gps->disableNMEAMessage(UBX_NMEA_GLL, COM_PORT_I2C);
+    _gps->disableNMEAMessage(UBX_NMEA_GSA, COM_PORT_I2C);
+    _gps->disableNMEAMessage(UBX_NMEA_GSV, COM_PORT_I2C);
+    _gps->disableNMEAMessage(UBX_NMEA_GGA, COM_PORT_I2C);
+    _gps->disableNMEAMessage(UBX_NMEA_VTG, COM_PORT_I2C);
+    _gps->disableNMEAMessage(UBX_NMEA_TXT, COM_PORT_I2C);
+    // Enable only GPRMC/GNRMC messages
+    _gps->enableNMEAMessage(UBX_NMEA_RMC, COM_PORT_I2C);
 
-    _lastUpdate = millis();
+    _gps->setI2COutput(COM_TYPE_NMEA);
+    _gps->setNMEAOutputPort(Serial);
+    uint8_t rate = 1000 / _updateInterval;
+    if(rate < 1) rate = 1;
+    _gps->setNavigationFrequency(rate);
 
-    _gps->setI2COutput(COM_TYPE_UBX); //Set the I2C port to output UBX only (turn off NMEA noise)
-    _gps->saveConfigSelective(VAL_CFG_SUBSEC_IOPORT); //Save (only) the communications port settings to flash and BBR
-    _gps->setAutoPVT(true);
 }
 
 void SensorGps::handle() {
-    
-    if(millis() > _lastUpdate + _updateInterval) {
-        _lastUpdate = millis();
+    _gps->checkUblox();
+}
 
-        _latitude = _gps->getLatitude() * 0.0000001;
-        _longitude = _gps->getLongitude() * 0.0000001;
-        _altitude = _gps->getAltitude() * 0.001;
-        _speed = _gps->getGroundSpeed() * 0.0036;
-        _siv = _gps->getSIV();
+String SensorGps::getSentence() {
+    return completeSentence;
+}
+
+void SFE_UBLOX_GNSS::processNMEA(char incoming) {
+    if(incoming == '\n'){
+        completeSentence = String(sentenceBuffer);
+        memset(sentenceBuffer, 0, sizeof(sentenceBuffer));
+    }else{
+        uint8_t bufferLength = strlen(sentenceBuffer);
+        sentenceBuffer[bufferLength] = incoming;
+        sentenceBuffer[bufferLength+1] = '\0';
     }
-    
 }
-
-// Returns current latitude in degrees
-double SensorGps::getLatitude() {
-    return _latitude;
-}
-
-// Returns current longitude in degrees
-double SensorGps::getLongitude() {
-    return _longitude;
-}
-
-// Return current altitude in meters from sea level
-double SensorGps::getAltitude() {
-    return _altitude;
-}
-
-// Returns current ground speed in km/h
-double SensorGps::getSpeed() {
-    return _speed;
-}
-
-// Returns number of satellites in view
-uint8_t SensorGps::getNumSatellites() {
-    return _siv;
-}
-
