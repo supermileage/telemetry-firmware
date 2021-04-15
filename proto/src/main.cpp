@@ -4,6 +4,7 @@
 #include "SensorGps.h"
 #include "SensorThermo.h"
 
+SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 // Disable publish when not necessary during development to reduce data usage
