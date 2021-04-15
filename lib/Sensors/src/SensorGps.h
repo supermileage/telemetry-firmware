@@ -8,6 +8,7 @@ class SensorGps {
         void handle();
         
         String getSentence();
+        float getSpeedKph();
 
     private:
         SFE_UBLOX_GNSS* _gps;
