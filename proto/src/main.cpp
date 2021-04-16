@@ -41,7 +41,7 @@ long time_build_msg;
 /**
  * Publishes a new message to Particle Cloud
  * */
-void publishMessage(){
+void publishMessage() {
     if(LOG_TIMING) start = micros();
 
     // Create JSON object for publish
