@@ -13,7 +13,7 @@ SYSTEM_THREAD(ENABLED);
 // Output Serial messages (disable for production)
 #define OUTPUT_SERIAL_MSG           1
 // Log and output delay for each sensor poll and new message
-#define LOG_TIMING                  0
+#define LOG_TIMING                  1
 
 #if OUTPUT_SERIAL_MSG
     #define DEBUG_SERIAL(x) Serial.println(x)
@@ -32,6 +32,7 @@ SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 
 Sensor *sensors[3] = {&ecu, &gps, &thermoA};
+
 
 uint32_t lastPublish = 0;
 
@@ -78,6 +79,10 @@ void publishMessage() {
     // If log timing is enabled, output time for delay at every publish 
     if (LOG_TIMING) {
         DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
+        for (Sensor *s : sensors) {
+            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(s->getLongestHandleTime()) + "us");
+        }
+        DEBUG_SERIAL();
     }
 }
 
@@ -104,8 +109,7 @@ void setup() {
 void loop() {
     for (Sensor *s : sensors) {
         if (LOG_TIMING) {
-            long time = s->benchmarkedHandle();
-            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(time) + "us");
+            s->benchmarkedHandle();
         } else {
             s->handle();
         }

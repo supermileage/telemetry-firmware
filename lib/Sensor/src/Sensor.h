@@ -1,3 +1,5 @@
+#include "Particle.h"
+
 #ifndef _SENSOR_H_
 #define _SENSOR_H_
 
@@ -8,15 +10,11 @@ class Sensor {
 
         virtual String getHumanName() = 0;
 
-        /**
-         * Returns the time it took to run this function
-         * in microseconds.
-         */
-        long benchmarkedHandle() {
-            long start = micros();
-            this->handle();
-            return micros() - start;
-        }
+        void benchmarkedHandle();
+        long getLongestHandleTime();
+
+    private:
+        long _longestHandleTime = 0;
 };
 
 #endif
