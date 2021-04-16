@@ -1,5 +1,6 @@
 #include "Particle.h"
 #include "JsonMaker.h"
+#include "Sensor.h"
 #include "SensorEcu.h"
 #include "SensorGps.h"
 #include "SensorThermo.h"
@@ -25,9 +26,12 @@ SYSTEM_THREAD(ENABLED);
 #define THERMO_UPDATE_INTERVAL_MS   500
 
 JsonMaker jsonMaker;
+
 SensorEcu ecu(&Serial1);
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
+
+Sensor *sensors[3] = {&ecu, &gps, &thermoA};
 
 uint32_t lastPublish = 0;
 
@@ -94,9 +98,9 @@ void publishMessage() {
 void setup() {
     Serial.begin(115200);
 
-    ecu.begin();
-    gps.begin();
-    thermoA.begin();
+    for (Sensor *s : sensors) {
+        s->begin();
+    }
 
     DEBUG_SERIAL("TELEMETRY ONLINE");
 }
@@ -107,26 +111,30 @@ void setup() {
  * 
  * */
 void loop() {
-    if(LOG_TIMING) start = micros();
+    // if(LOG_TIMING) start = micros();
 
-    ecu.handle();
-    if(LOG_TIMING) {
-        long time_elapsed = micros() - start;
-        if(time_elapsed > time_ecu_poll) time_ecu_poll = time_elapsed;
-        start = micros();
-    }
+    // ecu.handle();
+    // if(LOG_TIMING) {
+    //     long time_elapsed = micros() - start;
+    //     if(time_elapsed > time_ecu_poll) time_ecu_poll = time_elapsed;
+    //     start = micros();
+    // }
 
-    gps.handle();
-    if(LOG_TIMING) {
-        long time_elapsed = micros() - start;
-        if(time_elapsed > time_gps_poll) time_gps_poll = time_elapsed;
-        start = micros();
-    }
+    // gps.handle();
+    // if(LOG_TIMING) {
+    //     long time_elapsed = micros() - start;
+    //     if(time_elapsed > time_gps_poll) time_gps_poll = time_elapsed;
+    //     start = micros();
+    // }
 
-    thermoA.handle();
-    if(LOG_TIMING) {
-        long time_elapsed = micros() - start;
-        if(time_elapsed > time_thermo_poll) time_thermo_poll = time_elapsed;
+    // thermoA.handle();
+    // if(LOG_TIMING) {
+    //     long time_elapsed = micros() - start;
+    //     if(time_elapsed > time_thermo_poll) time_thermo_poll = time_elapsed;
+    // }
+
+    for (Sensor *s : sensors) {
+        s->handle();
     }
 
     // Publish a message every publish interval
