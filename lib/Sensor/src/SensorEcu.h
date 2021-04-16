@@ -1,6 +1,10 @@
-#include "Particle.h"
+#ifndef _SENSOR_ECU_H_
+#define _SENSOR_ECU_H_
 
-class SensorEcu {
+#include "Particle.h"
+#include "Sensor.h"
+
+class SensorEcu : public Sensor {
     public:
         SensorEcu(USARTSerial *serial);
 
@@ -37,3 +41,5 @@ class SensorEcu {
         float _ubadc;
         float _interpretValue(uint8_t high, uint8_t low, float factor, float offset);
 };
+
+#endif
