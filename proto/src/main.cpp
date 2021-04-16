@@ -35,18 +35,14 @@ Sensor *sensors[3] = {&ecu, &gps, &thermoA};
 
 uint32_t lastPublish = 0;
 
-// Timing logs
-long start;
-long time_ecu_poll = 0;
-long time_gps_poll = 0;
-long time_thermo_poll = 0;
-long time_build_msg;
-
 /**
  * Publishes a new message to Particle Cloud
  * */
 void publishMessage() {
-    if(LOG_TIMING) start = micros();
+    long start, json_build_time;
+    if (LOG_TIMING) {
+        start = micros();
+    }
 
     // Create JSON object for publish
     jsonMaker.refresh();
@@ -61,7 +57,9 @@ void publishMessage() {
     jsonMaker.add("PROTO-Location", gps.getSentence());
     jsonMaker.add("PROTO-Speed", gps.getSpeedKph());
 
-    if(LOG_TIMING) time_build_msg = micros() - start;
+    if (LOG_TIMING) {
+        json_build_time = micros() - start;
+    }
 
     if(PUBLISH_ENABLED){
         // Publish to Particle Cloud
@@ -78,15 +76,8 @@ void publishMessage() {
     DEBUG_SERIAL();
     
     // If log timing is enabled, output time for delay at every publish 
-    if(LOG_TIMING) {
-        DEBUG_SERIAL("TIME ELAPSED FOR: ");
-        DEBUG_SERIAL("ECU Polling:        " + String(time_ecu_poll) + "us");
-        DEBUG_SERIAL("GPS Polling:        " + String(time_gps_poll) + "us");
-        DEBUG_SERIAL("Thermo Polling:     " + String(time_thermo_poll) + "us");
-        DEBUG_SERIAL("Build JSON Message: " + String(time_build_msg) + "us");
-        time_ecu_poll = 0;
-        time_gps_poll = 0;
-        time_thermo_poll = 0;
+    if (LOG_TIMING) {
+        DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
     }
 }
 
@@ -111,30 +102,13 @@ void setup() {
  * 
  * */
 void loop() {
-    // if(LOG_TIMING) start = micros();
-
-    // ecu.handle();
-    // if(LOG_TIMING) {
-    //     long time_elapsed = micros() - start;
-    //     if(time_elapsed > time_ecu_poll) time_ecu_poll = time_elapsed;
-    //     start = micros();
-    // }
-
-    // gps.handle();
-    // if(LOG_TIMING) {
-    //     long time_elapsed = micros() - start;
-    //     if(time_elapsed > time_gps_poll) time_gps_poll = time_elapsed;
-    //     start = micros();
-    // }
-
-    // thermoA.handle();
-    // if(LOG_TIMING) {
-    //     long time_elapsed = micros() - start;
-    //     if(time_elapsed > time_thermo_poll) time_thermo_poll = time_elapsed;
-    // }
-
     for (Sensor *s : sensors) {
-        s->handle();
+        if (LOG_TIMING) {
+            long time = s->benchmarkedHandle();
+            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(time) + "us");
+        } else {
+            s->handle();
+        }
     }
 
     // Publish a message every publish interval

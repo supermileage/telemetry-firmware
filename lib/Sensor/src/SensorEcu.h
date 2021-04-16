@@ -12,6 +12,8 @@ class SensorEcu : public Sensor {
         void flush();
         void handle();
 
+        String getHumanName();
+
         // Getters
         time_t getTimestamp();
 

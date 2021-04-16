@@ -10,6 +10,11 @@ SensorThermo::SensorThermo(SPIClass *spi, uint8_t csPin, uint16_t updateInterval
     _spi = spi;
     _probe = new Adafruit_MAX31855(csPin,spi);
     _updateInterval = updateInterval;
+    _csPin = csPin;
+}
+
+String SensorThermo::getHumanName() {
+    return "Thermo_" + String(_csPin);
 }
 
 /**

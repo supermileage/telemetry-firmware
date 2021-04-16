@@ -10,6 +10,8 @@ class SensorGps : public Sensor {
 
         void begin();
         void handle();
+
+        String getHumanName();
         
         String getSentence();
         float getSpeedKph();

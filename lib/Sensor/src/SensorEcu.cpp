@@ -20,6 +20,10 @@ SensorEcu::SensorEcu(USARTSerial *serial)
     this->_ubadc = 0;
 }
 
+String SensorEcu::getHumanName() {
+    return "ECU";
+}
+
 /**
  * Begins ECU receive
  * */

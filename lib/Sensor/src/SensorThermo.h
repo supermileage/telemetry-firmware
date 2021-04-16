@@ -12,12 +12,15 @@ class SensorThermo : public Sensor {
         void begin();
         void handle();
 
+        String getHumanName();
+
         double getTemp();
 
     private:
         Adafruit_MAX31855* _probe;
         SPIClass *_spi;
         uint16_t _updateInterval;
+        uint8_t _csPin;
         unsigned long int _lastUpdate;
         double _temp;
 };
