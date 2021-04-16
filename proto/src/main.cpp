@@ -1,73 +1,140 @@
 #include "Particle.h"
-#include "Arduino.h"
 #include "JsonMaker.h"
-#include "Sensor_RSSI.h"
-#include "Sensor_ECU.h"
+#include "SensorEcu.h"
+#include "SensorGps.h"
+#include "SensorThermo.h"
 
-#define BLINK_INTERVAL_OFF 1800
-#define BLINK_INTERVAL_ON 200
-#define PUBLISH_INTERVAL 10000
-
+SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-void onSerialData();
-JsonMaker json_maker;
-Sensor_RSSI rssi;
-Sensor_ECU ecu(&Serial1);
+// Publish to Cloud (Disable when not necessary during dev to save data)
+#define PUBLISH_ENABLED             1
+// Output Serial messages (disable for production)
+#define OUTPUT_SERIAL_MSG           1
+// Log and output delay for each sensor poll and new message
+#define LOG_TIMING                  0
 
+#if OUTPUT_SERIAL_MSG
+    #define DEBUG_SERIAL(x) Serial.println(x)
+#else
+    #define DEBUG_SERIAL(x)
+#endif
 
-uint32_t last_blink = 0; // Time of last blink
-uint32_t last_publish = 0; // Time of last publish
-boolean led_state = LOW;
+#define PUBLISH_INTERVAL_MS         5000
+#define GPS_UPDATE_INTERVAL_MS      1000
+#define THERMO_UPDATE_INTERVAL_MS   500
 
-Timer timer(1, onSerialData);
+JsonMaker jsonMaker;
+SensorEcu ecu(&Serial1);
+SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 
-// Handler for any new message on ID "Proto"
-void proto_response(const char *event, const char *data) {
-    Serial.println("Received Message on ID: " + String(event) + " - Message Data: " + String(data));
+uint32_t lastPublish = 0;
+
+// Timing logs
+long start;
+long time_ecu_poll = 0;
+long time_gps_poll = 0;
+long time_thermo_poll = 0;
+long time_build_msg;
+
+/**
+ * Publishes a new message to Particle Cloud
+ * */
+void publishMessage() {
+    if(LOG_TIMING) start = micros();
+
+    // Create JSON object for publish
+    jsonMaker.refresh();
+    // ECU data
+    jsonMaker.add("PROTO-ECT", ecu.getECT());
+    jsonMaker.add("PROTO-IAT", ecu.getIAT());
+    jsonMaker.add("PROTO-RPM", ecu.getRPM());
+    jsonMaker.add("PROTO-UBADC", ecu.getUbAdc());
+    jsonMaker.add("PROTO-O2S", ecu.getO2S());
+    jsonMaker.add("PROTO-SPARK", ecu.getSpark());
+    // GPS data
+    jsonMaker.add("PROTO-Location", gps.getSentence());
+    jsonMaker.add("PROTO-Speed", gps.getSpeedKph());
+
+    if(LOG_TIMING) time_build_msg = micros() - start;
+
+    if(PUBLISH_ENABLED){
+        // Publish to Particle Cloud
+        Particle.publish("Proto", jsonMaker.get(), PRIVATE, WITH_ACK);
+        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+    }else{
+        DEBUG_SERIAL("Publish - DISABLED - Message: ");
+    }
+    DEBUG_SERIAL("New JSON Message: " + jsonMaker.get());
+
+    // Any sensors that are working but not yet packaged for publish
+    DEBUG_SERIAL("Not in Message: ");
+    DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermoA.getTemp()) + "C");
+    DEBUG_SERIAL();
+    
+    // If log timing is enabled, output time for delay at every publish 
+    if(LOG_TIMING) {
+        DEBUG_SERIAL("TIME ELAPSED FOR: ");
+        DEBUG_SERIAL("ECU Polling:        " + String(time_ecu_poll) + "us");
+        DEBUG_SERIAL("GPS Polling:        " + String(time_gps_poll) + "us");
+        DEBUG_SERIAL("Thermo Polling:     " + String(time_thermo_poll) + "us");
+        DEBUG_SERIAL("Build JSON Message: " + String(time_build_msg) + "us");
+        time_ecu_poll = 0;
+        time_gps_poll = 0;
+        time_thermo_poll = 0;
+    }
 }
 
+/**
+ * 
+ * SETUP
+ * 
+ * */
 void setup() {
-    pinMode(D7, OUTPUT);
+    Serial.begin(115200);
 
     ecu.begin();
-    timer.start();
+    gps.begin();
+    thermoA.begin();
 
-    // Subscribe to any new messages on ID "Proto"
-    Particle.subscribe("hook-response/Proto", proto_response, MY_DEVICES);
-
-    // Setup function only runs after Boron connected in (default) Automatic mode
-    Serial.println("Particle Connected!");
+    DEBUG_SERIAL("TELEMETRY ONLINE");
 }
 
+/**
+ * 
+ * LOOP
+ * 
+ * */
 void loop() {
+    if(LOG_TIMING) start = micros();
 
-    digitalWrite(D7, led_state);
-    
-    // Blink the LED
-    if (led_state & (millis() - last_blink >= BLINK_INTERVAL_ON)){
-        led_state = LOW;
-        last_blink = millis();
-    }else if(!led_state & (millis() - last_blink >= BLINK_INTERVAL_OFF)){
-        led_state = HIGH;
-        last_blink = millis();
+    ecu.handle();
+    if(LOG_TIMING) {
+        long time_elapsed = micros() - start;
+        if(time_elapsed > time_ecu_poll) time_ecu_poll = time_elapsed;
+        start = micros();
     }
 
-    //Publish a message to Proto
-    if (millis() - last_publish >= PUBLISH_INTERVAL){
-        last_publish = millis();
-        //Call makeJSON function
-        // json_maker.init();
-        //json_maker.add("RSSI", rssi.get());
-        json_maker.add("PROTO-RPM", ecu.getRPM());
-        json_maker.add("PROTO-SPARK", ecu.getSpark());
-        Particle.publish("Proto", json_maker.get(), PRIVATE, WITH_ACK);
+    gps.handle();
+    if(LOG_TIMING) {
+        long time_elapsed = micros() - start;
+        if(time_elapsed > time_gps_poll) time_gps_poll = time_elapsed;
+        start = micros();
     }
 
+    thermoA.handle();
+    if(LOG_TIMING) {
+        long time_elapsed = micros() - start;
+        if(time_elapsed > time_thermo_poll) time_thermo_poll = time_elapsed;
+    }
+
+    // Publish a message every publish interval
+    if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
+        lastPublish = millis();
+        publishMessage();
+    }
 }
 
-void onSerialData()
-{
-    ecu.onSerialData();
-}
+
 
