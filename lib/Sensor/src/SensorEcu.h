@@ -1,9 +1,8 @@
 #include "Particle.h"
-#include "Sensor.h"
 
-class Sensor_ECU: public Sensor {
+class SensorEcu {
     public:
-        Sensor_ECU(USARTSerial *serial);
+        SensorEcu(USARTSerial *serial);
 
         void begin();
         void flush();

@@ -1,7 +1,10 @@
+#include "SensorEcu.h"
 
-#include "Sensor_ECU.h"
-
-Sensor_ECU::Sensor_ECU(USARTSerial *serial)
+/**
+ * Constructor 
+ * @param *serial bus receiving ECU data
+ **/
+SensorEcu::SensorEcu(USARTSerial *serial)
 {
     this->_serial = serial;
     this->_time = 0;
@@ -17,12 +20,18 @@ Sensor_ECU::Sensor_ECU(USARTSerial *serial)
     this->_ubadc = 0;
 }
 
-void Sensor_ECU::begin()
+/**
+ * Begins ECU receive
+ * */
+void SensorEcu::begin()
 {
     this->_serial->begin(115200, SERIAL_8N1);
 }
 
-void Sensor_ECU::flush()
+/**
+ * Flushes all data out of Serial receive buffer
+ * */
+void SensorEcu::flush()
 {
     while (this->_serial->available())
     {
@@ -30,7 +39,10 @@ void Sensor_ECU::flush()
     }
 }
 
-void Sensor_ECU::handle()
+/**
+ * Checks Serial buffer for incoming data. If a full ECU data frame is in buffer, parses and saves it
+ * */
+void SensorEcu::handle()
 {
     if (this->_serial->available() < 27)
     {
@@ -73,62 +85,103 @@ void Sensor_ECU::handle()
     }
 }
 
-time_t Sensor_ECU::getTimestamp()
+/**
+ * @return Timestamp of last ECU receive
+ * */
+time_t SensorEcu::getTimestamp()
 {
     return this->_time;
 }
 
-float Sensor_ECU::getRPM()
+/**
+ * @return Rotations Per Minute
+ * */
+float SensorEcu::getRPM()
 {
     return this->_rpm;
 }
 
-float Sensor_ECU::getMap()
+/**
+ * @return Mass Airflow Pressure??
+ * */
+float SensorEcu::getMap()
 {
     return this->_map;
 }
 
-float Sensor_ECU::getTPS()
+/**
+ * @return ??
+ * */
+float SensorEcu::getTPS()
 {
     return this->_tps;
 }
 
-float Sensor_ECU::getECT()
+/**
+ * @return ??
+ * */
+float SensorEcu::getECT()
 {
     return this->_ect;
 }
 
-float Sensor_ECU::getIAT()
+/**
+ * @return ??
+ * */
+float SensorEcu::getIAT()
 {
     return this->_iat;
 }
 
-float Sensor_ECU::getO2S()
+/**
+ * @return Oxygen Sensor??
+ * */
+float SensorEcu::getO2S()
 {
     return this->_o2s;
 }
 
-float Sensor_ECU::getSpark()
+/**
+ * @return Ignition Timing??
+ * */
+float SensorEcu::getSpark()
 {
     return this->_spark;
 }
 
-float Sensor_ECU::getFuelPW1()
+/**
+ * @return Fuel Pressure??
+ * */
+float SensorEcu::getFuelPW1()
 {
     return this->_fuelpw1;
 }
 
-float Sensor_ECU::getFuelPW2()
+/**
+ * @return Fuel Pressure??
+ * */
+float SensorEcu::getFuelPW2()
 {
     return this->_fuelpw2;
 }
 
-float Sensor_ECU::getUbAdc()
+/**
+ * @return ??
+ * */
+float SensorEcu::getUbAdc()
 {
     return this->_ubadc;
 }
 
-float Sensor_ECU::_interpretValue(uint8_t high, uint8_t low, float factor, float offset)
+/**
+ * Helper for interpreting raw values from ECU
+ * @param high byte
+ * @param low byte
+ * @param factor ??
+ * @param offset ??
+ * @return Intepreted value
+ * */
+float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset)
 {
     return (float)((int)high * 256 + (int)low) * factor + offset;
 }
