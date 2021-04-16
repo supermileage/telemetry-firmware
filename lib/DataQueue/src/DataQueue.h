@@ -1,5 +1,5 @@
-#ifndef DATAQUEUE_H
-#define DATAQUEUE_H
+#ifndef _DATAQUEUE_H_
+#define _DATAQUEUE_H_
 
 #define BUFFER_SIZE 5000
 

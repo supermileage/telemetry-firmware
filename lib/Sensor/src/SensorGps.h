@@ -1,11 +1,17 @@
-#include "SparkFun_u-blox_GNSS_Arduino_Library.h"
+#ifndef _SENSOR_GPS_H_
+#define _SENSOR_GPS_H_
 
-class SensorGps {
+#include "SparkFun_u-blox_GNSS_Arduino_Library.h"
+#include "Sensor.h"
+
+class SensorGps : public Sensor {
     public:
         SensorGps(uint16_t updateInterval);
 
         void begin();
         void handle();
+
+        String getHumanName();
         
         String getSentence();
         float getSpeedKph();
@@ -15,3 +21,5 @@ class SensorGps {
         uint16_t _updateInterval;
 
 };
+
+#endif

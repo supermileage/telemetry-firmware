@@ -12,6 +12,10 @@ SensorGps::SensorGps(uint16_t updateInterval) {
     _gps = new SFE_UBLOX_GNSS();
 }
 
+String SensorGps::getHumanName() {
+    return "GPS";
+}
+
 /**
  * Begin the GPS sensor by setting up over i2c
  **/
