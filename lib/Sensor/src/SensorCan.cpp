@@ -3,8 +3,10 @@
 /**
  * Constructor 
  **/
-SensorCan::SensorCa () {
-
+SensorCan::SensorCan(SPIClass *spi, uint8_t csPin, uint8_t intPin) {
+    _spi = spi;
+    _csPin = csPin;
+    _intPin = intPin;
 }
 
 String SensorCan::getHumanName() {
