@@ -10,3 +10,6 @@
 [submodule "lib/Adafruit-BusIO"]
 	path = lib/Adafruit-BusIO
 	url = https://github.com/adafruit/Adafruit_BusIO.git
+[submodule "lib/Seeed_Arduino_CAN"]
+	path = lib/Seeed_Arduino_CAN
+	url = https://github.com/Seeed-Studio/Seeed_Arduino_CAN.git

@@ -1,8 +1,10 @@
 #ifndef _SENSOR_CAN_H_
 #define _SENSOR_CAN_H_
 
-#include "ArduinoMCP2515.h"
 #include "Sensor.h"
+#include "mcp2515_can.h"
+
+#define NUM_IDS 2
 
 class SensorCan : public Sensor {
     public:
@@ -10,27 +12,20 @@ class SensorCan : public Sensor {
 
         void begin();
         void handle();
-
         String getHumanName();
-    
+
+        uint8_t getNumIds();
+        uint16_t getId(uint8_t id_num);
+        uint8_t getDataLen(uint8_t id_num);
+        uint8_t* getData(uint8_t id_num);
 
     private:
-        SPIClass *_spi;
-        uint8_t _csPin;
+        const uint16_t IDS[NUM_IDS] = {0x00, 0xA2};
+        uint8_t _dataLen[NUM_IDS];
+        uint8_t _data[NUM_IDS][8];
+
         uint8_t _intPin;
-
-        void spi_select();
-        void spi_deselect();
-        uint8_t spi_transfer(uint8_t const);
-        void onExternalEvent();
-        void onReceiveBufferFull(uint32_t const, uint32_t const, uint8_t const *, uint8_t const);
-
-        ArduinoMCP2515 mcp2515(spi_select,
-                       spi_deselect,
-                       spi_transfer,
-                       micros,
-                       onReceiveBufferFull,
-                       nullptr);
+        mcp2515_can* _CAN;
 
 };
 

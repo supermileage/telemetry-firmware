@@ -3,12 +3,13 @@
 #include "Sensor.h"
 #include "SensorGps.h"
 #include "SensorThermo.h"
+#include "SensorCan.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 // Publish to Cloud (Disable when not necessary during dev to save data)
-#define PUBLISH_ENABLED             1
+#define PUBLISH_ENABLED             0
 // Output Serial messages (disable for production)
 #define OUTPUT_SERIAL_MSG           1
 // Log and output delay for each sensor poll and new message
@@ -27,8 +28,9 @@ SYSTEM_THREAD(ENABLED);
 JsonMaker jsonMaker;
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
+SensorCan can(&SPI1, D5, D6);
 
-Sensor *sensors[3] = {&gps, &thermoA};
+Sensor *sensors[3] = {&gps, &thermoA, &can};
 
 uint32_t lastPublish = 0;
 
@@ -61,8 +63,20 @@ void publishMessage() {
     DEBUG_SERIAL("New JSON Message: " + jsonMaker.get());
 
     // Any sensors that are working but not yet packaged for publish
-    DEBUG_SERIAL("Not in Message: ");
+    DEBUG_SERIAL("\nNot in Message: ");
+
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermoA.getTemp()) + "C");
+
+    for(int i = 0; i < can.getNumIds(); i++){
+        String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
+        uint8_t canDataLength = can.getDataLen(i);
+        unsigned char* canData = can.getData(i);
+        for(int k = 0; k < canDataLength; k++){
+            output += " 0x";
+            output += String(canData[k], HEX);
+        }
+        DEBUG_SERIAL(output);
+    }
     DEBUG_SERIAL();
     
     // If log timing is enabled, output time for delay at every publish 
