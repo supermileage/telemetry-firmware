@@ -1,6 +1,10 @@
 #include "Telemetry.h"
 #include "SensorCan.h"
 
+JsonMaker jsonMaker;
+
+SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorCan can(&SPI1, D5, D6);
 
 Sensor *sensors[3] = {&gps, &thermoA, &can};
@@ -26,7 +30,7 @@ void generateMessage() {
         json_build_time = micros() - start;
     }
 
-    publishMessage("Urban");
+    publishMessage("Urban", jsonMaker.get());
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
