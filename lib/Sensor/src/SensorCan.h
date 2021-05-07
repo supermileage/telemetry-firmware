@@ -3,6 +3,7 @@
 
 #include "Sensor.h"
 #include "mcp2515_can.h"
+#include "can_common.h"
 
 #define NUM_IDS 2
 
@@ -20,7 +21,7 @@ class SensorCan : public Sensor {
         uint8_t* getData(uint8_t id_num);
 
     private:
-        const uint16_t IDS[NUM_IDS] = {0x00, 0xA2};
+        const uint16_t IDS[NUM_IDS] = {CAN_THROTTLE, CAN_MOTOR_ENABLE};
         uint8_t _dataLen[NUM_IDS];
         uint8_t _data[NUM_IDS][8];
 
