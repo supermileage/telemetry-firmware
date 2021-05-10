@@ -1,3 +1,9 @@
+#ifndef _SETTINGS_H
+#define _SETTINGS_H
+
+SYSTEM_MODE(AUTOMATIC);
+SYSTEM_THREAD(ENABLED);
+
 // Publish to Cloud (Disable when not necessary during dev to save data)
 #define PUBLISH_ENABLED             0
 // Output Serial messages (disable for production)
@@ -8,3 +14,5 @@
 #define PUBLISH_INTERVAL_MS         5000
 #define GPS_UPDATE_INTERVAL_MS      1000
 #define THERMO_UPDATE_INTERVAL_MS   500
+
+#endif

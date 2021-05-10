@@ -1,3 +1,6 @@
+#ifndef _TELEMETRY_H
+#define _TELEMETRY_H
+
 #include "Particle.h"
 #include "settings.h"
 
@@ -6,8 +9,7 @@
 #include "SensorGps.h"
 #include "SensorThermo.h"
 
-SYSTEM_MODE(AUTOMATIC);
-SYSTEM_THREAD(ENABLED);
+
 
 #if OUTPUT_SERIAL_MSG
     #define DEBUG_SERIAL(x) Serial.println(x)
@@ -15,7 +17,7 @@ SYSTEM_THREAD(ENABLED);
     #define DEBUG_SERIAL(x)
 #endif
 
-void publishMessage(String topic, String msg) {
+void publishMessage(String topic, String& msg) {
     if(PUBLISH_ENABLED){
         // Publish to Particle Cloud
         Particle.publish(topic, msg, PRIVATE, WITH_ACK);
@@ -25,3 +27,5 @@ void publishMessage(String topic, String msg) {
     }
     DEBUG_SERIAL("New JSON Message: " + msg);
 }
+
+#endif

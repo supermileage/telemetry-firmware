@@ -37,7 +37,8 @@ void generateMessage() {
         json_build_time = micros() - start;
     }
 
-    publishMessage("Proto", jsonMaker.get());
+    String jsonString = jsonMaker.get();
+    publishMessage("Proto", jsonString);
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("Not in Message: ");
