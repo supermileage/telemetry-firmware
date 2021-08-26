@@ -1,8 +1,6 @@
 #include "Telemetry.h"
 #include "SensorEcu.h"
 
-JsonMaker jsonMaker;
-
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorEcu ecu(&Serial1);
@@ -20,29 +18,31 @@ void generateMessage() {
         start = micros();
     }
 
-    // Create JSON object for publish
-    jsonMaker.refresh();
+    newPayload();
+    
     // ECU data
-    jsonMaker.add("PROTO-ECT", ecu.getECT());
-    jsonMaker.add("PROTO-IAT", ecu.getIAT());
-    jsonMaker.add("PROTO-RPM", ecu.getRPM());
-    jsonMaker.add("PROTO-UBADC", ecu.getUbAdc());
-    jsonMaker.add("PROTO-O2S", ecu.getO2S());
-    jsonMaker.add("PROTO-SPARK", ecu.getSpark());
+    addMessage("PROTO-ECT", ecu.getECT());
+    addMessage("PROTO-IAT", ecu.getIAT());
+    addMessage("PROTO-RPM", ecu.getRPM());
+    addMessage("PROTO-UBADC", ecu.getUbAdc());
+    addMessage("PROTO-O2S", ecu.getO2S());
+    addMessage("PROTO-SPARK", ecu.getSpark());
     // GPS data
-    jsonMaker.add("PROTO-Location", gps.getSentence());
-    jsonMaker.add("PROTO-Speed", gps.getSpeedKph());
+    addMessage("PROTO-Location", gps.getSentence());
+    addMessage("PROTO-Speed", gps.getSpeedKph());
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
     }
 
-    String jsonString = jsonMaker.get();
-    publishMessage("Proto", jsonString);
+    publishMessage("Proto");
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("Not in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermoA.getTemp()) + "C");
+    DEBUG_SERIAL("Current Time: " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
+    DEBUG_SERIAL("GPS Time: " + String(gps.getTime()));
     DEBUG_SERIAL();
     
     // If log timing is enabled, output time for delay at every publish 
@@ -81,6 +81,13 @@ void loop() {
             s->benchmarkedHandle();
         } else {
             s->handle();
+        }
+    }
+
+    // If there is valid time pulled from cellular, get time from GPS (if valid)
+    if(Time.now() < 1609459201){
+        if(gps.getTime() > 1609459201){
+            Time.setTime(gps.getTime());
         }
     }
 

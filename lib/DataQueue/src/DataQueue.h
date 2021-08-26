@@ -1,7 +1,7 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#define BUFFER_SIZE 5000
+#define DATA_Q_BUFFER_SIZE 5000
 
 #include "PublishQueueAsyncRK.h"
 #include "JsonMaker.h"
@@ -63,13 +63,22 @@ class DataQueue {
          * @param flag1 The publish flag. Set to PUBLIC or PRIVATE.
          * 
          * @param flag2 The acknowledgement flag. Set to either WITH_ACK or NO_ACK.
+         * 
+         * @return Published payload
          * */
-        void publish(String event, PublishFlags flag1, PublishFlags flag2);
+        String publish(String event, PublishFlags flag1, PublishFlags flag2);
+
+        /**
+         * Resets data in jsonMaker and returns what was in there
+         * 
+         * @return Data in jsonMaker before reset
+         * */
+        String resetData();
 
     private:
         PublishQueueAsyncRetained* publishQueue;
         JsonMaker* jsonMaker;
-        uint8_t publishQueueRetainedBuffer[BUFFER_SIZE];
+        uint8_t publishQueueRetainedBuffer[DATA_Q_BUFFER_SIZE];
 
         /**
          * Initializes the PublishQueueAsyncRetained and JsonMaker objects by

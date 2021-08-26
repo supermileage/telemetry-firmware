@@ -4,12 +4,10 @@
 #include "Particle.h"
 #include "settings.h"
 
-#include "JsonMaker.h"
+#include "DataQueue.h"
 #include "Sensor.h"
 #include "SensorGps.h"
 #include "SensorThermo.h"
-
-
 
 #if OUTPUT_SERIAL_MSG
     #define DEBUG_SERIAL(x) Serial.println(x)
@@ -17,15 +15,33 @@
     #define DEBUG_SERIAL(x)
 #endif
 
-void publishMessage(String topic, String& msg) {
+DataQueue dataQ;
+
+void newPayload(){
+    dataQ.resetData();
+}
+
+void addMessage(String id, int value){
+    dataQ.add(id, value);
+}
+
+void addMessage(String id, String value){
+    dataQ.add(id, value);
+}
+
+void addMessage(String id, float value){
+    dataQ.add(id, value);
+}
+
+void publishMessage(String topic) {
     if(PUBLISH_ENABLED){
-        // Publish to Particle Cloud
-        Particle.publish(topic, msg, PRIVATE, WITH_ACK);
         DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        // Publish to Particle Cloud
+        DEBUG_SERIAL(dataQ.publish(topic, PRIVATE, WITH_ACK));
     }else{
         DEBUG_SERIAL("Publish - DISABLED - Message: ");
+        DEBUG_SERIAL(dataQ.resetData());
     }
-    DEBUG_SERIAL("New JSON Message: " + msg);
 }
 
 #endif

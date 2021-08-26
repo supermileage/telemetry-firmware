@@ -69,6 +69,10 @@ float SensorGps::getSpeedKph() {
     return speedKnots * 1.852;
 }
 
+uint32_t SensorGps::getTime() {
+    return _gps->getUnixEpoch();
+}
+
 /**
  * Replaces the Sparkfun GNSS library method for handling incoming bytes over i2c
  * 

@@ -16,10 +16,17 @@ void DataQueue::add(String id, float value) {
 	jsonMaker->add(id, value);
 }
 
-void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
+String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	String payload = jsonMaker->get();
 	publishQueue->publish(event, payload, flag1, flag2);
 	jsonMaker->refresh();
+    return payload;
+}
+
+String DataQueue::resetData() {
+    String payload = jsonMaker->get();
+    jsonMaker->refresh();
+    return payload;
 }
 
 void DataQueue::init() {

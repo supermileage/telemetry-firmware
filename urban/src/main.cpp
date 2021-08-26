@@ -1,7 +1,7 @@
 #include "Telemetry.h"
 #include "SensorCan.h"
 
-JsonMaker jsonMaker;
+
 
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
@@ -20,18 +20,15 @@ void generateMessage() {
         start = micros();
     }
 
-    // Create JSON object for publish
-    jsonMaker.refresh();
     // GPS data
-    jsonMaker.add("URBAN-Location", gps.getSentence());
-    jsonMaker.add("URBAN-Temperature", String(thermoA.getTemp()) + "C");
+    dataQ.add("URBAN-Location", gps.getSentence());
+    dataQ.add("URBAN-Temperature", String(thermoA.getTemp()) + "C");
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
     }
 
-    String jsonString = jsonMaker.get();
-    publishMessage("Urban", jsonString);
+    publishMessage("Urban");
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
