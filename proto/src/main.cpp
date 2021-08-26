@@ -19,7 +19,7 @@ void generateMessage() {
     }
 
     newPayload();
-    
+
     // ECU data
     addMessage("PROTO-ECT", ecu.getECT());
     addMessage("PROTO-IAT", ecu.getIAT());
@@ -40,9 +40,8 @@ void generateMessage() {
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("Not in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermoA.getTemp()) + "C");
-    DEBUG_SERIAL("Current Time: " + Time.timeStr());
+    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
-    DEBUG_SERIAL("GPS Time: " + String(gps.getTime()));
     DEBUG_SERIAL();
     
     // If log timing is enabled, output time for delay at every publish 
