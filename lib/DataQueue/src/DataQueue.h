@@ -1,7 +1,7 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#define DATA_Q_BUFFER_SIZE 5000
+#define DATA_Q_BUFFER_SIZE 10000
 
 #include "PublishQueueAsyncRK.h"
 #include "JsonMaker.h"

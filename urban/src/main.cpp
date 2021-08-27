@@ -19,10 +19,12 @@ void generateMessage() {
     if (LOG_TIMING) {
         start = micros();
     }
+    
+    newPayload();
 
     // GPS data
-    dataQ.add("URBAN-Location", gps.getSentence());
-    dataQ.add("URBAN-Temperature", String(thermoA.getTemp()) + "C");
+    addMessage("URBAN-Location", gps.getSentence());
+    addMessage("URBAN-Temperature", String(thermoA.getTemp()) + "C");
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
@@ -32,8 +34,9 @@ void generateMessage() {
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-
-    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");
+    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
+    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
 
     for(int i = 0; i < can.getNumIds(); i++){
         String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
@@ -55,6 +58,8 @@ void generateMessage() {
         }
         DEBUG_SERIAL();
     }
+
+
 }
 
 /**
@@ -64,6 +69,8 @@ void generateMessage() {
  * */
 void setup() {
     Serial.begin(115200);
+
+    Time.zone(TIME_ZONE);
 
     for (Sensor *s : sensors) {
         s->begin();
@@ -83,6 +90,13 @@ void loop() {
             s->benchmarkedHandle();
         } else {
             s->handle();
+        }
+    }
+
+    // If there is valid time pulled from cellular, get time from GPS (if valid)
+    if(Time.now() < 1609459201){
+        if(gps.getTime() > 1609459201){
+            Time.setTime(gps.getTime());
         }
     }
 

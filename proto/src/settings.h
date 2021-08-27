@@ -10,9 +10,16 @@ SYSTEM_THREAD(ENABLED);
 #define OUTPUT_SERIAL_MSG           1
 // Log and output delay for each sensor poll and new message
 #define LOG_TIMING                  0
+// Output free memory to console
+#define OUTPUT_FREE_MEM             1
 
 #define PUBLISH_INTERVAL_MS         10000
 #define GPS_UPDATE_INTERVAL_MS      1000
 #define THERMO_UPDATE_INTERVAL_MS   500
+
+// Time zone in UTC offset (must manually adjust for DST)
+#define TIME_ZONE                   -7
+
+
 
 #endif

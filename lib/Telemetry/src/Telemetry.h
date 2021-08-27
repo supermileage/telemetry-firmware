@@ -34,6 +34,7 @@ void addMessage(String id, float value){
 }
 
 void publishMessage(String topic) {
+    DEBUG_SERIAL("------------------------");
     if(PUBLISH_ENABLED){
         DEBUG_SERIAL("Publish - ENABLED - Message: ");
         // Publish to Particle Cloud
@@ -41,6 +42,10 @@ void publishMessage(String topic) {
     }else{
         DEBUG_SERIAL("Publish - DISABLED - Message: ");
         DEBUG_SERIAL(dataQ.resetData());
+    }
+
+    if(OUTPUT_FREE_MEM){
+        DEBUG_SERIAL("\nFree RAM: " + String(System.freeMemory()) + "B / 80000B");
     }
 }
 

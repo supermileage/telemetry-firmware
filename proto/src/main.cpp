@@ -38,7 +38,7 @@ void generateMessage() {
     publishMessage("Proto");
 
     // Any sensors that are working but not yet packaged for publish
-    DEBUG_SERIAL("Not in Message: ");
+    DEBUG_SERIAL("\nNot in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermoA.getTemp()) + "C");
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
@@ -61,6 +61,8 @@ void generateMessage() {
  * */
 void setup() {
     Serial.begin(115200);
+
+    Time.zone(TIME_ZONE);
 
     for (Sensor *s : sensors) {
         s->begin();
