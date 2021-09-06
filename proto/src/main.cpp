@@ -18,18 +18,18 @@ void generateMessage() {
         start = micros();
     }
 
-    newPayload();
+    dataQ.resetData();
 
     // ECU data
-    addMessage("PROTO-ECT", ecu.getECT());
-    addMessage("PROTO-IAT", ecu.getIAT());
-    addMessage("PROTO-RPM", ecu.getRPM());
-    addMessage("PROTO-UBADC", ecu.getUbAdc());
-    addMessage("PROTO-O2S", ecu.getO2S());
-    addMessage("PROTO-SPARK", ecu.getSpark());
+    dataQ.add("PROTO-ECT", ecu.getECT());
+    dataQ.add("PROTO-IAT", ecu.getIAT());
+    dataQ.add("PROTO-RPM", ecu.getRPM());
+    dataQ.add("PROTO-UBADC", ecu.getUbAdc());
+    dataQ.add("PROTO-O2S", ecu.getO2S());
+    dataQ.add("PROTO-SPARK", ecu.getSpark());
     // GPS data
-    addMessage("PROTO-Location", gps.getSentence());
-    addMessage("PROTO-Speed", gps.getSpeedKph());
+    dataQ.add("PROTO-Location", gps.getSentence());
+    dataQ.add("PROTO-Speed", gps.getSpeedKph());
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
@@ -86,8 +86,8 @@ void loop() {
     }
 
     // If there is valid time pulled from cellular, get time from GPS (if valid)
-    if(Time.now() < 1609459201){
-        if(gps.getTime() > 1609459201){
+    if(!Time.isValid()){
+        if(gps.getTimeValid()){
             Time.setTime(gps.getTime());
         }
     }

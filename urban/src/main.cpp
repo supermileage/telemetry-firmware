@@ -94,11 +94,12 @@ void loop() {
     }
 
     // If there is valid time pulled from cellular, get time from GPS (if valid)
-    if(Time.now() < 1609459201){
-        if(gps.getTime() > 1609459201){
+    if(!Time.isValid()){
+        if(gps.getTimeValid()){
             Time.setTime(gps.getTime());
         }
     }
+
 
     // Publish a message every publish interval
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){

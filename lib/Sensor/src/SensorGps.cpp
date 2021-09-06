@@ -73,6 +73,10 @@ uint32_t SensorGps::getTime() {
     return _gps->getUnixEpoch();
 }
 
+bool SensorGps::getTimeValid() {
+    return _gps->getTimeValid();
+}
+
 /**
  * Replaces the Sparkfun GNSS library method for handling incoming bytes over i2c
  * 
