@@ -7,6 +7,8 @@ SensorEcu ecu(&Serial1);
 
 Sensor *sensors[3] = {&ecu, &gps, &thermoA};
 
+DataQueue dataQ;
+
 uint32_t lastPublish = 0;
 
 /**
@@ -35,7 +37,20 @@ void generateMessage() {
         json_build_time = micros() - start;
     }
 
-    publishMessage("Proto");
+    DEBUG_SERIAL("------------------------");
+    if(PUBLISH_ENABLED){
+        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        // Publish to Particle Cloud
+        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
+    }else{
+        DEBUG_SERIAL("Publish - DISABLED - Message: ");
+        DEBUG_SERIAL(dataQ.resetData());
+    }
+
+    if(OUTPUT_FREE_MEM){
+        DEBUG_SERIAL("\nFree RAM: " + String(System.freeMemory()) + "B / 80000B");
+    }
+
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
@@ -68,7 +83,7 @@ void setup() {
         s->begin();
     }
 
-    DEBUG_SERIAL("TELEMETRY ONLINE");
+    DEBUG_SERIAL("TELEMETRY ONLINE - PROTO");
 }
 
 /**

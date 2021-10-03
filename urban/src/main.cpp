@@ -1,13 +1,13 @@
 #include "Telemetry.h"
 #include "SensorCan.h"
 
-
-
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorCan can(&SPI1, D5, D6);
 
 Sensor *sensors[3] = {&gps, &thermoA, &can};
+
+DataQueue dataQ;
 
 uint32_t lastPublish = 0;
 
@@ -20,17 +20,29 @@ void generateMessage() {
         start = micros();
     }
     
-    newPayload();
+    dataQ.resetData();
 
     // GPS data
-    addMessage("URBAN-Location", gps.getSentence());
-    addMessage("URBAN-Temperature", String(thermoA.getTemp()) + "C");
+    dataQ.add("URBAN-Location", gps.getSentence());
+    dataQ.add("URBAN-Temperature", String(thermoA.getTemp()) + "C");
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
     }
 
-    publishMessage("Urban");
+    DEBUG_SERIAL("------------------------");
+    if(PUBLISH_ENABLED){
+        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        // Publish to Particle Cloud
+        DEBUG_SERIAL(dataQ.publish("Urban", PRIVATE, WITH_ACK));
+    }else{
+        DEBUG_SERIAL("Publish - DISABLED - Message: ");
+        DEBUG_SERIAL(dataQ.resetData());
+    }
+
+    if(OUTPUT_FREE_MEM){
+        DEBUG_SERIAL("\nFree RAM: " + String(System.freeMemory()) + "B / 80000B");
+    }
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
@@ -76,7 +88,7 @@ void setup() {
         s->begin();
     }
 
-    DEBUG_SERIAL("TELEMETRY ONLINE");
+    DEBUG_SERIAL("TELEMETRY ONLINE - URBAN");
 }
 
 /**
@@ -99,8 +111,7 @@ void loop() {
             Time.setTime(gps.getTime());
         }
     }
-
-
+    
     // Publish a message every publish interval
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
         lastPublish = millis();
