@@ -15,6 +15,8 @@ class SensorGps : public Sensor {
         
         String getSentence();
         float getSpeedKph();
+        uint32_t getTime();
+        bool getTimeValid();
 
     private:
         SFE_UBLOX_GNSS* _gps;

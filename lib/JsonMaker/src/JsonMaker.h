@@ -4,7 +4,7 @@
 #include "Particle.h"
 #include "Arduino.h"
 
-#define BUFFER_SIZE 1024
+#define JSON_MAKER_BUFFER_SIZE 1024
 
 class JsonMaker {
     public:
@@ -21,7 +21,7 @@ class JsonMaker {
 
     private:
         JSONBufferWriter* writer;
-        char buf[BUFFER_SIZE];
+        char buf[JSON_MAKER_BUFFER_SIZE];
 
         void init();
     

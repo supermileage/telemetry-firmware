@@ -1,13 +1,13 @@
 #include "Telemetry.h"
 #include "SensorEcu.h"
 
-JsonMaker jsonMaker;
-
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorEcu ecu(&Serial1);
 
 Sensor *sensors[3] = {&ecu, &gps, &thermoA};
+
+DataQueue dataQ;
 
 uint32_t lastPublish = 0;
 
@@ -20,29 +20,43 @@ void generateMessage() {
         start = micros();
     }
 
-    // Create JSON object for publish
-    jsonMaker.refresh();
+    dataQ.resetData();
+
     // ECU data
-    jsonMaker.add("PROTO-ECT", ecu.getECT());
-    jsonMaker.add("PROTO-IAT", ecu.getIAT());
-    jsonMaker.add("PROTO-RPM", ecu.getRPM());
-    jsonMaker.add("PROTO-UBADC", ecu.getUbAdc());
-    jsonMaker.add("PROTO-O2S", ecu.getO2S());
-    jsonMaker.add("PROTO-SPARK", ecu.getSpark());
+    dataQ.add("PROTO-ECT", ecu.getECT());
+    dataQ.add("PROTO-IAT", ecu.getIAT());
+    dataQ.add("PROTO-RPM", ecu.getRPM());
+    dataQ.add("PROTO-UBADC", ecu.getUbAdc());
+    dataQ.add("PROTO-O2S", ecu.getO2S());
+    dataQ.add("PROTO-SPARK", ecu.getSpark());
     // GPS data
-    jsonMaker.add("PROTO-Location", gps.getSentence());
-    jsonMaker.add("PROTO-Speed", gps.getSpeedKph());
+    dataQ.add("PROTO-Location", gps.getSentence());
+    dataQ.add("PROTO-Speed", gps.getSpeedKph());
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
     }
 
-    String jsonString = jsonMaker.get();
-    publishMessage("Proto", jsonString);
+    DEBUG_SERIAL("------------------------");
+    if(PUBLISH_ENABLED){
+        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        // Publish to Particle Cloud
+        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
+    }else{
+        DEBUG_SERIAL("Publish - DISABLED - Message: ");
+        DEBUG_SERIAL(dataQ.resetData());
+    }
+
+    if(OUTPUT_FREE_MEM){
+        DEBUG_SERIAL("\nFree RAM: " + String(System.freeMemory()) + "B / 80000B");
+    }
+
 
     // Any sensors that are working but not yet packaged for publish
-    DEBUG_SERIAL("Not in Message: ");
+    DEBUG_SERIAL("\nNot in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermoA.getTemp()) + "C");
+    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
     DEBUG_SERIAL();
     
     // If log timing is enabled, output time for delay at every publish 
@@ -63,11 +77,13 @@ void generateMessage() {
 void setup() {
     Serial.begin(115200);
 
+    Time.zone(TIME_ZONE);
+
     for (Sensor *s : sensors) {
         s->begin();
     }
 
-    DEBUG_SERIAL("TELEMETRY ONLINE");
+    DEBUG_SERIAL("TELEMETRY ONLINE - PROTO");
 }
 
 /**
@@ -81,6 +97,13 @@ void loop() {
             s->benchmarkedHandle();
         } else {
             s->handle();
+        }
+    }
+
+    // If there is valid time pulled from cellular, get time from GPS (if valid)
+    if(!Time.isValid()){
+        if(gps.getTimeValid()){
+            Time.setTime(gps.getTime());
         }
     }
 

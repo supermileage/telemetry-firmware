@@ -1,13 +1,13 @@
 #include "Telemetry.h"
 #include "SensorCan.h"
 
-JsonMaker jsonMaker;
-
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorCan can(&SPI1, D5, D6);
 
 Sensor *sensors[3] = {&gps, &thermoA, &can};
+
+DataQueue dataQ;
 
 uint32_t lastPublish = 0;
 
@@ -19,24 +19,36 @@ void generateMessage() {
     if (LOG_TIMING) {
         start = micros();
     }
+    
+    dataQ.resetData();
 
-    // Create JSON object for publish
-    jsonMaker.refresh();
     // GPS data
-    jsonMaker.add("URBAN-Location", gps.getSentence());
-    jsonMaker.add("URBAN-Temperature", String(thermoA.getTemp()) + "C");
+    dataQ.add("URBAN-Location", gps.getSentence());
+    dataQ.add("URBAN-Temperature", String(thermoA.getTemp()) + "C");
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
     }
 
-    String jsonString = jsonMaker.get();
-    publishMessage("Urban", jsonString);
+    DEBUG_SERIAL("------------------------");
+    if(PUBLISH_ENABLED){
+        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        // Publish to Particle Cloud
+        DEBUG_SERIAL(dataQ.publish("Urban", PRIVATE, WITH_ACK));
+    }else{
+        DEBUG_SERIAL("Publish - DISABLED - Message: ");
+        DEBUG_SERIAL(dataQ.resetData());
+    }
+
+    if(OUTPUT_FREE_MEM){
+        DEBUG_SERIAL("\nFree RAM: " + String(System.freeMemory()) + "B / 80000B");
+    }
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-
-    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");
+    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
+    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
 
     for(int i = 0; i < can.getNumIds(); i++){
         String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
@@ -58,6 +70,8 @@ void generateMessage() {
         }
         DEBUG_SERIAL();
     }
+
+
 }
 
 /**
@@ -68,11 +82,13 @@ void generateMessage() {
 void setup() {
     Serial.begin(115200);
 
+    Time.zone(TIME_ZONE);
+
     for (Sensor *s : sensors) {
         s->begin();
     }
 
-    DEBUG_SERIAL("TELEMETRY ONLINE");
+    DEBUG_SERIAL("TELEMETRY ONLINE - URBAN");
 }
 
 /**
@@ -89,6 +105,13 @@ void loop() {
         }
     }
 
+    // If there is valid time pulled from cellular, get time from GPS (if valid)
+    if(!Time.isValid()){
+        if(gps.getTimeValid()){
+            Time.setTime(gps.getTime());
+        }
+    }
+    
     // Publish a message every publish interval
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
         lastPublish = millis();
