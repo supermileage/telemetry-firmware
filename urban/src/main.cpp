@@ -90,6 +90,13 @@ void setup() {
         s->begin();
     }
 
+    pinMode(A0, OUTPUT);
+    pinMode(D7, OUTPUT);
+    pinMode(D8, OUTPUT);
+    digitalWrite(A0, HIGH);
+    digitalWrite(D7, HIGH);
+    digitalWrite(D8, HIGH);
+
     DEBUG_SERIAL("TELEMETRY ONLINE - URBAN");
 }
 

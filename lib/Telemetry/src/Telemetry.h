@@ -5,6 +5,7 @@
 #include "settings.h"
 
 #include "DataQueue.h"
+#include "Led.h"
 #include "Sensor.h"
 #include "SensorGps.h"
 #include "SensorThermo.h"
