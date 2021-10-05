@@ -2,10 +2,11 @@
 #include "SensorEcu.h"
 
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
-SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
+SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
+SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 SensorEcu ecu(&Serial1);
 
-Sensor *sensors[3] = {&ecu, &gps, &thermoA};
+Sensor *sensors[4] = {&ecu, &gps, &thermo1, &thermo2};
 
 DataQueue dataQ;
 
@@ -54,7 +55,8 @@ void generateMessage() {
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermoA.getTemp()) + "C");
+    DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
+    DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
     DEBUG_SERIAL();

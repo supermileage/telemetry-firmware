@@ -2,10 +2,11 @@
 #include "SensorCan.h"
 
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
-SensorThermo thermoA(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
+SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
+SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 SensorCan can(&SPI1, D5, D6);
 
-Sensor *sensors[3] = {&gps, &thermoA, &can};
+Sensor *sensors[4] = {&gps, &can, &thermo1, &thermo2};
 
 DataQueue dataQ;
 
@@ -24,7 +25,7 @@ void generateMessage() {
 
     // GPS data
     dataQ.add("URBAN-Location", gps.getSentence());
-    dataQ.add("URBAN-Temperature", String(thermoA.getTemp()) + "C");
+    dataQ.add("URBAN-Temperature", String(thermo1.getTemp()) + "C");
 
     if (LOG_TIMING) {
         json_build_time = micros() - start;
@@ -46,6 +47,7 @@ void generateMessage() {
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
+    DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
     DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(Cellular.RSSI().getStrength()) + "%");
