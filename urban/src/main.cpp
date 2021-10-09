@@ -8,6 +8,10 @@ SensorCan can(&SPI1, D5, D6);
 
 Sensor *sensors[4] = {&gps, &can, &thermo1, &thermo2};
 
+Led led_orange(A0, 63);
+Led led_blue(D7, 255);
+Led led_green(D8, 40);
+
 DataQueue dataQ;
 
 uint32_t lastPublish = 0;
@@ -90,12 +94,10 @@ void setup() {
         s->begin();
     }
 
-    pinMode(A0, OUTPUT);
-    pinMode(D7, OUTPUT);
-    pinMode(D8, OUTPUT);
-    digitalWrite(A0, HIGH);
-    digitalWrite(D7, HIGH);
-    digitalWrite(D8, HIGH);
+    led_orange.pulse(100);
+    led_blue.pulse(1000);
+    led_green.pulse(5000);
+
 
     DEBUG_SERIAL("TELEMETRY ONLINE - URBAN");
 }
@@ -126,6 +128,10 @@ void loop() {
         lastPublish = millis();
         generateMessage();
     }
+
+    led_orange.handle();
+    led_blue.handle();
+    led_green.handle();
 }
 
 
