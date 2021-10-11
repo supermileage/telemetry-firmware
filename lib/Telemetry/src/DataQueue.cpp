@@ -29,7 +29,31 @@ String DataQueue::resetData() {
     return payload;
 }
 
+void DataQueue::_writerRefresh() {
+	if(this->_writer != NULL) delete this->_writer;
+    _writerrInit();
+}
+
+String DataQueue::_writerGet() {
+	_writer->endArray();
+    _writer->endObject();
+    return String(_buf);
+}
+
+void DataQueue::_writerInit() {
+    memset(_buf, 0, sizeof(_buf));
+	this->_writer = new JSONBufferWriter(_buf, sizeof(_buf) - 1);
+
+	_writer->beginObject();
+	_writer->name("time").value((int)Time.now());
+	_writer->name("d").beginArray();
+}
+
 void DataQueue::_init() {
+	// Initalize JSON writer
+	_writerInit();
+
+	// Initialize Queue
 	_publishQueue = new PublishQueueAsyncRetained(_publishQueueRetainedBuffer, uint16_t(sizeof(_publishQueueRetainedBuffer)));
 	_jsonMaker = new JsonMaker();
 	_publishQueue->setup();

@@ -1,6 +1,7 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
+#define JSON_WRITER_BUFFER_SIZE 1024
 #define DATA_Q_BUFFER_SIZE 10000
 
 #include "PublishQueueAsyncRK.h"
@@ -16,7 +17,7 @@ class DataQueue {
     public:
 
         /**
-         * Contructor
+         * Constructor
          * */
         DataQueue();
 
@@ -76,9 +77,22 @@ class DataQueue {
         String resetData();
 
     private:
+        JSONBufferWriter* _writer;
+        char _buf[JSON_WRITER_BUFFER_SIZE];
+
         PublishQueueAsyncRetained* _publishQueue;
-        JsonMaker* _jsonMaker;
         uint8_t _publishQueueRetainedBuffer[DATA_Q_BUFFER_SIZE];
+
+        JsonMaker* _jsonMaker; // item to deprecate
+
+        void _writerRefresh();
+
+        /**
+         * Initializes JSON Writer for DataQueue
+        **/
+        void _writerInit();
+
+        String _writerGet();
 
         /**
          * Initializes the PublishQueueAsyncRetained and JsonMaker objects by
