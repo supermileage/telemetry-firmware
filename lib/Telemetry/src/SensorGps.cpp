@@ -3,18 +3,16 @@
 char sentenceBuffer[128];
 String completeSentence = "";
 
-/**
- * Constructor 
- * @param updateInterval for GPS position/speed in ms
- **/
+
 SensorGps::SensorGps(uint16_t updateInterval) {
     _updateInterval = updateInterval;
     _gps = new SFE_UBLOX_GNSS();
 }
 
-/**
- * Begin the GPS sensor by setting up over i2c
- **/
+String SensorGps::getHumanName() {
+    return "GPS";
+}
+
 void SensorGps::begin() {
     Wire.begin();
     _gps->begin();
@@ -41,28 +39,27 @@ void SensorGps::begin() {
 
 }
 
-/**
- * Polls GPS for any new data
- **/
 void SensorGps::handle() {
     _gps->checkUblox();
 }
 
-/**
- * @return GPRMC/GNRMC sentence containing position and other data
- **/
 String SensorGps::getSentence() {
     return completeSentence;
 }
 
-/**
- * @return Speed in Kilometers per Hour
- **/
 float SensorGps::getSpeedKph() {
     String speedString = completeSentence.substring(completeSentence.indexOf(",W,") + 3);
     speedString = speedString.substring(0,speedString.indexOf(','));
     float speedKnots = speedString.toFloat();
     return speedKnots * 1.852;
+}
+
+uint32_t SensorGps::getTime() {
+    return _gps->getUnixEpoch();
+}
+
+bool SensorGps::getTimeValid() {
+    return _gps->getTimeValid();
 }
 
 /**
