@@ -1,36 +1,36 @@
 #include "DataQueue.h"
 
 DataQueue::DataQueue() {
-	init();
+	_init();
 }
 
 void DataQueue::add(String id, int value) {
-	jsonMaker->add(id, value);
+	_jsonMaker->add(id, value);
 }
 
 void DataQueue::add(String id, String value) {
-	jsonMaker->add(id, value);
+	_jsonMaker->add(id, value);
 }
 
 void DataQueue::add(String id, float value) {
-	jsonMaker->add(id, value);
+	_jsonMaker->add(id, value);
 }
 
 String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
-	String payload = jsonMaker->get();
-	publishQueue->publish(event, payload, flag1, flag2);
-	jsonMaker->refresh();
+	String payload = _jsonMaker->get();
+	_publishQueue->publish(event, payload, flag1, flag2);
+	_jsonMaker->refresh();
     return payload;
 }
 
 String DataQueue::resetData() {
-    String payload = jsonMaker->get();
-    jsonMaker->refresh();
+    String payload = _jsonMaker->get();
+    _jsonMaker->refresh();
     return payload;
 }
 
-void DataQueue::init() {
-	publishQueue = new PublishQueueAsyncRetained(publishQueueRetainedBuffer, uint16_t(sizeof(publishQueueRetainedBuffer)));
-	jsonMaker = new JsonMaker();
-	publishQueue->setup();
+void DataQueue::_init() {
+	_publishQueue = new PublishQueueAsyncRetained(_publishQueueRetainedBuffer, uint16_t(sizeof(_publishQueueRetainedBuffer)));
+	_jsonMaker = new JsonMaker();
+	_publishQueue->setup();
 }

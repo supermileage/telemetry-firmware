@@ -6,7 +6,6 @@
 #include "Sensor.h"
 #include "SensorGps.h"
 #include "SensorThermo.h"
-#include "SensorEcu.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -14,9 +13,8 @@ SYSTEM_THREAD(ENABLED);
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
-SensorEcu ecu(&Serial1);
 
-Sensor *sensors[4] = {&ecu, &gps, &thermo1, &thermo2};
+Sensor *sensors[3] = {&gps, &thermo1, &thermo2};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
@@ -36,17 +34,6 @@ void publishMessage() {
         start = micros();
     }
 
-    // ECU data
-    dataQ.add("PROTO-ECT", ecu.getECT());
-    dataQ.add("PROTO-IAT", ecu.getIAT());
-    dataQ.add("PROTO-RPM", ecu.getRPM());
-    dataQ.add("PROTO-UBADC", ecu.getUbAdc());
-    dataQ.add("PROTO-O2S", ecu.getO2S());
-    dataQ.add("PROTO-SPARK", ecu.getSpark());
-    // GPS data
-    dataQ.add("PROTO-Location", gps.getSentence());
-    dataQ.add("PROTO-Speed", gps.getSpeedKph());
-
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
     }
@@ -55,7 +42,7 @@ void publishMessage() {
     if(PUBLISH_ENABLED){
         DEBUG_SERIAL("Publish - ENABLED - Message: ");
         // Publish to Particle Cloud
-        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
+        DEBUG_SERIAL(dataQ.publish("FC", PRIVATE, WITH_ACK));
     }else{
         DEBUG_SERIAL("Publish - DISABLED - Message: ");
         DEBUG_SERIAL(dataQ.resetData());
@@ -65,6 +52,8 @@ void publishMessage() {
     DEBUG_SERIAL("\nNot in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
+    DEBUG_SERIAL("GPS Sentence: " + gps.getSentence());
+    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL();
     
@@ -101,7 +90,7 @@ void setup() {
 
     led_blue.flashRepeat(500);
 
-    DEBUG_SERIAL("TELEMETRY ONLINE - PROTO");
+    DEBUG_SERIAL("TELEMETRY ONLINE - FUEL CELL");
 }
 
 /**

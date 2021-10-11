@@ -76,16 +76,16 @@ class DataQueue {
         String resetData();
 
     private:
-        PublishQueueAsyncRetained* publishQueue;
-        JsonMaker* jsonMaker;
-        uint8_t publishQueueRetainedBuffer[DATA_Q_BUFFER_SIZE];
+        PublishQueueAsyncRetained* _publishQueue;
+        JsonMaker* _jsonMaker;
+        uint8_t _publishQueueRetainedBuffer[DATA_Q_BUFFER_SIZE];
 
         /**
          * Initializes the PublishQueueAsyncRetained and JsonMaker objects by
          * allocating memory on the heap. This method invokes the setup method
          * for the queue object.
          * */
-        void init();
+        void _init();
 };
 
 #endif
