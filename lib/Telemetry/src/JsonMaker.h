@@ -4,6 +4,8 @@
 #include "Particle.h"
 #include "Arduino.h"
 
+#define JSON_MAKER_BUFFER_SIZE 2024
+
 class JsonMaker {
     public:
 
@@ -18,7 +20,8 @@ class JsonMaker {
          * @param id The id for the value.
          * @param value An integer value to be stored.
          **/
-        void add(String id, int value);
+        template <class T>
+        void add(String id, T value);
 
         /**
          * Adds a new object to the buffer with a string value.

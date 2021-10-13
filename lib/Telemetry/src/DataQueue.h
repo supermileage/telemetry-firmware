@@ -5,7 +5,6 @@
 #define DATA_Q_BUFFER_SIZE 10000
 
 #include "PublishQueueAsyncRK.h"
-#include "JsonMaker.h"
 
 /**
  * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
@@ -70,9 +69,9 @@ class DataQueue {
         String publish(String event, PublishFlags flag1, PublishFlags flag2);
 
         /**
-         * Resets data in jsonMaker and returns what was in there
+         * Returns data in writer buffer and reinstantiates JSONBufferWriter
          * 
-         * @return Data in jsonMaker before reset
+         * @return Data in writer buffer before reset
          * */
         String resetData();
 
@@ -83,8 +82,10 @@ class DataQueue {
         PublishQueueAsyncRetained* _publishQueue;
         uint8_t _publishQueueRetainedBuffer[DATA_Q_BUFFER_SIZE];
 
-        JsonMaker* _jsonMaker; // item to deprecate
-
+        /**
+         * Removes the data stored in the JSON object and reinitializes
+         * writer's buffer.
+         * */
         void _writerRefresh();
 
         /**
@@ -92,6 +93,10 @@ class DataQueue {
         **/
         void _writerInit();
 
+        /**
+         * @return A JSON string representing the data stored in the
+         *         JSON object.
+         * */
         String _writerGet();
 
         /**

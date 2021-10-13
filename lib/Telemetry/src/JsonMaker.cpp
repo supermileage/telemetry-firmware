@@ -14,7 +14,8 @@ void JsonMaker::_init() {
     _writer->name("d").beginArray();
 }
 
-void JsonMaker::add(String id, int value) {
+template <class T>
+void JsonMaker::add(String id, T value) {
     _writer->beginObject();
     _writer->name("t").value(id);
     _writer->name("d").value(value);

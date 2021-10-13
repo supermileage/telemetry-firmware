@@ -5,38 +5,46 @@ DataQueue::DataQueue() {
 }
 
 void DataQueue::add(String id, int value) {
-	_jsonMaker->add(id, value);
+	_writer->beginObject()
+    	.name("t").value(id)
+    	.name("d").value(value)
+    .endObject();
 }
 
 void DataQueue::add(String id, String value) {
-	_jsonMaker->add(id, value);
+	_writer->beginObject()
+    	.name("t").value(id)
+    	.name("d").value(value)
+    .endObject();
 }
 
 void DataQueue::add(String id, float value) {
-	_jsonMaker->add(id, value);
+	_writer->beginObject()
+    	.name("t").value(id)
+    	.name("d").value(value)
+    .endObject();
 }
 
 String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
-	String payload = _jsonMaker->get();
+	String payload = _writerGet();
 	_publishQueue->publish(event, payload, flag1, flag2);
-	_jsonMaker->refresh();
+	_writerRefresh();
     return payload;
 }
 
 String DataQueue::resetData() {
-    String payload = _jsonMaker->get();
-    _jsonMaker->refresh();
+    String payload = _writerGet();
+    _writerRefresh();
     return payload;
 }
 
 void DataQueue::_writerRefresh() {
 	if(this->_writer != NULL) delete this->_writer;
-    _writerrInit();
+    _writerInit();
 }
 
 String DataQueue::_writerGet() {
-	_writer->endArray();
-    _writer->endObject();
+	_writer->endArray().endObject();
     return String(_buf);
 }
 
@@ -44,17 +52,14 @@ void DataQueue::_writerInit() {
     memset(_buf, 0, sizeof(_buf));
 	this->_writer = new JSONBufferWriter(_buf, sizeof(_buf) - 1);
 
-	_writer->beginObject();
-	_writer->name("time").value((int)Time.now());
-	_writer->name("d").beginArray();
+	_writer->beginObject()
+		.name("time").value((int)Time.now())
+		.name("d").beginArray();
 }
 
 void DataQueue::_init() {
-	// Initalize JSON writer
-	_writerInit();
-
 	// Initialize Queue
 	_publishQueue = new PublishQueueAsyncRetained(_publishQueueRetainedBuffer, uint16_t(sizeof(_publishQueueRetainedBuffer)));
-	_jsonMaker = new JsonMaker();
+	_writerInit();
 	_publishQueue->setup();
 }
