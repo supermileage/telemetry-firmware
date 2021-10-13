@@ -139,8 +139,6 @@ void loop() {
         lastPublish = millis();
         publishMessage();
     }
-
-    
 }
 
 

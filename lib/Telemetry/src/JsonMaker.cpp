@@ -6,7 +6,7 @@ JsonMaker::JsonMaker() {
 }
 
 void JsonMaker::_init() {
-    memset(_buf, 0, sizeof(_buf));
+    memset(_buf, 0, sizeof(_buf)); // _buf = 1024 character buffer (passed as pointer in this case)
     this->_writer = new JSONBufferWriter(_buf, sizeof(_buf) - 1);
 
     _writer->beginObject();
@@ -45,5 +45,3 @@ void JsonMaker::refresh() {
     if(this->_writer != NULL) delete this->_writer;
     _init();
 }
-
-
