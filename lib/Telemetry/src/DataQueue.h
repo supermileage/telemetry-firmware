@@ -100,7 +100,7 @@ class DataQueue {
         String _writerGet();
 
         /**
-         * Initializes the PublishQueueAsyncRetained and JsonMaker objects by
+         * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by
          * allocating memory on the heap. This method invokes the setup method
          * for the queue object.
          * */
