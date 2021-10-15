@@ -48,7 +48,7 @@ void publishMessage() {
     if(PUBLISH_ENABLED){
         DEBUG_SERIAL("Publish - ENABLED - Message: ");
         // Publish to Particle Cloud
-        DEBUG_SERIAL(dataQ.publish("Urban", PRIVATE, WITH_ACK));
+        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
     }else{
         DEBUG_SERIAL("Publish - DISABLED - Message: ");
         DEBUG_SERIAL(dataQ.resetData());
