@@ -20,7 +20,7 @@
 #if DEBUG_SERIAL_ENABLE
     #define DEBUG_SERIAL(x) Serial.println(x)
 #else
-    #define DEBUG_SERIAL(x)
+    #define DEBUG_SERIAL(x) x
 #endif
 
 #endif
