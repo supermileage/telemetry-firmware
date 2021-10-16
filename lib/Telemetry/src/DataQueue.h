@@ -1,10 +1,10 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
+#define JSON_WRITER_BUFFER_SIZE 1024
 #define DATA_Q_BUFFER_SIZE 10000
 
 #include "PublishQueueAsyncRK.h"
-#include "JsonMaker.h"
 
 /**
  * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
@@ -16,7 +16,7 @@ class DataQueue {
     public:
 
         /**
-         * Contructor
+         * Constructor
          * */
         DataQueue();
 
@@ -69,19 +69,38 @@ class DataQueue {
         String publish(String event, PublishFlags flag1, PublishFlags flag2);
 
         /**
-         * Resets data in jsonMaker and returns what was in there
+         * Returns data in writer buffer and reinstantiates JSONBufferWriter
          * 
-         * @return Data in jsonMaker before reset
+         * @return Data in writer buffer before reset
          * */
         String resetData();
 
     private:
+        JSONBufferWriter* _writer;
+        char _buf[JSON_WRITER_BUFFER_SIZE];
+
         PublishQueueAsyncRetained* _publishQueue;
-        JsonMaker* _jsonMaker;
         uint8_t _publishQueueRetainedBuffer[DATA_Q_BUFFER_SIZE];
 
         /**
-         * Initializes the PublishQueueAsyncRetained and JsonMaker objects by
+         * Removes the data stored in the JSON object and reinitializes
+         * writer's buffer.
+         * */
+        void _writerRefresh();
+
+        /**
+         * Initializes JSON Writer for DataQueue
+        **/
+        void _writerInit();
+
+        /**
+         * @return A JSON string representing the data stored in the
+         *         JSON object.
+         * */
+        String _writerGet();
+
+        /**
+         * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by
          * allocating memory on the heap. This method invokes the setup method
          * for the queue object.
          * */
