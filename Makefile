@@ -1,4 +1,4 @@
-IMAGE := ghcr.io/supermileage/particle-v1.5.2:latest
+IMAGE := ghcr.io/supermileage/particle-v3.0.0:latest
 OUTPUT_DIR := output
 
 .PHONY: urban proto pull-image clean
