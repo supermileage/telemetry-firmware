@@ -90,7 +90,7 @@ void setup() {
 
     led_blue.flashRepeat(500);
 
-    DEBUG_SERIAL("TELEMETRY ONLINE - FUEL CELL");
+    DEBUG_SERIAL("TELEMETRY ONLINE - FC");
 }
 
 /**
