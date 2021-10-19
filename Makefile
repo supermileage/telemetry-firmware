@@ -17,6 +17,13 @@ proto: clean pull-image
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 
+fc: clean pull-image
+	$(call print, COMPILING FC FIRMWARE)
+	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
+		make all PLATFORM=boron APPDIR=/app/fc TARGET_DIR=/$(OUTPUT_DIR) 
+	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
+	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
+
 pull-image:
 	docker pull $(IMAGE)
 
