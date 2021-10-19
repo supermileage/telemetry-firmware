@@ -1,4 +1,5 @@
 .vscode/
+!*/settings.json
 demo/
 *.code-workspace
 target/
