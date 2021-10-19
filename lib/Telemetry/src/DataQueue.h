@@ -1,10 +1,10 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#define JSON_WRITER_BUFFER_SIZE 1024
-#define DATA_Q_BUFFER_SIZE 10000
+#define JSON_WRITER_BUFFER_SIZE 1028
+#define RAM_QUEUE_EVENT_COUNT 8
 
-#include "PublishQueueAsyncRK.h"
+#include "PublishQueuePosixRK.h"
 
 /**
  * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
@@ -54,6 +54,11 @@ class DataQueue {
         void add(String id, float value);
 
         /**
+         * Wrapper for loop function of PublishQueuePosix
+         * */
+        void loop();
+
+        /**
          * Publishes the data stored in the queue to the particle device cloud.
          * The client does not need to check if the particle board is connected 
          * to the network. This method is non-blocking.
@@ -79,8 +84,7 @@ class DataQueue {
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];
 
-        PublishQueueAsyncRetained* _publishQueue;
-        uint8_t _publishQueueRetainedBuffer[DATA_Q_BUFFER_SIZE];
+        PublishQueuePosix* _publishQueuePosix;
 
         /**
          * Removes the data stored in the JSON object and reinitializes

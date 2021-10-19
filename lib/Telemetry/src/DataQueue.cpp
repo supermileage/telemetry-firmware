@@ -25,9 +25,14 @@ void DataQueue::add(String id, float value) {
     .endObject();
 }
 
+void DataQueue::loop() {
+	_publishQueuePosix->loop();
+}
+
 String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	String payload = _writerGet();
-	_publishQueue->publish(event, payload, flag1, flag2);
+	// _publishQueue->publish(event, payload, flag1, flag2);
+	_publishQueuePosix->publish(event, payload, flag1, flag2);
 	_writerRefresh();
     return payload;
 }
@@ -58,8 +63,11 @@ void DataQueue::_writerInit() {
 }
 
 void DataQueue::_init() {
+	// initialize PublishQueuePosix
+	_publishQueuePosix = &(PublishQueuePosix::instance());
+	_publishQueuePosix->setup();
+	_publishQueuePosix->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
+
 	// Initialize Queue
-	_publishQueue = new PublishQueueAsyncRetained(_publishQueueRetainedBuffer, uint16_t(sizeof(_publishQueueRetainedBuffer)));
 	_writerInit();
-	_publishQueue->setup();
 }
