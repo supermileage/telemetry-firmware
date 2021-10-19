@@ -16,7 +16,7 @@ SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 
 Sensor *sensors[3] = {&gps, &thermo1, &thermo2};
 
-Led led_orange(A0, 70);
+Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
