@@ -11,25 +11,19 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Diff Source
-        uses: marceloprado/has-changed-path@v1
+      - name: Diff Source and Libraries
+        uses: MarceloPrado/has-changed-path@v1.0
         id: changed
         with:
-          paths: urban
-      
-      - name: Diff Libraries
-        uses: marceloprado/has-changed-path@v1
-        id: lib-changed
-        with:
-          paths: lib
+          paths: urban lib
 
       - name: Build
-        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        if: steps.changed.outputs.changed == 'true'
         run: |
           make urban
 
       - name: Upload
-        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: urban-${{ github.sha }}
@@ -44,25 +38,19 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Diff Source
-        uses: marceloprado/has-changed-path@v1
+      - name: Diff Source and Libraries
+        uses: MarceloPrado/has-changed-path@v1.0
         id: changed
         with:
-          paths: proto
-      
-      - name: Diff Libraries
-        uses: marceloprado/has-changed-path@v1
-        id: lib-changed
-        with:
-          paths: lib
+          paths: proto lib
 
       - name: Build
-        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        if: steps.changed.outputs.changed == 'true'
         run: |
           make proto
 
       - name: Upload
-        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: proto-${{ github.sha }}
@@ -77,25 +65,19 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Diff Source
-        uses: marceloprado/has-changed-path@v1
+      - name: Diff Source and Libraries
+        uses: MarceloPrado/has-changed-path@v1.0
         id: changed
         with:
-          paths: fc
-      
-      - name: Diff Libraries
-        uses: marceloprado/has-changed-path@v1
-        id: lib-changed
-        with:
-          paths: lib
+          paths: fc lib
 
       - name: Build
-        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        if: steps.changed.outputs.changed == 'true'
         run: |
           make fc
 
       - name: Upload
-        if: steps.changed.outputs.changed == 'true' || steps.lib-changed.outputs.changed == 'true'
+        if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: fc-${{ github.sha }}
