@@ -69,7 +69,7 @@ void publishMessage() {
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
-        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 80000B");
+        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
     }
 
     // Output CPU time in microseconds spent on each task
