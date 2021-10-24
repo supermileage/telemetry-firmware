@@ -1,3 +1,4 @@
+#include "Particle.h"
 #include "settings.h"
 #include "DataQueue.h"
 #include "Led.h"
@@ -19,9 +20,8 @@ Led led_orange(A0, 63);
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-Led *leds[3] { &led_orange, &led_blue, &led_green };
-
 DataQueue dataQ;
+Led *leds[3] { &led_orange, &led_blue, &led_green };
 uint32_t lastPublish = 0;
 
 /**
