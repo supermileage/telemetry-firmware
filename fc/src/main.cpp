@@ -42,7 +42,7 @@ void publishMessage() {
     if(PUBLISH_ENABLED){
         DEBUG_SERIAL("Publish - ENABLED - Message: ");
         // Publish to Particle Cloud
-        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
+        DEBUG_SERIAL(dataQ.publish("FC", PRIVATE, WITH_ACK));
     }else{
         DEBUG_SERIAL("Publish - DISABLED - Message: ");
         DEBUG_SERIAL(dataQ.resetData());
@@ -58,7 +58,7 @@ void publishMessage() {
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
-        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
+        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 80000B");
     }
 
     // Output CPU time in microseconds spent on each task
@@ -90,7 +90,7 @@ void setup() {
 
     led_blue.flashRepeat(500);
 
-    DEBUG_SERIAL("TELEMETRY ONLINE - FC");
+    DEBUG_SERIAL("TELEMETRY ONLINE - FUEL CELL");
 }
 
 /**
