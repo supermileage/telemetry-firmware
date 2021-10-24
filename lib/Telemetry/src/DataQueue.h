@@ -3,6 +3,7 @@
 
 #define JSON_WRITER_BUFFER_SIZE 1028
 #define RAM_QUEUE_EVENT_COUNT 8
+#define FILE_QUEUE_EVENT_COUNT 64
 #define POSIX_DIRECTORY_PATH "/myqueue"
 
 #include "PublishQueuePosixRK.h"

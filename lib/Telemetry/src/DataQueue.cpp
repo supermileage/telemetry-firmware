@@ -1,5 +1,7 @@
 #include "DataQueue.h"
 
+#include "Particle.h"
+
 DataQueue::DataQueue() {
 	_init();
 }
@@ -31,9 +33,12 @@ void DataQueue::loop() {
 
 String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	String payload = _writerGet();
-	// _publishQueue->publish(event, payload, flag1, flag2);
-	_publishQueuePosix->publish(event, payload, flag1, flag2);
+	bool operationSuccess = PublishQueuePosix::instance().publish(event, payload, flag1, flag2);
+	size_t numEvents = PublishQueuePosix::instance().getNumEvents();
 	_writerRefresh();
+	Serial.println("Posix Directory Path: " + (String)PublishQueuePosix::instance().getDirPath());
+	Serial.println("Publish Operation Success: " + (String)(operationSuccess ? "true" : "false"));
+	Serial.println("Number of events Queued: " + String(numEvents));
     return payload;
 }
 
@@ -63,10 +68,13 @@ void DataQueue::_writerInit() {
 }
 
 void DataQueue::_init() {
+	char *filePath = new char [9];
+	strcpy(filePath, "/myqueue");
+
 	_publishQueuePosix = &(PublishQueuePosix::instance());
-	_publishQueuePosix->setup();
-	_publishQueuePosix->withRamQueueSize(RAM_QUEUE_EVENT_COUNT)
-		.withDirPath(POSIX_DIRECTORY_PATH);
+	PublishQueuePosix::instance().setup();
+	PublishQueuePosix::instance().withRamQueueSize(RAM_QUEUE_EVENT_COUNT).withFileQueueSize(FILE_QUEUE_EVENT_COUNT)
+		.withDirPath(filePath);
 
 	// Initialize Queue
 	_writerInit();
