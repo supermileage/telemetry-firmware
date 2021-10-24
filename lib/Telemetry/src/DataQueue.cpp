@@ -63,10 +63,10 @@ void DataQueue::_writerInit() {
 }
 
 void DataQueue::_init() {
-	// initialize PublishQueuePosix
 	_publishQueuePosix = &(PublishQueuePosix::instance());
 	_publishQueuePosix->setup();
-	_publishQueuePosix->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
+	_publishQueuePosix->withRamQueueSize(RAM_QUEUE_EVENT_COUNT)
+		.withDirPath(POSIX_DIRECTORY_PATH);
 
 	// Initialize Queue
 	_writerInit();

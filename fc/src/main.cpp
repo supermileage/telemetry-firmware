@@ -1,4 +1,3 @@
-#include "Particle.h"
 #include "settings.h"
 #include "DataQueue.h"
 #include "Led.h"
@@ -15,14 +14,14 @@ SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 
 Sensor *sensors[3] = {&gps, &thermo1, &thermo2};
-
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-DataQueue dataQ;
+Led *leds[3] { &led_orange, &led_blue, &led_green };
 
+DataQueue dataQ;
 uint32_t lastPublish = 0;
 
 /**
@@ -87,7 +86,7 @@ void setup() {
     for (Sensor *s : sensors) {
         s->begin();
     }
-
+    
     led_blue.flashRepeat(500);
 
     DEBUG_SERIAL("TELEMETRY ONLINE - FUEL CELL");
@@ -99,6 +98,8 @@ void setup() {
  * 
  * */
 void loop() {
+    dataQ.loop();
+
     // Sensor Handlers
     for (Sensor *s : sensors) {
         if (DEBUG_CPU_TIME) {

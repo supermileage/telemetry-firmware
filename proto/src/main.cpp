@@ -110,6 +110,8 @@ void setup() {
  * 
  * */
 void loop() {
+    dataQ.loop();
+
     // Sensor Handlers
     for (Sensor *s : sensors) {
         if (DEBUG_CPU_TIME) {
