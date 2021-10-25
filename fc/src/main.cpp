@@ -21,7 +21,7 @@ Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
 DataQueue dataQ;
-Led *leds[3] { &led_orange, &led_blue, &led_green };
+
 uint32_t lastPublish = 0;
 
 /**
