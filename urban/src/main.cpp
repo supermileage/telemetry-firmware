@@ -12,8 +12,8 @@ SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
-SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
-SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
+SensorThermo thermo1(&SPI, A5);
+SensorThermo thermo2(&SPI, A4);
 SensorCan can(&SPI1, D5, D6);
 
 Sensor *sensors[4] = {&gps, &can, &thermo1, &thermo2};
@@ -38,7 +38,7 @@ void publishMessage() {
 
     // Data packaged for publish
     dataQ.add("URBAN-Location", gps.getSentence());
-    dataQ.add("URBAN-Temperature", String(thermo1.getTemp()) + "C");
+    dataQ.add("URBAN-Temperature", String(thermo1.getInternalTemp()) + "C");
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
@@ -56,9 +56,10 @@ void publishMessage() {
 
     // Data NOT packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
-    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
-    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
+    DEBUG_SERIAL("Internal Temperature (Thermo2): " + String(thermo2.getInternalTemp()) + "C");
+    DEBUG_SERIAL("Speed: " + String(gps.getSpeedKph()) + "KM/h");    
+    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
 
     for(int i = 0; i < can.getNumIds(); i++){
         String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
@@ -80,7 +81,7 @@ void publishMessage() {
         DEBUG_SERIAL("\nCPU Time:");
         DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
         for (Sensor *s : sensors) {
-            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(s->getLongestHandleTime()) + "us");
+            DEBUG_SERIAL(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
         }
         DEBUG_SERIAL();
     }

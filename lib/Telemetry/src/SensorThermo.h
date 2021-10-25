@@ -15,7 +15,7 @@ class SensorThermo : public Sensor {
          * @param csPin chip select pin to use for this Thermocouple
          * @param updateInterval in ms to poll for new data
          **/
-        SensorThermo(SPIClass *spi, uint8_t csPin, uint16_t updateInterval);
+        SensorThermo(SPIClass *spi, uint8_t csPin);
 
         /**
          * Begin the Thermocouple sensor by setting up over SPI
@@ -30,17 +30,19 @@ class SensorThermo : public Sensor {
         String getHumanName();
 
         /**
-         * @return current temperature in Celsius
+         * @return current probe temperature in Celsius
          **/
-        double getTemp();
+        double getProbeTemp();
+
+        /**
+         * @return current internal temperature in Celsius
+         **/
+        double getInternalTemp();
 
     private:
         Adafruit_MAX31855* _probe;
         SPIClass *_spi;
-        uint16_t _updateInterval;
         uint8_t _csPin;
-        unsigned long int _lastUpdate;
-        double _temp;
 };
 
 #endif
