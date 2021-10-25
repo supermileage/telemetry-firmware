@@ -3,8 +3,6 @@
 
 #define JSON_WRITER_BUFFER_SIZE 1028
 #define RAM_QUEUE_EVENT_COUNT 8
-#define FILE_QUEUE_EVENT_COUNT 64
-#define POSIX_DIRECTORY_PATH "/myqueue"
 
 #include "PublishQueuePosixRK.h"
 
@@ -85,8 +83,7 @@ class DataQueue {
     private:
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];
-
-        PublishQueuePosix* _publishQueuePosix;
+        PublishQueuePosix* _publishQueue;
 
         /**
          * Removes the data stored in the JSON object and reinitializes

@@ -28,17 +28,19 @@ void DataQueue::add(String id, float value) {
 }
 
 void DataQueue::loop() {
-	_publishQueuePosix->loop();
+	_publishQueue->loop();
 }
 
 String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	String payload = _writerGet();
-	bool operationSuccess = PublishQueuePosix::instance().publish(event, payload, flag1, flag2);
-	size_t numEvents = PublishQueuePosix::instance().getNumEvents();
+	_publishQueue->publish(event, payload, flag1, flag2);
 	_writerRefresh();
-	Serial.println("Posix Directory Path: " + (String)PublishQueuePosix::instance().getDirPath());
-	Serial.println("Publish Operation Success: " + (String)(operationSuccess ? "true" : "false"));
+
+	// TODO: Delete these next 3 lines when we're done with testing the publish queue
+	size_t numEvents = _publishQueue->getNumEvents();
+	Serial.println("Posix Directory Path: " + (String)_publishQueue->getDirPath());
 	Serial.println("Number of events Queued: " + String(numEvents));
+
     return payload;
 }
 
@@ -68,14 +70,8 @@ void DataQueue::_writerInit() {
 }
 
 void DataQueue::_init() {
-	char *filePath = new char [9];
-	strcpy(filePath, "/myqueue");
-
-	_publishQueuePosix = &(PublishQueuePosix::instance());
-	PublishQueuePosix::instance().setup();
-	PublishQueuePosix::instance().withRamQueueSize(RAM_QUEUE_EVENT_COUNT).withFileQueueSize(FILE_QUEUE_EVENT_COUNT)
-		.withDirPath(filePath);
-
-	// Initialize Queue
+	_publishQueue = &(PublishQueuePosix::instance());
+	_publishQueue->setup();
+	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
 	_writerInit();
 }
