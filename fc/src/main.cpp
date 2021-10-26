@@ -15,6 +15,7 @@ SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 
 Sensor *sensors[3] = {&gps, &thermo1, &thermo2};
+
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
 Led led_blue(D7, 255);
@@ -57,7 +58,7 @@ void publishMessage() {
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
-        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 80000B");
+        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
     }
 
     // Output CPU time in microseconds spent on each task
@@ -86,10 +87,10 @@ void setup() {
     for (Sensor *s : sensors) {
         s->begin();
     }
-    
+
     led_blue.flashRepeat(500);
 
-    DEBUG_SERIAL("TELEMETRY ONLINE - FUEL CELL");
+    DEBUG_SERIAL("TELEMETRY ONLINE - FC");
 }
 
 /**
@@ -98,8 +99,6 @@ void setup() {
  * 
  * */
 void loop() {
-    dataQ.loop();
-
     // Sensor Handlers
     for (Sensor *s : sensors) {
         if (DEBUG_CPU_TIME) {

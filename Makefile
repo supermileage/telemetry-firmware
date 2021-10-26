@@ -1,4 +1,4 @@
-IMAGE := ghcr.io/supermileage/particle-v1.5.2:latest
+IMAGE := ghcr.io/supermileage/particle-v3.0.0:latest
 OUTPUT_DIR := output
 
 .PHONY: urban proto pull-image clean
@@ -14,6 +14,13 @@ proto: clean pull-image
 	$(call print, COMPILING PROTO FIRMWARE)
 	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
 		make all PLATFORM=boron APPDIR=/app/proto TARGET_DIR=/$(OUTPUT_DIR) 
+	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
+	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
+
+fc: clean pull-image
+	$(call print, COMPILING FC FIRMWARE)
+	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
+		make all PLATFORM=boron APPDIR=/app/fc TARGET_DIR=/$(OUTPUT_DIR) 
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 

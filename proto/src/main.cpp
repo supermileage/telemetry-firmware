@@ -69,7 +69,7 @@ void publishMessage() {
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
-        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 80000B");
+        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
     }
 
     // Output CPU time in microseconds spent on each task
@@ -110,8 +110,6 @@ void setup() {
  * 
  * */
 void loop() {
-    dataQ.loop();
-
     // Sensor Handlers
     for (Sensor *s : sensors) {
         if (DEBUG_CPU_TIME) {
