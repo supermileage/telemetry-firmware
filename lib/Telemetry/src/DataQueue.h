@@ -1,7 +1,7 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#define JSON_WRITER_BUFFER_SIZE 1028
+#define JSON_WRITER_BUFFER_SIZE 1024
 #define RAM_QUEUE_EVENT_COUNT 8
 
 #include "PublishQueuePosixRK.h"
