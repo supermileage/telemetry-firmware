@@ -75,6 +75,10 @@ class DataQueue {
          * */
         String resetData();
 
+        void wrapStart();
+        
+        void wrapEnd();
+
     private:
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];

@@ -28,6 +28,7 @@ class SensorCan : public Sensor {
          * Saves any messages that match the CAN IDs specificed in IDS array
          **/
         void handle();
+        
         String getHumanName();
 
         /**

@@ -1,9 +1,9 @@
 #ifndef _LOG_COMMAND_H
 #define _LOG_COMMAND_H
 
-class LogCommand {
+class Command {
     public:
-        virtual void log(DataQueue &dataQ) = 0;
+        virtual void execute() = 0;
 };
 
 #endif

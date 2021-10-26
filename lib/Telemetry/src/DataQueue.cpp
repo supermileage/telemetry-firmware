@@ -5,24 +5,25 @@ DataQueue::DataQueue() {
 }
 
 void DataQueue::add(String id, int value) {
-	_writer->beginObject()
-    	.name("t").value(id)
-    	.name("d").value(value)
-    .endObject();
+	_writer->name(id).value(value);
 }
 
 void DataQueue::add(String id, String value) {
-	_writer->beginObject()
-    	.name("t").value(id)
-    	.name("d").value(value)
-    .endObject();
+	_writer->name(id).value(value);
 }
 
 void DataQueue::add(String id, float value) {
+	_writer->name(id).value(value);
+}
+
+void DataQueue::wrapStart() {
 	_writer->beginObject()
-    	.name("t").value(id)
-    	.name("d").value(value)
-    .endObject();
+		.name("t").value((int)Time.now())
+		.name("d").beginObject();
+}
+
+void DataQueue::wrapEnd() {
+	_writer->endObject().endObject();
 }
 
 String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
@@ -53,7 +54,7 @@ void DataQueue::_writerInit() {
 	this->_writer = new JSONBufferWriter(_buf, sizeof(_buf) - 1);
 
 	_writer->beginObject()
-		.name("time").value((int)Time.now())
+		.name("t").value((int)Time.now())
 		.name("d").beginArray();
 }
 

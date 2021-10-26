@@ -1,11 +1,19 @@
 #include "Particle.h"
 #include "settings.h"
-#include "DataQueue.h"
 #include "Led.h"
 
 #include "Sensor.h"
 #include "SensorGps.h"
+#include "SensorCan.h"
 #include "SensorThermo.h"
+
+#include "Command.h"
+#include "LogThermoCommand.h"
+#include "LogGpsCommand.h"
+
+#include "DataQueue.h"
+#include "Dispatcher.h"
+
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -22,6 +30,16 @@ Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
 DataQueue dataQ;
+
+// sets up Logging Command Dispatchers
+LogGpsCommand gpsCommand(&gps, &dataQ);
+LogThermoCommand thermoCommand(&thermo1, &dataQ);
+Command *frequentCommands = { &gpsCommand };
+Command *infrequentCommands = { &thermoCommand };
+
+Dispatcher frequentDispatcher(frequentCommands, &dataQ, 1, 1);
+Dispatcher infrequentDispatcher(infrequentCommands, &dataQ, 1, 5);
+Dispatcher *dispatchers[2] = { &frequentDispatcher, &infrequentDispatcher };
 
 uint32_t lastPublish = 0;
 
@@ -88,6 +106,8 @@ void setup() {
         s->begin();
     }
 
+
+
     led_blue.flashRepeat(500);
 
     DEBUG_SERIAL("TELEMETRY ONLINE - FUEL CELL");
@@ -99,6 +119,8 @@ void setup() {
  * 
  * */
 void loop() {
+    unsigned int time = millis();
+
     // Sensor Handlers
     for (Sensor *s : sensors) {
         if (DEBUG_CPU_TIME) {
@@ -108,13 +130,17 @@ void loop() {
         }
     }
 
+    for (Dispatcher *d : dispatchers) {
+        d->run(time);
+    }
+
     // LED Handlers
     led_orange.handle();
     led_blue.handle();
     led_green.handle();
 
     // Publish a message every publish interval
-    if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
+    if (time - lastPublish >= PUBLISH_INTERVAL_MS){
         // If no valid time pulled from cellular, attempt to get valid time from GPS (should be faster)
         if(!Time.isValid()){
             if(gps.getTimeValid()){
@@ -125,7 +151,7 @@ void loop() {
             led_blue.on();
         }
 
-        lastPublish = millis();
+        lastPublish = time;
         publishMessage();
     }
 
