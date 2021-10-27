@@ -8,11 +8,11 @@ class SensorGps : public Sensor {
     public:
 
         /**
-         * Constructor 
+         * Constructor
          * 
-         * @param updateInterval for GPS position/speed in ms
+         * @param updateFrequency of GPS module in Hz [1,10] 
          **/
-        SensorGps(uint16_t updateInterval);
+        SensorGps(uint8_t updateFrequency);
 
         /**
          * Initialize the GPS sensor and i2c interface
@@ -25,30 +25,80 @@ class SensorGps : public Sensor {
         void handle();
 
         String getHumanName();
-        
-        /**
-         * @return GPRMC/GNRMC sentence containing position and other data
-         **/
-        String getSentence();
 
         /**
-         * @return Speed in Kilometers per Hour
-         **/
-        float getSpeedKph();
-
-        /**
-         * @return UNIX Time
-         **/
-        uint32_t getTime();
-
-        /**
-         * @return If time has been received from satellite
+         * @return true if current time is valid
          **/
         bool getTimeValid();
 
+        /**
+         * @return UNIX Time (seconds)
+         **/
+        uint32_t getUnixTime();
+
+        /**
+         * @return Longitude (degrees)
+         **/
+        float getLongitude();
+
+        /**
+         * @return Latitude (degrees)
+         **/
+        float getLatitude();
+
+        /**
+         * @return Heading of motion (degrees)
+         **/
+        float getHeading();
+
+        /**
+         * @return Horizontal speed (m/s)
+         **/
+        float getXySpeed();
+
+        /**
+         * @return Horizontal acceleration between the last 2 times speed was polled (m/s^2)
+         **/
+        float getXyAcceleration();
+
+        /**
+         * @return Horizontal position accuracy (m)
+         **/
+        float getXyAccuracy();
+
+        /**
+         * @return Vertical Position relative to Mean Sea Level (m)
+         **/
+        float getAltitude();
+
+        /**
+         * @return Vertical speed between the last 2 times altitude was polled (m/s)
+         **/
+        float getZSpeed();
+        
+        /**
+         * @return Vertical acceleration between the last 2 times altitude was polled (m/s^2)
+         **/
+        float getZAcceleration();
+
+        /**
+         * @return Vertical position accuracy (m)
+         **/
+        float getZAccuracy();
+
     private:
         SFE_UBLOX_GNSS* _gps;
-        uint16_t _updateInterval;
+        uint8_t _updateFrequency;
+
+        uint64_t _lastUpdateMicros;
+
+        float _lastXySpeed;
+        float _xyAcceleration;
+
+        float _lastZPosition;
+        float _zSpeed;
+        float _lastZSpeed;
+        float _zAcceleration;
 
 };
 

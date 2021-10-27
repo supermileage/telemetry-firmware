@@ -11,7 +11,7 @@
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorGps gps(GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 SensorEcu ecu(&Serial1);
@@ -44,8 +44,7 @@ void publishMessage() {
     dataQ.add("PROTO-O2S", ecu.getO2S());
     dataQ.add("PROTO-SPARK", ecu.getSpark());
     // GPS data
-    dataQ.add("PROTO-Location", gps.getSentence());
-    dataQ.add("PROTO-Speed", gps.getSpeedKph());
+    dataQ.add("PROTO-Speed", gps.getXySpeed());
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
@@ -65,7 +64,15 @@ void publishMessage() {
     DEBUG_SERIAL("\nNot in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
-    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
+    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
+    DEBUG_SERIAL("Heading: " + String(gps.getHeading()));
+    DEBUG_SERIAL("X/Y Acceleration: " + String(gps.getXyAcceleration()) + "m/s^2");
+    DEBUG_SERIAL("X/Y Accuracy: " + String(gps.getXyAccuracy()) + "m");
+    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + "m");
+    DEBUG_SERIAL("Z Speed: " + String(gps.getZSpeed()) + "m/s");
+    DEBUG_SERIAL("Z Acceleration: " + String(gps.getZAcceleration()) + "m/s^2");
+    DEBUG_SERIAL("Z Accuracy: " + String(gps.getZAccuracy()) + "m");
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
@@ -130,7 +137,7 @@ void loop() {
         if(!Time.isValid()){
             if(gps.getTimeValid()){
                 led_blue.on();
-                Time.setTime(gps.getTime());
+                Time.setTime(gps.getUnixTime());
             }
         }else{
             led_blue.on();
