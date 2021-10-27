@@ -1,4 +1,7 @@
 #include "DataQueue.h"
+#include "Particle.h"
+
+#include "settings.h"
 
 DataQueue::DataQueue() {
 	_init();
@@ -25,10 +28,17 @@ void DataQueue::add(String id, float value) {
     .endObject();
 }
 
+void DataQueue::loop() {
+	_publishQueue->loop();
+}
+
 String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	String payload = _writerGet();
 	_publishQueue->publish(event, payload, flag1, flag2);
 	_writerRefresh();
+
+	DEBUG_SERIAL("Number of events Queued: " + String(_publishQueue->getNumEvents()));
+	
     return payload;
 }
 
@@ -58,8 +68,10 @@ void DataQueue::_writerInit() {
 }
 
 void DataQueue::_init() {
-	// Initialize Queue
-	_publishQueue = new PublishQueueAsyncRetained(_publishQueueRetainedBuffer, uint16_t(sizeof(_publishQueueRetainedBuffer)));
-	_writerInit();
+	_publishQueue = &(PublishQueuePosix::instance());
 	_publishQueue->setup();
+	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
+	_writerInit();
+
+	DEBUG_SERIAL("Posix Directory Path: " + (String)_publishQueue->getDirPath());
 }
