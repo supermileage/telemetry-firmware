@@ -61,8 +61,8 @@ void publishMessage() {
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
     DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
-    DEBUG_SERIAL("Signal Strength: " + String(sigstrength.getStrength()) + "%");
-    DEBUG_SERIAL("Signal Quality: " + String(sigstrength.getQuality()) + "%");
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
     
     for(int i = 0; i < can.getNumIds(); i++){
         String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";

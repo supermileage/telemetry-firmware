@@ -68,8 +68,8 @@ void publishMessage() {
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
-    DEBUG_SERIAL("Signal Strength: " + String(sigstrength.getStrength()) + "%");
-    DEBUG_SERIAL("Signal Quality: " + String(sigstrength.getQuality()) + "%");
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){

@@ -57,8 +57,8 @@ void publishMessage() {
     DEBUG_SERIAL("GPS Sentence: " + gps.getSentence());
     DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
-    DEBUG_SERIAL("Signal Strength: " + String(sigstrength.getStrength()) + "%");
-    DEBUG_SERIAL("Signal Quality: " + String(sigstrength.getQuality()) + "%");
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
