@@ -15,12 +15,10 @@ void SensorSigStrength::handle() {
 
 float SensorSigStrength::getStrength() {
     _sig = Cellular.RSSI();
-    _strength = (int) _sig.getStrength();
-    return _strength;
+    return (int) _sig.getStrength();
 }
 
 float SensorSigStrength:: getQuality() {
     _sig = Cellular.RSSI();
-    _quality = (int) _sig.getQuality();
-    return _quality;
+    return (int) _sig.getQuality();
 }

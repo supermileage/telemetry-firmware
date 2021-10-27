@@ -16,9 +16,9 @@ SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 SensorEcu ecu(&Serial1);
-SensorSigStrength sigstrength;
+SensorSigStrength sigStrength;
 
-Sensor *sensors[5] = {&ecu, &gps, &thermo1, &thermo2, &sigstrength};
+Sensor *sensors[5] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
@@ -69,7 +69,7 @@ void publishMessage() {
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(sigstrength.getStrength()) + "%");
-    DEBUG_SERIAL("Signal Strength: " + String(sigstrength.getQuality()) + "%");
+    DEBUG_SERIAL("Signal Quality: " + String(sigstrength.getQuality()) + "%");
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){

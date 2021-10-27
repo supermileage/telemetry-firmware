@@ -34,8 +34,6 @@ class SensorSigStrength : public Sensor
         **/
     
     private:
-        int _strength;
-        int _quality;
         CellularSignal _sig; //Object to call strength and quality commands
 };
 
