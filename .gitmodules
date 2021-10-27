@@ -1,3 +1,6 @@
+[submodule "lib/PublishQueueAsyncRK"]
+	path = lib/PublishQueueAsyncRK
+	url = https://github.com/rickkas7/PublishQueueAsyncRK.git
 [submodule "lib/SparkFun_GNSS"]
 	path = lib/SparkFun_GNSS
 	url = https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library.git
@@ -22,4 +25,3 @@
 [submodule "lib/BackgroundPublishRK"]
 	path = lib/BackgroundPublishRK
 	url = https://github.com/rickkas7/BackgroundPublishRK.git
-
