@@ -119,6 +119,8 @@ void loop() {
         }
     }
 
+    dataQ.loop();
+
     // LED Handlers
     led_orange.handle();
     led_blue.handle();
