@@ -7,16 +7,18 @@
 #include "SensorGps.h"
 #include "SensorThermo.h"
 #include "SensorCan.h"
+#include "SensorSigStrength.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 SensorGps gps(GPS_UPDATE_FREQUENCY);
-SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
-SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
+SensorThermo thermo1(&SPI, A5);
+SensorThermo thermo2(&SPI, A4);
 SensorCan can(&SPI1, D5, D6);
+SensorSigStrength sigStrength;
 
-Sensor *sensors[4] = {&gps, &can, &thermo1, &thermo2};
+Sensor *sensors[5] = {&gps, &can, &thermo1, &thermo2, &sigStrength};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
@@ -53,9 +55,11 @@ void publishMessage() {
         DEBUG_SERIAL(dataQ.resetData());
     }
 
-    // Data NOT packaged for publish
+    // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
+
+    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
+    DEBUG_SERIAL("Internal Temperature (Thermo2): " + String(thermo2.getInternalTemp()) + "C");
     DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
     DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
     DEBUG_SERIAL("Horizontal Speed: " + String(gps.getHorizontalSpeed()) + "m/s");
@@ -64,8 +68,10 @@ void publishMessage() {
     DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
     DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
     DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");    
-    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
-
+    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
+   
     for(int i = 0; i < can.getNumIds(); i++){
         String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
         uint8_t canDataLength = can.getDataLen(i);
@@ -86,7 +92,7 @@ void publishMessage() {
         DEBUG_SERIAL("\nCPU Time:");
         DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
         for (Sensor *s : sensors) {
-            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(s->getLongestHandleTime()) + "us");
+            DEBUG_SERIAL(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
         }
         DEBUG_SERIAL();
     }
@@ -125,6 +131,8 @@ void loop() {
             s->handle();
         }
     }
+
+    dataQ.loop();
 
     // LED Handlers
     led_orange.handle();

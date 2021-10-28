@@ -7,16 +7,19 @@
 #include "SensorGps.h"
 #include "SensorThermo.h"
 #include "SensorEcu.h"
+#include "SensorSigStrength.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 SensorGps gps(GPS_UPDATE_FREQUENCY);
-SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
-SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
-SensorEcu ecu(&Serial1);
+SensorThermo thermo1(&SPI, A5);
+SensorThermo thermo2(&SPI, A4);
 
-Sensor *sensors[4] = {&ecu, &gps, &thermo1, &thermo2};
+SensorEcu ecu(&Serial1);
+SensorSigStrength sigStrength;
+
+Sensor *sensors[5] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
@@ -62,8 +65,9 @@ void publishMessage() {
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
-    DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
+    DEBUG_SERIAL("Probe Temperature (Thermo1): " + String(thermo1.getProbeTemp()) + "C");
+    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
+    DEBUG_SERIAL("Internal Temperature (Thermo1): " + String(thermo1.getInternalTemp()) + "C");
     DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
     DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
     DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
@@ -71,6 +75,9 @@ void publishMessage() {
     DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
     DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
     DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");  
+    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
@@ -82,7 +89,7 @@ void publishMessage() {
         DEBUG_SERIAL("\nCPU Time:");
         DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
         for (Sensor *s : sensors) {
-            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(s->getLongestHandleTime()) + "us");
+            DEBUG_SERIAL(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
         }
         DEBUG_SERIAL();
     }
@@ -123,6 +130,8 @@ void loop() {
             s->handle();
         }
     }
+
+    dataQ.loop();
 
     // LED Handlers
     led_orange.handle();
