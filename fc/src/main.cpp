@@ -12,8 +12,8 @@ SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 SensorGps gps(GPS_UPDATE_INTERVAL_MS);
-SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
-SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
+SensorThermo thermo1(&SPI, A5);
+SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 
 Sensor *sensors[4] = {&gps, &thermo1, &thermo2, &sigStrength};
@@ -52,11 +52,12 @@ void publishMessage() {
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
-    DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
+    DEBUG_SERIAL("Probe Temperature (Thermo1): " + String(thermo1.getProbeTemp()) + "C");
+    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
+    DEBUG_SERIAL("Internal Temperature (Thermo2): " + String(thermo2.getInternalTemp()) + "C");
     DEBUG_SERIAL("GPS Sentence: " + gps.getSentence());
-    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
-    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Speed: " + String(gps.getSpeedKph()) + "KM/h");    
+    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
     DEBUG_SERIAL();
@@ -70,7 +71,7 @@ void publishMessage() {
         DEBUG_SERIAL("\nCPU Time:");
         DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
         for (Sensor *s : sensors) {
-            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(s->getLongestHandleTime()) + "us");
+            DEBUG_SERIAL(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
         }
         DEBUG_SERIAL();
     }

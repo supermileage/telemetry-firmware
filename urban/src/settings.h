@@ -12,7 +12,6 @@
 
 #define PUBLISH_INTERVAL_MS         5000
 #define GPS_UPDATE_INTERVAL_MS      1000
-#define THERMO_UPDATE_INTERVAL_MS   1000
 
 // Time zone in UTC offset (must manually adjust for DST)
 #define TIME_ZONE                   -7
