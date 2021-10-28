@@ -5,13 +5,10 @@ SensorGps::SensorGps(uint8_t updateFrequency) {
 
     _gps = new SFE_UBLOX_GNSS();
 
-    _lastUpdateMicros = 0;
-    _lastHorizontalSpeed = 0.0;
-    _horizontalAcceleration = 0.0;
-    _lastAltitude = 0.0;
-    _verticalSpeed = 0.0;
-    _lastVerticalSpeed = 0.0;
-    _verticalAcceleration = 0.0;
+}
+
+SensorGps::~SensorGps(){
+    delete _gps;
 }
 
 String SensorGps::getHumanName() {
@@ -19,11 +16,7 @@ String SensorGps::getHumanName() {
 }
 
 void SensorGps::begin() {
-    // Start i2c with clock speed of 400 KHz
-    // This requires the pull-up resistors to be removed on i2c bus by cutting i2c jumpers on Sparkfun GNSS module
-    Wire.setClock(400000);
-    Wire.begin();
-    
+ 
     _gps->begin();
 
     // Output NMEA and UBX messages over i2c
@@ -40,25 +33,25 @@ void SensorGps::handle() {
     _gps->checkUblox();
 
     // Calculate the current microsecond
-    uint64_t thisUpdateMicros = (_gps->getUnixEpoch() * 1000000) + (_gps->getNanosecond() / 1000);
+    uint64_t thisUpdateMicros = (_gps->getUnixEpoch() * MICROSECONDS_IN_SECOND) + (_gps->getNanosecond() / NANOSECONDS_IN_MICROSECOND);
 
     // Check to see if there has been an update
     if(thisUpdateMicros != _lastUpdateMicros){
 
-        uint64_t elapsedTime = thisUpdateMicros - _lastUpdateMicros;
+        uint64_t elapsedMicroseconds = thisUpdateMicros - _lastUpdateMicros;
 
         // Calculate XY Acceleration
-        float horizontalSpeed = _gps->getGroundSpeed() / 1000.0;
-        _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * 1000000.0) / elapsedTime;
+        float horizontalSpeed = _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
+        _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
         _lastHorizontalSpeed = horizontalSpeed;
 
         // Calculate Z Speed
-        float altitude = _gps->getAltitudeMSL() / 1000.0;
-        _verticalSpeed = ((altitude - _lastAltitude) * 1000000.0) / elapsedTime;
+        float altitude = _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
+        _verticalSpeed = ((altitude - _lastAltitude) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
         _lastAltitude = altitude;
 
         // Calculate Z Acceleration
-        _verticalAcceleration = ((_verticalSpeed - _lastVerticalSpeed) * 1000000.0) / elapsedTime;
+        _verticalAcceleration = ((_verticalSpeed - _lastVerticalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
         _lastVerticalSpeed = _verticalSpeed;
 
         _lastUpdateMicros = thisUpdateMicros;
@@ -75,19 +68,19 @@ uint32_t SensorGps::getUnixTime() {
 }
 
 float SensorGps::getLongitude() {
-    return _gps->getLongitude() / 10000000.0;
+    return _gps->getLongitude() / TEN_POWER_SEVEN;
 }
 
 float SensorGps::getLatitude() {
-    return _gps->getLatitude() / 10000000.0;
+    return _gps->getLatitude() / TEN_POWER_SEVEN;
 }
 
 float SensorGps::getHeading() {
-    return _gps->getHeading() / 100000.0;
+    return _gps->getHeading() / TEN_POWER_FIVE;
 }
 
 float SensorGps::getHorizontalSpeed() {
-    return _gps->getGroundSpeed() / 1000.0;
+    return _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
 }
 
 float SensorGps::getHorizontalAcceleration() {
@@ -95,11 +88,11 @@ float SensorGps::getHorizontalAcceleration() {
 }
 
 float SensorGps::getHorizontalAccuracy() {
-    return _gps->getHorizontalAccEst() / 1000.0;
+    return _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
 }
 
 float SensorGps::getAltitude() {
-    return _gps->getAltitudeMSL() / 1000.0;
+    return _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
 }
 
 float SensorGps::getVerticalSpeed() {
@@ -111,5 +104,5 @@ float SensorGps::getVerticalAcceleration() {
 }
 
 float SensorGps::getVerticalAccuracy() {
-    return _gps->getVerticalAccEst() / 1000.0;
+    return _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
 }

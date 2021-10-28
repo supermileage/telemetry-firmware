@@ -105,6 +105,11 @@ void setup() {
         Serial.begin(115200);
     }
 
+    // Start i2c with clock speed of 400 KHz
+    // This requires the pull-up resistors to be removed on i2c bus
+    Wire.setClock(400000);
+    Wire.begin();
+
     Time.zone(TIME_ZONE);
 
     for (Sensor *s : sensors) {
