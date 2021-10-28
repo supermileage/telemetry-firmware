@@ -39,7 +39,7 @@ void publishMessage() {
     }
 
     // Data packaged for publish
-    dataQ.add("URBAN-Temperature", String(thermo1.getTemp()) + "C");
+    dataQ.add("URBAN-Temperature", String(thermo1.getProbeTemp()) + "C");
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
