@@ -7,6 +7,7 @@
 #include "SensorGps.h"
 #include "SensorThermo.h"
 #include "SensorEcu.h"
+#include "SensorSigStrength.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -15,8 +16,9 @@ SensorGps gps(GPS_UPDATE_INTERVAL_MS);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorEcu ecu(&Serial1);
+SensorSigStrength sigStrength;
 
-Sensor *sensors[4] = {&ecu, &gps, &thermo1, &thermo2};
+Sensor *sensors[5] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
@@ -67,6 +69,8 @@ void publishMessage() {
     DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
     DEBUG_SERIAL("Internal Temperature (Thermo1): " + String(thermo1.getInternalTemp()) + "C");
     DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
@@ -119,6 +123,8 @@ void loop() {
             s->handle();
         }
     }
+
+    dataQ.loop();
 
     // LED Handlers
     led_orange.handle();
