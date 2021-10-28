@@ -6,12 +6,12 @@ SensorGps::SensorGps(uint8_t updateFrequency) {
     _gps = new SFE_UBLOX_GNSS();
 
     _lastUpdateMicros = 0;
-    _lastXySpeed = 0.0;
-    _xyAcceleration = 0.0;
-    _lastZPosition = 0.0;
-    _zSpeed = 0.0;
-    _lastZSpeed = 0.0;
-    _zAcceleration = 0.0;
+    _lastHorizontalSpeed = 0.0;
+    _horizontalAcceleration = 0.0;
+    _lastAltitude = 0.0;
+    _verticalSpeed = 0.0;
+    _lastVerticalSpeed = 0.0;
+    _verticalAcceleration = 0.0;
 }
 
 String SensorGps::getHumanName() {
@@ -19,9 +19,11 @@ String SensorGps::getHumanName() {
 }
 
 void SensorGps::begin() {
-    Wire.begin();
+    // Start i2c with clock speed of 400 KHz
+    // This requires the pull-up resistors to be removed on i2c bus by cutting i2c jumpers on Sparkfun GNSS module
     Wire.setClock(400000);
-
+    Wire.begin();
+    
     _gps->begin();
 
     // Output NMEA and UBX messages over i2c
@@ -46,18 +48,18 @@ void SensorGps::handle() {
         uint64_t elapsedTime = thisUpdateMicros - _lastUpdateMicros;
 
         // Calculate XY Acceleration
-        float xySpeed = _gps->getGroundSpeed() / 1000.0;
-        _xyAcceleration = ((xySpeed - _lastXySpeed) * 1000000.0) / elapsedTime;
-        _lastXySpeed = xySpeed;
+        float horizontalSpeed = _gps->getGroundSpeed() / 1000.0;
+        _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * 1000000.0) / elapsedTime;
+        _lastHorizontalSpeed = horizontalSpeed;
 
         // Calculate Z Speed
-        float zPosition = _gps->getAltitudeMSL() / 1000.0;
-        _zSpeed = ((zPosition - _lastZPosition) * 1000000.0) / elapsedTime;
-        _lastZPosition = zPosition;
+        float altitude = _gps->getAltitudeMSL() / 1000.0;
+        _verticalSpeed = ((altitude - _lastAltitude) * 1000000.0) / elapsedTime;
+        _lastAltitude = altitude;
 
         // Calculate Z Acceleration
-        _zAcceleration = ((_zSpeed - _lastZSpeed) * 1000000.0) / elapsedTime;
-        _lastZSpeed = _zSpeed;
+        _verticalAcceleration = ((_verticalSpeed - _lastVerticalSpeed) * 1000000.0) / elapsedTime;
+        _lastVerticalSpeed = _verticalSpeed;
 
         _lastUpdateMicros = thisUpdateMicros;
     }
@@ -84,15 +86,15 @@ float SensorGps::getHeading() {
     return _gps->getHeading() / 100000.0;
 }
 
-float SensorGps::getXySpeed() {
+float SensorGps::getHorizontalSpeed() {
     return _gps->getGroundSpeed() / 1000.0;
 }
 
-float SensorGps::getXyAcceleration() {
-    return _xyAcceleration;
+float SensorGps::getHorizontalAcceleration() {
+    return _horizontalAcceleration;
 }
 
-float SensorGps::getXyAccuracy() {
+float SensorGps::getHorizontalAccuracy() {
     return _gps->getHorizontalAccEst() / 1000.0;
 }
 
@@ -100,14 +102,14 @@ float SensorGps::getAltitude() {
     return _gps->getAltitudeMSL() / 1000.0;
 }
 
-float SensorGps::getZSpeed() {
-    return _zSpeed;
+float SensorGps::getVerticalSpeed() {
+    return _verticalSpeed;
 }
 
-float SensorGps::getZAcceleration() {
-    return _zAcceleration;
+float SensorGps::getVerticalAcceleration() {
+    return _verticalAcceleration;
 }
 
-float SensorGps::getZAccuracy() {
+float SensorGps::getVerticalAccuracy() {
     return _gps->getVerticalAccEst() / 1000.0;
 }

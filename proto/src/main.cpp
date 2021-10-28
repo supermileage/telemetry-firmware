@@ -44,7 +44,7 @@ void publishMessage() {
     dataQ.add("PROTO-O2S", ecu.getO2S());
     dataQ.add("PROTO-SPARK", ecu.getSpark());
     // GPS data
-    dataQ.add("PROTO-Speed", gps.getXySpeed());
+    dataQ.add("PROTO-Speed", gps.getHorizontalSpeed());
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
@@ -66,13 +66,11 @@ void publishMessage() {
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
     DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
     DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
-    DEBUG_SERIAL("Heading: " + String(gps.getHeading()));
-    DEBUG_SERIAL("X/Y Acceleration: " + String(gps.getXyAcceleration()) + "m/s^2");
-    DEBUG_SERIAL("X/Y Accuracy: " + String(gps.getXyAccuracy()) + "m");
+    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
     DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + "m");
-    DEBUG_SERIAL("Z Speed: " + String(gps.getZSpeed()) + "m/s");
-    DEBUG_SERIAL("Z Acceleration: " + String(gps.getZAcceleration()) + "m/s^2");
-    DEBUG_SERIAL("Z Accuracy: " + String(gps.getZAccuracy()) + "m");
+    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
+    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
+    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");  
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){

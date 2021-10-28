@@ -10,7 +10,7 @@
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorGps gps(GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 
@@ -52,8 +52,14 @@ void publishMessage() {
     DEBUG_SERIAL("\nNot in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
-    DEBUG_SERIAL("GPS Sentence: " + gps.getSentence());
-    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
+    DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
+    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
+    DEBUG_SERIAL("Horizontal Speed: " + String(gps.getHorizontalSpeed()) + "m/s");
+    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
+    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + "m");
+    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
+    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
+    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");    
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL();
     
@@ -119,7 +125,7 @@ void loop() {
         if(!Time.isValid()){
             if(gps.getTimeValid()){
                 led_blue.on();
-                Time.setTime(gps.getTime());
+                Time.setTime(gps.getUnixTime());
             }
         }else{
             led_blue.on();

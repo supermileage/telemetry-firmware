@@ -10,7 +10,7 @@ class SensorGps : public Sensor {
         /**
          * Constructor
          * 
-         * @param updateFrequency of GPS module in Hz [1,10] 
+         * @param updateFrequency of GPS module in Hz [1,10]. Each update takes 5-7ms. 
          **/
         SensorGps(uint8_t updateFrequency);
 
@@ -54,17 +54,17 @@ class SensorGps : public Sensor {
         /**
          * @return Horizontal speed (m/s)
          **/
-        float getXySpeed();
+        float getHorizontalSpeed();
 
         /**
-         * @return Horizontal acceleration between the last 2 times speed was polled (m/s^2)
+         * @return Horizontal acceleration (m/s^2)
          **/
-        float getXyAcceleration();
+        float getHorizontalAcceleration();
 
         /**
          * @return Horizontal position accuracy (m)
          **/
-        float getXyAccuracy();
+        float getHorizontalAccuracy();
 
         /**
          * @return Vertical Position relative to Mean Sea Level (m)
@@ -72,19 +72,19 @@ class SensorGps : public Sensor {
         float getAltitude();
 
         /**
-         * @return Vertical speed between the last 2 times altitude was polled (m/s)
+         * @return Vertical speed (m/s)
          **/
-        float getZSpeed();
+        float getVerticalSpeed();
         
         /**
-         * @return Vertical acceleration between the last 2 times altitude was polled (m/s^2)
+         * @return Vertical acceleration b (m/s^2)
          **/
-        float getZAcceleration();
+        float getVerticalAcceleration();
 
         /**
          * @return Vertical position accuracy (m)
          **/
-        float getZAccuracy();
+        float getVerticalAccuracy();
 
     private:
         SFE_UBLOX_GNSS* _gps;
@@ -92,13 +92,13 @@ class SensorGps : public Sensor {
 
         uint64_t _lastUpdateMicros;
 
-        float _lastXySpeed;
-        float _xyAcceleration;
+        float _lastHorizontalSpeed;
+        float _horizontalAcceleration;
 
-        float _lastZPosition;
-        float _zSpeed;
-        float _lastZSpeed;
-        float _zAcceleration;
+        float _lastAltitude;
+        float _verticalSpeed;
+        float _lastVerticalSpeed;
+        float _verticalAcceleration;
 
 };
 
