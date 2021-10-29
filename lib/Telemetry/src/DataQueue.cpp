@@ -66,6 +66,14 @@ void DataQueue::_writerInit() {
 	_writer->beginObject()
 		.name("t").value((int)Time.now())
 		.name("d").beginArray();
+} 
+
+size_t DataQueue::getBufferSize() {
+	return _writer->bufferSize();
+}
+
+size_t DataQueue::getDataSize() {
+	return _writer->dataSize();
 }
 
 void DataQueue::_init() {

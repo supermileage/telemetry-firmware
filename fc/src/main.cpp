@@ -119,7 +119,7 @@ void setup() {
  * 
  * */
 void loop() {
-    unsigned int time = millis();
+    uint32_t time = millis();
 
     // Sensor Handlers
     for (Sensor *s : sensors) {

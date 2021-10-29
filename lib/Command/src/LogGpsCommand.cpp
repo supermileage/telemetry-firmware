@@ -1,5 +1,7 @@
 #include "LogGpsCommand.h"
 
+#include "settings.h"
+
 LogGpsCommand::LogGpsCommand(SensorGps *sensor, DataQueue *dataQ) {
     this->_sensor = sensor;
     this->_dataQ = dataQ;

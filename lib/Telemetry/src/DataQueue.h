@@ -84,6 +84,10 @@ class DataQueue {
         
         void wrapEnd();
 
+        size_t getBufferSize();
+
+        size_t getDataSize();
+
     private:
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];
