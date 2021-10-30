@@ -16,6 +16,16 @@ class SensorGps : public Sensor {
         SensorGps(uint8_t updateFrequency);
 
         /**
+         * Copy Constructor
+         **/
+        SensorGps(const SensorGps &other);
+
+        /**
+         * Copy Assignment Operator
+         **/
+        SensorGps& operator=(const SensorGps &other);
+
+        /**
          * Destructor
          **/
         ~SensorGps();

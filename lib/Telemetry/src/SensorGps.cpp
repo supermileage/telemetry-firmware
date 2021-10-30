@@ -2,9 +2,20 @@
 
 SensorGps::SensorGps(uint8_t updateFrequency) {
     _updateFrequency = updateFrequency;
-
     _gps = new SFE_UBLOX_GNSS();
 
+}
+
+SensorGps::SensorGps(const SensorGps &other){
+    _updateFrequency = other._updateFrequency;
+    _gps = new SFE_UBLOX_GNSS();
+}
+
+SensorGps& SensorGps::operator = (const SensorGps &other){
+    if(this == &other) return *this;
+    _updateFrequency = other._updateFrequency;
+    _gps = other._gps;
+    return *this;
 }
 
 SensorGps::~SensorGps(){
