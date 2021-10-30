@@ -6,12 +6,12 @@
 
 class Dispatcher {
     public:
-        Dispatcher(Command *commands, DataQueue *dataQ, uint8_t len, uint16_t interval);
+        Dispatcher(Command *loggers, DataQueue *dataQ, uint8_t len, uint16_t interval);
         void run(uint32_t time);
     protected:
         void dispatch();
     private:
-        Command *_commands;
+        Command *_loggers;
         DataQueue *_dataQ;
         uint16_t _interval;
         uint8_t _numCommands;

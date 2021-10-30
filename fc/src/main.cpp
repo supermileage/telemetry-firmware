@@ -7,18 +7,15 @@
 #include "SensorCan.h"
 #include "SensorThermo.h"
 
-#include "Command.h"
-#include "LogThermoCommand.h"
-#include "LogGpsCommand.h"
-
+#include "GpsLoggerFrequent.h"
+#include "GpsLoggerSparse.h"
 #include "DataQueue.h"
 #include "Dispatcher.h"
-
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorGps gps(GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 
@@ -32,13 +29,14 @@ Led led_green(D8, 40);
 DataQueue dataQ;
 
 // sets up Logging Command Dispatchers
-LogGpsCommand gpsCommand(&gps, &dataQ);
-LogThermoCommand thermoCommand(&thermo1, &dataQ);
-Command *frequentCommands = { &gpsCommand };
-Command *infrequentCommands = { &thermoCommand };
+GpsLoggerFrequent frequentGps(&gps);
+GpsLoggerSparse sparseGps(&gps);
 
-Dispatcher frequentDispatcher(frequentCommands, &dataQ, 1, 1);
-Dispatcher infrequentDispatcher(infrequentCommands, &dataQ, 1, 5);
+Command *frequent = { &frequentGps };
+Command *sparse = { &sparseGps };
+
+Dispatcher frequentDispatcher(frequent, &dataQ, 1, 1);
+Dispatcher infrequentDispatcher(sparse, &dataQ, 1, 5);
 Dispatcher *dispatchers[2] = { &frequentDispatcher, &infrequentDispatcher };
 
 uint32_t lastPublish = 0;
@@ -70,8 +68,6 @@ void publishMessage() {
     DEBUG_SERIAL("\nNot in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo1): " + String(thermo1.getTemp()) + "C");
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
-    DEBUG_SERIAL("GPS Sentence: " + gps.getSentence());
-    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL();
     
@@ -99,6 +95,11 @@ void setup() {
     if(DEBUG_SERIAL_ENABLE){
         Serial.begin(115200);
     }
+
+    // Start i2c with clock speed of 400 KHz
+    // This requires the pull-up resistors to be removed on i2c bus
+    Wire.setClock(400000);
+    Wire.begin();
 
     Time.zone(TIME_ZONE);
 
@@ -147,7 +148,7 @@ void loop() {
         if(!Time.isValid()){
             if(gps.getTimeValid()){
                 led_blue.on();
-                Time.setTime(gps.getTime());
+                Time.setTime(gps.getUnixTime());
             }
         }else{
             led_blue.on();

@@ -5,8 +5,8 @@
 #include "Particle.h"
 
 
-Dispatcher::Dispatcher(Command *commands, DataQueue *dataQ, uint8_t len, uint16_t interval) {
-    _commands = commands;
+Dispatcher::Dispatcher(Command *loggers, DataQueue *dataQ, uint8_t len, uint16_t interval) {
+    _loggers = loggers;
     _dataQ = dataQ;
     _numCommands = len;
     _interval = interval * 1000;
@@ -26,7 +26,7 @@ void Dispatcher::dispatch() {
     _dataQ->wrapStart();
 
     for (uint8_t i = 0; i < _numCommands; i++) {
-        _commands[i].execute();
+        _loggers[i].execute(_dataQ);
     }
 
     _dataQ->wrapEnd();
