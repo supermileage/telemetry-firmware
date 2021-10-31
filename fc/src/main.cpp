@@ -7,10 +7,12 @@
 #include "SensorCan.h"
 #include "SensorThermo.h"
 
-#include "GpsLoggerFrequent.h"
-#include "GpsLoggerSparse.h"
 #include "DataQueue.h"
-#include "Dispatcher.h"
+#include "../Telemetry/src/LoggerFactory.h"
+#include "../Telemetry/src/JsonLogger.h"
+
+
+#include <iostream>
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -27,17 +29,6 @@ Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
 DataQueue dataQ;
-
-// sets up Logging Command Dispatchers
-GpsLoggerFrequent frequentGps(&gps);
-GpsLoggerSparse sparseGps(&gps);
-
-Command *frequent = { &frequentGps };
-Command *sparse = { &sparseGps };
-
-Dispatcher frequentDispatcher(frequent, &dataQ, 1, 1);
-Dispatcher infrequentDispatcher(sparse, &dataQ, 1, 5);
-Dispatcher *dispatchers[2] = { &frequentDispatcher, &infrequentDispatcher };
 
 uint32_t lastPublish = 0;
 
@@ -107,8 +98,6 @@ void setup() {
         s->begin();
     }
 
-
-
     led_blue.flashRepeat(500);
 
     DEBUG_SERIAL("TELEMETRY ONLINE - FC");
@@ -120,7 +109,7 @@ void setup() {
  * 
  * */
 void loop() {
-    uint32_t time = millis();
+    unsigned long time = millis();
 
     // Sensor Handlers
     for (Sensor *s : sensors) {
@@ -132,10 +121,6 @@ void loop() {
     }
 
     dataQ.loop();
-
-    for (Dispatcher *d : dispatchers) {
-        d->run(time);
-    }
 
     // LED Handlers
     led_orange.handle();
