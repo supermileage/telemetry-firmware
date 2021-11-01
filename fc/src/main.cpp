@@ -84,17 +84,6 @@ void setup() {
         Serial.begin(115200);
     }
 
-    DispatcherFactory factory((uint16_t)15, &dataQ);
-
-    factory.add<SensorGps, float>(&gps, "lat", &SensorGps::getLatitude, 2);
-    factory.add<SensorGps, float>(&gps, "long", &SensorGps::getLongitude, 2);
-    factory.add<SensorGps, float>(&gps, "v-accel", &SensorGps::getVerticalAcceleration, 1);
-    factory.add<SensorGps, float>(&gps, "h-accel", &SensorGps::getHorizontalAcceleration, 1);
-    // factory.add<SensorThermo, double>(&thermo1, "temp1", &SensorThermo::getTemp, 4);
-    // factory.add<SensorThermo, double>(&thermo2, "temp2", &SensorThermo::getTemp, 5);
-
-    dispatcher = factory.build();
-
     // Start i2c with clock speed of 400 KHz
     // This requires the pull-up resistors to be removed on i2c bus
     Wire.setClock(400000);
@@ -105,6 +94,17 @@ void setup() {
     for (Sensor *s : sensors) {
         s->begin();
     }
+
+    DispatcherFactory factory(6, &dataQ);
+
+    factory.add<SensorGps, float>(&gps, "lat", &SensorGps::getLatitude, 1);
+    factory.add<SensorGps, float>(&gps, "long", &SensorGps::getLongitude, 1);
+    factory.add<SensorGps, float>(&gps, "v-accel", &SensorGps::getVerticalAcceleration, 2);
+    factory.add<SensorGps, float>(&gps, "h-accel", &SensorGps::getHorizontalAcceleration, 2);
+    factory.add<SensorThermo, double>(&thermo1, "temp1", &SensorThermo::getTemp, 5);
+    factory.add<SensorThermo, double>(&thermo2, "temp2", &SensorThermo::getTemp, 5);
+
+    dispatcher = factory.build();
 
     led_blue.flashRepeat(500);
 

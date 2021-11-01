@@ -11,7 +11,7 @@
 #define DEBUG_MEM                   1
 
 #define PUBLISH_INTERVAL_MS         5000
-#define GPS_UPDATE_INTERVAL_MS      1000
+#define GPS_UPDATE_FREQUENCY        4
 #define THERMO_UPDATE_INTERVAL_MS   1000
 
 // Time zone in UTC offset (must manually adjust for DST)

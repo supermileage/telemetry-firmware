@@ -8,10 +8,12 @@
 #include "SensorThermo.h"
 #include "SensorEcu.h"
 
+#include "DispatcherFactory.h"
+
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorGps gps(GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 SensorEcu ecu(&Serial1);
@@ -24,6 +26,7 @@ Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
 DataQueue dataQ;
+Dispatcher *dispatcher;
 
 uint32_t lastPublish = 0;
 
@@ -35,17 +38,6 @@ void publishMessage() {
     if (DEBUG_CPU_TIME) {
         start = micros();
     }
-
-    // ECU data
-    dataQ.add("PROTO-ECT", ecu.getECT());
-    dataQ.add("PROTO-IAT", ecu.getIAT());
-    dataQ.add("PROTO-RPM", ecu.getRPM());
-    dataQ.add("PROTO-UBADC", ecu.getUbAdc());
-    dataQ.add("PROTO-O2S", ecu.getO2S());
-    dataQ.add("PROTO-SPARK", ecu.getSpark());
-    // GPS data
-    dataQ.add("PROTO-Location", gps.getSentence());
-    dataQ.add("PROTO-Speed", gps.getSpeedKph());
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
@@ -99,6 +91,20 @@ void setup() {
         s->begin();
     }
 
+    DispatcherFactory factory(8, &dataQ);
+    // ECU data
+    factory.add<SensorEcu, float>(&ecu, "PROTO-ECT", &SensorEcu::getECT, 5);
+    factory.add<SensorEcu, float>(&ecu, "PROTO-IAT", &SensorEcu::getIAT, 5);
+    factory.add<SensorEcu, float>(&ecu, "PROTO-RPM", &SensorEcu::getRPM, 5);
+    factory.add<SensorEcu, float>(&ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 5);
+    factory.add<SensorEcu, float>(&ecu, "PROTO-O2S", &SensorEcu::getO2S, 5);
+    factory.add<SensorEcu, float>(&ecu, "PROTO-SPARK", &SensorEcu::getSpark, 5);
+    // GPS data
+    factory.add<SensorGps, float>(&gps, "PROTO-Latitude", &SensorGps::getLatitude, 1);
+    factory.add<SensorGps, float>(&gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
+
+    dispatcher = factory.build();
+
     led_blue.flashRepeat(500);
 
     DEBUG_SERIAL("TELEMETRY ONLINE - PROTO");
@@ -119,7 +125,9 @@ void loop() {
         }
     }
 
+    unsigned long seconds = millis() / 1000;
     dataQ.loop();
+    dispatcher->run(seconds);
 
     // LED Handlers
     led_orange.handle();
@@ -132,7 +140,7 @@ void loop() {
         if(!Time.isValid()){
             if(gps.getTimeValid()){
                 led_blue.on();
-                Time.setTime(gps.getTime());
+                Time.setTime(gps.getUnixTime());
             }
         }else{
             led_blue.on();

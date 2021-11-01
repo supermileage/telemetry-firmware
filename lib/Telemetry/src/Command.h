@@ -1,29 +1,29 @@
-#include "CommandBase.h"
 #include "DataQueue.h"
-#include "Sensor.h"
-#include "Particle.h"
 
 #ifndef _COMMAND_H
 #define _COMMAND_H
 
-template <class S, class R>
-class Command : public CommandBase {
+/**
+ *  Abstract Command class
+ **/
+class Command {
     public:
-        Command(S *sensor, String propertyName, R (S::*func)(), uint16_t interval) {
-            _sensor = sensor;
-            _getter = func;
-            _propertyName = propertyName;
-            _interval = interval;
+        /**
+         * Default constructor
+         **/
+        Command() { }
+
+        virtual void execute(DataQueue *dataQ) = 0;
+
+        /**
+         *  Returns interval assigned to this command (_interval is only assigned in constructor of subclasses)
+         **/
+        uint16_t getInterval() {
+            return _interval;
         }
 
-        void execute(DataQueue *dataQ) {
-            dataQ->add(_propertyName, (*_sensor.*_getter)());
-        }
-
-    private:
-        R (S::*_getter)();
-        S *_sensor;
-        String _propertyName;
+    protected:
+         uint16_t _interval;
 };
 
 #endif

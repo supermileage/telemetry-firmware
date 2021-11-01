@@ -20,7 +20,7 @@ void DataQueue::add(String id, float value) {
 }
 
 void DataQueue::add(String id, double value) {
-	_writer->name(id).value((float)value);
+	_writer->name(id).value(String(value));
 }
 
 void DataQueue::wrapStart() {

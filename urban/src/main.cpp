@@ -3,15 +3,18 @@
 #include "DataQueue.h"
 #include "Led.h"
 
+#include "constants.h"
 #include "Sensor.h"
 #include "SensorGps.h"
 #include "SensorThermo.h"
 #include "SensorCan.h"
 
+#include "DispatcherFactory.h"
+
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorGps gps(GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 SensorCan can(&SPI1, D5, D6);
@@ -24,6 +27,7 @@ Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
 DataQueue dataQ;
+Dispatcher *dispatcher;
 
 uint32_t lastPublish = 0;
 
@@ -35,10 +39,6 @@ void publishMessage() {
     if (DEBUG_CPU_TIME) {
         start = micros();
     }
-
-    // Data packaged for publish
-    dataQ.add("URBAN-Location", gps.getSentence());
-    dataQ.add("URBAN-Temperature", String(thermo1.getTemp()) + "C");
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
@@ -57,7 +57,7 @@ void publishMessage() {
     // Data NOT packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
     DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
-    DEBUG_SERIAL("Current Speed: " + String(gps.getSpeedKph()) + "KM/h");    
+    DEBUG_SERIAL("Current Speed: " + String(gps.getHorizontalSpeed()) + "KM/h");    
     DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
 
     for(int i = 0; i < can.getNumIds(); i++){
@@ -84,8 +84,6 @@ void publishMessage() {
         }
         DEBUG_SERIAL();
     }
-
-
 }
 
 /**
@@ -101,6 +99,15 @@ void setup() {
     for (Sensor *s : sensors) {
         s->begin();
     }
+
+    DispatcherFactory factory(3, &dataQ);
+    // Gps data
+    factory.add<SensorGps, float>(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
+    factory.add<SensorGps, float>(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
+    // Thermo data
+    factory.add<SensorThermo, double>(&thermo1, "URBAN-Temperature", &SensorThermo::getTemp, 5);
+
+    dispatcher = factory.build();
 
     led_blue.flashRepeat(500);
 
@@ -120,7 +127,9 @@ void loop() {
         }
     }
 
+    unsigned long seconds = millis() / 1000;
     dataQ.loop();
+    dispatcher->run(seconds);
 
     // LED Handlers
     led_orange.handle();
@@ -133,7 +142,7 @@ void loop() {
         if(!Time.isValid()){
             if(gps.getTimeValid()){
                 led_blue.on();
-                Time.setTime(gps.getTime());
+                Time.setTime(gps.getUnixTime());
             }
         }else{
             led_blue.on();
