@@ -10,7 +10,7 @@ JsonLogger::JsonLogger() { }
 JsonLogger::JsonLogger(CommandBase **commands, uint8_t numCommands, uint16_t interval) {
     _logCommands = commands;
     _numCommands = numCommands;
-    _interval = interval * 1000;
+    _interval = interval;
     _lastLog = 0;
     _logThisLoop = false;
 }

@@ -18,7 +18,8 @@ class Dispatcher {
 
             // check if any of the loggers have reached the start of new interval
             for (uint16_t i = 0; i < _numLoggers; i++) {
-                if ((_loggers[i]->getLastLog() + _loggers[i]->getInterval()) >= time) {
+                if ((_loggers[i]->getLastLog() + _loggers[i]->getInterval()) <= time) {
+                    _loggers[i]->setLastLog(time);
                     _logThisLoop = true;
                     _loggers[i]->logThisLoop(true);
                 }   
@@ -31,7 +32,6 @@ class Dispatcher {
                     if (_loggers[i]->logThisLoop()) {
                         _loggers[i]->logThisLoop(false);
                         _loggers[i]->log(_dataQ);
-                        _loggers[i]->setLastLog(time);
                     }
                 }
                 _dataQ->wrapEnd();

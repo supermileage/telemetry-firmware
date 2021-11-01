@@ -7,8 +7,8 @@
 
 #define MAX_NUM_INTERVALS 5
 
-#ifndef _LOGGER_FACTORY_H_
-#define _LOGGER_FACTORY_H_
+#ifndef _DISPTACHER_FACTORY_H_
+#define _DISPATCHER_FACTORY_H_
 
 class DispatcherFactory {
     public:

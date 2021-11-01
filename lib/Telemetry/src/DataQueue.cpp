@@ -19,6 +19,10 @@ void DataQueue::add(String id, float value) {
 	_writer->name(id).value(value);
 }
 
+void DataQueue::add(String id, double value) {
+	_writer->name(id).value((float)value);
+}
+
 void DataQueue::wrapStart() {
 	_writer->beginObject()
 		.name("t").value((int)Time.now())
@@ -64,7 +68,6 @@ void DataQueue::_writerInit() {
 	this->_writer = new JSONBufferWriter(_buf, sizeof(_buf) - 1);
 
 	_writer->beginObject()
-		.name("t").value((int)Time.now())
 		.name("d").beginArray();
 } 
 

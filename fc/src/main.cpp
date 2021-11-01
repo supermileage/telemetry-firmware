@@ -8,11 +8,8 @@
 #include "SensorThermo.h"
 
 #include "DataQueue.h"
-#include "../Telemetry/src/LoggerFactory.h"
+#include "../Telemetry/src/DispatcherFactory.h"
 #include "../Telemetry/src/JsonLogger.h"
-
-
-#include <iostream>
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -29,6 +26,7 @@ Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
 DataQueue dataQ;
+Dispatcher *dispatcher;
 
 uint32_t lastPublish = 0;
 
@@ -87,6 +85,17 @@ void setup() {
         Serial.begin(115200);
     }
 
+    DispatcherFactory factory((uint16_t)15, &dataQ);
+
+    factory.add<SensorGps, float>(&gps, "lat", &SensorGps::getLatitude, 2);
+    factory.add<SensorGps, float>(&gps, "long", &SensorGps::getLongitude, 2);
+    factory.add<SensorGps, float>(&gps, "v-accel", &SensorGps::getVerticalAcceleration, 1);
+    factory.add<SensorGps, float>(&gps, "h-accel", &SensorGps::getHorizontalAcceleration, 1);
+    // factory.add<SensorThermo, double>(&thermo1, "temp1", &SensorThermo::getTemp, 4);
+    // factory.add<SensorThermo, double>(&thermo2, "temp2", &SensorThermo::getTemp, 5);
+
+    dispatcher = factory.build();
+
     // Start i2c with clock speed of 400 KHz
     // This requires the pull-up resistors to be removed on i2c bus
     Wire.setClock(400000);
@@ -110,6 +119,7 @@ void setup() {
  * */
 void loop() {
     unsigned long time = millis();
+    unsigned long seconds = time / 1000;
 
     // Sensor Handlers
     for (Sensor *s : sensors) {
@@ -121,6 +131,7 @@ void loop() {
     }
 
     dataQ.loop();
+    dispatcher->run(seconds);
 
     // LED Handlers
     led_orange.handle();

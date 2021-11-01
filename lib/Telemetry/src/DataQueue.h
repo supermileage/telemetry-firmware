@@ -54,6 +54,17 @@ class DataQueue {
         void add(String id, float value);
 
         /**
+         * Adds a float value and its ID into the data queue.
+         * An ID may not be added twice before publishing the data queue.
+         * 
+         * @param id A string representing an id for the data.
+         * 
+         * @param value A double representing the data to be stored in 
+         *              the queue.
+         * */
+        void add(String id, double value);
+
+        /**
          * Wrapper for loop function of PublishQueuePosix
          * */
         void loop();
