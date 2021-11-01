@@ -9,7 +9,6 @@
 
 #include "DataQueue.h"
 #include "../Telemetry/src/DispatcherFactory.h"
-#include "../Telemetry/src/JsonLogger.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);

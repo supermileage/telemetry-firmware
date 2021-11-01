@@ -16,7 +16,7 @@ class Dispatcher {
 
         void run(unsigned long time) {
 
-            // check if any of the loggers have reached the start of new interval
+            // check if it's time to log any data from any of the loggers
             for (uint16_t i = 0; i < _numLoggers; i++) {
                 if ((_loggers[i]->getLastLog() + _loggers[i]->getInterval()) <= time) {
                     _loggers[i]->setLastLog(time);
@@ -25,17 +25,16 @@ class Dispatcher {
                 }   
             }
 
-            // call log on whichever should be logged, then reset logThisLoop bool on this and loggers
+            // call log on loggers and reset logThisLoop bool
             if (_logThisLoop) {
                 _dataQ->wrapStart();
                 for (uint16_t i = 0; i < _numLoggers; i++) {
                     if (_loggers[i]->logThisLoop()) {
-                        _loggers[i]->logThisLoop(false);
                         _loggers[i]->log(_dataQ);
+                        _loggers[i]->logThisLoop(false);
                     }
                 }
                 _dataQ->wrapEnd();
-                
                 _logThisLoop = false;
             }
         }
@@ -43,8 +42,8 @@ class Dispatcher {
     private:
         JsonLogger **_loggers;
         DataQueue *_dataQ;
-        bool _logThisLoop;
         uint16_t _numLoggers;
+        bool _logThisLoop;
 };
 
 #endif
