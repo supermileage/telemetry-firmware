@@ -11,7 +11,7 @@
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_FREQUENCY);
+SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
@@ -63,7 +63,8 @@ void publishMessage() {
     DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + "m");
     DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
     DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
-    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");      
+    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");    
+    DEBUG_SERIAL("Satellites in View: " + String(gps.getSatellitesInView()));  
     DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");

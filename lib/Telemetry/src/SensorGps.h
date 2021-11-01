@@ -13,22 +13,7 @@ class SensorGps : public Sensor {
          * 
          * @param updateFrequency of GPS module in Hz [1,10]. Each update takes 5-7ms. 
          **/
-        SensorGps(uint8_t updateFrequency);
-
-        /**
-         * Copy Constructor
-         **/
-        SensorGps(const SensorGps &other);
-
-        /**
-         * Copy Assignment Operator
-         **/
-        SensorGps& operator=(const SensorGps &other);
-
-        /**
-         * Destructor
-         **/
-        ~SensorGps();
+        SensorGps(SFE_UBLOX_GNSS *gps, uint8_t updateFrequency);
 
         /**
          * Initialize the GPS sensor and i2c interface
@@ -101,6 +86,11 @@ class SensorGps : public Sensor {
          * @return Vertical position accuracy (m)
          **/
         float getVerticalAccuracy();
+
+        /**
+         * @return Number of Satellites currently seen by GPS
+         **/
+        uint8_t getSatellitesInView();
 
     private:
         SFE_UBLOX_GNSS* _gps;
