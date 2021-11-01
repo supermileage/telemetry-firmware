@@ -1,6 +1,7 @@
 #include "DataQueue.h"
 #include "Command.h"
 #include "CommandBase.h"
+#include "Dispatcher.h"
 #include "Particle.h"
 #include "JsonLogger.h"
 
@@ -36,7 +37,7 @@ class LoggerFactory {
             addToIntervalsCount(interval);
         }
 
-        JsonLogger** build() {
+        Dispatcher* build() {
             JsonLogger **loggers = new JsonLogger*[_numIntervals];
 
             for (int i = 0; i < _numIntervals; i++) {
@@ -50,10 +51,10 @@ class LoggerFactory {
                         commandsOnInterval[commandCount++] = _commands[i];
                 }
 
-                loggers[i] = new JsonLogger(commandsOnInterval, numCommandsOnInterval, _dataQ, interval);
+                loggers[i] = new JsonLogger(commandsOnInterval, numCommandsOnInterval, interval);
             }
 
-            return loggers;
+            return new Dispatcher(loggers, _numIntervals, _dataQ);
         }
 
     private:

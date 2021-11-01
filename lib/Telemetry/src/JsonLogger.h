@@ -8,9 +8,9 @@ class JsonLogger {
     public:
         JsonLogger();
 
-        JsonLogger(CommandBase **commands, uint8_t numCommands, DataQueue *dataQ, uint16_t interval);
+        JsonLogger(CommandBase **commands, uint8_t numCommands, uint16_t interval);
 
-        void log();
+        void log(DataQueue *dataQ);
 
         uint16_t getInterval() {
             return _interval;
@@ -33,8 +33,7 @@ class JsonLogger {
         }
 
     protected:
-        unsigned long _lastLog; 
-        DataQueue *_dataQ;
+        unsigned long _lastLog;
         CommandBase **_logCommands;
         uint16_t _interval;
         uint8_t _numCommands;

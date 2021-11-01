@@ -11,17 +11,17 @@ class Command : public CommandBase {
     public:
         Command(S *sensor, String propertyName, R (S::*func)(), uint16_t interval) {
             _sensor = sensor;
-            _someGetter = func;
+            _getter = func;
             _propertyName = propertyName;
             _interval = interval;
         }
 
         void execute(DataQueue *dataQ) {
-            dataQ->add(_propertyName, (*_sensor.*_someGetter)());
+            dataQ->add(_propertyName, (*_sensor.*_getter)());
         }
 
     private:
-        R (S::*_someGetter)();
+        R (S::*_getter)();
         S *_sensor;
         String _propertyName;
 };
