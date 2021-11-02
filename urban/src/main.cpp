@@ -12,7 +12,7 @@
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorCan can(&SPI1, D5, D6);
@@ -39,8 +39,7 @@ void publishMessage() {
     }
 
     // Data packaged for publish
-    dataQ.add("URBAN-Location", gps.getSentence());
-    dataQ.add("URBAN-Temperature", String(thermo1.getInternalTemp()) + "C");
+    dataQ.add("URBAN-Temperature", String(thermo1.getProbeTemp()) + "C");
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
@@ -58,9 +57,18 @@ void publishMessage() {
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
+
     DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
     DEBUG_SERIAL("Internal Temperature (Thermo2): " + String(thermo2.getInternalTemp()) + "C");
-    DEBUG_SERIAL("Speed: " + String(gps.getSpeedKph()) + "KM/h");    
+    DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
+    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
+    DEBUG_SERIAL("Horizontal Speed: " + String(gps.getHorizontalSpeed()) + "m/s");
+    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
+    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + "m");
+    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
+    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
+    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");    
+    DEBUG_SERIAL("Satellites in View: " + String(gps.getSatellitesInView()));
     DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
     DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
@@ -101,6 +109,11 @@ void setup() {
         Serial.begin(115200);
     }
 
+    // Start i2c with clock speed of 400 KHz
+    // This requires the pull-up resistors to be removed on i2c bus
+    Wire.setClock(400000);
+    Wire.begin();
+
     Time.zone(TIME_ZONE);
 
     for (Sensor *s : sensors) {
@@ -138,7 +151,7 @@ void loop() {
         if(!Time.isValid()){
             if(gps.getTimeValid()){
                 led_blue.on();
-                Time.setTime(gps.getTime());
+                Time.setTime(gps.getUnixTime());
             }
         }else{
             led_blue.on();

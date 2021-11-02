@@ -1,12 +1,9 @@
 #include "SensorGps.h"
 
-char sentenceBuffer[128];
-String completeSentence = "";
+SensorGps::SensorGps(SFE_UBLOX_GNSS *gps, uint8_t updateFrequency) {
+    _updateFrequency = updateFrequency;
+    _gps = gps;
 
-
-SensorGps::SensorGps(uint16_t updateInterval) {
-    _updateInterval = updateInterval;
-    _gps = new SFE_UBLOX_GNSS();
 }
 
 String SensorGps::getHumanName() {
@@ -14,68 +11,97 @@ String SensorGps::getHumanName() {
 }
 
 void SensorGps::begin() {
-    Wire.begin();
+ 
     _gps->begin();
 
-    // Disable all NMEA messages we don't want
-    _gps->disableNMEAMessage(UBX_NMEA_GLL, COM_PORT_I2C);
-    _gps->disableNMEAMessage(UBX_NMEA_GSA, COM_PORT_I2C);
-    _gps->disableNMEAMessage(UBX_NMEA_GSV, COM_PORT_I2C);
-    _gps->disableNMEAMessage(UBX_NMEA_GGA, COM_PORT_I2C);
-    _gps->disableNMEAMessage(UBX_NMEA_VTG, COM_PORT_I2C);
-    _gps->disableNMEAMessage(UBX_NMEA_TXT, COM_PORT_I2C);
-    // Enable only GPRMC/GNRMC messages
-    _gps->enableNMEAMessage(UBX_NMEA_RMC, COM_PORT_I2C);
-
-    // Set i2c to only output NMEA messages
-    _gps->setI2COutput(COM_TYPE_NMEA);
-
-    // Convert update interval in ms to update rate in s
-    // Limit update rate to 1Hz-10Hz
-    uint8_t rate = 1000 / _updateInterval;
-    if(rate < 1) rate = 1;
-    else if(rate > 10) rate = 10;
-    _gps->setNavigationFrequency(rate);
+    // Output NMEA and UBX messages over i2c
+    _gps->setI2COutput(COM_TYPE_UBX);
+    // GPS polls are non-blocking
+    _gps->setAutoPVT(true);
+    // Set the update frequency
+    _gps->setNavigationFrequency(_updateFrequency);
 
 }
 
 void SensorGps::handle() {
+    // The Sparkfun GNSS library automatically rate-limits the checks to _updateFrequency * 4
     _gps->checkUblox();
-}
 
-String SensorGps::getSentence() {
-    return completeSentence;
-}
+    // Calculate the current microsecond
+    uint64_t thisUpdateMicros = (_gps->getUnixEpoch() * MICROSECONDS_IN_SECOND) + (_gps->getNanosecond() / NANOSECONDS_IN_MICROSECOND);
 
-float SensorGps::getSpeedKph() {
-    String speedString = completeSentence.substring(completeSentence.indexOf(",W,") + 3);
-    speedString = speedString.substring(0,speedString.indexOf(','));
-    float speedKnots = speedString.toFloat();
-    return speedKnots * 1.852;
-}
+    // Check to see if there has been an update
+    if(thisUpdateMicros != _lastUpdateMicros){
 
-uint32_t SensorGps::getTime() {
-    return _gps->getUnixEpoch();
+        uint64_t elapsedMicroseconds = thisUpdateMicros - _lastUpdateMicros;
+
+        // Calculate XY Acceleration
+        float horizontalSpeed = _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
+        _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
+        _lastHorizontalSpeed = horizontalSpeed;
+
+        // Calculate Z Speed
+        float altitude = _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
+        _verticalSpeed = ((altitude - _lastAltitude) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
+        _lastAltitude = altitude;
+
+        // Calculate Z Acceleration
+        _verticalAcceleration = ((_verticalSpeed - _lastVerticalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
+        _lastVerticalSpeed = _verticalSpeed;
+
+        _lastUpdateMicros = thisUpdateMicros;
+    }
+        
 }
 
 bool SensorGps::getTimeValid() {
     return _gps->getTimeValid();
 }
 
-/**
- * Replaces the Sparkfun GNSS library method for handling incoming bytes over i2c
- * 
- * @param incoming byte over i2c
- **/
-void SFE_UBLOX_GNSS::processNMEA(char incoming) {
-    // If there is a new line, update the current complete sentence with buffer contents and clear the buffer
-    if(incoming == '\n'){
-        completeSentence = String(sentenceBuffer);
-        memset(sentenceBuffer, 0, sizeof(sentenceBuffer));
-    // Append the current byte to the buffer
-    }else{
-        uint8_t bufferLength = strlen(sentenceBuffer);
-        sentenceBuffer[bufferLength] = incoming;
-        sentenceBuffer[bufferLength+1] = '\0';
-    }
+uint32_t SensorGps::getUnixTime() {
+    return _gps->getUnixEpoch();
+}
+
+float SensorGps::getLongitude() {
+    return _gps->getLongitude() / TEN_POWER_SEVEN;
+}
+
+float SensorGps::getLatitude() {
+    return _gps->getLatitude() / TEN_POWER_SEVEN;
+}
+
+float SensorGps::getHeading() {
+    return _gps->getHeading() / TEN_POWER_FIVE;
+}
+
+float SensorGps::getHorizontalSpeed() {
+    return _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
+}
+
+float SensorGps::getHorizontalAcceleration() {
+    return _horizontalAcceleration;
+}
+
+float SensorGps::getHorizontalAccuracy() {
+    return _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
+}
+
+float SensorGps::getAltitude() {
+    return _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
+}
+
+float SensorGps::getVerticalSpeed() {
+    return _verticalSpeed;
+}
+
+float SensorGps::getVerticalAcceleration() {
+    return _verticalAcceleration;
+}
+
+float SensorGps::getVerticalAccuracy() {
+    return _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
+}
+
+uint8_t SensorGps::getSatellitesInView() {
+    return _gps->getSIV();
 }
