@@ -14,6 +14,8 @@ class IntervalLogger {
         **/
         IntervalLogger();
 
+        ~IntervalLogger();
+
         /**
         *  Constructor
         * 

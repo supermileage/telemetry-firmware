@@ -18,7 +18,7 @@ class DataQueue {
         /**
          * Constructor
          * */
-        DataQueue();
+        DataQueue(String publishHeader);
 
         /**
          * Adds an integer value and its ID into the data queue.
@@ -103,6 +103,7 @@ class DataQueue {
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];
         PublishQueuePosix* _publishQueue;
+        String _publishHeader;
 
         /**
          * Removes the data stored in the JSON object and reinitializes

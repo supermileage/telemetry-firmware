@@ -26,7 +26,7 @@ Led led_orange(A0, 63);
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-DataQueue dataQ;
+DataQueue dataQ("urban");
 Dispatcher *dispatcher;
 
 uint32_t lastPublish = 0;
@@ -127,9 +127,8 @@ void loop() {
         }
     }
 
-    unsigned long seconds = millis() / 1000;
     dataQ.loop();
-    dispatcher->run(seconds);
+    dispatcher->run();
 
     // LED Handlers
     led_orange.handle();

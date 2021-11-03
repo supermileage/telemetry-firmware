@@ -36,14 +36,15 @@ class DispatcherFactory {
          * Destructor which frees unused heap data (can safely be called after build)
         **/
         ~DispatcherFactory() {
-            delete _intervals;
-            delete _numCommandsOnIntervals;
+            delete[] _intervals;
+            delete[] _numCommandsOnIntervals;
+            delete[] _commands;
         }
 
         /**
          * Adds a Sensor-property getter function, the property name, and interval at which to call it
          * 
-         * @param S the address of the Sensor whose getter you want to be called
+         * @param sensor the address of the Sensor whose getter you want to be called
          * @param propertyName the publish-name of the property which the getter returns
          * @param func function pointer to Sensor member function with return type of R
          * @param interval the interval (in seconds) at which you want to log data from Sensor's getter

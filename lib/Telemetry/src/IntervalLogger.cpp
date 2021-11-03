@@ -15,6 +15,13 @@ IntervalLogger::IntervalLogger(Command **commands, uint8_t numCommands, uint16_t
     _logThisLoop = false;
 }
 
+IntervalLogger::~IntervalLogger() {
+    for (uint16_t i = 0; i < _numCommands; i++) { 
+        delete _commands[i];
+    }
+    delete[] _commands;
+}
+
 void IntervalLogger::log(DataQueue *dataQ) {
     for (uint8_t i = 0; i < _numCommands; i++) {
         _commands[i]->execute(dataQ);

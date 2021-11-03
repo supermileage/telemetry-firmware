@@ -20,13 +20,21 @@ class Dispatcher {
             _logThisLoop = false;
         }
 
+        ~Dispatcher() {
+            for (uint16_t i = 0; i < _numLoggers; i++) {
+                delete _loggers[i];
+            }
+            delete[] _loggers;
+        }
+
         /**
          *  Must be called from main loop!  Takes times since program start (in seconds) and checks whether
          *  log needs to be called on any of its loggers.
          * 
          * @param time the time in seconds since the start of the program
          **/
-        void run(unsigned long time) {
+        void run() {
+            unsigned long time = millis() / 1000;
             // check if it's time to log any data from any of the loggers
             for (uint16_t i = 0; i < _numLoggers; i++) {
                 if ((_loggers[i]->getLastLog() + _loggers[i]->getInterval()) <= time) {
