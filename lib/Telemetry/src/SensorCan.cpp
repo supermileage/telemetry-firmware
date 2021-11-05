@@ -12,12 +12,12 @@ String SensorCan::getHumanName() {
 }
 
 void SensorCan::begin() {
-    _CAN->begin(CAN_125KBPS,MCP_8MHz);
+    _CAN->begin(CAN_500KBPS,MCP_8MHz);
 }
 
 void SensorCan::handle() {
     if(!digitalRead(_intPin)){
-        if(_CAN->checkReceive() == CAN_MSGAVAIL){
+        while(_CAN->checkReceive() == CAN_MSGAVAIL){
             unsigned char len = 0;
             unsigned char data[8];
             _CAN->readMsgBuf(&len, data);
