@@ -1,5 +1,5 @@
 #ifndef _SENSOR_SIG_H_
-#define _SENSOR_CAN_H_
+#define _SENSOR_SIG_H_
 
 #include "Particle.h"
 #include "Sensor.h"
