@@ -13,9 +13,10 @@
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-SensorGps gps(GPS_UPDATE_INTERVAL_MS);
+SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
+
 SensorEcu ecu(&Serial1);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
@@ -48,8 +49,7 @@ void publishMessage() {
     dataQ.add("PROTO-O2S", ecu.getO2S());
     dataQ.add("PROTO-SPARK", ecu.getSpark());
     // GPS data
-    dataQ.add("PROTO-Location", gps.getSentence());
-    dataQ.add("PROTO-Speed", gps.getSpeedKph());
+    dataQ.add("PROTO-Speed", gps.getHorizontalSpeed());
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
@@ -74,6 +74,14 @@ void publishMessage() {
     DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + " %");
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + " %");
     DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
+    DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
+    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
+    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2");
+    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + " m");
+    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2");
+    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + " m");
+    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + " m");  
+    DEBUG_SERIAL("Satellites in View: " + String(gps.getSatellitesInView()));
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
@@ -100,6 +108,11 @@ void setup() {
     if(DEBUG_SERIAL_ENABLE){
         Serial.begin(115200);
     }
+
+    // Start i2c with clock speed of 400 KHz
+    // This requires the pull-up resistors to be removed on i2c bus
+    Wire.setClock(400000);
+    Wire.begin();
 
     Time.zone(TIME_ZONE);
 
@@ -140,7 +153,7 @@ void loop() {
         if(!Time.isValid()){
             if(gps.getTimeValid()){
                 led_blue.on();
-                Time.setTime(gps.getTime());
+                Time.setTime(gps.getUnixTime());
             }
         }else{
             led_blue.on();
