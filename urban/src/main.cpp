@@ -66,8 +66,7 @@ void publishMessage() {
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + " %");
     DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
     DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
-    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
-    DEBUG_SERIAL("Speed: " + String(gps.getSpeedKph()) + " KM/h");    
+    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));  
     DEBUG_SERIAL("Horizontal Speed: " + String(gps.getHorizontalSpeed()) + " m/s");
     DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2");
     DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + " m");
