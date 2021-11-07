@@ -8,22 +8,14 @@
  **/
 class Command {
     public:
-        /**
-         * Default constructor
-         **/
         Command() { }
 
-        virtual void execute(DataQueue *dataQ) = 0;
+        virtual ~Command() { }
 
         /**
-         *  Returns interval assigned to this command (_interval is only assigned in constructor of subclasses)
+         * Virtual function executes the instruction owned by this command
          **/
-        uint16_t getInterval() {
-            return _interval;
-        }
-
-    protected:
-         uint16_t _interval;
+        virtual void execute() = 0;
 };
 
 #endif

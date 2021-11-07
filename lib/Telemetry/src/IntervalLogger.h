@@ -1,8 +1,10 @@
-#include "Command.h"
-#include "DataQueue.h"
-
 #ifndef _INTERVAL_LOGGER_H_
 #define _INTERVAL_LOGGER_H_
+
+#include "Particle.h"
+#include "settings.h"
+#include "DataQueue.h"
+#include "IntervalCommand.h"
 
 /**
  * IntervalLogger owns a collection of logging commands set to log on the same interval
@@ -28,7 +30,7 @@ class IntervalLogger {
         /**
         *  Calls execute on all commands owned by this logger
         **/
-        void log(DataQueue *dataQ);
+        void log();
 
         /**
         *  Retuns the interval length (in seconds)

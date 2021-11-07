@@ -1,33 +1,19 @@
+#include "globals.h"
 #include "Particle.h"
-#include "settings.h"
+#include "DispatcherFactory.h"
 #include "Led.h"
-
-#include "Sensor.h"
-#include "SensorGps.h"
-#include "SensorCan.h"
-#include "SensorThermo.h"
-
-#include "DataQueue.h"
-#include "../Telemetry/src/DispatcherFactory.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
-
-SensorGps gps(GPS_UPDATE_FREQUENCY);
-SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
-SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
-
-Sensor *sensors[3] = {&gps, &thermo1, &thermo2};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-DataQueue dataQ("fc");
 Dispatcher *dispatcher;
 
-uint32_t lastPublish = 0;
+unsigned long lastPublish = 0;
 
 /**
  * Publishes a new message to Particle Cloud
@@ -95,15 +81,8 @@ void setup() {
         s->begin();
     }
 
-    DispatcherFactory factory(6, &dataQ);
-
-    factory.add<SensorGps, float>(&gps, "lat", &SensorGps::getLatitude, 1);
-    factory.add<SensorGps, float>(&gps, "long", &SensorGps::getLongitude, 1);
-    factory.add<SensorGps, float>(&gps, "v-accel", &SensorGps::getVerticalAcceleration, 2);
-    factory.add<SensorGps, float>(&gps, "h-accel", &SensorGps::getHorizontalAcceleration, 2);
-    factory.add<SensorThermo, double>(&thermo1, "temp1", &SensorThermo::getTemp, 5);
-    factory.add<SensorThermo, double>(&thermo2, "temp2", &SensorThermo::getTemp, 5);
-
+    // commands are define in globals.cpp
+    DispatcherFactory factory(commands, &dataQ);
     dispatcher = factory.build();
 
     led_blue.flashRepeat(500);
@@ -135,7 +114,7 @@ void loop() {
     led_green.handle();
 
     // Publish a message every publish interval
-    if (time - lastPublish >= PUBLISH_INTERVAL_MS){
+    if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
         // If no valid time pulled from cellular, attempt to get valid time from GPS (should be faster)
         if(!Time.isValid()){
             if(gps.getTimeValid()){
@@ -146,7 +125,7 @@ void loop() {
             led_blue.on();
         }
 
-        lastPublish = time;
+        lastPublish = millis();
         publishMessage();
     }
 

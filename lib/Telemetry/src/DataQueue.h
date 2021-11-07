@@ -5,6 +5,8 @@
 #define RAM_QUEUE_EVENT_COUNT 8
 
 #include "PublishQueuePosixRK.h"
+#include "Particle.h"
+#include "settings.h"
 
 /**
  * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
@@ -26,43 +28,11 @@ class DataQueue {
          * 
          * @param id A string representing an id for the data.
          * 
-         * @param value An integer representing the data to be stored in 
+         * @param value the data (of type T) to be stored in 
          *              the queue.
          * */
-        void add(String id, int value);
-
-        /**
-         * Adds a string value and its ID into the data queue.
-         * An ID may not be added twice before publishing the data queue.
-         * 
-         * @param id A string representing an id for the data.
-         * 
-         * @param value A string representing the data to be stored in 
-         *              the queue.
-         * */
-        void add(String id, String value);
-
-        /**
-         * Adds a float value and its ID into the data queue.
-         * An ID may not be added twice before publishing the data queue.
-         * 
-         * @param id A string representing an id for the data.
-         * 
-         * @param value A float representing the data to be stored in 
-         *              the queue.
-         * */
-        void add(String id, float value);
-
-        /**
-         * Adds a float value and its ID into the data queue.
-         * An ID may not be added twice before publishing the data queue.
-         * 
-         * @param id A string representing an id for the data.
-         * 
-         * @param value A double representing the data to be stored in 
-         *              the queue.
-         * */
-        void add(String id, double value);
+        template <typename T>
+        void add(String id, T value) { _writer->name(id).value(value); };
 
         /**
          * Wrapper for loop function of PublishQueuePosix

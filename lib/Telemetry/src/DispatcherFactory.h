@@ -1,14 +1,13 @@
+#ifndef _DISPTACHER_FACTORY_H_
+#define _DISPATCHER_FACTORY_H_
+
+#include "Particle.h"
 #include "DataQueue.h"
 #include "LogCommand.h"
-#include "Command.h"
 #include "Dispatcher.h"
-#include "Particle.h"
 #include "IntervalLogger.h"
 
 #define MAX_NUM_INTERVALS 5
-
-#ifndef _DISPTACHER_FACTORY_H_
-#define _DISPATCHER_FACTORY_H_
 
 // This isn't really a factory but it has a similar purpose:
 // Add all the commands you want to this and call build().  It
@@ -23,13 +22,19 @@ class DispatcherFactory {
          * Note: this must be accurate and has potential to cause a segfault if the value is too low
          * @param dataQ the Data Queue from main
          * */
-        DispatcherFactory(uint16_t numCommands, DataQueue *dataQ) {
+        DispatcherFactory(IntervalCommand *commands[], DataQueue *dataQ) {
             _dataQ = dataQ;
-            _commands = new Command*[numCommands];
-            _intervals = new uint16_t[MAX_NUM_INTERVALS] ();
-            _numCommandsOnIntervals = new uint16_t[MAX_NUM_INTERVALS] ();
-            _numCommands = 0;
             _numIntervals = 0;
+            _numCommands = sizeof(&commands);
+            _commands = commands;
+            _intervals = new uint16_t[MAX_NUM_INTERVALS] ();
+            _numCommandsAddedOnIntervals = new uint16_t[MAX_NUM_INTERVALS] ();
+
+            for (uint16_t i = 0; i < _numCommands; i++) {
+                addInterval(commands[i]);
+            }
+
+            DEBUG_SERIAL("num commands = " + String(_numCommands));
         }
         
         /**
@@ -37,27 +42,7 @@ class DispatcherFactory {
         **/
         ~DispatcherFactory() {
             delete[] _intervals;
-            delete[] _numCommandsOnIntervals;
-            delete[] _commands;
-        }
-
-        /**
-         * Adds a Sensor-property getter function, the property name, and interval at which to call it
-         * 
-         * @param sensor the address of the Sensor whose getter you want to be called
-         * @param propertyName the publish-name of the property which the getter returns
-         * @param func function pointer to Sensor member function with return type of R
-         * @param interval the interval (in seconds) at which you want to log data from Sensor's getter
-         **/
-        template <class S, class R>
-        void add(S *sensor, String propertyName, R (S::*func)(), uint16_t interval) {
-            _commands[_numCommands++] = new LogCommand<S, R>(sensor, propertyName, func, interval);
-
-            if (!containsInterval(interval)) {
-                _intervals[_numIntervals++] = interval; 
-            }
-
-            updateIntervals(interval);
+            delete[] _numCommandsAddedOnIntervals;
         }
 
         /**
@@ -71,7 +56,7 @@ class DispatcherFactory {
             // add loggers to pointer array of loggers
             for (int i = 0; i < _numIntervals; i++) {
                 uint16_t interval = _intervals[i];
-                uint16_t numCommandsOnInterval = _numCommandsOnIntervals[i];
+                uint16_t numCommandsOnInterval = _numCommandsAddedOnIntervals[i];
                 Command **commandsOnInterval = new Command*[numCommandsOnInterval];
                 
                 uint16_t commandCount = 0;
@@ -87,6 +72,23 @@ class DispatcherFactory {
         }
 
     private:
+        /**
+         * Adds a Sensor-property getter function, the property name, and interval at which to call it
+         * 
+         * @param sensor the address of the Sensor whose getter you want to be called
+         * @param propertyName the publish-name of the property which the getter returns
+         * @param func function pointer to Sensor member function with return type of R
+         * @param interval the interval (in seconds) at which you want to log data from Sensor's getter
+         **/
+        void addInterval(IntervalCommand *command) {
+
+            if (!containsInterval(command->getInterval())) {
+                _intervals[_numIntervals++] = command->getInterval(); 
+            }
+
+            updateIntervals(command->getInterval());
+        }
+
         // return true if array of intervals already contains this interval
         bool containsInterval(uint16_t newInterval) {
             for (uint16_t i = 0; i < _numIntervals; i++) {
@@ -100,16 +102,16 @@ class DispatcherFactory {
         void updateIntervals(uint16_t newInterval) {
             for (uint16_t i = 0; i < _numIntervals; i++) {
                 if (newInterval == _intervals[i])
-                    ++_numCommandsOnIntervals[i];
+                    ++_numCommandsAddedOnIntervals[i];
             } 
         }
 
-        Command **_commands;
+        IntervalCommand **_commands;
         DataQueue *_dataQ;
-        uint16_t _numCommands;
         uint16_t *_intervals;
-        uint16_t *_numCommandsOnIntervals;
+        uint16_t *_numCommandsAddedOnIntervals;
         uint16_t _numIntervals;
+        uint16_t _numCommands;
 };
 
 #endif

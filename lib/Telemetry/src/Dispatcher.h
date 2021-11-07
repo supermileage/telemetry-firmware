@@ -1,9 +1,9 @@
+#ifndef _DISPATCHER_H_
+#define _DISPATCHER_H_
+
 #include "Particle.h"
 #include "DataQueue.h"
 #include "IntervalLogger.h"
-
-#ifndef _DISPATCHER_H_
-#define _DISPATCHER_H_
 
 /**
  * Dispatcher owns and operates on a collection of loggers
@@ -49,7 +49,7 @@ class Dispatcher {
                 _dataQ->wrapStart();
                 for (uint16_t i = 0; i < _numLoggers; i++) {
                     if (_loggers[i]->logThisLoop()) {
-                        _loggers[i]->log(_dataQ);
+                        _loggers[i]->log();
                         _loggers[i]->logThisLoop(false);
                     }
                 }

@@ -1,27 +1,8 @@
 #include "DataQueue.h"
-#include "Particle.h"
-
-#include "settings.h"
 
 DataQueue::DataQueue(String publishHeader) {
 	_publishHeader = publishHeader;
 	_init();
-}
-
-void DataQueue::add(String id, int value) {
-	_writer->name(id).value(value);
-}
-
-void DataQueue::add(String id, String value) {
-	_writer->name(id).value(value);
-}
-
-void DataQueue::add(String id, float value) {
-	_writer->name(id).value(value);
-}
-
-void DataQueue::add(String id, double value) {
-	_writer->name(id).value(String(value));
 }
 
 void DataQueue::wrapStart() {

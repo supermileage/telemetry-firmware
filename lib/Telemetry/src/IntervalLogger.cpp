@@ -1,9 +1,5 @@
-#include "Particle.h"
-#include "settings.h"
-
 #include "IntervalLogger.h"
-#include "DataQueue.h"
-#include "Command.h"
+
 
 IntervalLogger::IntervalLogger() { }
 
@@ -22,9 +18,9 @@ IntervalLogger::~IntervalLogger() {
     delete[] _commands;
 }
 
-void IntervalLogger::log(DataQueue *dataQ) {
+void IntervalLogger::log() {
     for (uint8_t i = 0; i < _numCommands; i++) {
-        _commands[i]->execute(dataQ);
+        _commands[i]->execute();
     }
 }
 
