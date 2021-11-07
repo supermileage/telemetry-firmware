@@ -13,12 +13,12 @@ void SensorSigStrength:: begin() {
 void SensorSigStrength::handle() {
 }
 
-float SensorSigStrength::getStrength() {
+String SensorSigStrength::getStrength() {
     _sig = Cellular.RSSI();
-    return (int) _sig.getStrength();
+    return String::format("%.0f",_sig.getStrength());
 }
 
-float SensorSigStrength:: getQuality() {
+String SensorSigStrength:: getQuality() {
     _sig = Cellular.RSSI();
-    return (int) _sig.getQuality();
+    return String::format("%.0f",_sig.getQuality());
 }

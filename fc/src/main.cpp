@@ -17,7 +17,7 @@ SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 
 
-Sensor *sensors[4] = {&gps, &thermo1, &thermo2, &sigStrength};
+Sensor *sensors[] = {&gps, &thermo1, &thermo2, &sigStrength};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
@@ -37,52 +37,56 @@ void publishMessage() {
         start = micros();
     }
 
+    dataQ.add("PropertyName", "Value");
+
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
     }
 
-    DEBUG_SERIAL("------------------------");
+    DEBUG_SERIAL_LN("------------------------");
     if(PUBLISH_ENABLED){
-        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        DEBUG_SERIAL_LN("FC - Publish ENABLED - Message: ");
         // Publish to Particle Cloud
-        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
+        DEBUG_SERIAL_LN(dataQ.publish("Proto", PRIVATE, WITH_ACK));
     }else{
-        DEBUG_SERIAL("Publish - DISABLED - Message: ");
-        DEBUG_SERIAL(dataQ.resetData());
+        DEBUG_SERIAL_LN("FC - Publish DISABLED - Message: ");
+        DEBUG_SERIAL_LN(dataQ.resetData());
     }
 
-    // Any sensors that are working but not yet packaged for publish
-    DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Probe Temperature (Thermo1): " + String(thermo1.getProbeTemp()) + "C");
-    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
-    DEBUG_SERIAL("Internal Temperature (Thermo2): " + String(thermo2.getInternalTemp()) + "C");
-    DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
-    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
-    DEBUG_SERIAL("Horizontal Speed: " + String(gps.getHorizontalSpeed()) + "m/s");
-    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
-    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + "m");
-    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
-    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
-    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");    
-    DEBUG_SERIAL("Satellites in View: " + String(gps.getSatellitesInView()));  
-    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
-    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
-    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
-
-    DEBUG_SERIAL();
+    if(DEBUG_SENSOR_ENABLE){
+        DEBUG_SERIAL_LN("");
+        DEBUG_SERIAL_LN("SENSOR READINGS: ");
+        // Diagnostic
+        DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + " % - ");
+        DEBUG_SERIAL_LN("Signal Quality: " + String(sigStrength.getQuality()) + " %");
+        // Thermocouples
+        DEBUG_SERIAL("Temperature (Thermo1): " + String(thermo1.getProbeTemp()) + "°C - ");
+        DEBUG_SERIAL("Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "°C - ");
+        DEBUG_SERIAL_LN("Internal Temperature (Thermo1): " + String(thermo1.getInternalTemp()) + "°C");
+        // GPS
+        DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()) + "° - ");
+        DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()) + "° - ");
+        DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2 - ");
+        DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + " m - ");
+        DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2 - ");
+        DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + " m - ");
+        DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + " m - ");  
+        DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
+        DEBUG_SERIAL_LN();
+    }
     
     if(DEBUG_MEM){
-        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
+        DEBUG_SERIAL_LN("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
     }
 
     // Output CPU time in microseconds spent on each task
     if (DEBUG_CPU_TIME) {
-        DEBUG_SERIAL("\nCPU Time:");
-        DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
+        DEBUG_SERIAL_LN("\nCPU Time:");
+        DEBUG_SERIAL_LN("Build JSON Message: " + String(json_build_time) + "us");
         for (Sensor *s : sensors) {
-            DEBUG_SERIAL(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
+            DEBUG_SERIAL_LN(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
         }
-        DEBUG_SERIAL();
+        DEBUG_SERIAL_LN();
     }
 }
 
@@ -109,7 +113,7 @@ void setup() {
 
     led_blue.flashRepeat(500);
 
-    DEBUG_SERIAL("TELEMETRY ONLINE - FC");
+    DEBUG_SERIAL_LN("TELEMETRY ONLINE - FC");
 }
 
 /**

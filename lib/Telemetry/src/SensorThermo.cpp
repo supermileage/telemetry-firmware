@@ -18,10 +18,10 @@ void SensorThermo::begin() {
 void SensorThermo::handle() {
 }
 
-double SensorThermo::getProbeTemp() {
-    return _probe->readCelsius();
+String SensorThermo::getProbeTemp() {
+    return String::format("%.0f",_probe->readCelsius());
 }
 
-double SensorThermo::getInternalTemp() {
-    return _probe->readInternal();
+String SensorThermo::getInternalTemp() {
+    return String::format("%.0f",_probe->readInternal());
 }

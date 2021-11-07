@@ -40,57 +40,57 @@ class SensorGps : public Sensor {
         /**
          * @return Longitude (degrees)
          **/
-        float getLongitude();
+        String getLongitude();
 
         /**
          * @return Latitude (degrees)
          **/
-        float getLatitude();
+        String getLatitude();
 
         /**
          * @return Heading of motion (degrees)
          **/
-        float getHeading();
+        String getHeading();
 
         /**
          * @return Horizontal speed (m/s)
          **/
-        float getHorizontalSpeed();
+        String getHorizontalSpeed();
 
         /**
          * @return Horizontal acceleration (m/s^2)
          **/
-        float getHorizontalAcceleration();
+        String getHorizontalAcceleration();
 
         /**
          * @return Horizontal position accuracy (m)
          **/
-        float getHorizontalAccuracy();
+        String getHorizontalAccuracy();
 
         /**
          * @return Vertical Position relative to Mean Sea Level (m)
          **/
-        float getAltitude();
+        String getAltitude();
 
         /**
          * @return Vertical speed (m/s)
          **/
-        float getVerticalSpeed();
+        String getVerticalSpeed();
         
         /**
          * @return Vertical acceleration b (m/s^2)
          **/
-        float getVerticalAcceleration();
+        String getVerticalAcceleration();
 
         /**
          * @return Vertical position accuracy (m)
          **/
-        float getVerticalAccuracy();
+        String getVerticalAccuracy();
 
         /**
          * @return Number of Satellites currently seen by GPS
          **/
-        uint8_t getSatellitesInView();
+        String getSatellitesInView();
 
     private:
         SFE_UBLOX_GNSS* _gps;
