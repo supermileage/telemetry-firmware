@@ -13,5 +13,4 @@ LogCommand<SensorGps, float> gpsHorAccel(&dataQ, &gps, "h-accel", &SensorGps::ge
 LogCommand<SensorThermo, double> thermoTemp1(&dataQ, &thermo1, "temp1", &SensorThermo::getTemp, 5);
 LogCommand<SensorThermo, double> thermoTemp2(&dataQ, &thermo2, "temp2", &SensorThermo::getTemp, 5);
 
-Sensor *sensors[NUM_SENSORS] = {&gps, &thermo1, &thermo2};
 IntervalCommand *commands[NUM_LOG_COMMANDS] = { &gpsLat, &gpsLong, &gpsVertAccel, &gpsHorAccel, &thermoTemp1, &thermoTemp2 };

@@ -1,5 +1,4 @@
 #include "globals.h"
-#include "Particle.h"
 #include "DispatcherFactory.h"
 #include "Led.h"
 

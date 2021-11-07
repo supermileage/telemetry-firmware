@@ -1,6 +1,7 @@
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
+#include "Particle.h"
 #include "settings.h"
 #include "SensorGps.h"
 #include "SensorCan.h"
