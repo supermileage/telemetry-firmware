@@ -1,6 +1,4 @@
 #include "globals.h"
-#include "DispatcherFactory.h"
-#include "Led.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -10,8 +8,28 @@ Led led_orange(A0, 63);
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-Dispatcher *dispatcher;
 
+// Global Objects to Test
+
+DataQueue dataQ("fc");
+
+// SensorGps gps(GPS_UPDATE_FREQUENCY);
+// SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
+// SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
+
+// LogCommand<SensorGps, float> gpsLat(&dataQ, &gps, "lat", &SensorGps::getLatitude, 1);
+// LogCommand<SensorGps, float> gpsLong(&dataQ, &gps, "long", &SensorGps::getLongitude, 1);
+// LogCommand<SensorGps, float> gpsVertAccel(&dataQ, &gps, "v-accel", &SensorGps::getVerticalAcceleration, 2);
+// LogCommand<SensorGps, float> gpsHorAccel(&dataQ, &gps, "h-accel", &SensorGps::getHorizontalAcceleration, 2);
+// LogCommand<SensorThermo, double> thermoTemp1(&dataQ, &thermo1, "temp1", &SensorThermo::getTemp, 5);
+// LogCommand<SensorThermo, double> thermoTemp2(&dataQ, &thermo2, "temp2", &SensorThermo::getTemp, 5);
+
+// Sensor *sensors[] = { &gps, &thermo1, &thermo2 };
+// IntervalCommand *commands[] = { &gpsLat, &gpsLong, &gpsVertAccel, &gpsHorAccel, &thermoTemp1, &thermoTemp2 };
+
+// End of Global Objects to Test
+
+Dispatcher *dispatcher;
 unsigned long lastPublish = 0;
 
 /**
@@ -36,6 +54,11 @@ void publishMessage() {
         DEBUG_SERIAL("Publish - DISABLED - Message: ");
         DEBUG_SERIAL(dataQ.resetData());
     }
+
+    // TODO: remove this
+    DEBUG_SERIAL("\nThe extern int that you declared: " + String(six));
+    DEBUG_SERIAL("\nThe extern word that you declared: " + String(theWord));
+    DEBUG_SERIAL("\nSome data from extern SensorGps: " + String(gps1.getLongitude()));
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
@@ -80,6 +103,9 @@ void setup() {
         s->begin();
     }
 
+    // TODO: remove this
+    gps1.begin();
+
     // commands are define in globals.cpp
     DispatcherFactory factory(commands, &dataQ);
     dispatcher = factory.build();
@@ -103,6 +129,9 @@ void loop() {
             s->handle();
         }
     }
+
+    // TODO: remove this
+    gps1.handle();
 
     dataQ.loop();
     dispatcher->run();
