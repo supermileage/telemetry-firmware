@@ -1,7 +1,6 @@
 #define PROTO 0
 #define URBAN 1
 #define FC 2
-
 #define CURRENT_VEHICLE 1
 
 #if (CURRENT_VEHICLE == PROTO)
@@ -22,7 +21,7 @@ Led led_green(D8, 40);
 
 DataQueue dataQ(VEHICLE_NAME);
 Dispatcher *dispatcher;
-uint32_t lastPublish = 0;
+unsigned long lastPublish = 0;
 
 
 /**
@@ -35,11 +34,11 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    for (Sensor *s : sensors) {
-        s->begin();
+    for (unsigned i = 0; i < sensor_count; i++) {
+        sensors[i]->begin();
     }
 
-    DispatcherBuilder builder(commands, &dataQ);
+    DispatcherBuilder builder(commands, command_count, &dataQ);
     dispatcher = builder.build();
 
     led_blue.flashRepeat(500);
@@ -50,11 +49,11 @@ void setup() {
  * */
 void loop() {
     // Sensor Handlers
-    for (Sensor *s : sensors) {
+    for (unsigned i = 0; i < sensor_count; i++) {
         if (DEBUG_CPU_TIME) {
-            s->benchmarkedHandle();
+            sensors[i]->benchmarkedHandle();
         } else {
-            s->handle();
+            sensors[i]->handle();
         }
     }
 

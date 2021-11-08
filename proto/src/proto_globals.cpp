@@ -1,10 +1,12 @@
 #include "proto_globals.h"
 
+// sensor definitions
 SensorGps gps(GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
 SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
 SensorEcu ecu(&Serial1);
 
+// command definitions
 LogCommand<SensorEcu, float> ecuEct(&dataQ, &ecu, "PROTO-ECT", &SensorEcu::getECT, 5);
 LogCommand<SensorEcu, float> ecuIat(&dataQ, &ecu, "PROTO-IAT", &SensorEcu::getIAT, 5);
 LogCommand<SensorEcu, float> ecuRpm(&dataQ, &ecu, "PROTO-RPM", &SensorEcu::getRPM, 5);
@@ -14,14 +16,18 @@ LogCommand<SensorEcu, float> ecuSpark(&dataQ, &ecu, "PROTO-SPARK", &SensorEcu::g
 LogCommand<SensorGps, float> gpsLat(&dataQ, &gps, "PROTO-Latitude", &SensorGps::getLatitude, 1);
 LogCommand<SensorGps, float> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
 
-// Update counts in globals.h if you make changes here
+// array definitions: update counts if you make changes here
 Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2};
 IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel };
+uint16_t sensor_count = 4;
+uint16_t command_count = 8;
 
+
+// SerialDebugPublishing namespace definitions
 
 /**
- * Publishes a new message to Particle Cloud
- * */
+ * Publishes a new message to Particle Cloud for proto
+**/
 void SerialDebugPublishing::publishMessage() {
     long start, json_build_time;
     if (DEBUG_CPU_TIME) {
@@ -64,6 +70,9 @@ void SerialDebugPublishing::publishMessage() {
     }
 }
 
+/**
+ * Prints proto's setup message
+**/
 void SerialDebugPublishing::setupMessage() {
     DEBUG_SERIAL("TELEMETRY ONLINE - PROTO");
 }

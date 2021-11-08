@@ -13,26 +13,26 @@
 #include "LogCommand.h"
 #include "DispatcherBuilder.h"
 
-#define NUM_SENSORS 3
-#define NUM_LOG_COMMANDS 6
 #define VEHICLE_NAME "fc"
 
 extern DataQueue dataQ;
-
 extern SensorGps gps;
-extern SensorThermo thermo1;
-extern SensorThermo thermo2;
 
-extern Sensor *sensors[NUM_SENSORS];
-extern IntervalCommand *commands[NUM_LOG_COMMANDS];
+extern Sensor *sensors[];
+extern IntervalCommand *commands[];
+extern uint16_t sensor_count;
+extern uint16_t command_count;
 
 namespace SerialDebugPublishing {
 
     /**
-     * Publishes a new message to Particle Cloud
-     * */
+     * Publishes a new message to Particle Cloud for fc
+    **/
     void publishMessage();
 
+    /**
+     * Prints fc's setup message
+    **/
     void setupMessage();
 }
 

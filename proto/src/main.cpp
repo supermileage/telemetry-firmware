@@ -37,11 +37,11 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    for (Sensor *s : sensors) {
-        s->begin();
+    for (unsigned i = 0; i < sensor_count; i++) {
+        sensors[i]->begin();
     }
 
-    DispatcherBuilder builder(commands, &dataQ);
+    DispatcherBuilder builder(commands, command_count, &dataQ);
     dispatcher = builder.build();
 
     led_blue.flashRepeat(500);
@@ -54,11 +54,11 @@ void setup() {
  * */
 void loop() {
     // Sensor Handlers
-    for (Sensor *s : sensors) {
+    for (unsigned i = 0; i < sensor_count; i++) {
         if (DEBUG_CPU_TIME) {
-            s->benchmarkedHandle();
+            sensors[i]->benchmarkedHandle();
         } else {
-            s->handle();
+            sensors[i]->handle();
         }
     }
 

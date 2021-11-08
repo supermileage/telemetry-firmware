@@ -16,18 +16,14 @@
 
 #define VEHICLE_NAME "proto"
 
-#define NUM_SENSORS 4
-#define NUM_LOG_COMMANDS 8
-
 extern DataQueue dataQ;
 
 extern SensorGps gps;
-extern SensorThermo thermo1;
-extern SensorThermo thermo2;
-extern SensorEcu ecu;
 
-extern Sensor *sensors[NUM_SENSORS];
-extern IntervalCommand *commands[NUM_LOG_COMMANDS];
+extern Sensor *sensors[];
+extern IntervalCommand *commands[];
+extern uint16_t sensor_count;
+extern uint16_t command_count;
 
 namespace SerialDebugPublishing {
     void publishMessage();
