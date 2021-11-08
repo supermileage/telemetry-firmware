@@ -1,5 +1,5 @@
-#ifndef _DISPTACHER_FACTORY_H_
-#define _DISPATCHER_FACTORY_H_
+#ifndef _DISPTACHER_BUILDER_H_
+#define _DISPATCHER_BUILDER_H_
 
 #include "Particle.h"
 #include "DataQueue.h"
@@ -9,20 +9,19 @@
 
 #define MAX_NUM_INTERVALS 5
 
-// This isn't really a factory but it has a similar purpose:
 // Add all the commands you want to this and call build().  It
 // produces a dispatcher with all logging functionality already set up
 // You can delete this safely after build() has been called
-class DispatcherFactory {
+class DispatcherBuilder {
     public:
         /**
-         * Constructs new DispatcherFactory with number of commands and data queue
+         * Constructs new DispatcherBuilder with number of commands and data queue
          * 
-         * @param numCommands The number of sensor functions you will add to the factory
+         * @param numCommands The number of sensor functions you will add to the builder
          * Note: this must be accurate and has potential to cause a segfault if the value is too low
          * @param dataQ the Data Queue from main
          * */
-        DispatcherFactory(IntervalCommand *commands[], DataQueue *dataQ) {
+        DispatcherBuilder(IntervalCommand *commands[], DataQueue *dataQ) {
             _dataQ = dataQ;
             _numIntervals = 0;
             _numCommands = sizeof(&commands);
@@ -33,14 +32,12 @@ class DispatcherFactory {
             for (uint16_t i = 0; i < _numCommands; i++) {
                 addInterval(commands[i]);
             }
-
-            DEBUG_SERIAL("num commands = " + String(_numCommands));
         }
         
         /**
          * Destructor which frees unused heap data (can safely be called after build)
         **/
-        ~DispatcherFactory() {
+        ~DispatcherBuilder() {
             delete[] _intervals;
             delete[] _numCommandsAddedOnIntervals;
         }
@@ -72,14 +69,7 @@ class DispatcherFactory {
         }
 
     private:
-        /**
-         * Adds a Sensor-property getter function, the property name, and interval at which to call it
-         * 
-         * @param sensor the address of the Sensor whose getter you want to be called
-         * @param propertyName the publish-name of the property which the getter returns
-         * @param func function pointer to Sensor member function with return type of R
-         * @param interval the interval (in seconds) at which you want to log data from Sensor's getter
-         **/
+        // adds interval to this builder's set of intervals
         void addInterval(IntervalCommand *command) {
 
             if (!containsInterval(command->getInterval())) {

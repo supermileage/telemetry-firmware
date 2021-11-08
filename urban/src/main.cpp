@@ -1,90 +1,29 @@
-#include "Particle.h"
-#include "settings.h"
-#include "DataQueue.h"
-#include "Led.h"
+#define PROTO 0
+#define URBAN 1
+#define FC 2
 
-#include "constants.h"
-#include "Sensor.h"
-#include "SensorGps.h"
-#include "SensorThermo.h"
-#include "SensorCan.h"
+#define CURRENT_VEHICLE 1
 
-#include "DispatcherFactory.h"
+#if (CURRENT_VEHICLE == PROTO)
+    #include "proto_globals.h"
+#elif (CURRENT_VEHICLE == URBAN)
+    #include "urban_globals.h"
+#else
+    #include "fc_globals.h"
+#endif
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
-
-SensorGps gps(GPS_UPDATE_FREQUENCY);
-SensorThermo thermo1(&SPI, A5, THERMO_UPDATE_INTERVAL_MS);
-SensorThermo thermo2(&SPI, A4, THERMO_UPDATE_INTERVAL_MS);
-SensorCan can(&SPI1, D5, D6);
-
-Sensor *sensors[4] = {&gps, &can, &thermo1, &thermo2};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-DataQueue dataQ("urban");
+DataQueue dataQ(VEHICLE_NAME);
 Dispatcher *dispatcher;
-
 uint32_t lastPublish = 0;
 
-/**
- * Publishes a new message to Particle Cloud
- * */
-void publishMessage() {
-    long start, json_build_time;
-    if (DEBUG_CPU_TIME) {
-        start = micros();
-    }
-
-    if (DEBUG_CPU_TIME) {
-        json_build_time = micros() - start;
-    }
-
-    DEBUG_SERIAL("------------------------");
-    if(PUBLISH_ENABLED){
-        DEBUG_SERIAL("Publish - ENABLED - Message: ");
-        // Publish to Particle Cloud
-        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
-    }else{
-        DEBUG_SERIAL("Publish - DISABLED - Message: ");
-        DEBUG_SERIAL(dataQ.resetData());
-    }
-
-    // Data NOT packaged for publish
-    DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Current Temperature (Thermo2): " + String(thermo2.getTemp()) + "C");
-    DEBUG_SERIAL("Current Speed: " + String(gps.getHorizontalSpeed()) + "KM/h");    
-    DEBUG_SERIAL("Current Time (UTC): " + Time.timeStr());
-
-    for(int i = 0; i < can.getNumIds(); i++){
-        String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
-        uint8_t canDataLength = can.getDataLen(i);
-        unsigned char* canData = can.getData(i);
-        for(int k = 0; k < canDataLength; k++){
-            output += " 0x";
-            output += String(canData[k], HEX);
-        }
-        DEBUG_SERIAL(output);
-    }
-
-    if(DEBUG_MEM){
-        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
-    }
-
-    // Output CPU time in microseconds spent on each task
-    if (DEBUG_CPU_TIME) {
-        DEBUG_SERIAL("\nCPU Time:");
-        DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
-        for (Sensor *s : sensors) {
-            DEBUG_SERIAL(s->getHumanName() + " polling: " + String(s->getLongestHandleTime()) + "us");
-        }
-        DEBUG_SERIAL();
-    }
-}
 
 /**
  * SETUP
@@ -100,18 +39,10 @@ void setup() {
         s->begin();
     }
 
-    DispatcherFactory factory(3, &dataQ);
-    // Gps data
-    factory.add<SensorGps, float>(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
-    factory.add<SensorGps, float>(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
-    // Thermo data
-    factory.add<SensorThermo, double>(&thermo1, "URBAN-Temperature", &SensorThermo::getTemp, 5);
-
-    dispatcher = factory.build();
+    DispatcherBuilder builder(commands, &dataQ);
+    dispatcher = builder.build();
 
     led_blue.flashRepeat(500);
-
-    DEBUG_SERIAL("TELEMETRY ONLINE - URBAN");
 }
 
 /**
@@ -148,7 +79,7 @@ void loop() {
         }
 
         lastPublish = millis();
-        publishMessage();
+        SerialDebugPublishing::publishMessage();
     }
 }
 
