@@ -1,10 +1,5 @@
 #include "SensorVoltage.h"
 
-#define INPUT_VOLTAGE_PIN A1
-#define ANALOG_CONVERT_RAW_TO_3V 1241
-#define R1 10000
-#define R2 2200
-
 SensorVoltage::SensorVoltage() {
     pinMode(INPUT_VOLTAGE_PIN, INPUT);
 }
