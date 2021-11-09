@@ -7,6 +7,7 @@
 #include "SensorGps.h"
 #include "SensorThermo.h"
 #include "SensorSigStrength.h"
+#include "SensorVoltage.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -15,9 +16,9 @@ SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
+SensorVoltage inVoltage;
 
-
-Sensor *sensors[4] = {&gps, &thermo1, &thermo2, &sigStrength};
+Sensor *sensors[] = {&gps, &thermo1, &thermo2, &sigStrength, &inVoltage};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
@@ -53,22 +54,22 @@ void publishMessage() {
 
     // Any sensors that are working but not yet packaged for publish
     DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Probe Temperature (Thermo1): " + String(thermo1.getProbeTemp()) + "C");
-    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + "C");
-    DEBUG_SERIAL("Internal Temperature (Thermo2): " + String(thermo2.getInternalTemp()) + "C");
+    DEBUG_SERIAL("Probe Temperature (Thermo1): " + String(thermo1.getProbeTemp()) + " C");
+    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + " C");
+    DEBUG_SERIAL("Internal Temperature (Thermo2): " + String(thermo2.getInternalTemp()) + " C");  
+    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + " %");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + " %");
+    DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
     DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
     DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
-    DEBUG_SERIAL("Horizontal Speed: " + String(gps.getHorizontalSpeed()) + "m/s");
-    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
-    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + "m");
-    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + "m/s^2");
-    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + "m");
-    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + "m");    
+    DEBUG_SERIAL("Horizontal Speed: " + String(gps.getHorizontalSpeed()) + " m/s");
+    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2");
+    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + " m");
+    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2");
+    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + " m");
+    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + " m");    
     DEBUG_SERIAL("Satellites in View: " + String(gps.getSatellitesInView()));  
-    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
-    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "%");
-    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "%");
-
     DEBUG_SERIAL();
     
     if(DEBUG_MEM){
