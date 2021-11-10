@@ -62,46 +62,51 @@ uint32_t SensorGps::getUnixTime() {
     return _gps->getUnixEpoch();
 }
 
-float SensorGps::getLongitude() {
-    return _gps->getLongitude() / TEN_POWER_SEVEN;
+String SensorGps::getLongitude() {
+    return String::format("%.7f",_gps->getLongitude() / TEN_POWER_SEVEN);
 }
 
-float SensorGps::getLatitude() {
-    return _gps->getLatitude() / TEN_POWER_SEVEN;
+String SensorGps::getLatitude() {
+    return String::format("%.7f",_gps->getLatitude() / TEN_POWER_SEVEN);
 }
 
-float SensorGps::getHeading() {
-    return _gps->getHeading() / TEN_POWER_FIVE;
+String SensorGps::getHeading() {
+    return String::format("%.5f",_gps->getHeading() / TEN_POWER_FIVE);    
 }
 
-float SensorGps::getHorizontalSpeed() {
-    return _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
+String SensorGps::getHorizontalSpeed() {
+    return String::format("%.2f",_gps->getGroundSpeed() / MILIMETERS_IN_METERS);  
 }
 
-float SensorGps::getHorizontalAcceleration() {
-    return _horizontalAcceleration;
+String SensorGps::getHorizontalAcceleration() {
+    return String::format("%.2f",_horizontalAcceleration);  
 }
 
-float SensorGps::getHorizontalAccuracy() {
-    return _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
+String SensorGps::getHorizontalAccuracy() {
+    float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
+    if (value < 0.0001 || value > 10000.0) value = 10000.0;
+    return String::format("%.2f",value);  
 }
 
-float SensorGps::getAltitude() {
-    return _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
+String SensorGps::getAltitude() {
+    if(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS < 0.0001) return "0.00";
+    return String::format("%.2f",_gps->getAltitudeMSL() / MILIMETERS_IN_METERS);  
 }
 
-float SensorGps::getVerticalSpeed() {
-    return _verticalSpeed;
+String SensorGps::getVerticalSpeed() {
+    return String::format("%.2f",_verticalSpeed);  
 }
 
-float SensorGps::getVerticalAcceleration() {
-    return _verticalAcceleration;
+String SensorGps::getVerticalAcceleration() {
+    return String::format("%.2f",_verticalAcceleration);  
 }
 
-float SensorGps::getVerticalAccuracy() {
-    return _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
+String SensorGps::getVerticalAccuracy() {
+    float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
+    if (value < 0.0001 || value > 10000.0) value = 10000.0;
+    return String::format("%.2f",value);  
 }
 
-uint8_t SensorGps::getSatellitesInView() {
-    return _gps->getSIV();
+String SensorGps::getSatellitesInView() {
+    return String::format("%d",_gps->getSIV());  
 }

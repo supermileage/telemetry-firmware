@@ -15,27 +15,21 @@ class SensorVoltage : public Sensor
 
         /**
          * Constructor 
-         * @param /No external dependencies
         **/
         SensorVoltage();
 
-        /**
-         * Empty handle since input voltage run on publish
-        **/
         void begin();
 
-        /**
-         * Empty handle since input voltage run on publish
-        **/
         void handle();
 
         String getHumanName();
 
-        float getVoltage();
-
         /**
          * @return //input voltage of Boron device
         **/
+        String getVoltage();
+
+        
 };
 
 #endif
