@@ -41,61 +41,69 @@ void publishMessage() {
         start = micros();
     }
 
-    // ECU data
-    dataQ.add("PROTO-ECT", ecu.getECT());
-    dataQ.add("PROTO-IAT", ecu.getIAT());
-    dataQ.add("PROTO-RPM", ecu.getRPM());
-    dataQ.add("PROTO-UBADC", ecu.getUbAdc());
-    dataQ.add("PROTO-O2S", ecu.getO2S());
-    dataQ.add("PROTO-SPARK", ecu.getSpark());
-    // GPS data
-    dataQ.add("PROTO-Speed", gps.getHorizontalSpeed());
+    dataQ.add("PropertyName", "Value");
 
     if (DEBUG_CPU_TIME) {
         json_build_time = micros() - start;
     }
 
-    DEBUG_SERIAL("------------------------");
+    DEBUG_SERIAL_LN("------------------------");
+    DEBUG_SERIAL_LN("Time: " + Time.timeStr());
     if(PUBLISH_ENABLED){
-        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        DEBUG_SERIAL_LN("PROTO - Publish ENABLED - Message: ");
         // Publish to Particle Cloud
-        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
+        DEBUG_SERIAL_LN(dataQ.publish("Proto", PRIVATE, WITH_ACK));
     }else{
-        DEBUG_SERIAL("Publish - DISABLED - Message: ");
-        DEBUG_SERIAL(dataQ.resetData());
+        DEBUG_SERIAL_LN("PROTO - Publish DISABLED - Message: ");
+        DEBUG_SERIAL_LN(dataQ.resetData());
     }
 
-    // Any sensors that are working but not yet packaged for publish
-    DEBUG_SERIAL("\nNot in Message: ");
-    DEBUG_SERIAL("Probe Temperature (Thermo1): " + String(thermo1.getProbeTemp()) + " C");
-    DEBUG_SERIAL("Probe Temperature (Thermo2): " + String(thermo2.getProbeTemp()) + " C");
-    DEBUG_SERIAL("Internal Temperature (Thermo1): " + String(thermo1.getInternalTemp()) + " C");
-    DEBUG_SERIAL("Time (UTC): " + Time.timeStr());
-    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + " %");
-    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + " %");
-    DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
-    DEBUG_SERIAL("Longitude: " + String(gps.getLongitude()));
-    DEBUG_SERIAL("Latitude: " + String(gps.getLatitude()));
-    DEBUG_SERIAL("Horizontal Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2");
-    DEBUG_SERIAL("Altitude: " + String(gps.getAltitude()) + " m");
-    DEBUG_SERIAL("Vertical Acceleration: " + String(gps.getHorizontalAcceleration()) + " m/s^2");
-    DEBUG_SERIAL("Horizontal Accuracy: " + String(gps.getHorizontalAccuracy()) + " m");
-    DEBUG_SERIAL("Vertical Accuracy: " + String(gps.getVerticalAccuracy()) + " m");  
-    DEBUG_SERIAL("Satellites in View: " + String(gps.getSatellitesInView()));
-    DEBUG_SERIAL();
+    if(DEBUG_SENSOR_ENABLE){
+        DEBUG_SERIAL_LN("");
+        DEBUG_SERIAL_LN("SENSOR READINGS: ");
+        // Diagnostic
+        DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
+        DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " %");
+        DEBUG_SERIAL_LN("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
+        // Thermocouples
+        DEBUG_SERIAL("Temperature (Thermo1): " + thermo1.getProbeTemp() + "°C - ");
+        DEBUG_SERIAL("Temperature (Thermo2): " + thermo2.getProbeTemp() + "°C - ");
+        DEBUG_SERIAL_LN("Internal Temperature (Thermo1): " + thermo1.getInternalTemp() + "°C");
+        // GPS
+        DEBUG_SERIAL("Longitude: " + gps.getLongitude() + "° - ");
+        DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
+        DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
+        DEBUG_SERIAL("Altitude: " + gps.getAltitude() + " m - ");
+        DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
+        DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
+        DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
+        DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
+        // Engine Computer
+        DEBUG_SERIAL("ECU RPM: " + ecu.getRPM() + " - ");
+        DEBUG_SERIAL("ECU MAP: " + ecu.getMap() + " kPa - ");
+        DEBUG_SERIAL("ECU TPS: " + ecu.getTPS() + "% - ");
+        DEBUG_SERIAL("ECU Coolant Temp: " + ecu.getECT() + "°C - ");
+        DEBUG_SERIAL("ECU Intake Temp: " + ecu.getIAT() + "°C - ");
+        DEBUG_SERIAL("ECU O2 Sensor: " + ecu.getO2S() + "°C - ");
+        DEBUG_SERIAL("ECU Spark Advance: " + ecu.getSpark() + "° - ");
+        DEBUG_SERIAL("ECU Fuel PWM 1: " + ecu.getFuelPW1() + " ms - ");
+        DEBUG_SERIAL("ECU Fuel PWM 2: " + ecu.getFuelPW2() + " ms - ");
+        DEBUG_SERIAL_LN("ECU Input Voltage: " + ecu.getUbAdc() + " v");
+        DEBUG_SERIAL_LN();
+    }
     
     if(DEBUG_MEM){
-        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
+        DEBUG_SERIAL_LN("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
     }
 
     // Output CPU time in microseconds spent on each task
     if (DEBUG_CPU_TIME) {
-        DEBUG_SERIAL("\nCPU Time:");
-        DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
+        DEBUG_SERIAL_LN("\nCPU Time:");
+        DEBUG_SERIAL_LN("Build JSON Message: " + String(json_build_time) + "us");
         for (Sensor *s : sensors) {
-            DEBUG_SERIAL(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
+            DEBUG_SERIAL_LN(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
         }
-        DEBUG_SERIAL();
+        DEBUG_SERIAL_LN();
     }
 }
 
@@ -122,7 +130,7 @@ void setup() {
 
     led_blue.flashRepeat(500);
 
-    DEBUG_SERIAL("TELEMETRY ONLINE - PROTO");
+    DEBUG_SERIAL_LN("TELEMETRY ONLINE - PROTO");
 }
 
 /**

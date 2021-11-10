@@ -10,7 +10,6 @@ class SensorSigStrength : public Sensor
 
         /**
          * Constructor
-         * @param /No external dependencies
         **/
         SensorSigStrength();
 
@@ -26,12 +25,17 @@ class SensorSigStrength : public Sensor
 
         String getHumanName();
 
-        float getStrength(); 
-        float getQuality();
+        /**
+         * @return Signal strength in percentage
+        **/
+        String getStrength(); 
 
         /**
-         * @return Signal strength and quality in percentage
+         * @return Signal quality in percentage
         **/
+        String getQuality();
+
+
     
     private:
         CellularSignal _sig; //Object to call strength and quality commands

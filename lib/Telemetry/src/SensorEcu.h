@@ -29,73 +29,67 @@ class SensorEcu : public Sensor {
         String getHumanName();
 
         /**
-         * @return Timestamp of last ECU receive
-         * */
-        time_t getTimestamp();
-
-        /**
          * @return Rotations Per Minute
          * */
-        float getRPM();
+        String getRPM();
 
         /**
         * @return Manifold Absolute Pressure
         * */
-        float getMap();
+        String getMap();
 
         /**
         * @return Throttle Position Sensor
         * */
-        float getTPS();
+        String getTPS();
 
         /**
         * @return Engine Coolant Temperature
         * */
-        float getECT();
+        String getECT();
 
         /**
         * @return Intake Air Temperature
         * */
-        float getIAT();
+        String getIAT();
 
         /**
         * @return Oxygen Sensor
         * */
-        float getO2S();
+        String getO2S();
 
         /**
         * @return Spark (Advance? Timing?)
         * */
-        float getSpark();
+        String getSpark();
 
         /**
         * @return Fuel Injector 1 PWM Duty Cycle
         * */
-        float getFuelPW1();
+        String getFuelPW1();
 
         /**
         * @return Fuel Injector 2 PWM Duty Cycle
         * */
-        float getFuelPW2();
+        String getFuelPW2();
 
         /**
         * @return Battery Voltage
         * */
-        float getUbAdc();
+        String getUbAdc();
 
     private:
         USARTSerial * _serial;
-        time_t _time;
-        float _rpm;
-        float _map;
-        float _tps;
-        float _ect;
-        float _iat;
-        float _o2s;
-        float _spark;
-        float _fuelPW1;
-        float _fuelPW2;
-        float _ubAdc;
+        float _rpm = 0;
+        float _map = 0;
+        float _tps = 0;
+        float _ect = 0;
+        float _iat = 0;
+        float _o2s = 0;
+        float _spark = 0;
+        float _fuelPW1 = 0;
+        float _fuelPW2 = 0;
+        float _ubAdc = 0;
 
         /**
          * Helper for interpreting raw values from ECU
