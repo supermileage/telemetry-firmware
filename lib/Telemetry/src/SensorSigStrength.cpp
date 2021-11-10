@@ -15,10 +15,14 @@ void SensorSigStrength::handle() {
 
 String SensorSigStrength::getStrength() {
     _sig = Cellular.RSSI();
-    return String::format("%.0f",_sig.getStrength());
+    int value = _sig.getStrength();
+    if(value < 0) value = 0;
+    return String(value);
 }
 
 String SensorSigStrength:: getQuality() {
     _sig = Cellular.RSSI();
-    return String::format("%.0f",_sig.getQuality());
+    int value = _sig.getQuality();
+    if(value < 0) value = 0;
+    return String(value);
 }

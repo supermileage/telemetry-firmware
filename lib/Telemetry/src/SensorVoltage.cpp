@@ -14,7 +14,7 @@ void SensorVoltage:: begin() {
 void SensorVoltage::handle() {
 }
 
-float SensorVoltage::getVoltage() {
+String SensorVoltage::getVoltage() {
     float in3v3 = (analogRead(INPUT_VOLTAGE_PIN))/ (float) ANALOG_CONVERT_RAW_TO_3V;
-    return ((in3v3*(R1+R2))/R2);
+    return String::format("%.1f",(in3v3*(R1+R2))/R2);
 }

@@ -83,10 +83,13 @@ String SensorGps::getHorizontalAcceleration() {
 }
 
 String SensorGps::getHorizontalAccuracy() {
-    return String::format("%.2f",_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS);  
+    float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
+    if (value < 0.0001 || value > 10000.0) value = 10000.0;
+    return String::format("%.2f",value);  
 }
 
 String SensorGps::getAltitude() {
+    if(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS < 0.0001) return "0.00";
     return String::format("%.2f",_gps->getAltitudeMSL() / MILIMETERS_IN_METERS);  
 }
 
@@ -99,7 +102,9 @@ String SensorGps::getVerticalAcceleration() {
 }
 
 String SensorGps::getVerticalAccuracy() {
-    return String::format("%.2f",_gps->getVerticalAccEst() / MILIMETERS_IN_METERS);  
+    float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
+    if (value < 0.0001 || value > 10000.0) value = 10000.0;
+    return String::format("%.2f",value);  
 }
 
 String SensorGps::getSatellitesInView() {

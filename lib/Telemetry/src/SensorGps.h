@@ -63,7 +63,7 @@ class SensorGps : public Sensor {
         String getHorizontalAcceleration();
 
         /**
-         * @return Horizontal position accuracy (m)
+         * @return Horizontal position accuracy (m), max 10,000m
          **/
         String getHorizontalAccuracy();
 
@@ -83,7 +83,7 @@ class SensorGps : public Sensor {
         String getVerticalAcceleration();
 
         /**
-         * @return Vertical position accuracy (m)
+         * @return Vertical position accuracy (m), max 10,000m
          **/
         String getVerticalAccuracy();
 

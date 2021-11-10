@@ -45,6 +45,7 @@ void publishMessage() {
     }
 
     DEBUG_SERIAL_LN("------------------------");
+    DEBUG_SERIAL_LN("Time: " + Time.timeStr());
     if(PUBLISH_ENABLED){
         DEBUG_SERIAL_LN("FC - Publish ENABLED - Message: ");
         // Publish to Particle Cloud
@@ -60,7 +61,7 @@ void publishMessage() {
         DEBUG_SERIAL_LN("SENSOR READINGS: ");
         // Diagnostic
         DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
-        DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " %");
+        DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " % - ");
         DEBUG_SERIAL_LN("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
         // Thermocouples
         DEBUG_SERIAL("Temperature (Thermo1): " + thermo1.getProbeTemp() + "°C - ");

@@ -63,7 +63,7 @@ void publishMessage() {
         DEBUG_SERIAL_LN("SENSOR READINGS: ");
         // Diagnostic
         DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
-        DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " %");
+        DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " % - ");
         DEBUG_SERIAL_LN("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
         // Thermocouples
         DEBUG_SERIAL("Temperature (Thermo1): " + thermo1.getProbeTemp() + "°C - ");
@@ -81,10 +81,10 @@ void publishMessage() {
         // Engine Computer
         DEBUG_SERIAL("ECU RPM: " + ecu.getRPM() + " - ");
         DEBUG_SERIAL("ECU MAP: " + ecu.getMap() + " kPa - ");
-        DEBUG_SERIAL("ECU TPS: " + ecu.getTPS() + "% - ");
+        DEBUG_SERIAL("ECU TPS: " + ecu.getTPS() + " % - ");
         DEBUG_SERIAL("ECU Coolant Temp: " + ecu.getECT() + "°C - ");
         DEBUG_SERIAL("ECU Intake Temp: " + ecu.getIAT() + "°C - ");
-        DEBUG_SERIAL("ECU O2 Sensor: " + ecu.getO2S() + "°C - ");
+        DEBUG_SERIAL("ECU O2 Sensor: " + ecu.getO2S() + " V - ");
         DEBUG_SERIAL("ECU Spark Advance: " + ecu.getSpark() + "° - ");
         DEBUG_SERIAL("ECU Fuel PWM 1: " + ecu.getFuelPW1() + " ms - ");
         DEBUG_SERIAL("ECU Fuel PWM 2: " + ecu.getFuelPW2() + " ms - ");
