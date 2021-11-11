@@ -11,13 +11,12 @@
 #include "SensorEcu.h"
 
 #include "DataQueue.h"
-#include "LogCommand.h"
+#include "SensorCommand.h"
 #include "DispatcherBuilder.h"
 
 #define VEHICLE_NAME "proto"
 
 extern DataQueue dataQ;
-
 extern SensorGps gps;
 
 extern Sensor *sensors[];
@@ -25,7 +24,7 @@ extern IntervalCommand *commands[];
 extern uint16_t sensor_count;
 extern uint16_t command_count;
 
-namespace SerialDebugPublishing {
+namespace CurrentVehicle {
     void publishMessage();
 
     void setupMessage();

@@ -1,6 +1,6 @@
         #include "Dispatcher.h"
 		
-		Dispatcher::Dispatcher(IntervalLogger **loggers, uint16_t numLoggers, DataQueue *dataQ) {
+		Dispatcher::Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ) {
             _loggers = loggers;
             _numLoggers = numLoggers;
             _dataQ = dataQ;
@@ -18,10 +18,10 @@
             unsigned long time = millis() / 1000;
             // check if it's time to log any data from any of the loggers
             for (uint16_t i = 0; i < _numLoggers; i++) {
-                if ((_loggers[i]->getLastLog() + _loggers[i]->getInterval()) <= time) {
-                    _loggers[i]->setLastLog(time);
+                if ((_loggers[i]->getLastExecution() + _loggers[i]->getInterval()) <= time) {
+                    _loggers[i]->setLastExecution(time);
                     _logThisLoop = true;
-                    _loggers[i]->logThisLoop(true);
+                    _loggers[i]->executeThisLoop(true);
                 }   
             }
 
@@ -29,9 +29,9 @@
             if (_logThisLoop) {
                 _dataQ->wrapStart();
                 for (uint16_t i = 0; i < _numLoggers; i++) {
-                    if (_loggers[i]->logThisLoop()) {
-                        _loggers[i]->log();
-                        _loggers[i]->logThisLoop(false);
+                    if (_loggers[i]->executeThisLoop()) {
+                        _loggers[i]->executeCommands();
+                        _loggers[i]->executeThisLoop(false);
                     }
                 }
                 _dataQ->wrapEnd();

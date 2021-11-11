@@ -3,9 +3,9 @@
 
 #include "Particle.h"
 #include "DataQueue.h"
-#include "LogCommand.h"
+#include "IntervalCommand.h"
 #include "Dispatcher.h"
-#include "IntervalLogger.h"
+#include "IntervalCommandGroup.h"
 
 #define MAX_NUM_INTERVALS 5
 

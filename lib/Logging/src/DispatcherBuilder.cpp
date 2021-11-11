@@ -19,8 +19,8 @@
         }
 
         Dispatcher* DispatcherBuilder::build() {
-            // create array of *IntervalLogger
-            IntervalLogger **loggers = new IntervalLogger*[_numIntervals];
+            // create array of *IntervalCommandGroup
+            IntervalCommandGroup **loggers = new IntervalCommandGroup*[_numIntervals];
 
             // iterate over intervals: get all commands which share same interval and add them to a new logger
             // add loggers to pointer array of loggers
@@ -34,7 +34,7 @@
                     if (_commands[i]->getInterval() == interval)
                         commandsOnInterval[commandCount++] = _commands[i];
                 }
-                loggers[i] = new IntervalLogger(commandsOnInterval, numCommandsOnInterval, interval);
+                loggers[i] = new IntervalCommandGroup(commandsOnInterval, numCommandsOnInterval, interval);
             }
 
             // create new dispatcher with set of loggers (_numIntervals == number of loggers)

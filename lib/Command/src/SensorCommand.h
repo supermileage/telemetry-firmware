@@ -1,5 +1,5 @@
-#ifndef _LOG_COMMAND_H
-#define _LOG_COMMAND_H
+#ifndef _SENSOR_COMMAND_H
+#define _SENSOR_COMMAND_H
 
 #include "IntervalCommand.h"
 #include "DataQueue.h"
@@ -10,10 +10,10 @@
  *  Templated class which represents a telemetry-logging command
  **/
 template <class S, class R>
-class LogCommand : public IntervalCommand {
+class SensorCommand : public IntervalCommand {
     public:
         /**
-         * Constructs a LogCommand with sensor, property name, getter function and interval
+         * Constructs a SensorCommand with sensor, property name, getter function and interval
          * 
          * @param dataQ pointer to DataQueue in main
          * @param sensor pointer to sensor which we will call _getter on
@@ -21,7 +21,7 @@ class LogCommand : public IntervalCommand {
          * @param func pointer to Sensor's member getter function
          * @param interval interval (in seconds) at which this command will be called to execute
          **/
-        LogCommand(DataQueue *dataQ, S *sensor, String propertyName, R (S::*func)(), uint16_t interval)
+        SensorCommand(DataQueue *dataQ, S *sensor, String propertyName, R (S::*func)(), uint16_t interval)
         : IntervalCommand(interval) {
             _dataQ = dataQ;
             _sensor = sensor;
@@ -29,10 +29,10 @@ class LogCommand : public IntervalCommand {
             _propertyName = propertyName;
         }
 
-        ~LogCommand() { }
+        ~SensorCommand() { }
 
         /**
-         * Constructs a LogCommand with sensor, property name, getter function and interval
+         * Constructs a SensorCommand with sensor, property name, getter function and interval
          * 
          * @param dataQ passed in so getter data can be logged to main DataQueue
          **/

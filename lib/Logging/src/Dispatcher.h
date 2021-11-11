@@ -3,7 +3,7 @@
 
 #include "Particle.h"
 #include "DataQueue.h"
-#include "IntervalLogger.h"
+#include "IntervalCommandGroup.h"
 
 /**
  * Dispatcher owns and operates on a collection of loggers
@@ -13,7 +13,7 @@ class Dispatcher {
         /**
          * Constructs a Dispatcher with loggers, numLoggers and DataQueue
          **/
-        Dispatcher(IntervalLogger **loggers, uint16_t numLoggers, DataQueue *dataQ);
+        Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ);
 
         /**
          * @brief Destroy the Dispatcher object
@@ -29,7 +29,7 @@ class Dispatcher {
         void run();
 
     private:
-        IntervalLogger **_loggers;
+        IntervalCommandGroup **_loggers;
         DataQueue *_dataQ;
         uint16_t _numLoggers;
         bool _logThisLoop;

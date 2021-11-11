@@ -10,7 +10,7 @@
 #include "SensorThermo.h"
 
 #include "DataQueue.h"
-#include "LogCommand.h"
+#include "SensorCommand.h"
 #include "DispatcherBuilder.h"
 
 #define VEHICLE_NAME "fc"
@@ -23,7 +23,7 @@ extern IntervalCommand *commands[];
 extern uint16_t sensor_count;
 extern uint16_t command_count;
 
-namespace SerialDebugPublishing {
+namespace CurrentVehicle {
 
     /**
      * Publishes a new message to Particle Cloud for fc

@@ -24,6 +24,43 @@ DataQueue dataQ(VEHICLE_NAME);
 Dispatcher *dispatcher;
 unsigned long lastPublish = 0;
 
+void publishMessage() {
+    long start, json_build_time;
+    if (DEBUG_CPU_TIME) {
+        start = micros();
+    }
+
+    if (DEBUG_CPU_TIME) {
+        json_build_time = micros() - start;
+    }
+
+    DEBUG_SERIAL("------------------------");
+    if(PUBLISH_ENABLED){
+        DEBUG_SERIAL("Publish - ENABLED - Message: ");
+        // Publish to Particle Cloud
+        DEBUG_SERIAL(dataQ.publish("Proto", PRIVATE, WITH_ACK));
+    }else{
+        DEBUG_SERIAL("Publish - DISABLED - Message: ");
+        DEBUG_SERIAL(dataQ.resetData());
+    }
+
+    CurrentVehicle::publishMessage();
+
+    if(DEBUG_MEM) {
+        DEBUG_SERIAL("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
+    }
+
+    // Output CPU time in microseconds spent on each task
+    if (DEBUG_CPU_TIME) {
+        DEBUG_SERIAL("\nCPU Time:");
+        DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
+        for (unsigned i = 0; i < sensor_count; i++) {
+            DEBUG_SERIAL(sensors[i]->getHumanName() + " polling: " + String(sensors[i]->getLongestHandleTime()) + "us");
+        }
+        DEBUG_SERIAL();
+    }
+}
+
 /**
  * 
  * SETUP
@@ -49,6 +86,8 @@ void setup() {
     dispatcher = builder.build();
 
     led_blue.flashRepeat(500);
+
+    CurrentVehicle::setupMessage();
 }
 
 /**
@@ -87,6 +126,6 @@ void loop() {
         }
 
         lastPublish = millis();
-        SerialDebugPublishing::publishMessage();
+        publishMessage();
     }
 }
