@@ -7,7 +7,6 @@
 
 class SensorThermo : public Sensor {
     public:
-
         /**
          * Constructor 
          * 

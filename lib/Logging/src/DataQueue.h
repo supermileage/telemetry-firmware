@@ -5,6 +5,8 @@
 #define RAM_QUEUE_EVENT_COUNT 8
 
 #include "PublishQueuePosixRK.h"
+#include "Particle.h"
+#include "settings.h"
 
 /**
  * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
@@ -18,7 +20,7 @@ class DataQueue {
         /**
          * Constructor
          * */
-        DataQueue();
+        DataQueue(String publishHeader);
 
         /**
          * Adds an integer value and its ID into the data queue.
@@ -26,32 +28,11 @@ class DataQueue {
          * 
          * @param id A string representing an id for the data.
          * 
-         * @param value An integer representing the data to be stored in 
+         * @param value the data (of type T) to be stored in 
          *              the queue.
          * */
-        void add(String id, int value);
-
-        /**
-         * Adds a string value and its ID into the data queue.
-         * An ID may not be added twice before publishing the data queue.
-         * 
-         * @param id A string representing an id for the data.
-         * 
-         * @param value A string representing the data to be stored in 
-         *              the queue.
-         * */
-        void add(String id, String value);
-
-        /**
-         * Adds a float value and its ID into the data queue.
-         * An ID may not be added twice before publishing the data queue.
-         * 
-         * @param id A string representing an id for the data.
-         * 
-         * @param value A float representing the data to be stored in 
-         *              the queue.
-         * */
-        void add(String id, float value);
+        template <typename T>
+        void add(String id, T value) { _writer->name(id).value(value); };
 
         /**
          * Wrapper for loop function of PublishQueuePosix
@@ -80,10 +61,19 @@ class DataQueue {
          * */
         String resetData();
 
+        void wrapStart();
+        
+        void wrapEnd();
+
+        size_t getBufferSize();
+
+        size_t getDataSize();
+
     private:
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];
         PublishQueuePosix* _publishQueue;
+        String _publishHeader;
 
         /**
          * Removes the data stored in the JSON object and reinitializes

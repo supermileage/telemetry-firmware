@@ -1,37 +1,29 @@
-#include "Particle.h"
-#include "settings.h"
-#include "DataQueue.h"
-#include "Led.h"
+#define PROTO 0
+#define URBAN 1
+#define FC 2
 
-#include "Sensor.h"
-#include "SensorGps.h"
-#include "SensorThermo.h"
-#include "SensorSigStrength.h"
-#include "SensorVoltage.h"
+#define CURRENT_VEHICLE 2
+
+#if (CURRENT_VEHICLE == PROTO)
+    #include "proto_globals.h"
+#elif (CURRENT_VEHICLE == URBAN)
+    #include "urban_globals.h"
+#else
+    #include "fc_globals.h"
+#endif
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
-
-SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
-SensorThermo thermo1(&SPI, A5);
-SensorThermo thermo2(&SPI, A4);
-SensorSigStrength sigStrength;
-SensorVoltage inVoltage;
-
-Sensor *sensors[] = {&gps, &thermo1, &thermo2, &sigStrength, &inVoltage};
 
 Led led_orange(A0, 63);
 // Blue LED to flash on startup, go solid when valid time has been established
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-DataQueue dataQ;
+DataQueue dataQ(VEHICLE_NAME);
+Dispatcher *dispatcher;
+unsigned long lastPublish = 0;
 
-uint32_t lastPublish = 0;
-
-/**
- * Publishes a new message to Particle Cloud
- * */
 void publishMessage() {
     long start, json_build_time;
     if (DEBUG_CPU_TIME) {
@@ -55,40 +47,18 @@ void publishMessage() {
         DEBUG_SERIAL_LN(dataQ.resetData());
     }
 
-
-    if(DEBUG_SENSOR_ENABLE){
-        DEBUG_SERIAL_LN("");
-        DEBUG_SERIAL_LN("SENSOR READINGS: ");
-        // Diagnostic
-        DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
-        DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " % - ");
-        DEBUG_SERIAL_LN("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
-        // Thermocouples
-        DEBUG_SERIAL("Temperature (Thermo1): " + thermo1.getProbeTemp() + "°C - ");
-        DEBUG_SERIAL("Temperature (Thermo2): " + thermo2.getProbeTemp() + "°C - ");
-        DEBUG_SERIAL_LN("Internal Temperature (Thermo1): " + thermo1.getInternalTemp() + "°C");
-        // GPS
-        DEBUG_SERIAL("Longitude: " + gps.getLongitude() + "° - ");
-        DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
-        DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
-        DEBUG_SERIAL("Altitude: " + gps.getAltitude() + " m - ");
-        DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
-        DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
-        DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
-        DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
-        DEBUG_SERIAL_LN();
-    }
-    
+    CurrentVehicle::publishMessage();
+ 
     if(DEBUG_MEM){
         DEBUG_SERIAL_LN("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
     }
 
     // Output CPU time in microseconds spent on each task
     if (DEBUG_CPU_TIME) {
-        DEBUG_SERIAL_LN("\nCPU Time:");
-        DEBUG_SERIAL_LN("Build JSON Message: " + String(json_build_time) + "us");
-        for (Sensor *s : sensors) {
-            DEBUG_SERIAL_LN(s->getHumanName() + " handle: " + String(s->getLongestHandleTime()) + "us");
+        DEBUG_SERIAL("\nCPU Time:");
+        DEBUG_SERIAL("Build JSON Message: " + String(json_build_time) + "us");
+        for (unsigned i = 0; i < sensor_count; i++) {
+            DEBUG_SERIAL(sensors[i]->getHumanName() + " polling: " + String(sensors[i]->getLongestHandleTime()) + "us");
         }
         DEBUG_SERIAL_LN();
     }
@@ -111,13 +81,16 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    for (Sensor *s : sensors) {
-        s->begin();
+    for (unsigned int i = 0; i < sensor_count; i++) {
+        sensors[i]->begin();
     }
+
+    DispatcherBuilder builder(commands, command_count, &dataQ);
+    dispatcher = builder.build();
 
     led_blue.flashRepeat(500);
 
-    DEBUG_SERIAL_LN("TELEMETRY ONLINE - FC");
+    CurrentVehicle::setupMessage();
 }
 
 /**
@@ -127,15 +100,16 @@ void setup() {
  * */
 void loop() {
     // Sensor Handlers
-    for (Sensor *s : sensors) {
+    for (unsigned int i = 0; i < sensor_count; i++) {
         if (DEBUG_CPU_TIME) {
-            s->benchmarkedHandle();
+            sensors[i]->benchmarkedHandle();
         } else {
-            s->handle();
+            sensors[i]->handle();
         }
     }
 
     dataQ.loop();
+    dispatcher->run();
 
     // LED Handlers
     led_orange.handle();

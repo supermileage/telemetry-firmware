@@ -1,31 +1,18 @@
 #include "DataQueue.h"
-#include "Particle.h"
 
-#include "settings.h"
-
-DataQueue::DataQueue() {
+DataQueue::DataQueue(String publishHeader) {
+	_publishHeader = publishHeader;
 	_init();
 }
 
-void DataQueue::add(String id, int value) {
+void DataQueue::wrapStart() {
 	_writer->beginObject()
-    	.name("t").value(id)
-    	.name("d").value(value)
-    .endObject();
+		.name("t").value((int)Time.now())
+		.name("d").beginObject();
 }
 
-void DataQueue::add(String id, String value) {
-	_writer->beginObject()
-    	.name("t").value(id)
-    	.name("d").value(value)
-    .endObject();
-}
-
-void DataQueue::add(String id, float value) {
-	_writer->beginObject()
-    	.name("t").value(id)
-    	.name("d").value(value)
-    .endObject();
+void DataQueue::wrapEnd() {
+	_writer->endObject().endObject();
 }
 
 void DataQueue::loop() {
@@ -62,9 +49,16 @@ void DataQueue::_writerInit() {
     memset(_buf, 0, sizeof(_buf));
 	this->_writer = new JSONBufferWriter(_buf, sizeof(_buf) - 1);
 
-	_writer->beginObject()
-		.name("time").value((int)Time.now())
-		.name("d").beginArray();
+	_writer->beginObject().name("v").value(_publishHeader)
+		.name("l").beginArray();
+} 
+
+size_t DataQueue::getBufferSize() {
+	return _writer->bufferSize();
+}
+
+size_t DataQueue::getDataSize() {
+	return _writer->dataSize();
 }
 
 void DataQueue::_init() {
