@@ -5,9 +5,11 @@
 #include "settings.h"
 #include "Led.h"
 
+#include "Sensor.h"
 #include "SensorGps.h"
-#include "SensorCan.h"
 #include "SensorThermo.h"
+#include "SensorSigStrength.h"
+#include "SensorVoltage.h"
 
 #include "DataQueue.h"
 #include "SensorCommand.h"
