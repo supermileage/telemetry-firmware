@@ -12,7 +12,7 @@
  *  SETTINGS
 **/
 // Select from: 0 1 2
-#define CURRENT_VEHICLE 1
+#define CURRENT_VEHICLE 0
 
 // Publish to Cloud (Disable when not necessary during dev to save data)
 #define PUBLISH_ENABLED         0

@@ -2,7 +2,7 @@
 #include "vehicle.h"
 #include "Led.h"
 
-SYSTEM_MODE(MANUAL);
+SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 Led led_orange(A0, 63);
