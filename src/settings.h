@@ -2,11 +2,15 @@
 #define _SETTINGS_H_
 
 /**
- *  SETTINGS
+ *  CONSTANTS
 **/
 #define PROTO           0
 #define URBAN           1
 #define FC              2
+
+/**
+ *  SETTINGS
+**/
 // Select from: 0 1 2
 #define CURRENT_VEHICLE 1
 
