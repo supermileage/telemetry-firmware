@@ -1,2 +1,22 @@
 {
+    "cortex-debug.openocdPath": "${command:particle.getDebuggerOpenocdPath}",
+    "particle.targetDevice": "",
+    "particle.targetPlatform": "boron",
+    "particle.firmwareVersion": "3.0.0",
+    "files.associations": {
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "initializer_list": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "complex": "cpp"
+    }
 }
