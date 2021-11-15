@@ -8,7 +8,7 @@
 SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
-SensorCan can(&SPI1, D5, D6);}}
+SensorCan can(&SPI1, D5, D6);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
