@@ -7,7 +7,7 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define PROTO
+    #define URBAN
 #endif
 
 // Publish to Cloud (Disable when not necessary during dev to save data)

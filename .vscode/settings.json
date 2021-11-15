@@ -17,6 +17,7 @@
         "string_view": "cpp",
         "unordered_map": "cpp",
         "vector": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "__tuple": "cpp"
     }
 }

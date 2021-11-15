@@ -23,10 +23,6 @@ IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1 };
 uint16_t sensor_count = 6;
 uint16_t command_count = 3;
 
-
-// SerialDebugPublishing namespace definitions
-
-
 void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN("SENSOR READINGS: ");
