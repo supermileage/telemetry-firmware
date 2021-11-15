@@ -1,6 +1,6 @@
 #include "vehicle.h"
 
-#if (CURRENT_VEHICLE == PROTO)
+#ifdef PROTO
 
 #include "SensorEcu.h"
 

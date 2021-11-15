@@ -4,6 +4,7 @@
 #define JSON_WRITER_BUFFER_SIZE 1024
 #define RAM_QUEUE_EVENT_COUNT 8
 
+#include "settings.h"
 #include "PublishQueuePosixRK.h"
 
 /**

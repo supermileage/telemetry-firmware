@@ -2,17 +2,12 @@
 #define _SETTINGS_H_
 
 /**
- *  CONSTANTS
-**/
-#define PROTO           0
-#define URBAN           1
-#define FC              2
-
-/**
  *  SETTINGS
 **/
-// Select from: 0 1 2
-#define CURRENT_VEHICLE 0
+#if !defined(PROTO) || !defined(URBAN) || !defined(FC)
+    // SELECT VEHICLE: PROTO URBAN FC 
+    #define PROTO
+#endif
 
 // Publish to Cloud (Disable when not necessary during dev to save data)
 #define PUBLISH_ENABLED         0
@@ -40,11 +35,11 @@
     #define DEBUG_SERIAL(x) x
 #endif
 
-#if (CURRENT_VEHICLE == PROTO)
+#ifdef  PROTO
     #define VEHICLE_NAME "PROTO"
-#elif (CURRENT_VEHICLE == URBAN)
+#elif   defined(URBAN)
     #define VEHICLE_NAME "URBAN"
-#elif (CURRENT_VEHICLE == FC)
+#elif   defined(FC)
     #define VEHICLE_NAME "FC"
 #endif
 

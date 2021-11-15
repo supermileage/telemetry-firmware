@@ -2,7 +2,7 @@ name: Build Firmware
 on: [push, pull_request]
 
 jobs:
-  build-all:
+  build-urban:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -15,16 +15,67 @@ jobs:
         uses: MarceloPrado/has-changed-path@v1.0
         id: changed
         with:
-          paths: src lib
+          paths: urban lib
 
       - name: Build
         if: steps.changed.outputs.changed == 'true'
         run: |
-          make all
-
+          make urban
       - name: Upload
         if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
-          name: telemetry-${{ github.sha }}
+          name: urban-${{ github.sha }}
+          path: output
+
+  build-proto:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 5
+
+      - name: Diff Source and Libraries
+        uses: MarceloPrado/has-changed-path@v1.0
+        id: changed
+        with:
+          paths: proto lib
+
+      - name: Build
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          make proto
+      - name: Upload
+        if: steps.changed.outputs.changed == 'true'
+        uses: actions/upload-artifact@v2
+        with:
+          name: proto-${{ github.sha }}
+          path: output
+
+  build-fc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 5
+
+      - name: Diff Source and Libraries
+        uses: MarceloPrado/has-changed-path@v1.0
+        id: changed
+        with:
+          paths: fc lib
+
+      - name: Build
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          make fc
+      - name: Upload
+        if: steps.changed.outputs.changed == 'true'
+        uses: actions/upload-artifact@v2
+        with:
+          name: fc-${{ github.sha }}
           path: output

@@ -1,6 +1,6 @@
 #include "vehicle.h"
 
-#if (CURRENT_VEHICLE == URBAN)
+#ifdef URBAN
 
 #include "SensorCan.h"
 

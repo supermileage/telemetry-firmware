@@ -11,37 +11,41 @@ Led::Led(uint16_t pin, uint8_t brightness){
 
 void Led::handle(){
     uint16_t current_time_in_interval = (millis() - _interval_time_start) % _interval;
-
-    if(_state == LED_FLASH_ON){ 
-        if(current_time_in_interval > _interval / 2 ){
-            _state = LED_FLASH_OFF;
-            analogWrite(_pin, 0);
-        }
-    }else if(_state == LED_FLASH_OFF){
-        if(!_flash_count_left){
-            _state = LED_OFF;
-        }else if(current_time_in_interval <= _interval / 2){
-            _state = LED_FLASH_ON;
-            _flash_count_left--;
-            analogWrite(_pin, _brightness);
-        }
-    }else if(_state == LED_FLASH_REPEAT){
-        if(current_time_in_interval > _interval / 2 ){
-            analogWrite(_pin, 0);
-        }else{
-            analogWrite(_pin, _brightness);
-        }
-    }
-    else if(_state == LED_PULSE){
-        uint8_t pulse_brightness;
-        if(current_time_in_interval < _interval / 2){
+    switch(_state){
+        case LED_PULSE:
+            uint8_t pulse_brightness;
+            if(current_time_in_interval < _interval / 2){
             pulse_brightness = (_brightness *current_time_in_interval * 2) / _interval;
-        }else{
+            }else{
             pulse_brightness = (_brightness * (_interval - current_time_in_interval) * 2) / _interval;
-        }
+            }
 
-        analogWrite(_pin, (pulse_brightness * pulse_brightness) / _brightness);
+            analogWrite(_pin, (pulse_brightness * pulse_brightness) / _brightness);
+            break; 
+        case LED_FLASH_ON:
+            if(current_time_in_interval > _interval / 2 ){
+                _state = LED_FLASH_OFF;
+                analogWrite(_pin, 0);
+            }
+            break;
+        case LED_FLASH_OFF:
+            if(!_flash_count_left){
+                _state = LED_OFF;
+            }else if(current_time_in_interval <= _interval / 2){
+                _state = LED_FLASH_ON;
+                _flash_count_left--;
+                analogWrite(_pin, _brightness);
+            }
+        break;
+        case LED_FLASH_REPEAT:
+            if(current_time_in_interval > _interval / 2 ){
+                analogWrite(_pin, 0);
+            }else{
+                analogWrite(_pin, _brightness);
+            }
+            break;
     }
+
 }
 
 void Led::on(){

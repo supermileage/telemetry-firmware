@@ -1,12 +1,27 @@
+
 IMAGE := ghcr.io/supermileage/particle-v3.0.0:latest
 OUTPUT_DIR := output
 
-.PHONY: all pull-image clean
+.PHONY: urban proto pull-image clean
 
-all: clean pull-image
-	$(call print, COMPILING TELEMETRY FIRMWARE)
+urban: clean pull-image
+	$(call print, COMPILING URBAN FIRMWARE)
 	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
-		make all PLATFORM=boron APPDIR=/app/ TARGET_DIR=/$(OUTPUT_DIR)
+		make all PLATFORM=boron APPDIR=/app/ TARGET_DIR=/$(OUTPUT_DIR) EXTRA_CFLAGS='-DURBAN'
+	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
+	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
+
+proto: clean pull-image
+	$(call print, COMPILING PROTO FIRMWARE)
+	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
+		make all PLATFORM=boron APPDIR=/app/ TARGET_DIR=/$(OUTPUT_DIR) EXTRA_CFLAGS='-DPROTO'
+	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
+	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
+
+fc: clean pull-image
+	$(call print, COMPILING FC FIRMWARE)
+	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
+		make all PLATFORM=boron APPDIR=/app/ TARGET_DIR=/$(OUTPUT_DIR) EXTRA_CFLAGS='-DFC'
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 

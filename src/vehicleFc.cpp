@@ -1,6 +1,6 @@
 #include "vehicle.h"
 
-#if (CURRENT_VEHICLE == FC)
+#ifdef FC
 
 // sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);

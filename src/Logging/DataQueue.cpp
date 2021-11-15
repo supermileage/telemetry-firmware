@@ -24,7 +24,7 @@ String DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) 
 	_publishQueue->publish(event, payload, flag1, flag2);
 	_writerRefresh();
 
-	// DEBUG_SERIAL_LN("Number of events Queued: " + String(_publishQueue->getNumEvents()));
+	DEBUG_SERIAL_LN("Number of events Queued: " + String(_publishQueue->getNumEvents()));
 	
     return payload;
 }
@@ -67,5 +67,5 @@ void DataQueue::_init() {
 	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
 	_writerInit();
 
-	// DEBUG_SERIAL_LN("Posix Directory Path: " + (String)_publishQueue->getDirPath());
+	DEBUG_SERIAL_LN("Posix Directory Path: " + (String)_publishQueue->getDirPath());
 }

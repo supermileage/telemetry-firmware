@@ -41,9 +41,6 @@ void publishMessage() {
  * SETUP
  * */
 void setup() {
-    static_assert(CURRENT_VEHICLE == PROTO || CURRENT_VEHICLE == URBAN || CURRENT_VEHICLE == FC,
-                    "CURRENT_VEHICLE IS INVALID!");
-                    
     if(DEBUG_SERIAL_ENABLE){
         Serial.begin(115200);
     }
