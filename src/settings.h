@@ -4,9 +4,9 @@
 /**
  *  SETTINGS
 **/
-#if !defined(PROTO) || !defined(URBAN) || !defined(FC)
+#if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define PROTO
+    #define URBAN
 #endif
 
 // Publish to Cloud (Disable when not necessary during dev to save data)
