@@ -4,9 +4,10 @@
 /**
  *  SETTINGS
 **/
+// If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define URBAN
+    #define PROTO
 #endif
 
 // Publish to Cloud (Disable when not necessary during dev to save data)
@@ -22,7 +23,7 @@
 #define GPS_UPDATE_FREQUENCY    4
 
 // Time zone in UTC offset (must manually adjust for DST)
-#define TIME_ZONE                   -7
+#define TIME_ZONE                   -8
 
 /**
  *  MACROS
