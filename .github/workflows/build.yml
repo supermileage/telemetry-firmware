@@ -11,18 +11,10 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Diff Source and Libraries
-        uses: MarceloPrado/has-changed-path@v1.0
-        id: changed
-        with:
-          paths: src lib
-
       - name: Build
-        if: steps.changed.outputs.changed == 'true'
         run: |
           make urban
       - name: Upload
-        if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: urban-${{ github.sha }}
@@ -37,18 +29,11 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Diff Source and Libraries
-        uses: MarceloPrado/has-changed-path@v1.0
-        id: changed
-        with:
-          paths: src lib
-
       - name: Build
-        if: steps.changed.outputs.changed == 'true'
         run: |
           make proto
+
       - name: Upload
-        if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: proto-${{ github.sha }}
@@ -63,18 +48,11 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Diff Source and Libraries
-        uses: MarceloPrado/has-changed-path@v1.0
-        id: changed
-        with:
-          paths: src lib
-
       - name: Build
-        if: steps.changed.outputs.changed == 'true'
         run: |
           make fc
+
       - name: Upload
-        if: steps.changed.outputs.changed == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: fc-${{ github.sha }}

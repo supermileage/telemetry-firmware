@@ -79,7 +79,7 @@ void loop() {
     led_blue.handle();
     led_green.handle();
 
-    // Publish a message every publish interval
+    // Publish a message every publish interva
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
         // If no valid time pulled from cellular, attempt to get valid time from GPS (should be faster)
         if(!Time.isValid()){
