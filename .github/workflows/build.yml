@@ -12,8 +12,8 @@ jobs:
           fetch-depth: 5
 
       - name: Build
-        run: |
-          make urban
+        run: make urban
+
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
@@ -30,8 +30,7 @@ jobs:
           fetch-depth: 5
 
       - name: Build
-        run: |
-          make proto
+        run: make proto
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -49,8 +48,7 @@ jobs:
           fetch-depth: 5
 
       - name: Build
-        run: |
-          make fc
+        run: make fc
 
       - name: Upload
         uses: actions/upload-artifact@v2
