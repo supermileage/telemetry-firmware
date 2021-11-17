@@ -43,7 +43,7 @@ void publishMessage() {
 void setup() {
     // A2 is the publish button input, setting up as input for safety
     pinMode(A2,INPUT_PULLDOWN);
-    
+
     if(DEBUG_SERIAL_ENABLE){
         Serial.begin(115200);
     }
@@ -82,7 +82,7 @@ void loop() {
     led_blue.handle();
     led_green.handle();
 
-    // Publish a message every publish interva
+    // Publish a message every publish interval
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
         // If no valid time pulled from cellular, attempt to get valid time from GPS (should be faster)
         if(!Time.isValid()){
