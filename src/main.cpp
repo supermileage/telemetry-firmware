@@ -41,6 +41,9 @@ void publishMessage() {
  * SETUP
  * */
 void setup() {
+    // A2 is the publish button input, setting up as input for safety
+    pinMode(A2,INPUT_PULLDOWN);
+    
     if(DEBUG_SERIAL_ENABLE){
         Serial.begin(115200);
     }
