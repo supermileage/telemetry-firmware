@@ -55,11 +55,11 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    for (unsigned i = 0; i < sensor_count; i++) {
+    for (unsigned i = 0; sensors[i]; i++) {
         sensors[i]->begin();
     }
 
-    DispatcherBuilder builder(commands, command_count, &dataQ);
+    DispatcherBuilder builder(commands, &dataQ);
     dispatcher = builder.build();
 
     DEBUG_SERIAL_LN("TELEMETRY ONLINE - " + String(VEHICLE_NAME));
@@ -70,7 +70,7 @@ void setup() {
  * */
 void loop() {
     // Sensor Handlers
-    for (unsigned i = 0; i < sensor_count; i++) {
+    for (unsigned i = 0; sensors[i]; i++) {
         sensors[i]->handle();
     }
 

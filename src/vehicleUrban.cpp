@@ -17,11 +17,9 @@ SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorG
 SensorCommand<SensorGps, String> gpsLong(&dataQ, &gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
 SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
 
-// array definitions: update counts if you make changes here
-Sensor *sensors[] = {&gps, &can, &thermo1, &thermo2, &sigStrength, &inVoltage};
-IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1 };
-uint16_t sensor_count = 6;
-uint16_t command_count = 3;
+// Array Definitions - MUST BE NULL TERMINATED
+Sensor *sensors[] = {&gps, &can, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
+IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
 
 void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN();
