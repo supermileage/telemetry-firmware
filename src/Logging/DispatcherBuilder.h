@@ -20,7 +20,7 @@ class DispatcherBuilder {
          * Note: this must be accurate and has potential to cause a segfault if the value is too low
          * @param dataQ the Data Queue from main
          * */
-        DispatcherBuilder(IntervalCommand *commands[], uint16_t numCommands, DataQueue *dataQ);
+        DispatcherBuilder(IntervalCommand *commands[], DataQueue *dataQ);
         
         /**
          * @brief Destroy the Dispatcher Builder object
@@ -47,7 +47,6 @@ class DispatcherBuilder {
         uint16_t *_intervals;
         uint16_t *_numCommandsAddedOnIntervals;
         uint16_t _numIntervals;
-        uint16_t _numCommands;
 };
 
 #endif

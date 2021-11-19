@@ -23,11 +23,9 @@ SensorCommand<SensorEcu, String> ecuSpark(&dataQ, &ecu, "PROTO-SPARK", &SensorEc
 SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "PROTO-Latitude", &SensorGps::getLatitude, 1);
 SensorCommand<SensorGps, String> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
 
-// array definitions: update counts if you make changes here
-Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage};
-IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel };
-uint16_t sensor_count = 6;
-uint16_t command_count = 8;
+// Array Definitions - MUST BE NULL TERMINATED
+Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
+IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
 
 
 // SerialDebugPublishing namespace definitions
