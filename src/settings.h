@@ -21,6 +21,7 @@
 
 #define PUBLISH_INTERVAL_MS     5000
 #define GPS_UPDATE_FREQUENCY    4
+#define LED_FLASH_INTERVAL      500
 
 // Time zone in UTC offset (must manually adjust for DST)
 #define TIME_ZONE                   -8

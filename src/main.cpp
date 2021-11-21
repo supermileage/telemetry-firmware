@@ -1,22 +1,26 @@
 #include "settings.h"
 #include "vehicle.h"
 #include "Led.h"
+#include "Button.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
+void buttonPushed();
+
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
+Button button(A2, true, buttonPushed, NULL);
 
 DataQueue dataQ(VEHICLE_NAME);
 Dispatcher *dispatcher;
+
 unsigned long lastPublish = 0;
-boolean loggingEnabled = LOGGING_ENABLED_AT_BOOT;
+bool loggingEnabled = LOGGING_ENABLED_AT_BOOT;
+bool error = false;
 
 void publishMessage() {
-
-    // dataQ.add("property", "value");
 
     DEBUG_SERIAL_LN("------------------------");
     DEBUG_SERIAL_LN("Time: " + Time.timeStr());
@@ -37,20 +41,70 @@ void publishMessage() {
     }
 
 }
+
+// Toggle logging enabled on and off
+void buttonPushed(){
+    if(loggingEnabled){
+        loggingEnabled = false;
+        DEBUG_SERIAL_LN("#### Logging has been DISABLED (button)");
+    }else{
+        loggingEnabled = true;
+        DEBUG_SERIAL_LN("#### Logging has been ENABLED (button)");
+    }
+}
+
+// Handle User Interface Functionality
+void handleUI(){
+    ledOrange.handle();
+    ledBlue.handle();
+    ledGreen.handle();
+    button.handle();
+
+    // Green Light Behaviour
+    if(Time.isValid()){
+        ledGreen.on();
+    }else{
+        ledGreen.flashRepeat(LED_FLASH_INTERVAL);
+    }
+
+    // Blue LED Behaviour
+    if(loggingEnabled){
+        if(Time.isValid() && !error){
+            ledBlue.on();
+        }else{
+            ledBlue.flashRepeat(LED_FLASH_INTERVAL);
+        }
+    }else{
+        ledBlue.off();
+    }
+
+    // Orange LED Behaviour
+    if(error){
+        ledOrange.flashRepeat(LED_FLASH_INTERVAL);
+    }else{
+        ledOrange.off();
+    }
+
+}
+
+// Enable Logging Remotely
+int remoteEnableLogging(String command){
+    loggingEnabled = true;
+    DEBUG_SERIAL_LN("#### Logging has been ENABLED (remote)");
+    return 1;
+}
+
+// Disable Logging Remotely
+int remoteDisableLogging(String command){
+    loggingEnabled = false;
+    DEBUG_SERIAL_LN("#### Logging has been DISABLED (remote)");
+    return 1;
+}
+
 /**
  * SETUP
  * */
 void setup() {
-    // A2 is the publish button input, setting up as input for safety
-    pinMode(A2,INPUT_PULLDOWN);
-
-    // Green LED flashes on boot-up
-    ledGreen.flashRepeat(500);
-    // Blue LED flashes on boot-up if logging enabled
-    if(loggingEnabled){
-        ledBlue.flashRepeat(500);
-    }
-
     if(DEBUG_SERIAL_ENABLE){
         Serial.begin(115200);
     }
@@ -59,6 +113,10 @@ void setup() {
     // This requires the pull-up resistors to be removed on i2c bus
     Wire.setClock(400000);
     Wire.begin();
+
+    // Define Remote Functions
+    Particle.function("enableLogging", remoteEnableLogging);
+    Particle.function("disableLogging", remoteDisableLogging);
 
     Time.zone(TIME_ZONE);
 
@@ -82,18 +140,12 @@ void loop() {
     }
 
     dataQ.loop();
-    if(loggingEnabled){
+
+    if(loggingEnabled && Time.isValid()){
         dispatcher->run();
     }
-    
-    if(digitalRead(A2)){
-        loggingEnabled = !loggingEnabled;
-    }
 
-    // LED Handlers
-    ledOrange.handle();
-    ledBlue.handle();
-    ledGreen.handle();
+    handleUI();
 
     // Publish a message every publish interval
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
@@ -102,9 +154,6 @@ void loop() {
             if(gps.getTimeValid()){
                 Time.setTime(gps.getUnixTime());
             }
-        }else{
-            ledGreen.on();
-            ledBlue.on();
         }
 
         lastPublish = millis();
