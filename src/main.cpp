@@ -5,13 +5,14 @@
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
-Led led_orange(A0, 63);
-Led led_blue(D7, 255);
-Led led_green(D8, 40);
+Led ledOrange(A0, 63);
+Led ledBlue(D7, 255);
+Led ledGreen(D8, 40);
 
 DataQueue dataQ(VEHICLE_NAME);
 Dispatcher *dispatcher;
 unsigned long lastPublish = 0;
+boolean loggingEnabled = LOGGING_ENABLED_AT_BOOT;
 
 void publishMessage() {
 
@@ -19,13 +20,12 @@ void publishMessage() {
 
     DEBUG_SERIAL_LN("------------------------");
     DEBUG_SERIAL_LN("Time: " + Time.timeStr());
-    if(PUBLISH_ENABLED){
-        DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish ENABLED - Message: ");
+    if(loggingEnabled){
+        DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Logging ENABLED - Message: ");
         // Publish to Particle Cloud
         DEBUG_SERIAL_LN(dataQ.publish("BQIngestion", PRIVATE, WITH_ACK));
     }else{
-        DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish DISABLED - Message: ");
-        DEBUG_SERIAL_LN(dataQ.resetData());
+        DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Logging DISABLED");
     }
     
     if(DEBUG_SENSOR_ENABLE){
@@ -43,6 +43,13 @@ void publishMessage() {
 void setup() {
     // A2 is the publish button input, setting up as input for safety
     pinMode(A2,INPUT_PULLDOWN);
+
+    // Green LED flashes on boot-up
+    ledGreen.flashRepeat(500);
+    // Blue LED flashes on boot-up if logging enabled
+    if(loggingEnabled){
+        ledBlue.flashRepeat(500);
+    }
 
     if(DEBUG_SERIAL_ENABLE){
         Serial.begin(115200);
@@ -75,12 +82,18 @@ void loop() {
     }
 
     dataQ.loop();
-    dispatcher->run();
+    if(loggingEnabled){
+        dispatcher->run();
+    }
+    
+    if(digitalRead(A2)){
+        loggingEnabled = !loggingEnabled;
+    }
 
     // LED Handlers
-    led_orange.handle();
-    led_blue.handle();
-    led_green.handle();
+    ledOrange.handle();
+    ledBlue.handle();
+    ledGreen.handle();
 
     // Publish a message every publish interval
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
@@ -90,6 +103,8 @@ void loop() {
                 Time.setTime(gps.getUnixTime());
             }
         }else{
+            ledGreen.on();
+            ledBlue.on();
         }
 
         lastPublish = millis();

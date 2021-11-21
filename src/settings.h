@@ -7,11 +7,11 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define URBAN
+    #define FC
 #endif
 
-// Publish to Cloud (Disable when not necessary during dev to save data)
-#define PUBLISH_ENABLED         0
+// Logging enabled at boot-up
+#define LOGGING_ENABLED_AT_BOOT 0
 // Output Serial messages (disable for production)
 #define DEBUG_SERIAL_ENABLE     1
 // Output Sensor data over serial (disable for production)
