@@ -61,6 +61,14 @@ size_t DataQueue::getDataSize() {
 	return _writer->dataSize();
 }
 
+size_t DataQueue::getNumEventsInQueue() {
+	return _publishQueue->getNumEvents();
+}
+
+bool DataQueue::isCacheFull() {
+	return _publishQueue->getNumEvents() == _publishQueue->getFileQueueSize() + RAM_QUEUE_EVENT_COUNT;
+}
+
 void DataQueue::_init() {
 	_publishQueue = &(PublishQueuePosix::instance());
 	_publishQueue->setup();
