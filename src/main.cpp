@@ -9,24 +9,25 @@ Led led_orange(A0, 63);
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-void publishCallback(DataQueue::PublishStatus status);
+void publishCallback(String payload, DataQueue::PublishStatus status);
 
 DataQueue dataQ(VEHICLE_NAME, publishCallback);
 Dispatcher *dispatcher;
 unsigned long lastPublish = 0;
 
 
-void publishMessage() {
+void publishMessage(String payload) {
     lastPublish = millis();
     DEBUG_SERIAL_LN("------------------------");
     DEBUG_SERIAL_LN("Time: " + Time.timeStr());
+
     if(PUBLISH_ENABLED){
         DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish ENABLED - Message: ");
-        // Publish to Particle Cloud
     }else{
         DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish DISABLED - Message: ");
-        DEBUG_SERIAL_LN(dataQ.resetData());
     }
+
+    DEBUG_SERIAL_LN(payload);
     
     if(DEBUG_SENSOR_ENABLE){
         CurrentVehicle::debugSensorData();
@@ -38,7 +39,7 @@ void publishMessage() {
 }
 
 // allows us to define behavior depending on publish status
-void publishCallback(DataQueue::PublishStatus status) {
+void publishCallback(String payload, DataQueue::PublishStatus status) {
     switch (status) {
         case DataQueue::PublishingAtMaxFrequency:
             DEBUG_SERIAL_LN("CURRENTLY PUBLISHING AT MAX FREQUENCY");
@@ -47,7 +48,7 @@ void publishCallback(DataQueue::PublishStatus status) {
             DEBUG_SERIAL_LN("PUBLISH ERROR: JSON WRITER BUFFER HAS OVERFLOWED");
             return;
         default:
-            publishMessage();
+            publishMessage(payload);
     }
 }
 

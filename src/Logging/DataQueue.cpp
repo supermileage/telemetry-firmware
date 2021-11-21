@@ -1,6 +1,6 @@
 #include "DataQueue.h"
 
-DataQueue::DataQueue(String publishHeader,  void (*callback)(PublishStatus)) {
+DataQueue::DataQueue(String publishHeader,  void (*callback)(String, PublishStatus)) {
 	_publishHeader = publishHeader;
 	_init();
 	_publishCallback = callback;
@@ -26,14 +26,13 @@ void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 
 	_lastPublish = currentPublish;
 
-	// publish and refresh writer
+	// get payload and publish
 	String payload = _writerGet();
-	_publishQueue->publish(event, payload, flag1, flag2);
+	if (PUBLISH_ENABLED)
+		_publishQueue->publish(event, payload, flag1, flag2);
 	_writerRefresh();
 
-	// handle serial publishing behavior
-	_publishCallback(status);
-	DEBUG_SERIAL_LN(payload);
+	_publishCallback(payload, status);
 	DEBUG_SERIAL_LN("Number of events Queued: " + String(_publishQueue->getNumEvents()));
 }
 

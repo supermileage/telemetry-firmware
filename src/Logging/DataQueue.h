@@ -20,7 +20,7 @@ class DataQueue {
         /**
          * Constructor
          * */
-        DataQueue(String publishHeader, void (*publishMessage)(PublishStatus));
+        DataQueue(String publishHeader, void (*publishMessage)(String, PublishStatus));
 
         /**
          * Adds an integer value and its ID into the data queue.
@@ -89,7 +89,7 @@ class DataQueue {
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];
         PublishQueuePosix* _publishQueue;
-        void (*_publishCallback)(PublishStatus);
+        void (*_publishCallback)(String, PublishStatus);
         unsigned long _lastPublish;
         String _publishHeader;
         
