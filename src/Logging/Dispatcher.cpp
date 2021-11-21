@@ -30,7 +30,7 @@ void Dispatcher::loop() {
     if (_logThisLoop) {
         bool firstPass = true;
         for (uint16_t i = 0; i < _numLoggers; i++) {
-            if (_dataQ->getDataSize() + _maxPublishSizes[i] + 2 > _dataQ->getBufferSize())
+            if (_dataQ->getDataSize() + _maxPublishSizes[i] + 2 > _dataQ->getBufferSize() && _loggers[i]->executeThisLoop())
                 _dataQ->publish("BQIngestion", PRIVATE, WITH_ACK);
             
             if (firstPass) { 
