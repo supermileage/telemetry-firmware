@@ -19,6 +19,10 @@
         "vector": "cpp",
         "complex": "cpp",
         "__tuple": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "new": "cpp",
+        "__node_handle": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp"
     }
 }

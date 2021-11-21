@@ -26,14 +26,14 @@ class Dispatcher {
         void loop();
 
     private:
-        void CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i);
-
         IntervalCommandGroup **_loggers;
         DataQueue *_dataQ;
         uint16_t* _maxPublishSizes;
         uint16_t _numLoggers;
         bool _logThisLoop;
         String _publishName;
+
+        void CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i);
 };
 
 #endif

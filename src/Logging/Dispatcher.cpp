@@ -32,15 +32,20 @@ void Dispatcher::loop() {
     if (_logThisLoop) {
         bool firstPass = true;
         for (uint16_t i = 0; i < _numLoggers; i++) {
-            if (_dataQ->getDataSize() + _maxPublishSizes[i] + 2 > _dataQ->getBufferSize() && _loggers[i]->executeThisLoop())
+            // NOTE: max wrapper opening size = 21 bytes; max wrapper closing size = 2 bytes, final closing brackets = 2 bytes
+            unsigned additionalBytes = firstPass ? 25 : 4;
+            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _loggers[i]->executeThisLoop()) {
+                if (!firstPass)
+                    _dataQ->wrapEnd();
+
                 _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
-            
-            if (firstPass) { 
-                _dataQ->wrapStart();
-                firstPass = false;
             }
 
             if (_loggers[i]->executeThisLoop()) {
+                if (firstPass) { 
+                    _dataQ->wrapStart();
+                    firstPass = false;
+                }
                 uint16_t dataSizeBeforePublish = _dataQ->getDataSize();
 
                 _loggers[i]->executeCommands();

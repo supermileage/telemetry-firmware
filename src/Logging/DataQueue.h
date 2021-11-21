@@ -2,6 +2,7 @@
 #define _DATAQUEUE_H_
 
 #define JSON_WRITER_BUFFER_SIZE 1024
+#define JSON_WRITER_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8
 
 #include "settings.h"
@@ -78,20 +79,27 @@ class DataQueue {
         /**
          * @brief Get the buffer size of DataQueue's JsonWriter
          * 
-         * @return size_t the current buffer size
+         * @return size_t - the current buffer size
          */
         size_t getBufferSize();
 
         /**
          * @brief Get the size of data currently held in JsonWriter's buffer
          * 
-         * @return size_t the current data size
+         * @return size_t - the current data size
          */
         size_t getDataSize();
 
+        /**
+         * @brief Returns the number of events in the RAM and File Queues
+         * 
+         * @return size_t - num events in publish queue
+         */
+        size_t getNumEventsInQueue();
+
     private:
         JSONBufferWriter* _writer;
-        char _buf[JSON_WRITER_BUFFER_SIZE];
+        char _buf[JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY];
         PublishQueuePosix* _publishQueue;
         void (*_publishCallback)(String, PublishStatus);
         unsigned long _lastPublish;
@@ -114,6 +122,12 @@ class DataQueue {
          *         JSON object.
          * */
         String _writerGet();
+
+        /**
+         * Reparses Json data and removes last entry from Jobject at removal index in internal JArray
+         * Only used in the case that the JsonWriter's data buffer overflows
+         */
+        void _recoverDataFromBuffer(unsigned removalIndex);
 
         /**
          * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by

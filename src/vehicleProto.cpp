@@ -4,7 +4,6 @@
 
 #include "SensorEcu.h"
 
-#include "SensorEcu.h"
 // sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
 SensorThermo thermo1(&SPI, A5);

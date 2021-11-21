@@ -13,13 +13,20 @@ void DataQueue::loop() {
 
 void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	unsigned long currentPublish = millis() / 1000;
+	String payload = _writerGet();
 
 	// assign publishing status
 	PublishStatus status;
-	if (currentPublish - _lastPublish <= 1) {
-		status = PublishingAtMaxFrequency;
-	} else if (_writer->dataSize() > JSON_WRITER_BUFFER_SIZE) {
+	if (_writer->dataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
 		status = DataBufferOverflow;
+		// reduce data in buffer until it fits within json writer buffer size
+		unsigned i = 0;
+		while (_writer->dataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
+			_recoverDataFromBuffer(i++);
+			payload = _writerGet();
+		}
+	} else if (currentPublish - _lastPublish <= 1) {
+		status = PublishingAtMaxFrequency;
 	} else {
 		status = Normal;
 	}
@@ -27,13 +34,12 @@ void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	_lastPublish = currentPublish;
 
 	// get payload and publish
-	String payload = _writerGet();
-	if (PUBLISH_ENABLED)
+	if (PUBLISH_ENABLED) {
 		_publishQueue->publish(event, payload, flag1, flag2);
-	_writerRefresh();
+	}
 
+	_writerRefresh();
 	_publishCallback(payload, status);
-	DEBUG_SERIAL_LN("Number of events Queued: " + String(_publishQueue->getNumEvents()));
 }
 
 String DataQueue::resetData() {
@@ -53,11 +59,15 @@ void DataQueue::wrapEnd() {
 }
 
 size_t DataQueue::getBufferSize() {
-	return _writer->bufferSize();
+	return JSON_WRITER_BUFFER_SIZE;
 }
 
 size_t DataQueue::getDataSize() {
 	return _writer->dataSize();
+}
+
+size_t DataQueue::getNumEventsInQueue() {
+	return _publishQueue->getNumEvents();
 }
 
 void DataQueue::_writerRefresh() {
@@ -76,11 +86,79 @@ void DataQueue::_writerInit() {
 
 	_writer->beginObject().name("v").value(_publishHeader)
 		.name("l").beginArray();
-} 
+}
 
 void DataQueue::_init() {
 	_publishQueue = &(PublishQueuePosix::instance());
 	_publishQueue->setup();
 	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
 	_writerInit();
+}
+
+void DataQueue::_recoverDataFromBuffer(unsigned removalIndex) {
+	// parse and create copy of data in buffer
+	JSONValue obj = JSONValue::parseCopy(_buf);
+	JSONObjectIterator outerIterator(obj);
+
+	// for testing
+	if (DEBUG_SERIAL_ENABLE)
+		DEBUG_SERIAL_LN("Complete JSON string to be reparsed : " + String(_buf));
+
+	// reinitialize writer (opens JObject and JArray in data buffer)
+	_writerInit();
+
+	while (outerIterator.next()) {
+		if (outerIterator.value().isArray()) {
+			JSONArrayIterator arrayIterator(outerIterator.value());
+			bool oneObjectInArray = arrayIterator.count() == 1;
+
+			// LEVEL: Data array inside of main JObject
+			while (arrayIterator.next()) {
+				JSONObjectIterator peekingIterator(arrayIterator.value());
+
+				// don't record current object if it's not holding any data
+				bool currentObjectHasNoData = false;
+				while (peekingIterator.next()) {
+					if (peekingIterator.value().isObject()) {
+						JSONObjectIterator checkerIterator(peekingIterator.value());
+						currentObjectHasNoData = checkerIterator.count() == 0;
+					}
+				}
+				if (currentObjectHasNoData)
+					continue;
+
+				// remove data from current object if we are at removal index in array, or if array only has one JObject
+				bool removeDataFromCurrentObject = (arrayIterator.count() == removalIndex) || oneObjectInArray;
+				JSONObjectIterator innerIterator(arrayIterator.value());
+				
+				// LEVEL: JObject which carries timestamp and inner-most JObject
+				_writer->beginObject();
+				while (innerIterator.next()) {
+					_writer->name(String(innerIterator.name()));
+					
+					if (innerIterator.count() == 1) {
+						// add timestamp
+						_writer->value(innerIterator.value().toInt());
+					} else {
+						// get inner-most JObject and add all its data
+						JSONObjectIterator innerestIterator(innerIterator.value());
+
+						// LEVEL: inner-most JObject which carries event data
+						_writer->beginObject();
+						while (innerestIterator.next()) {
+							// remove last data entry from jobject if we are supposed to
+							if (removeDataFromCurrentObject && innerestIterator.count() == 0)
+								break;
+
+							_writer->name(String(innerestIterator.name()))
+								.value(String(innerestIterator.value().toString()));
+						}
+						_writer->endObject();
+					}
+				}
+				_writer->endObject();
+			}
+		}
+	}
+	// final closing of JArray and jobject handled by _writerGet() in publish()
 }

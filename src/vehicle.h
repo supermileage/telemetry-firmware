@@ -19,7 +19,6 @@ extern SensorGps gps;
 extern Sensor *sensors[];
 
 namespace CurrentVehicle {
-
     /**
      *  Returns dispatcher with current vehicle's set of commands
     **/

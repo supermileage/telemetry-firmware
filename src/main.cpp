@@ -10,7 +10,6 @@ Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
 void publishCallback(String payload, DataQueue::PublishStatus status);
-
 DataQueue dataQ(VEHICLE_NAME, publishCallback);
 Dispatcher *dispatcher;
 
@@ -25,6 +24,7 @@ void publishMessage(String payload) {
     }
 
     DEBUG_SERIAL_LN(payload);
+    DEBUG_SERIAL_LN("Number of events Queued: " + String(dataQ.getNumEventsInQueue()));
     
     if(DEBUG_SENSOR_ENABLE){
         CurrentVehicle::debugSensorData();
@@ -40,15 +40,15 @@ void publishCallback(String payload, DataQueue::PublishStatus status) {
     switch (status) {
         case DataQueue::PublishingAtMaxFrequency:
             DEBUG_SERIAL_LN("CURRENTLY PUBLISHING AT MAX FREQUENCY");
-            publishMessage(payload);
             break;
         case DataQueue::DataBufferOverflow:
             DEBUG_SERIAL_LN("PUBLISH ERROR: JSON WRITER BUFFER HAS OVERFLOWED");
-            // implement some handling behavior
             break;
         default:
-            publishMessage(payload);
+            break;
     }
+
+    publishMessage(payload);
 }
 
 /**
@@ -95,6 +95,3 @@ void loop() {
     led_blue.handle();
     led_green.handle();
 }
-
-
-
