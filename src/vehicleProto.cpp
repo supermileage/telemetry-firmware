@@ -28,11 +28,13 @@ Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage, N
 IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
 
 
-// SerialDebugPublishing namespace definitions
 
-/**
- * Publishes a new message to Particle Cloud for proto
-**/
+// CurrrentVehicle namespace definitions
+Dispatcher* CurrentVehicle::buildDispatcher() {
+    DispatcherBuilder builder(commands, &dataQ);
+    return builder.build();
+}
+
 void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN("SENSOR READINGS: ");

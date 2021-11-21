@@ -21,6 +21,13 @@ SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Tempera
 Sensor *sensors[] = {&gps, &can, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
 
+
+// CurrentVehicle namespace definitions
+Dispatcher* CurrentVehicle::buildDispatcher() {
+    DispatcherBuilder builder(commands, &dataQ);
+    return builder.build();
+}
+
 void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN("SENSOR READINGS: ");

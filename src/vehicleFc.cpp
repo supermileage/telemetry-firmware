@@ -22,7 +22,11 @@ Sensor *sensors[] = {&gps, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &gpsVertAccel, &gpsHorAccel, &thermoTemp1, &thermoTemp2, NULL};
 
 
-// SerialDebugPublishing namespace definitions
+// CurrentVehicle namespace definitions
+Dispatcher* CurrentVehicle::buildDispatcher() {
+    DispatcherBuilder builder(commands, &dataQ);
+    return builder.build();
+}
 
 void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN();

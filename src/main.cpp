@@ -9,20 +9,20 @@ Led led_orange(A0, 63);
 Led led_blue(D7, 255);
 Led led_green(D8, 40);
 
-DataQueue dataQ(VEHICLE_NAME);
+void publishCallback(DataQueue::PublishStatus status);
+
+DataQueue dataQ(VEHICLE_NAME, publishCallback);
 Dispatcher *dispatcher;
 unsigned long lastPublish = 0;
 
+
 void publishMessage() {
-
-    // dataQ.add("property", "value");
-
+    lastPublish = millis();
     DEBUG_SERIAL_LN("------------------------");
     DEBUG_SERIAL_LN("Time: " + Time.timeStr());
     if(PUBLISH_ENABLED){
         DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish ENABLED - Message: ");
         // Publish to Particle Cloud
-        DEBUG_SERIAL_LN(dataQ.publish("BQIngestion", PRIVATE, WITH_ACK));
     }else{
         DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish DISABLED - Message: ");
         DEBUG_SERIAL_LN(dataQ.resetData());
@@ -35,8 +35,22 @@ void publishMessage() {
     if(DEBUG_MEM){
         DEBUG_SERIAL_LN("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
     }
-
 }
+
+// allows us to define behavior depending on publish status
+void publishCallback(DataQueue::PublishStatus status) {
+    switch (status) {
+        case DataQueue::PublishingAtMaxFrequency:
+            DEBUG_SERIAL_LN("CURRENTLY PUBLISHING AT MAX FREQUENCY");
+            return;
+        case DataQueue::DataBufferOverflow:
+            DEBUG_SERIAL_LN("PUBLISH ERROR: JSON WRITER BUFFER HAS OVERFLOWED");
+            return;
+        default:
+            publishMessage();
+    }
+}
+
 /**
  * SETUP
  * */
@@ -59,8 +73,7 @@ void setup() {
         sensors[i]->begin();
     }
 
-    DispatcherBuilder builder(commands, &dataQ);
-    dispatcher = builder.build();
+    dispatcher = CurrentVehicle::buildDispatcher();
 
     DEBUG_SERIAL_LN("TELEMETRY ONLINE - " + String(VEHICLE_NAME));
 }
@@ -75,7 +88,7 @@ void loop() {
     }
 
     dataQ.loop();
-    dispatcher->run();
+    dispatcher->loop();
 
     // LED Handlers
     led_orange.handle();
@@ -89,11 +102,7 @@ void loop() {
             if(gps.getTimeValid()){
                 Time.setTime(gps.getUnixTime());
             }
-        }else{
         }
-
-        lastPublish = millis();
-        publishMessage();
     }
 }
 

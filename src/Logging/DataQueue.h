@@ -15,11 +15,12 @@
 class DataQueue {
 
     public:
+        enum PublishStatus { Normal, PublishingAtMaxFrequency, DataBufferOverflow };
 
         /**
          * Constructor
          * */
-        DataQueue(String publishHeader);
+        DataQueue(String publishHeader, void (*publishMessage)(PublishStatus));
 
         /**
          * Adds an integer value and its ID into the data queue.
@@ -51,7 +52,7 @@ class DataQueue {
          * 
          * @return Published payload
          * */
-        String publish(String event, PublishFlags flag1, PublishFlags flag2);
+        void publish(String event, PublishFlags flag1, PublishFlags flag2);
 
         /**
          * Returns data in writer buffer and reinstantiates JSONBufferWriter
@@ -60,19 +61,38 @@ class DataQueue {
          * */
         String resetData();
 
+        /**
+         * Defines data wrapping for start of individual logging event
+         */
         void wrapStart();
         
+        /**
+         * Closes data wrapping for individual logging event
+         */
         void wrapEnd();
 
+        /**
+         * @brief Get the buffer size of DataQueue's JsonWriter
+         * 
+         * @return size_t the current buffer size
+         */
         size_t getBufferSize();
 
+        /**
+         * @brief Get the size of data currently held in JsonWriter's buffer
+         * 
+         * @return size_t the current data size
+         */
         size_t getDataSize();
 
     private:
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE];
         PublishQueuePosix* _publishQueue;
+        void (*_publishCallback)(PublishStatus);
+        unsigned long _lastPublish;
         String _publishHeader;
+        
 
         /**
          * Removes the data stored in the JSON object and reinitializes

@@ -17,15 +17,18 @@ extern DataQueue dataQ;
 extern SensorGps gps;
 
 extern Sensor *sensors[];
-extern IntervalCommand *commands[];
 
 namespace CurrentVehicle {
+
+    /**
+     *  Returns dispatcher with current vehicle's set of commands
+    **/
+    Dispatcher* buildDispatcher();
 
     /**
      *  Output latest sensor data for debugging
     **/
     void debugSensorData();
-
 }
 
 #endif
