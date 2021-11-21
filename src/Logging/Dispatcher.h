@@ -10,9 +10,9 @@
 class Dispatcher {
     public:
         /**
-         * Constructs a Dispatcher with loggers, numLoggers and DataQueue
+         * Constructs a Dispatcher with loggers, numLoggers, dataQueue and publishName
          **/
-        Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ);
+        Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName);
 
         /**
          * @brief Destroy the Dispatcher object
@@ -33,6 +33,7 @@ class Dispatcher {
         uint16_t* _maxPublishSizes;
         uint16_t _numLoggers;
         bool _logThisLoop;
+        String _publishName;
 };
 
 #endif

@@ -1,11 +1,12 @@
 #include "Dispatcher.h"
 
-Dispatcher::Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ) {
+Dispatcher::Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName) {
     _loggers = loggers;
     _numLoggers = numLoggers;
     _maxPublishSizes = new uint16_t[numLoggers]();
     _dataQ = dataQ;
     _logThisLoop = false;
+    _publishName = publishName;
 }
 
 Dispatcher::~Dispatcher() {
@@ -13,6 +14,7 @@ Dispatcher::~Dispatcher() {
         delete _loggers[i];
     }
     delete[] _loggers;
+    delete[] _maxPublishSizes;
 }
 
 void Dispatcher::loop() {
@@ -31,7 +33,7 @@ void Dispatcher::loop() {
         bool firstPass = true;
         for (uint16_t i = 0; i < _numLoggers; i++) {
             if (_dataQ->getDataSize() + _maxPublishSizes[i] + 2 > _dataQ->getBufferSize() && _loggers[i]->executeThisLoop())
-                _dataQ->publish("BQIngestion", PRIVATE, WITH_ACK);
+                _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
             
             if (firstPass) { 
                 _dataQ->wrapStart();

@@ -15,6 +15,9 @@
 class DataQueue {
 
     public:
+        /**
+         * Describes set of possible publishing states
+         **/
         enum PublishStatus { Normal, PublishingAtMaxFrequency, DataBufferOverflow };
 
         /**
@@ -62,12 +65,13 @@ class DataQueue {
         String resetData();
 
         /**
-         * Defines data wrapping for start of individual logging event
+         * Defines data wrapping for start of individual logging event:
+         * Opens JObject and adds timestamp
          */
         void wrapStart();
         
         /**
-         * Closes data wrapping for individual logging event
+         * Closes data wrapping for individual logging event: closes JObject
          */
         void wrapEnd();
 

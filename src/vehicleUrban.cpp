@@ -21,10 +21,11 @@ SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Tempera
 Sensor *sensors[] = {&gps, &can, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
 
+String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
 Dispatcher* CurrentVehicle::buildDispatcher() {
-    DispatcherBuilder builder(commands, &dataQ);
+    DispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }
 

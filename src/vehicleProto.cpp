@@ -27,11 +27,11 @@ SensorCommand<SensorGps, String> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps
 Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
 IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
 
-
+String publishName = "BQIngestion";
 
 // CurrrentVehicle namespace definitions
 Dispatcher* CurrentVehicle::buildDispatcher() {
-    DispatcherBuilder builder(commands, &dataQ);
+    DispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }
 

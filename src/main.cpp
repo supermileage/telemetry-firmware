@@ -13,11 +13,8 @@ void publishCallback(String payload, DataQueue::PublishStatus status);
 
 DataQueue dataQ(VEHICLE_NAME, publishCallback);
 Dispatcher *dispatcher;
-unsigned long lastPublish = 0;
-
 
 void publishMessage(String payload) {
-    lastPublish = millis();
     DEBUG_SERIAL_LN("------------------------");
     DEBUG_SERIAL_LN("Time: " + Time.timeStr());
 
@@ -43,10 +40,12 @@ void publishCallback(String payload, DataQueue::PublishStatus status) {
     switch (status) {
         case DataQueue::PublishingAtMaxFrequency:
             DEBUG_SERIAL_LN("CURRENTLY PUBLISHING AT MAX FREQUENCY");
-            return;
+            publishMessage(payload);
+            break;
         case DataQueue::DataBufferOverflow:
             DEBUG_SERIAL_LN("PUBLISH ERROR: JSON WRITER BUFFER HAS OVERFLOWED");
-            return;
+            // implement some handling behavior
+            break;
         default:
             publishMessage(payload);
     }
@@ -95,16 +94,6 @@ void loop() {
     led_orange.handle();
     led_blue.handle();
     led_green.handle();
-
-    // Publish a message every publish interval
-    if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
-        // If no valid time pulled from cellular, attempt to get valid time from GPS (should be faster)
-        if(!Time.isValid()){
-            if(gps.getTimeValid()){
-                Time.setTime(gps.getUnixTime());
-            }
-        }
-    }
 }
 
 
