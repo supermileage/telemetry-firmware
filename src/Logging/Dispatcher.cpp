@@ -30,21 +30,23 @@ void Dispatcher::loop() {
 
     // check max publish sizes, publish if DataQueue buffer is close to full, update max publish sizes for each logger
     if (_logThisLoop) {
-        bool firstPass = true;
+        bool dataWrapperIsOpen = false;
         for (uint16_t i = 0; i < _numLoggers; i++) {
-            // NOTE: max wrapper opening size = 21 bytes; max wrapper closing size = 2 bytes, final closing brackets = 2 bytes
-            unsigned additionalBytes = firstPass ? 25 : 4;
+            // NOTE: max wrapper opening size = 21 bytes; wrapper closing size = 2 bytes; final closing brackets = 2 bytes
+            unsigned additionalBytes = dataWrapperIsOpen ? 4 : 25;
             if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _loggers[i]->executeThisLoop()) {
-                if (!firstPass)
+                if (dataWrapperIsOpen) {
                     _dataQ->wrapEnd();
+                    dataWrapperIsOpen = false;
+                }
 
                 _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
             }
 
             if (_loggers[i]->executeThisLoop()) {
-                if (firstPass) { 
+                if (!dataWrapperIsOpen) { 
                     _dataQ->wrapStart();
-                    firstPass = false;
+                    dataWrapperIsOpen = true;
                 }
                 uint16_t dataSizeBeforePublish = _dataQ->getDataSize();
 
@@ -55,7 +57,9 @@ void Dispatcher::loop() {
                 CheckAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
             }
         }
-        _dataQ->wrapEnd();
+        if (dataWrapperIsOpen)
+            _dataQ->wrapEnd();
+
         _logThisLoop = false;
     }
 }

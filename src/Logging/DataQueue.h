@@ -1,7 +1,7 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#define JSON_WRITER_BUFFER_SIZE 64
+#define JSON_WRITER_BUFFER_SIZE 72
 #define JSON_WRITER_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8
 
@@ -124,7 +124,7 @@ class DataQueue {
         String _writerGet();
 
         /**
-         * Reparses Json data and removes last entry from Jobject at removal index in internal JArray
+         * Reparses Json data and removes last entry from JObject at removalIndex in internal JArray
          * Only used in the case that the JsonWriter's data buffer overflows
          */
         void _recoverDataFromBuffer(unsigned removalIndex);
