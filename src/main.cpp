@@ -39,12 +39,15 @@ void publishMessage(String payload) {
 void publishCallback(String payload, DataQueue::PublishStatus status) {
     switch (status) {
         case DataQueue::PublishingAtMaxFrequency:
-            DEBUG_SERIAL_LN("CURRENTLY PUBLISHING AT MAX FREQUENCY");
+            DEBUG_SERIAL_LN("PUBLISH WARNING: Currently Publishing at Max Frequency");
+            led_orange.flash(250, 1);
             break;
         case DataQueue::DataBufferOverflow:
-            DEBUG_SERIAL_LN("PUBLISH ERROR: JSON WRITER BUFFER HAS OVERFLOWED");
+            DEBUG_SERIAL_LN("PUBLISH ERROR: Json Writer Data Buffer has Overflowed");
+            led_orange.flash(125, 3);
             break;
         default:
+            // everything is normal, do nothing
             break;
     }
 
