@@ -23,6 +23,9 @@
         "new": "cpp",
         "__node_handle": "cpp",
         "optional": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "typeinfo": "cpp",
+        "algorithm": "cpp",
+        "bitset": "cpp"
     }
 }

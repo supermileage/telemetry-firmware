@@ -126,8 +126,10 @@ class DataQueue {
         /**
          * Reparses Json data and removes last entry from JObject at removalIndex in internal JArray
          * Only used in the case that the JsonWriter's data buffer overflows
+         * 
+         * @return String payload -- json data string
          */
-        void _recoverDataFromBuffer(unsigned removalIndex);
+        String _recoverDataFromBuffer();
 
         /**
          * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by
