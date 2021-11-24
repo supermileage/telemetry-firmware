@@ -2,17 +2,22 @@
 
 #define DEBOUNCE_TIME 50
 
-Button::Button(uint16_t pin, bool activeHigh, void (*callbackPosEdge)() = NULL, void (*callbackNegEdge)() = NULL){
+Button::Button(uint16_t pin, bool activeHigh, bool normallyOpen, void (*callbackPushed)() = NULL, void (*callbackReleased)() = NULL){
     _pin = pin;
     _activeHigh = activeHigh;
-    _callbackPosEdge = callbackPosEdge;
-    _callbackNegEdge = callbackNegEdge;
+    _callbackPushed = callbackPushed;
+    _callbackReleased = callbackReleased;
 
-    // Enable input pin
+    // Enable input pin with a built-in resistor pulling opposite of active
     if(_activeHigh){
         pinMode(pin, INPUT_PULLDOWN);
     }else{
         pinMode(pin, INPUT_PULLUP);
+    }
+
+    // If the button is normally closed, reverse the polarity of the read. 
+    if(!normallyOpen) {
+        _activeHigh = !activeHigh;
     }
 }
 
