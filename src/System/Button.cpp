@@ -17,8 +17,8 @@ Button::Button(uint16_t pin, bool activeHigh, void (*callbackPosEdge)() = NULL, 
 }
 
 bool Button::handle(){
-    bool newState = digitalRead(_pin);
-    if(_activeHigh){
+    bool newState = pinReadFast(_pin);
+    if(!_activeHigh){
         newState = !newState;
     }
     if(newState != _state && millis() > _lastChange + DEBOUNCE_TIME){

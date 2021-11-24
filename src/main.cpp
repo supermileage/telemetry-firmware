@@ -11,7 +11,7 @@ void buttonPushed();
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
-Button button(A2, true, buttonPushed, NULL);
+Button button(A2, true, NULL, buttonPushed);
 
 DataQueue dataQ(VEHICLE_NAME);
 Dispatcher *dispatcher;
