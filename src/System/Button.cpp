@@ -30,9 +30,9 @@ bool Button::handle(){
         _state = newState;
         _lastChange = millis();
         if(newState){
-            if(_callbackPosEdge != NULL) _callbackPosEdge();
+            if(_callbackPushed != NULL) _callbackPushed();
         }else{
-            if(_callbackNegEdge != NULL) _callbackNegEdge();
+            if(_callbackReleased != NULL) _callbackReleased();
         }
     }
 

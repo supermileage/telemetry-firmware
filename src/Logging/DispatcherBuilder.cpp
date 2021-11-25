@@ -1,14 +1,14 @@
 #include "DispatcherBuilder.h"
 
-DispatcherBuilder::DispatcherBuilder(IntervalCommand *commands[], uint16_t numCommands, DataQueue *dataQ) {
+DispatcherBuilder::DispatcherBuilder(IntervalCommand *commands[], DataQueue *dataQ, String publishName) {
     _dataQ = dataQ;
     _numIntervals = 0;
-    _numCommands = numCommands;
     _commands = commands;
     _intervals = new uint16_t[MAX_NUM_INTERVALS] ();
     _numCommandsAddedOnIntervals = new uint16_t[MAX_NUM_INTERVALS] ();
+    _publishName = publishName;
 
-    for (uint16_t i = 0; i < _numCommands; i++) {
+    for (uint16_t i = 0; commands[i]; i++) {
         addInterval(commands[i]);
     }
 }
@@ -30,7 +30,7 @@ Dispatcher* DispatcherBuilder::build() {
         Command **commandsOnInterval = new Command*[numCommandsOnInterval];
         
         uint16_t commandCount = 0;
-        for (uint16_t i = 0; i < _numCommands; i++) {
+        for (uint16_t i = 0; _commands[i]; i++) {
             if (_commands[i]->getInterval() == interval)
                 commandsOnInterval[commandCount++] = _commands[i];
         }
@@ -38,7 +38,7 @@ Dispatcher* DispatcherBuilder::build() {
     }
 
     // create new dispatcher with set of loggers (_numIntervals == number of loggers)
-    return new Dispatcher(loggers, _numIntervals, _dataQ);
+    return new Dispatcher(loggers, _numIntervals, _dataQ, _publishName);
 }
 
 

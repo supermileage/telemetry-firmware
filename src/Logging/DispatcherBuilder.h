@@ -19,8 +19,9 @@ class DispatcherBuilder {
          * @param numCommands The number of sensor functions you will add to the builder
          * Note: this must be accurate and has potential to cause a segfault if the value is too low
          * @param dataQ the Data Queue from main
+         * @param publishName the name under which any data from interval commands will be published
          * */
-        DispatcherBuilder(IntervalCommand *commands[], uint16_t numCommands, DataQueue *dataQ);
+        DispatcherBuilder(IntervalCommand *commands[], DataQueue *dataQ, String publishName);
         
         /**
          * @brief Destroy the Dispatcher Builder object
@@ -47,7 +48,7 @@ class DispatcherBuilder {
         uint16_t *_intervals;
         uint16_t *_numCommandsAddedOnIntervals;
         uint16_t _numIntervals;
-        uint16_t _numCommands;
+        String _publishName;
 };
 
 #endif

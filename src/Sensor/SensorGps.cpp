@@ -1,7 +1,16 @@
 #include "SensorGps.h"
 
-SensorGps::SensorGps(SFE_UBLOX_GNSS *gps, uint8_t updateFrequency) {
-    _updateFrequency = updateFrequency;
+// GPS Update Frequency in Hz (1-10)
+#define UPDATE_FREQ 4
+
+// Math Constants
+#define MICROSECONDS_IN_SECOND      1000000
+#define NANOSECONDS_IN_MICROSECOND  1000
+#define MILIMETERS_IN_METERS        1000.0
+#define TEN_POWER_SEVEN             10000000.0
+#define TEN_POWER_FIVE              100000.0
+
+SensorGps::SensorGps(SFE_UBLOX_GNSS *gps) {
     _gps = gps;
 
 }
@@ -19,7 +28,7 @@ void SensorGps::begin() {
     // GPS polls are non-blocking
     _gps->setAutoPVT(true);
     // Set the update frequency
-    _gps->setNavigationFrequency(_updateFrequency);
+    _gps->setNavigationFrequency(UPDATE_FREQ);
 
 }
 

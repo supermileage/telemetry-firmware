@@ -7,39 +7,61 @@ SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 void buttonPushed();
+void publish(String payload, DataQueue::PublishStatus status);
 
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
 Button button(A2, true, false, buttonPushed, NULL);
 
-DataQueue dataQ(VEHICLE_NAME);
+DataQueue dataQ(VEHICLE_NAME, publish);
 Dispatcher *dispatcher;
 
-unsigned long lastPublish = 0;
-bool loggingEnabled = LOGGING_ENABLED_AT_BOOT;
+bool loggingEnabled = LOGGING_EN_AT_BOOT;
 bool error = false;
+long unsigned int lastDebugSensor = 0;
 
-void publishMessage() {
-
-    DEBUG_SERIAL_LN("------------------------");
-    DEBUG_SERIAL_LN("Time: " + Time.timeStr());
-    if(loggingEnabled){
-        DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Logging ENABLED - Message: ");
-        // Publish to Particle Cloud
-        DEBUG_SERIAL_LN(dataQ.publish("BQIngestion", PRIVATE, WITH_ACK));
+// Wrapper for current time, in case it's invalid
+String currentTime(){
+    if(Time.isValid()){
+        return Time.timeStr();
     }else{
-        DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Logging DISABLED");
+        return "NOT VALID";
     }
-    
-    if(DEBUG_SENSOR_ENABLE){
-        CurrentVehicle::debugSensorData();
+}
+
+// Publish a message
+void publish(String payload, DataQueue::PublishStatus status) {
+    switch (status) {
+        case DataQueue::PublishingAtMaxFrequency:
+            DEBUG_SERIAL_LN("WARNING: Currently Publishing at Max Frequency");
+            error = false;
+            break;
+        case DataQueue::DataBufferOverflow:
+            DEBUG_SERIAL_LN("ERROR: Json Writer Data Buffer has Overflowed");
+            error = true;
+            break;
+        default:
+            error = false;
+            break;
     }
 
-    if(DEBUG_MEM){
-        DEBUG_SERIAL_LN("\nFREE RAM: " + String(System.freeMemory()) + "B / 128000B");
-    }
+    DEBUG_SERIAL_LN("---- PUBLISH MESSAGE ----");
+    DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish " + (PUBLISH_EN ? "ENABLED" : "DISABLED") + " - " + currentTime());
+    DEBUG_SERIAL_LN(payload);
+    DEBUG_SERIAL_LN("");
+    DEBUG_SERIAL_LN("Publish Queue Size: " + String(dataQ.getNumEventsInQueue()));
+    DEBUG_SERIAL_LN("");
+}
 
+// Output sensor data over serial
+void debugSensors(){
+    DEBUG_SERIAL_LN("---- SENSOR DATA ----");
+    DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - " + currentTime());
+    CurrentVehicle::debugSensorData();
+
+    DEBUG_SERIAL_LN("Free Memory: " + String(System.freeMemory()/1000) + "kB / 128kB");
+    DEBUG_SERIAL_LN("");
 }
 
 // Toggle logging enabled on and off
@@ -64,7 +86,7 @@ void handleUI(){
     if(Time.isValid()){
         ledGreen.on();
     }else{
-        ledGreen.flashRepeat(LED_FLASH_INTERVAL);
+        ledGreen.flashRepeat(LED_FLASH_INT);
     }
 
     // Blue LED Behaviour
@@ -72,7 +94,7 @@ void handleUI(){
         if(Time.isValid() && !error){
             ledBlue.on();
         }else{
-            ledBlue.flashRepeat(LED_FLASH_INTERVAL);
+            ledBlue.flashRepeat(LED_FLASH_INT);
         }
     }else{
         ledBlue.off();
@@ -80,7 +102,7 @@ void handleUI(){
 
     // Orange LED Behaviour
     if(error){
-        ledOrange.flashRepeat(LED_FLASH_INTERVAL);
+        ledOrange.flashRepeat(LED_FLASH_INT);
     }else{
         ledOrange.off();
     }
@@ -105,7 +127,7 @@ int remoteDisableLogging(String command){
  * SETUP
  * */
 void setup() {
-    if(DEBUG_SERIAL_ENABLE){
+    if(DEBUG_SERIAL_EN){
         Serial.begin(115200);
     }
 
@@ -120,14 +142,13 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    for (unsigned i = 0; i < sensor_count; i++) {
+    for (unsigned i = 0; sensors[i]; i++) {
         sensors[i]->begin();
     }
 
-    DispatcherBuilder builder(commands, command_count, &dataQ);
-    dispatcher = builder.build();
+    dispatcher = CurrentVehicle::buildDispatcher();
 
-    DEBUG_SERIAL_LN("TELEMETRY ONLINE - " + String(VEHICLE_NAME));
+    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----");
 }
 
 /**
@@ -135,31 +156,29 @@ void setup() {
  * */
 void loop() {
     // Sensor Handlers
-    for (unsigned i = 0; i < sensor_count; i++) {
+    for (unsigned i = 0; sensors[i]; i++) {
         sensors[i]->handle();
     }
 
     dataQ.loop();
 
     if(loggingEnabled && Time.isValid()){
-        dispatcher->run();
+        dispatcher->loop();
     }
 
     handleUI();
 
-    // Publish a message every publish interval
-    if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
-        // If no valid time pulled from cellular, attempt to get valid time from GPS (should be faster)
-        if(!Time.isValid()){
-            if(gps.getTimeValid()){
-                Time.setTime(gps.getUnixTime());
-            }
-        }
-
-        lastPublish = millis();
-        publishMessage();
+    if(DEBUG_SENSOR_INT && millis() > lastDebugSensor + (DEBUG_SENSOR_INT * 1000)){
+        lastDebugSensor = millis();
+        debugSensors();
     }
+
+    // If no valid time pulled from cellular, attempt to get valid time from GPS
+    if(!Time.isValid()){
+        if(gps.getTimeValid()){
+            Time.setTime(gps.getUnixTime());
+        }
+    }
+
 }
-
-
 

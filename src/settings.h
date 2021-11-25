@@ -7,29 +7,26 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define FC
+    #define URBAN
 #endif
 
-// Logging enabled at boot-up
-#define LOGGING_ENABLED_AT_BOOT 0
+// Logging enabled at boot-up, control logging with button or Particle Function
+#define LOGGING_EN_AT_BOOT      0
+// Publish to Cloud
+#define PUBLISH_EN              1
 // Output Serial messages (disable for production)
-#define DEBUG_SERIAL_ENABLE     1
-// Output Sensor data over serial (disable for production)
-#define DEBUG_SENSOR_ENABLE     1
-// Output free memory to console
-#define DEBUG_MEM               1
-
-#define PUBLISH_INTERVAL_MS     5000
-#define GPS_UPDATE_FREQUENCY    4
-#define LED_FLASH_INTERVAL      500
-
+#define DEBUG_SERIAL_EN         1
+// Sensor Debug Interval in s, 0 for off
+#define DEBUG_SENSOR_INT        5
+// LED Flash interval in ms
+#define LED_FLASH_INT           500
 // Time zone in UTC offset (must manually adjust for DST)
-#define TIME_ZONE                   -8
+#define TIME_ZONE               -8
 
 /**
  *  MACROS
 **/
-#if DEBUG_SERIAL_ENABLE
+#if DEBUG_SERIAL_EN
     #define DEBUG_SERIAL_LN(x) Serial.println(x)
     #define DEBUG_SERIAL(x) Serial.print(x)
 #else
@@ -44,6 +41,5 @@
 #elif   defined(FC)
     #define VEHICLE_NAME "FC"
 #endif
-
 
 #endif

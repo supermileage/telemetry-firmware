@@ -4,9 +4,8 @@
 
 #include "SensorEcu.h"
 
-#include "SensorEcu.h"
 // sensor definitions
-SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
+SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorEcu ecu(&Serial1);
@@ -23,21 +22,19 @@ SensorCommand<SensorEcu, String> ecuSpark(&dataQ, &ecu, "PROTO-SPARK", &SensorEc
 SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "PROTO-Latitude", &SensorGps::getLatitude, 1);
 SensorCommand<SensorGps, String> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
 
-// array definitions: update counts if you make changes here
-Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage};
-IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel };
-uint16_t sensor_count = 6;
-uint16_t command_count = 8;
+// Array Definitions - MUST BE NULL TERMINATED
+Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
+IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
 
+String publishName = "BQIngestion";
 
-// SerialDebugPublishing namespace definitions
+// CurrrentVehicle namespace definitions
+Dispatcher* CurrentVehicle::buildDispatcher() {
+    DispatcherBuilder builder(commands, &dataQ, publishName);
+    return builder.build();
+}
 
-/**
- * Publishes a new message to Particle Cloud for proto
-**/
 void CurrentVehicle::debugSensorData() {
-    DEBUG_SERIAL_LN();
-    DEBUG_SERIAL_LN("SENSOR READINGS: ");
     // Diagnostic
     DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
     DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " % - ");
