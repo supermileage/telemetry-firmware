@@ -26,7 +26,7 @@ String currentTime(){
     if(Time.isValid()){
         return Time.timeStr();
     }else{
-        return "NOT VALID";
+        return "TIME NOT VALID";
     }
 }
 
