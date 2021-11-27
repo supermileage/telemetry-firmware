@@ -39,6 +39,13 @@ void publishMessage() {
     }
 
 }
+
+int remoteReset(String command) {
+    DEBUG_SERIAL_LN("#### Boron has been RESET (remote)");
+    System.reset();
+    return 1;
+}
+
 /**
  * SETUP
  * */
@@ -54,6 +61,8 @@ void setup() {
     // This requires the pull-up resistors to be removed on i2c bus
     Wire.setClock(400000);
     Wire.begin();
+
+    Particle.function("remoteReset", remoteReset);
 
     Time.zone(TIME_ZONE);
 
@@ -95,10 +104,3 @@ void loop() {
         publishMessage();
     }
 }
-/*
-if("SOMETHING == TRUE") {
-    System.reset();
-    System.reset("ANY PARAMETERS???"); //Optional System.resetReason(), doubt we will use it
-}
-
-*/

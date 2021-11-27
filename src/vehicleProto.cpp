@@ -73,7 +73,7 @@ bool CurrentVehicle::getTimeValid() {
 }
 
 uint32_t CurrentVehicle::getUnixTime() {
-    gps.getUnixTime();
+    return gps.getUnixTime();
 }
 
 #endif
