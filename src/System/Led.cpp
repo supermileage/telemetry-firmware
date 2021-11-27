@@ -49,33 +49,43 @@ void Led::handle(){
 }
 
 void Led::on(){
-    _state = LED_ON;
-    analogWrite(_pin, _brightness);
+    if(_state != LED_ON){
+        _state = LED_ON;
+        analogWrite(_pin, _brightness);
+    }
 }
 
 void Led::off(){
-    _state = LED_OFF;
-    analogWrite(_pin, 0);
+    if(_state != LED_OFF){
+        _state = LED_OFF;
+        analogWrite(_pin, 0);
+    }
 }
 
 void Led::flash(uint16_t interval, uint8_t count){
-    _state = LED_FLASH_ON;
-    _interval = interval;
-    _flash_count_total = count;
-    _flash_count_left = count - 1;
-    _interval_time_start = millis();
-    analogWrite(_pin, _brightness);
+    if(_state != LED_FLASH_ON && _state != LED_FLASH_OFF){
+        _state = LED_FLASH_ON;
+        _interval = interval;
+        _flash_count_total = count;
+        _flash_count_left = count - 1;
+        _interval_time_start = millis();
+        analogWrite(_pin, _brightness);
+    }
 }
 
 void Led::flashRepeat(uint16_t interval){
-    _state = LED_FLASH_REPEAT;
-    _interval = interval;
-    _interval_time_start = millis();
+    if(_state != LED_FLASH_REPEAT){
+        _state = LED_FLASH_REPEAT;
+        _interval = interval;
+        _interval_time_start = millis();
+    }
 }
 
 void Led::pulse(uint16_t interval){
-    _state = LED_PULSE;
-    _interval = interval;
-    _pulse_brightness = 0;
-    _interval_time_start = millis();
+    if(_state != LED_PULSE){
+        _state = LED_PULSE;
+        _interval = interval;
+        _pulse_brightness = 0;
+        _interval_time_start = millis();
+    }
 }

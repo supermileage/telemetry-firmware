@@ -3,7 +3,7 @@
 #ifdef FC
 
 // sensor definitions
-SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
+SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
@@ -30,8 +30,6 @@ Dispatcher* CurrentVehicle::buildDispatcher() {
 }
 
 void CurrentVehicle::debugSensorData() {
-    DEBUG_SERIAL_LN();
-    DEBUG_SERIAL_LN("SENSOR READINGS: ");
     // Diagnostic
     DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
     DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " % - ");

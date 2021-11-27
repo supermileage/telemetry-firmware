@@ -29,7 +29,7 @@ void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	_lastPublish = currentPublish;
 
 	// get payload and publish
-	if (PUBLISH_ENABLED) {
+	if (PUBLISH_EN) {
 		_publishQueue->publish(event, payload, flag1, flag2);
 	}
 
