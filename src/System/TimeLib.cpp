@@ -12,8 +12,13 @@ void TimeLib:: handle() {
     } 
     if(Time.isValid()) {     
         if(millis() - lastValidRun >= REG_CHECKTIME) {
-            Time.setTime( (time_t) CurrentVehicle::getUnixTime());
-            lastValidRun = millis();
+            if(CurrentVehicle::getTimeValid()) {
+                Time.setTime( (time_t) CurrentVehicle::getUnixTime());
+                lastValidRun = millis(); 
+            }
+            else {
+                Particle.syncTime(); 
+            }
         }
     }
 }
