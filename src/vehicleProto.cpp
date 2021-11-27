@@ -67,7 +67,7 @@ void CurrentVehicle::debugSensorData() {
 }
 
 bool CurrentVehicle::getTimeValid() {
-    gps.getTimeValid();
+    return gps.getTimeValid();
 
 }
 
