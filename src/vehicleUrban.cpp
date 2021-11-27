@@ -5,7 +5,7 @@
 #include "SensorCan.h"
 
 // sensor definitions
-SensorGps gps(new SFE_UBLOX_GNSS(), GPS_UPDATE_FREQUENCY);
+SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorCan can(&SPI1, D5, D6);
@@ -21,9 +21,15 @@ SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Tempera
 Sensor *sensors[] = {&gps, &can, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
 
+String publishName = "BQIngestion";
+
+// CurrentVehicle namespace definitions
+Dispatcher* CurrentVehicle::buildDispatcher() {
+    DispatcherBuilder builder(commands, &dataQ, publishName);
+    return builder.build();
+}
+
 void CurrentVehicle::debugSensorData() {
-    DEBUG_SERIAL_LN();
-    DEBUG_SERIAL_LN("SENSOR READINGS: ");
     // Diagnostic
     DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
     DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " % - ");
@@ -52,6 +58,15 @@ void CurrentVehicle::debugSensorData() {
         }
         DEBUG_SERIAL_LN(output);
     }
+}
+
+bool CurrentVehicle::getTimeValid() {
+    return gps.getTimeValid();
+
+}
+
+uint32_t CurrentVehicle::getUnixTime() {
+    return gps.getUnixTime();
 }
 
 #endif

@@ -2,6 +2,7 @@
 #define _DATAQUEUE_H_
 
 #define JSON_WRITER_BUFFER_SIZE 1024
+#define JSON_WRITER_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8
 
 #include "settings.h"
@@ -15,11 +16,15 @@
 class DataQueue {
 
     public:
+        /**
+         * Describes set of possible publishing states
+         **/
+        enum PublishStatus { Normal, PublishingAtMaxFrequency, DataBufferOverflow };
 
         /**
          * Constructor
          * */
-        DataQueue(String publishHeader);
+        DataQueue(String publishHeader, void (*publishMessage)(String, PublishStatus));
 
         /**
          * Adds an integer value and its ID into the data queue.
@@ -51,7 +56,7 @@ class DataQueue {
          * 
          * @return Published payload
          * */
-        String publish(String event, PublishFlags flag1, PublishFlags flag2);
+        void publish(String event, PublishFlags flag1, PublishFlags flag2);
 
         /**
          * Returns data in writer buffer and reinstantiates JSONBufferWriter
@@ -60,15 +65,33 @@ class DataQueue {
          * */
         String resetData();
 
+        /**
+         * Defines data wrapping for start of individual logging event:
+         * Opens JObject and adds timestamp
+         */
         void wrapStart();
         
+        /**
+         * Closes data wrapping for individual logging event: closes JObject
+         */
         void wrapEnd();
 
+        /**
+         * @brief Get the buffer size of DataQueue's JsonWriter
+         * 
+         * @return size_t - the current buffer size
+         */
         size_t getBufferSize();
 
+        /**
+         * @brief Get the size of data currently held in JsonWriter's buffer
+         * 
+         * @return size_t - the current data size
+         */
         size_t getDataSize();
 
         /**
+<<<<<<< HEAD
          * @brief Get the number of events in the publish queue
          * 
          * @return size_t
@@ -82,11 +105,22 @@ class DataQueue {
          */
         bool isCacheFull();
 
+=======
+         * @brief Returns the number of events in the RAM and File Queues
+         * 
+         * @return size_t - num events in publish queue
+         */
+        size_t getNumEventsInQueue();
+
+>>>>>>> develop
     private:
         JSONBufferWriter* _writer;
-        char _buf[JSON_WRITER_BUFFER_SIZE];
+        char _buf[JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY];
         PublishQueuePosix* _publishQueue;
+        void (*_publishCallback)(String, PublishStatus);
+        unsigned long _lastPublish;
         String _publishHeader;
+        
 
         /**
          * Removes the data stored in the JSON object and reinitializes
@@ -104,6 +138,14 @@ class DataQueue {
          *         JSON object.
          * */
         String _writerGet();
+
+        /**
+         * Reparses Json data and removes last entry from JObject at removalIndex in internal JArray
+         * Only used in the case that the JsonWriter's data buffer overflows
+         * 
+         * @return String payload -- json data string
+         */
+        String _recoverDataFromBuffer();
 
         /**
          * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by

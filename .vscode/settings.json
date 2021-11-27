@@ -18,6 +18,14 @@
         "unordered_map": "cpp",
         "vector": "cpp",
         "complex": "cpp",
-        "__tuple": "cpp"
+        "__tuple": "cpp",
+        "chrono": "cpp",
+        "new": "cpp",
+        "__node_handle": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp",
+        "typeinfo": "cpp",
+        "algorithm": "cpp",
+        "bitset": "cpp"
     }
 }
