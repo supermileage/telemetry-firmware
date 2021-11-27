@@ -4,21 +4,15 @@
 #include "SparkFun_u-blox_GNSS_Arduino_Library.h"
 #include "Sensor.h"
 
-#define MICROSECONDS_IN_SECOND      1000000
-#define NANOSECONDS_IN_MICROSECOND  1000
-#define MILIMETERS_IN_METERS        1000.0
-#define TEN_POWER_SEVEN             10000000.0
-#define TEN_POWER_FIVE              100000.0
-
 class SensorGps : public Sensor {
     public:
 
         /**
          * Constructor
          * 
-         * @param updateFrequency of GPS module in Hz [1,10]. Each update takes 5-7ms. 
+         * @param *gps pointer to gpd object
          **/
-        SensorGps(SFE_UBLOX_GNSS *gps, uint8_t updateFrequency);
+        SensorGps(SFE_UBLOX_GNSS *gps);
 
         /**
          * Initialize the GPS sensor and i2c interface
