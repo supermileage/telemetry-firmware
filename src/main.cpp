@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "vehicle.h"
 #include "Led.h"
+#include "TimeLib.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -11,6 +12,7 @@ Led led_green(D8, 40);
 
 DataQueue dataQ(VEHICLE_NAME);
 Dispatcher *dispatcher;
+TimeLib timeLib;
 unsigned long lastPublish = 0;
 
 void publishMessage() {
@@ -75,27 +77,28 @@ void loop() {
     }
 
     dataQ.loop();
-    dispatcher->run();
+    if(Time.isValid()) {   
+        dispatcher->run();   
+    }
 
     // LED Handlers
     led_orange.handle();
     led_blue.handle();
     led_green.handle();
 
+    timeLib.handle();
+
     // Publish a message every publish interval
     if (millis() - lastPublish >= PUBLISH_INTERVAL_MS){
-        // If no valid time pulled from cellular, attempt to get valid time from GPS (should be faster)
-        if(!Time.isValid()){
-            if(gps.getTimeValid()){
-                Time.setTime(gps.getUnixTime());
-            }
-        }else{
-        }
-
+    
         lastPublish = millis();
         publishMessage();
     }
 }
+/*
+if("SOMETHING == TRUE") {
+    System.reset();
+    System.reset("ANY PARAMETERS???"); //Optional System.resetReason(), doubt we will use it
+}
 
-
-
+*/

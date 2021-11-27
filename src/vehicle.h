@@ -14,7 +14,6 @@
 #include "SensorVoltage.h"
 
 extern DataQueue dataQ;
-extern SensorGps gps;
 
 extern Sensor *sensors[];
 extern IntervalCommand *commands[];
@@ -25,6 +24,16 @@ namespace CurrentVehicle {
      *  Output latest sensor data for debugging
     **/
     void debugSensorData();
+
+    /**
+     *  Output time validity from GPS sensor
+    **/
+    bool getTimeValid(); //returns time validity
+
+    /**
+     *  Output time data from GPS sensor
+    **/
+    uint32_t getUnixTime(); 
 
 }
 

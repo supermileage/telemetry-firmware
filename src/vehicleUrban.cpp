@@ -54,4 +54,13 @@ void CurrentVehicle::debugSensorData() {
     }
 }
 
+bool CurrentVehicle::getTimeValid() {
+    gps.getTimeValid();
+
+}
+
+uint32_t CurrentVehicle::getUnixTime() {
+    gps.getUnixTime();
+}
+
 #endif
