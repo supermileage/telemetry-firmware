@@ -106,6 +106,7 @@ void handleUI(){
 int remoteReset(String command) {
     DEBUG_SERIAL_LN("#### Boron has been RESET (remote)");
     System.reset();
+    return 1;
 }
 
 // Enable Logging Remotely
