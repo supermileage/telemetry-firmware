@@ -20,6 +20,8 @@ class TimeLib
          **/
         void handle();
 
+        String getTimeString();
+
     private:
 
         unsigned long lastValidRun = 0;

@@ -24,15 +24,6 @@ bool loggingEnabled = LOGGING_EN_AT_BOOT;
 bool error = false;
 long unsigned int lastDebugSensor = 0;
 
-// Wrapper for current time, in case it's invalid
-String currentTime(){
-    if(Time.isValid()){
-        return Time.timeStr();
-    }else{
-        return "TIME NOT VALID";
-    }
-}
-
 // Publish a message
 void publish(String payload, DataQueue::PublishStatus status) {
     switch (status) {
@@ -50,7 +41,7 @@ void publish(String payload, DataQueue::PublishStatus status) {
     }
 
     DEBUG_SERIAL_LN("---- PUBLISH MESSAGE ----");
-    DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish " + (PUBLISH_EN ? "ENABLED" : "DISABLED") + " - " + currentTime());
+    DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish " + (PUBLISH_EN ? "ENABLED" : "DISABLED") + " - " + timeLib.getTimeString());
     DEBUG_SERIAL_LN(payload);
     DEBUG_SERIAL_LN("");
     DEBUG_SERIAL_LN("Publish Queue Size: " + String(dataQ.getNumEventsInQueue()));
@@ -60,7 +51,7 @@ void publish(String payload, DataQueue::PublishStatus status) {
 // Output sensor data over serial
 void debugSensors(){
     DEBUG_SERIAL_LN("---- SENSOR DATA ----");
-    DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - " + currentTime());
+    DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - " + timeLib.getTimeString());
     CurrentVehicle::debugSensorData();
 
     DEBUG_SERIAL_LN("Free Memory: " + String(System.freeMemory()/1000) + "kB / 128kB");
