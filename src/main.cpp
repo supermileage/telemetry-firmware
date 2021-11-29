@@ -90,7 +90,7 @@ void handleUI(){
         }else{
             ledBlue.flashRepeat(LED_FLASH_INT);
         }
-    }else{
+    } else {
         ledBlue.off();
     }
 
@@ -162,7 +162,7 @@ void loop() {
     }
 
     dataQ.loop();
-    if(loggingEnabled && Time.isValid()){
+    if (loggingEnabled && Time.isValid()){
         dispatcher->loop();
     }
 

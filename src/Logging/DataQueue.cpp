@@ -61,10 +61,6 @@ size_t DataQueue::getDataSize() {
 	return _writer->dataSize();
 }
 
-size_t DataQueue::getNumEventsInQueue() {
-	return _publishQueue->getNumEvents();
-}
-
 void DataQueue::_writerRefresh() {
 	if(this->_writer != NULL) delete this->_writer;
     _writerInit();
@@ -81,6 +77,14 @@ void DataQueue::_writerInit() {
 
 	_writer->beginObject().name("v").value(_publishHeader)
 		.name("l").beginArray();
+}
+
+size_t DataQueue::getNumEventsInQueue() {
+	return _publishQueue->getNumEvents();
+}
+
+bool DataQueue::isCacheFull() {
+	return _publishQueue->getNumEvents() >= _publishQueue->getFileQueueSize();
 }
 
 void DataQueue::_init() {
