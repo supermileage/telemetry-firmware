@@ -61,10 +61,6 @@ size_t DataQueue::getDataSize() {
 	return _writer->dataSize();
 }
 
-size_t DataQueue::getNumEventsInQueue() {
-	return _publishQueue->getNumEvents();
-}
-
 void DataQueue::_writerRefresh() {
 	if(this->_writer != NULL) delete this->_writer;
     _writerInit();

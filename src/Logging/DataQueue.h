@@ -68,40 +68,40 @@ class DataQueue {
         /**
          * Defines data wrapping for start of individual logging event:
          * Opens JObject and adds timestamp
-         */
+         **/
         void wrapStart();
         
         /**
          * Closes data wrapping for individual logging event: closes JObject
-         */
+         **/
         void wrapEnd();
 
         /**
          * @brief Get the buffer size of DataQueue's JsonWriter
          * 
          * @return size_t - the current buffer size
-         */
+         **/
         size_t getBufferSize();
 
         /**
          * @brief Get the size of data currently held in JsonWriter's buffer
          * 
          * @return size_t - the current data size
-         */
+         **/
         size_t getDataSize();
 
         /**
          * @brief Get the number of events in the publish queue
          * 
          * @return size_t
-         */
+         **/
         size_t getNumEventsInQueue();
 
         /**
          * @brief returns true if File queue is full
          * 
          * @return bool
-         */
+         **/
         bool isCacheFull();
 
     private:
