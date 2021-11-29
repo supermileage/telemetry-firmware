@@ -91,7 +91,6 @@ class DataQueue {
         size_t getDataSize();
 
         /**
-<<<<<<< HEAD
          * @brief Get the number of events in the publish queue
          * 
          * @return size_t
@@ -105,14 +104,6 @@ class DataQueue {
          */
         bool isCacheFull();
 
-=======
-         * @brief Returns the number of events in the RAM and File Queues
-         * 
-         * @return size_t - num events in publish queue
-         */
-        size_t getNumEventsInQueue();
-
->>>>>>> develop
     private:
         JSONBufferWriter* _writer;
         char _buf[JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY];
