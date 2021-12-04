@@ -25,6 +25,9 @@ String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
 Dispatcher* CurrentVehicle::buildDispatcher() {
+    can.addMessageListen(0x14);
+    can.addMessageListen(0x2D);
+
     DispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }
@@ -47,16 +50,14 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
     DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
+
     // CAN
-    for(int i = 0; i < can.getNumIds(); i++){
-        String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
-        uint8_t canDataLength = can.getDataLen(i);
-        unsigned char* canData = can.getData(i);
-        for(int k = 0; k < canDataLength; k++){
-            output += " 0x";
-            output += String(canData[k], HEX);
+    for(SensorCan::CanMessage m : can.getMessages()){
+        DEBUG_SERIAL_F("CAN ID: 0x%03x - CAN Data:", m.id);
+        for(uint8_t i = 0; i < m.dataLength; i++){
+            DEBUG_SERIAL_F(" 0x%02x", m.data[i]);
         }
-        DEBUG_SERIAL_LN(output);
+        DEBUG_SERIAL_LN("");
     }
 }
 

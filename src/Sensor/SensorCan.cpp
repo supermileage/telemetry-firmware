@@ -18,36 +18,41 @@ void SensorCan::begin() {
 void SensorCan::handle() {
     if(!digitalRead(_intPin)){
         while(_CAN->checkReceive() == CAN_MSGAVAIL){
-            unsigned char len = 0;
-            unsigned char data[8];
+            uint8_t len = 0;
+            uint8_t data[8];
             _CAN->readMsgBuf(&len, data);
             unsigned long canId = _CAN->getCanId();
 
-            for(unsigned int i = 0; i < NUM_IDS; i++){
-                if(canId == IDS[i]){
-                    _dataLen[i] = len;
-                    for(int k = 0; k < len; k++){
-                        _data[i][k] = data[k];
+            for(CanMessage& m : _messages){
+                if(canId == m.id){
+                    m.dataLength = len;
+                    for(int i = 0; i < len; i++){
+                        m.data[i] = data[i];
                     }
                     return;
                 }
             }
+            
         }
     }
 }
 
-uint8_t SensorCan::getNumIds() {
-    return NUM_IDS;
+std::vector<SensorCan::CanMessage>& SensorCan::getMessages(){
+    return _messages;
 }
 
-uint16_t SensorCan::getId(uint8_t id_num) {
-    return IDS[id_num];
+SensorCan::CanMessage SensorCan::getMessage(uint16_t id) {
+    for(CanMessage m : _messages){
+        if(id == m.id){
+            return m;
+        }
+    }
+
+    return _nullMessage;
 }
 
-uint8_t SensorCan::getDataLen(uint8_t id_num) {
-    return _dataLen[id_num];
-}
-
-uint8_t* SensorCan::getData(uint8_t id_num) {
-    return _data[id_num];
+void SensorCan::addMessageListen(uint16_t id) {
+    CanMessage newMessage = _nullMessage;
+    newMessage.id = id;
+    _messages.push_back(newMessage);
 }

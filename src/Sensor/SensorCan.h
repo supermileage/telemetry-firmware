@@ -1,15 +1,25 @@
 #ifndef _SENSOR_CAN_H_
 #define _SENSOR_CAN_H_
 
+#include <vector>
+
 #include "Sensor.h"
 #include "mcp2515_can.h"
 #include "can_common.h"
 
-// Number of CAN IDs to listen for
-#define NUM_IDS 2
 
 class SensorCan : public Sensor {
     public:
+
+        // This struct contains all the components of a CAN message. dataLength must be <= 8, 
+        // and the first [dataLength] positions of data[] must contain valid data
+        struct CanMessage {
+            uint16_t id;
+            uint8_t dataLength;
+            uint8_t data[8];
+        };
+
+        const CanMessage _nullMessage = {0x0, 0, {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};
 
         /**
          * Constructor 
@@ -23,6 +33,7 @@ class SensorCan : public Sensor {
          * Begin the CAN sensor by setting baud rate and chip freq
          **/
         void begin();
+
         /**
          * Checks interrupt pin and then checks to make sure a message has been fully received
          * Saves any messages that match the CAN IDs specificed in IDS array
@@ -32,34 +43,24 @@ class SensorCan : public Sensor {
         String getHumanName();
 
         /**
-         * @return number of CAN IDs being monitored
+         * @return reference to vector of CAN IDs and their latest data
          **/
-        uint8_t getNumIds();
+        std::vector<CanMessage>& getMessages();
 
         /**
-         * @param id_num of CAN ID to return
-         * @return CAN ID
+         * @param id of the desired CAN message
+         * 
+         * @return the CAN message corresponding to the ID, message of length 0 if ID not found
          **/
-        uint16_t getId(uint8_t id_num);
+        CanMessage getMessage(uint16_t id);
 
         /**
-         * @param id_num of CAN ID to return
-         * @return Number of bytes received at this ID
+         * @param id to listen for on CAN bus
          **/
-        uint8_t getDataLen(uint8_t id_num);
-
-        /**
-         * @param id_num of CAN ID to return
-         * @return Pointer to byte array of data received at this ID
-         **/
-        uint8_t* getData(uint8_t id_num);
+        void addMessageListen(uint16_t id);
 
     private:
-        // CAN IDs to listen for
-        const uint16_t IDS[NUM_IDS] = {CAN_THROTTLE, CAN_MOTOR_ENABLE};
-
-        uint8_t _dataLen[NUM_IDS];
-        uint8_t _data[NUM_IDS][8];
+        std::vector<CanMessage> _messages;
 
         uint8_t _intPin;
         mcp2515_can* _CAN;
