@@ -3,25 +3,30 @@
 
 #include "Particle.h"
 #include "Handler.h"
+// Forward declaration due to mutual inclusion
 class Handler;
 
+// Abstract class for any object that can be "handleable"
+// (ie. would need a function to run regularly in the loop)
 class Handleable {
     public:
-    
+
+        // One handler is shared by all handleables
         static Handler handler;
 
+        /**
+         * Constructor
+         * 
+         * Adds this object to the handler's list of handleables
+         * */
         Handleable();
 
-        ~Handleable();
-
         /**
-         * INTERFACE
          * Begin Handleable Object
          * */
         virtual void begin() = 0;
 
         /**
-         * INTERFACE
          * Run Handleable object every loop
          * */
         virtual void handle() = 0;

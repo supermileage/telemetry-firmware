@@ -10,6 +10,7 @@ void TimeLib::begin() {}
 
 void TimeLib:: handle() {
 
+    // If time is invalid, check GPS time at a set interval
     if(!Time.isValid() && millis() - _lastInvalidRun >= INVALID_CHECKTIME) { 
         if(CurrentVehicle::getTimeValid()) {
             Time.setTime( (time_t) CurrentVehicle::getUnixTime()); 
@@ -17,15 +18,21 @@ void TimeLib:: handle() {
         _lastInvalidRun = millis();
     } 
 
+    // If time is valid, check GPS time or cell time at a set interval
     if(Time.isValid()) {     
         if(millis() - _lastValidRun >= REG_CHECKTIME) {
             if(CurrentVehicle::getTimeValid()) {
                 Time.setTime( (time_t) CurrentVehicle::getUnixTime());
-                _lastValidRun = millis(); 
-            }
-            else {
+            } else {
                 Particle.syncTime(); 
             }
+
+            _lastValidRun = millis(); 
+        }
+
+        if(!_timeIsValid) {
+            _timeIsValid = TRUE;
+            _timeValidCallback();
         }
     }
 
@@ -38,8 +45,4 @@ String TimeLib::getTimeString(){
     }else{
         return "TIME NOT VALID";
     }
-}
-
-void TimeLib::_triggerTimeValidCallback() {
-    _timeValidCallback();
 }

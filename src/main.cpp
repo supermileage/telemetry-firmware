@@ -9,6 +9,7 @@
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
+// Forward declarations for callback functions
 void buttonPushed();
 void publish(String payload, DataQueue::PublishStatus status);
 void timeValidCallback();
@@ -64,6 +65,7 @@ void debugSensors(){
     DEBUG_SERIAL_LN("");
 }
 
+// Action to take when time becomes valid
 void timeValidCallback() {
     DEBUG_SERIAL("#### TIME VALID ");
     if(loggingEnabled){
@@ -71,6 +73,7 @@ void timeValidCallback() {
     }
 }
 
+// Enable logging of sensor data
 void enableLogging() {
     if(!loggingEnabled) {
         loggingEnabled = TRUE;
@@ -79,6 +82,7 @@ void enableLogging() {
     }
 }
 
+// Disable logging of sensor data
 void disableLogging() {
     if(loggingEnabled) {
         loggingEnabled = FALSE;
@@ -87,7 +91,7 @@ void disableLogging() {
     }
 }
 
-// Toggle logging enabled on and off
+// Action to take when button pushed
 void buttonPushed(){
     DEBUG_SERIAL("#### BUTTON PUSHED - ");
     if(loggingEnabled){
@@ -125,9 +129,9 @@ void handleUI(){
     }
 
 }
-// Allows Rebooting Remotely
+// Reboot Remotely
 int remoteReset(String command) {
-    DEBUG_SERIAL_LN("#### Boron has been RESET (remote)");
+    DEBUG_SERIAL_LN("#### REMOTE - Boron has been RESET");
     System.reset();
     return 1;
 }

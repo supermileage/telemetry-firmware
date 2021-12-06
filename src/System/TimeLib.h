@@ -23,8 +23,6 @@ class TimeLib : public Handleable {
          **/
         void handle();
 
-        void setTimeValidCallback(void (*callback)());
-
         String getTimeString();
 
     private:
@@ -34,7 +32,6 @@ class TimeLib : public Handleable {
         unsigned long _lastInvalidRun = 0;
         void (*_timeValidCallback)();
 
-        void _triggerTimeValidCallback();
 };
 
 #endif

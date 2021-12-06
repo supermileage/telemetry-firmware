@@ -17,7 +17,4 @@ void Handler::handle() {
     }
 }
 
-uint16_t Handler::getSize() {
-    return _handleables.size();
-}
     
