@@ -2,8 +2,9 @@
 #define _SENSOR_H_
 
 #include "Particle.h"
+#include "Handleable.h"
 
-class Sensor {
+class Sensor : public Handleable {
     public:
 
         /**

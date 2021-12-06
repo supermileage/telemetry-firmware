@@ -3,26 +3,32 @@
 #include "Led.h"
 #include "TimeLib.h"
 #include "Button.h"
+#include "Handler.h"
+#include "Handleable.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 void buttonPushed();
 void publish(String payload, DataQueue::PublishStatus status);
+void timeValidCallback();
 
+// Initialize Handler
+Handler Handleable::handler;
+
+// Construct all Handleables
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
 Button button(A2, true, false, buttonPushed, NULL);
-
 DataQueue dataQ(VEHICLE_NAME, publish);
+TimeLib timeLib(timeValidCallback);
 Dispatcher *dispatcher;
-TimeLib timeLib;
-unsigned long lastPublish = 0;
 
 bool loggingEnabled = LOGGING_EN_AT_BOOT;
 bool error = false;
 long unsigned int lastDebugSensor = 0;
+unsigned long lastPublish = 0;
 
 // Publish a message
 void publish(String payload, DataQueue::PublishStatus status) {
@@ -58,24 +64,41 @@ void debugSensors(){
     DEBUG_SERIAL_LN("");
 }
 
+void timeValidCallback() {
+    DEBUG_SERIAL("#### TIME VALID ");
+    if(loggingEnabled){
+        dispatcher->enableLogging();
+    }
+}
+
+void enableLogging() {
+    if(!loggingEnabled) {
+        loggingEnabled = TRUE;
+        dispatcher->enableLogging();
+        DEBUG_SERIAL_LN("Logging has been ENABLED");
+    }
+}
+
+void disableLogging() {
+    if(loggingEnabled) {
+        loggingEnabled = FALSE;
+        dispatcher->disableLogging();
+        DEBUG_SERIAL_LN("Logging has been DISABLED");
+    }
+}
+
 // Toggle logging enabled on and off
 void buttonPushed(){
+    DEBUG_SERIAL("#### BUTTON PUSHED - ");
     if(loggingEnabled){
-        loggingEnabled = false;
-        DEBUG_SERIAL_LN("#### Logging has been DISABLED (button)");
+        disableLogging();
     }else{
-        loggingEnabled = true;
-        DEBUG_SERIAL_LN("#### Logging has been ENABLED (button)");
+        enableLogging();
     }
 }
 
 // Handle User Interface Functionality
 void handleUI(){
-    ledOrange.handle();
-    ledBlue.handle();
-    ledGreen.handle();
-    button.handle();
-
     // Green Light Behaviour
     if(Time.isValid()){
         ledGreen.on();
@@ -111,15 +134,15 @@ int remoteReset(String command) {
 
 // Enable Logging Remotely
 int remoteEnableLogging(String command){
-    loggingEnabled = true;
-    DEBUG_SERIAL_LN("#### Logging has been ENABLED (remote)");
+    DEBUG_SERIAL("#### REMOTE - ");
+    enableLogging();
     return 1;
 }
 
 // Disable Logging Remotely
 int remoteDisableLogging(String command){
-    loggingEnabled = false;
-    DEBUG_SERIAL_LN("#### Logging has been DISABLED (remote)");
+    DEBUG_SERIAL("#### REMOTE - ");
+    disableLogging();
     return 1;
 }
 
@@ -127,6 +150,7 @@ int remoteDisableLogging(String command){
  * SETUP
  * */
 void setup() {
+
     if(DEBUG_SERIAL_EN){
         Serial.begin(115200);
     }
@@ -143,30 +167,21 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    for (unsigned i = 0; sensors[i]; i++) {
-        sensors[i]->begin();
-    }
-
     dispatcher = CurrentVehicle::buildDispatcher();
 
+    // Begin all handleables
+    Handleable::handler.begin();
+
     DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----");
+
 }
 
 /**
  * LOOP
  * */
 void loop() {
-    // Sensor Handlers
-    for (unsigned i = 0; sensors[i]; i++) {
-        sensors[i]->handle();
-    }
-
-    dataQ.loop();
-    if (loggingEnabled && Time.isValid()){
-        dispatcher->loop();
-    }
-
-    timeLib.handle();
+    // Run all handleables
+    Handleable::handler.handle();
 
     handleUI();
 

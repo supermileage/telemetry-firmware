@@ -1,6 +1,6 @@
 #include "Led.h"
 
-Led::Led(uint16_t pin, uint8_t brightness){
+Led::Led(uint16_t pin, uint8_t brightness) : Handleable() {
     _pin = pin;
     _brightness = brightness;
     // Enable output pin
@@ -8,6 +8,10 @@ Led::Led(uint16_t pin, uint8_t brightness){
     _state = LED_OFF;
     off();
 }
+
+Led::~Led(){}
+
+void Led::begin(){}
 
 void Led::handle(){
     uint16_t current_time_in_interval = (millis() - _interval_time_start) % _interval;

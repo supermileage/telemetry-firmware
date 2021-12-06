@@ -1,13 +1,15 @@
 #ifndef _DISPATCHER_H_
 #define _DISPATCHER_H_
 
+#include "settings.h"
+#include "Handleable.h"
 #include "DataQueue.h"
 #include "IntervalCommandGroup.h"
 
 /**
  * Dispatcher owns and operates on a collection of loggers
  **/
-class Dispatcher {
+class Dispatcher : public Handleable {
     public:
         /**
          * Constructs a Dispatcher with loggers, numLoggers, dataQueue and publishName
@@ -19,19 +21,29 @@ class Dispatcher {
          */
         ~Dispatcher();
 
+        void begin();
+
+        void enableLogging();
+
+        void disableLogging();
+
         /**
          *  Must be called from main loop!  Takes times since program start (in seconds) and checks whether
          *  execute needs to be called on any of its loggers
          **/
-        void loop();
+        void handle();
 
     private:
+        bool _loggingEnabled = LOGGING_EN_AT_BOOT;
+
         IntervalCommandGroup **_loggers;
         DataQueue *_dataQ;
         uint16_t* _maxPublishSizes;
         uint16_t _numLoggers;
         bool _logThisLoop;
         String _publishName;
+
+        void _runLogging();
 
         void CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i);
 };
