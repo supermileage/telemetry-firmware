@@ -1,5 +1,5 @@
-#ifndef _SENSOR_CAN_H_
-#define _SENSOR_CAN_H_
+#ifndef _CAN_INTERFACE_H_
+#define _CAN_INTERFACE_H_
 
 #include <vector>
 
@@ -8,7 +8,7 @@
 #include "can_common.h"
 
 
-class SensorCan : public Sensor {
+class CanInterface : public Handleable {
     public:
 
         // This struct contains all the components of a CAN message. dataLength must be <= 8, 
@@ -27,7 +27,7 @@ class SensorCan : public Sensor {
          * @param csPin chip select pin to use for this CAN module
          * @param intPin interrupt pin to use for this CAN module
          **/
-        SensorCan(SPIClass *spi, uint8_t csPin, uint8_t intPin);
+        CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin);
 
         /**
          * Begin the CAN sensor by setting baud rate and chip freq
@@ -39,8 +39,6 @@ class SensorCan : public Sensor {
          * Saves any messages that match the CAN IDs specificed in IDS array
          **/
         void handle();
-        
-        String getHumanName();
 
         /**
          * @return reference to vector of CAN IDs and their latest data

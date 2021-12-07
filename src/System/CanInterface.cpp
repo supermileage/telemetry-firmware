@@ -1,21 +1,17 @@
-#include "SensorCan.h"
+#include "CanInterface.h"
 
-SensorCan::SensorCan(SPIClass *spi, uint8_t csPin, uint8_t intPin) {
+CanInterface::CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin) {
     pinMode(intPin, INPUT);
     _intPin = intPin;
     _CAN = new mcp2515_can(csPin);
     _CAN->setSPI(spi);
 }
 
-String SensorCan::getHumanName() {
-    return "CAN";
-}
-
-void SensorCan::begin() {
+void CanInterface::begin() {
     _CAN->begin(CAN_500KBPS,MCP_8MHz);
 }
 
-void SensorCan::handle() {
+void CanInterface::handle() {
     if(!digitalRead(_intPin)){
         while(_CAN->checkReceive() == CAN_MSGAVAIL){
             uint8_t len = 0;
@@ -37,11 +33,11 @@ void SensorCan::handle() {
     }
 }
 
-std::vector<SensorCan::CanMessage>& SensorCan::getMessages(){
+std::vector<CanInterface::CanMessage>& CanInterface::getMessages(){
     return _messages;
 }
 
-SensorCan::CanMessage SensorCan::getMessage(uint16_t id) {
+CanInterface::CanMessage CanInterface::getMessage(uint16_t id) {
     for(CanMessage m : _messages){
         if(id == m.id){
             return m;
@@ -51,7 +47,7 @@ SensorCan::CanMessage SensorCan::getMessage(uint16_t id) {
     return _nullMessage;
 }
 
-void SensorCan::addMessageListen(uint16_t id) {
+void CanInterface::addMessageListen(uint16_t id) {
     CanMessage newMessage = _nullMessage;
     newMessage.id = id;
     _messages.push_back(newMessage);
