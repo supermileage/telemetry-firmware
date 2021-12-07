@@ -33,6 +33,7 @@ unsigned long lastPublish = 0;
 
 // Publish a message
 void publish(String payload, DataQueue::PublishStatus status) {
+
     switch (status) {
         case DataQueue::PublishingAtMaxFrequency:
             DEBUG_SERIAL_LN("WARNING: Currently Publishing at Max Frequency");
@@ -53,42 +54,51 @@ void publish(String payload, DataQueue::PublishStatus status) {
     DEBUG_SERIAL_LN("");
     DEBUG_SERIAL_LN("Publish Queue Size: " + String(dataQ.getNumEventsInQueue()));
     DEBUG_SERIAL_LN("");
+
 }
 
 // Output sensor data over serial
 void debugSensors(){
+
     DEBUG_SERIAL_LN("---- SENSOR DATA ----");
     DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - " + timeLib.getTimeString());
     CurrentVehicle::debugSensorData();
 
     DEBUG_SERIAL_LN("Free Memory: " + String(System.freeMemory()/1000) + "kB / 128kB");
     DEBUG_SERIAL_LN("");
+    
 }
 
 // Action to take when time becomes valid
 void timeValidCallback() {
+
     DEBUG_SERIAL("#### TIME VALID ");
     if(loggingEnabled){
         dispatcher->enableLogging();
     }
+
 }
 
 // Enable logging of sensor data
 void enableLogging() {
+
     if(!loggingEnabled) {
         loggingEnabled = TRUE;
         dispatcher->enableLogging();
-        DEBUG_SERIAL_LN("Logging has been ENABLED");
+        DEBUG_SERIAL_LN("Logging has been ENABLED\n");
     }
+
 }
 
 // Disable logging of sensor data
 void disableLogging() {
+
     if(loggingEnabled) {
         loggingEnabled = FALSE;
         dispatcher->disableLogging();
-        DEBUG_SERIAL_LN("Logging has been DISABLED");
+        DEBUG_SERIAL_LN("Logging has been DISABLED\n");
     }
+
 }
 
 // Action to take when button pushed
@@ -103,6 +113,7 @@ void buttonPushed(){
 
 // Handle User Interface Functionality
 void handleUI(){
+
     // Green Light Behaviour
     if(Time.isValid()){
         ledGreen.on();
@@ -129,25 +140,32 @@ void handleUI(){
     }
 
 }
+
 // Reboot Remotely
 int remoteReset(String command) {
-    DEBUG_SERIAL_LN("#### REMOTE - Boron has been RESET");
+
+    DEBUG_SERIAL_LN("#### REMOTE - Boron has been RESET\n");
     System.reset();
     return 1;
+
 }
 
 // Enable Logging Remotely
 int remoteEnableLogging(String command){
+
     DEBUG_SERIAL("#### REMOTE - ");
     enableLogging();
     return 1;
+
 }
 
 // Disable Logging Remotely
 int remoteDisableLogging(String command){
+
     DEBUG_SERIAL("#### REMOTE - ");
     disableLogging();
     return 1;
+
 }
 
 /**
@@ -176,7 +194,7 @@ void setup() {
     // Begin all handleables
     Handleable::handler.begin();
 
-    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----");
+    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
 
 }
 
@@ -184,6 +202,7 @@ void setup() {
  * LOOP
  * */
 void loop() {
+
     // Run all handleables
     Handleable::handler.handle();
 
@@ -193,5 +212,6 @@ void loop() {
         lastDebugSensor = millis();
         debugSensors();
     }
+
 }
 

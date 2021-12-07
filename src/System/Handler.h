@@ -23,6 +23,13 @@ class Handler {
         void add(Handleable* handleable);
 
         /**
+         * Remove a handleable object from list of handleables
+         * 
+         * @param *handleable object to remove
+         * */
+        void remove(Handleable* handleable);
+
+        /**
          * Run the begin() function of all handleables
          * */
         void begin();

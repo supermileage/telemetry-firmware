@@ -22,6 +22,13 @@ class Handleable {
         Handleable();
 
         /**
+         * Destructor
+         * 
+         * Removes this object from the handler's list of handleables
+         * */
+        ~Handleable();
+
+        /**
          * Begin Handleable Object
          * */
         virtual void begin() = 0;

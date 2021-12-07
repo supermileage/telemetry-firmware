@@ -57,6 +57,7 @@ class SensorCan : public Sensor {
     private:
         // CAN IDs to listen for
         const uint16_t IDS[NUM_IDS] = {0x14, 0x2D};
+        // TODO - Eliminate these magic numbers
 
         uint8_t _dataLen[NUM_IDS];
         uint8_t _data[NUM_IDS][8];
