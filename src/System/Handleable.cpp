@@ -1,9 +1,22 @@
 #include "Handleable.h"
 
+// Static Object Declaration
+Handler* Handleable::_handlerInstance;
+
+// Static Method
+Handler& Handleable::handlerInstance() {
+    return *_handlerInstance;
+}
+
 Handleable::Handleable() {
-    handler.add(this);
+
+    if(!_handlerInstance) {
+        _handlerInstance = new Handler();
+    }
+
+    _handlerInstance->add(this);
 }
 
 Handleable::~Handleable() {
-    handler.remove(this);
+    _handlerInstance->remove(this);
 }

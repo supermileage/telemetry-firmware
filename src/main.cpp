@@ -14,9 +14,6 @@ void buttonPushed();
 void publish(String payload, DataQueue::PublishStatus status);
 void timeValidCallback();
 
-// Initialize Handler
-Handler Handleable::handler;
-
 // Construct all Handleables
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
@@ -192,7 +189,7 @@ void setup() {
     dispatcher = CurrentVehicle::buildDispatcher();
 
     // Begin all handleables
-    Handleable::handler.begin();
+    Handleable::handlerInstance().begin();
 
     DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
 
@@ -204,7 +201,7 @@ void setup() {
 void loop() {
 
     // Run all handleables
-    Handleable::handler.handle();
+    Handleable::handlerInstance().handle();
 
     handleUI();
 

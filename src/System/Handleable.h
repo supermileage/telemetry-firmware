@@ -11,8 +11,10 @@ class Handler;
 class Handleable {
     public:
 
-        // One handler is shared by all handleables
-        static Handler handler;
+        /**
+         * STATIC - Returns Handler instance for all handleables
+         * */
+        static Handler &handlerInstance();
 
         /**
          * Constructor
@@ -38,6 +40,10 @@ class Handleable {
          * */
         virtual void handle() = 0;
         
+    private:
+
+        // One handler is shared by all handleables
+        static Handler *_handlerInstance;
 
 };
 
