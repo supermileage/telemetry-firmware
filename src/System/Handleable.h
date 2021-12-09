@@ -33,6 +33,7 @@ class Handleable {
          * Run Handleable object every loop
          * */
         virtual void handle() = 0;
+        
 };
 
 #endif
