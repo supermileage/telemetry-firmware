@@ -189,11 +189,7 @@ void setup() {
     dispatcher = CurrentVehicle::buildDispatcher();
 
     // Begin all handleables
-<<<<<<< HEAD
     Handler::instance().begin();
-=======
-    Handleable::handlerInstance().begin();
->>>>>>> 9dd6f5b4314b99cee024a37ae23fa5acd364b5a0
 
     DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
 
@@ -205,11 +201,7 @@ void setup() {
 void loop() {
 
     // Run all handleables
-<<<<<<< HEAD
     Handler::instance().handle();
-=======
-    Handleable::handlerInstance().handle();
->>>>>>> 9dd6f5b4314b99cee024a37ae23fa5acd364b5a0
 
     handleUI();
 
