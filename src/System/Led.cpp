@@ -1,6 +1,6 @@
 #include "Led.h"
 
-Led::Led(uint16_t pin, uint8_t brightness) : Handleable() {
+Led::Led(uint16_t pin, uint8_t brightness) {
     _pin = pin;
     _brightness = brightness;
     // Enable output pin
