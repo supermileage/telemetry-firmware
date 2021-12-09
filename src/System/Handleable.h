@@ -10,10 +10,6 @@ class Handler;
 // (ie. would need a function to run regularly in the loop)
 class Handleable {
     public:
-
-        // One handler is shared by all handleables
-        static Handler handler;
-
         /**
          * Constructor
          * 
@@ -37,8 +33,6 @@ class Handleable {
          * Run Handleable object every loop
          * */
         virtual void handle() = 0;
-        
-
 };
 
 #endif

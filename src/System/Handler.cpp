@@ -2,6 +2,15 @@
 
 #include "Handler.h"
 
+Handler* Handler::_instance;
+
+Handler &Handler::instance() {
+    if (!_instance) {
+        _instance = new Handler();
+    }
+    return *_instance;
+}
+
 void Handler::add(Handleable* handleable) {
     _handleables.push_back(handleable);
 }

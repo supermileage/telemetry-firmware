@@ -1,9 +1,9 @@
 #include "Handleable.h"
 
 Handleable::Handleable() {
-    handler.add(this);
+    Handler::instance().add(this);
 }
 
 Handleable::~Handleable() {
-    handler.remove(this);
+    Handler::instance().remove(this);
 }
