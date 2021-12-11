@@ -95,77 +95,36 @@ void DataQueue::_init() {
 }
 
 String DataQueue::_recoverDataFromBuffer() {
+	StaticJsonDocument<JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY> doc;
+	DeserializationError error = deserializeJson(doc, _buf);
 	unsigned nextArrayRemovalIndex = 0;
 	unsigned nextObjectRemovalIndex = 0;
-	String payload = "";
+	
+	if (error) {
+		DEBUG_SERIAL_LN("Failed to Deserialize Json in buffer.  Unable to recover Json data");
+		return String(_buf);
+	}
+
+	JsonArray dataArray = doc["l"].to<JsonArray>();
 
 	while (_writer->dataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
-		JSONValue obj = JSONValue::parseCopy(_buf);
-
 		DEBUG_SERIAL_LN("Complete JSON string to be reparsed : " + String(_buf));
 
-		_writerInit();
-		
-		// iterate to data array inside of main JObject
-		JSONObjectIterator outerIterator(obj);
-		while (outerIterator.name() != "l")
-			outerIterator.next();
-		JSONArrayIterator arrayIterator(outerIterator.value());
-
-		unsigned arrayCount = arrayIterator.count();
-		if (arrayCount == 0)
-			return _writerGet();
-
-		bool oneObjectInArray = arrayCount == 1;
+		unsigned arrayCount = dataArray.size();
 		unsigned arrayRemovalIndex = nextArrayRemovalIndex++ % arrayCount;
+		JsonObject object = dataArray[arrayRemovalIndex].as<JsonObject>()["d"].as<JsonObject>();
+		unsigned objectCount = object.size();
 
-		// LEVEL: Data array inside of main JObject
-		while (arrayIterator.next()) {
-			bool removeDataFromCurrentObject = (arrayIterator.count() == arrayRemovalIndex) || oneObjectInArray;
-			unsigned objectRemovalIndex = 0;
-
-			// check if current JObject is holding any data
-			JSONObjectIterator innerPeekingIterator(arrayIterator.value());
-			while (innerPeekingIterator.name() != "d")
-				innerPeekingIterator.next();
-			JSONObjectIterator innerMostPeekingIterator(innerPeekingIterator.value());
-			unsigned currentObjectDataCount = innerMostPeekingIterator.count();
-			
-			// don't add data if current JObject has no data or if it has one element and we're going to remove it anyways
-			if (currentObjectDataCount == 0 || (removeDataFromCurrentObject && innerMostPeekingIterator.count() == 1))
-				continue;
-			
-			// varies object data removal index
-			if (removeDataFromCurrentObject)
-			 	objectRemovalIndex = nextObjectRemovalIndex++ % currentObjectDataCount;
-
-			// LEVEL: JObject which carries timestamp and inner-most JObject
-			JSONObjectIterator innerIterator(arrayIterator.value());
-			_writer->beginObject();
-			while (innerIterator.next()) {
-				_writer->name(String(innerIterator.name()));
-				if (innerIterator.name() == "t") {
-					// add timestamp
-					_writer->value(innerIterator.value().toInt());
-				} else {
-					// LEVEL: inner-most JObject which carries event data
-					JSONObjectIterator innerMostIterator(innerIterator.value());
-					_writer->beginObject();
-					while (innerMostIterator.next()) {
-						// remove last data entry from jobject if we are supposed to
-						if (removeDataFromCurrentObject && innerMostIterator.count() == objectRemovalIndex)
-							continue;
-							
-						_writer->name(String(innerMostIterator.name()))
-							.value(String(innerMostIterator.value().toString()));
-					}
-					_writer->endObject();
-				}
-			}
-			_writer->endObject();
+		if (objectCount <= 1) {
+			dataArray.remove(arrayRemovalIndex);
+			continue;
 		}
 
-		payload = _writerGet();
+		unsigned objectRemovalIndex = nextObjectRemovalIndex++ % object.size();
+		JsonObject::iterator it = object.begin();
+		it += objectRemovalIndex;
+		object.remove(it->key());
 	}
-	return payload;
+
+	return String(_buf);
 }

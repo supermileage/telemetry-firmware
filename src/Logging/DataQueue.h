@@ -7,6 +7,8 @@
 
 #include "settings.h"
 #include "PublishQueuePosixRK.h"
+#undef max
+#include "ArduinoJson.h"
 
 /**
  * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
