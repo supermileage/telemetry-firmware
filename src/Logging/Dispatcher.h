@@ -23,9 +23,7 @@ class Dispatcher : public Handleable {
 
         void begin();
 
-        void enableLogging();
-
-        void disableLogging();
+        void setEnableLogging(bool value);
 
         /**
          *  Must be called from main loop!  Takes times since program start (in seconds) and checks whether
@@ -45,7 +43,7 @@ class Dispatcher : public Handleable {
 
         void _runLogging();
 
-        void CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i);
+        void _checkAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i);
 };
 
 #endif

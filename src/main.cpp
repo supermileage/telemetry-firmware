@@ -71,7 +71,7 @@ void timeValidCallback() {
 
     DEBUG_SERIAL("#### TIME VALID ");
     if(loggingEnabled){
-        dispatcher->enableLogging();
+        dispatcher->setEnableLogging(TRUE);
     }
 
 }
@@ -81,7 +81,7 @@ void enableLogging() {
 
     if(!loggingEnabled) {
         loggingEnabled = TRUE;
-        dispatcher->enableLogging();
+        dispatcher->setEnableLogging(TRUE);
         DEBUG_SERIAL_LN("Logging has been ENABLED\n");
     }
 
@@ -92,7 +92,7 @@ void disableLogging() {
 
     if(loggingEnabled) {
         loggingEnabled = FALSE;
-        dispatcher->disableLogging();
+        dispatcher->setEnableLogging(FALSE);
         DEBUG_SERIAL_LN("Logging has been DISABLED\n");
     }
 
