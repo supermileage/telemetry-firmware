@@ -21,7 +21,11 @@ Button::Button(uint16_t pin, bool activeHigh, bool normallyOpen, void (*callback
     }
 }
 
-bool Button::handle(){
+Button::~Button(){}
+
+void Button::begin(){}
+
+void Button::handle(){
     bool newState = pinReadFast(_pin);
     if(!_activeHigh){
         newState = !newState;
@@ -35,6 +39,8 @@ bool Button::handle(){
             if(_callbackReleased != NULL) _callbackReleased();
         }
     }
+}
 
+bool Button::get() {
     return _state;
 }

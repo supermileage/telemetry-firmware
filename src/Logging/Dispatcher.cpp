@@ -17,7 +17,23 @@ Dispatcher::~Dispatcher() {
     delete[] _maxPublishSizes;
 }
 
-void Dispatcher::loop() {
+void Dispatcher::begin() {}
+
+void Dispatcher::setEnableLogging(bool value) {
+    _loggingEnabled = value;
+
+    if (value == FALSE) {
+        // flush
+    }
+}
+
+void Dispatcher::handle() {
+    if(_loggingEnabled) {
+        _runLogging();
+    }
+}
+
+void Dispatcher::_runLogging() {
     unsigned long time = millis() / 1000;
     // check if it's time to log any data from any of the loggers
     for (uint16_t i = 0; i < _numLoggers; i++) {
@@ -54,7 +70,7 @@ void Dispatcher::loop() {
                 _loggers[i]->executeThisLoop(false);
 
                 uint16_t dataSizeAfterPublish = _dataQ->getDataSize();
-                CheckAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
+                _checkAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
             }
         }
         if (dataWrapperIsOpen)
@@ -64,7 +80,7 @@ void Dispatcher::loop() {
     }
 }
 
-void Dispatcher::CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
+void Dispatcher::_checkAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
     if (currentPublishSize > _maxPublishSizes[i])
         _maxPublishSizes[i] = currentPublishSize;
 }

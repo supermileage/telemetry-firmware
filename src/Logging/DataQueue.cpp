@@ -2,12 +2,20 @@
 
 DataQueue::DataQueue(String publishHeader,  void (*callback)(String, PublishStatus)) {
 	_publishHeader = publishHeader;
-	_init();
 	_publishCallback = callback;
 	_lastPublish = 0;
 }
 
-void DataQueue::loop() {
+DataQueue::~DataQueue(){}
+
+void DataQueue::begin() {
+	_publishQueue = &(PublishQueuePosix::instance());
+	_publishQueue->setup();
+	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
+	_writerInit();
+}
+
+void DataQueue::handle() {
 	_publishQueue->loop();
 }
 
@@ -85,13 +93,6 @@ size_t DataQueue::getNumEventsInQueue() {
 
 bool DataQueue::isCacheFull() {
 	return _publishQueue->getNumEvents() >= _publishQueue->getFileQueueSize();
-}
-
-void DataQueue::_init() {
-	_publishQueue = &(PublishQueuePosix::instance());
-	_publishQueue->setup();
-	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
-	_writerInit();
 }
 
 String DataQueue::_recoverDataFromBuffer() {

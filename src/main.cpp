@@ -3,29 +3,34 @@
 #include "Led.h"
 #include "TimeLib.h"
 #include "Button.h"
+#include "Handler.h"
+#include "Handleable.h"
 
 SYSTEM_MODE(AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
+// Forward declarations for callback functions
 void buttonPushed();
 void publish(String payload, DataQueue::PublishStatus status);
+void timeValidCallback();
 
+// Construct all Handleables
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
 Button button(A2, true, false, buttonPushed, NULL);
-
 DataQueue dataQ(VEHICLE_NAME, publish);
+TimeLib timeLib(timeValidCallback);
 Dispatcher *dispatcher;
-TimeLib timeLib;
-unsigned long lastPublish = 0;
 
 bool loggingEnabled = LOGGING_EN_AT_BOOT;
 bool error = false;
 long unsigned int lastDebugSensor = 0;
+unsigned long lastPublish = 0;
 
 // Publish a message
 void publish(String payload, DataQueue::PublishStatus status) {
+
     switch (status) {
         case DataQueue::PublishingAtMaxFrequency:
             DEBUG_SERIAL_LN("WARNING: Currently Publishing at Max Frequency");
@@ -46,35 +51,65 @@ void publish(String payload, DataQueue::PublishStatus status) {
     DEBUG_SERIAL_LN("");
     DEBUG_SERIAL_LN("Publish Queue Size: " + String(dataQ.getNumEventsInQueue()));
     DEBUG_SERIAL_LN("");
+
 }
 
 // Output sensor data over serial
 void debugSensors(){
+
     DEBUG_SERIAL_LN("---- SENSOR DATA ----");
     DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - " + timeLib.getTimeString());
     CurrentVehicle::debugSensorData();
 
     DEBUG_SERIAL_LN("Free Memory: " + String(System.freeMemory()/1000) + "kB / 128kB");
     DEBUG_SERIAL_LN("");
+    
 }
 
-// Toggle logging enabled on and off
-void buttonPushed(){
+// Action to take when time becomes valid
+void timeValidCallback() {
+
+    DEBUG_SERIAL("#### TIME VALID ");
     if(loggingEnabled){
-        loggingEnabled = false;
-        DEBUG_SERIAL_LN("#### Logging has been DISABLED (button)");
+        dispatcher->setEnableLogging(TRUE);
+    }
+
+}
+
+// Enable logging of sensor data
+void enableLogging() {
+
+    if(!loggingEnabled) {
+        loggingEnabled = TRUE;
+        dispatcher->setEnableLogging(TRUE);
+        DEBUG_SERIAL_LN("Logging has been ENABLED\n");
+    }
+
+}
+
+// Disable logging of sensor data
+void disableLogging() {
+
+    if(loggingEnabled) {
+        loggingEnabled = FALSE;
+        dispatcher->setEnableLogging(FALSE);
+        DEBUG_SERIAL_LN("Logging has been DISABLED\n");
+    }
+
+}
+
+// Action to take when button pushed
+void buttonPushed(){
+    DEBUG_SERIAL("#### BUTTON PUSHED - ");
+    if(loggingEnabled){
+        disableLogging();
     }else{
-        loggingEnabled = true;
-        DEBUG_SERIAL_LN("#### Logging has been ENABLED (button)");
+        enableLogging();
     }
 }
 
 // Handle User Interface Functionality
 void handleUI(){
-    ledOrange.handle();
-    ledBlue.handle();
-    ledGreen.handle();
-    button.handle();
 
     // Green Light Behaviour
     if(Time.isValid()){
@@ -102,31 +137,39 @@ void handleUI(){
     }
 
 }
-// Allows Rebooting Remotely
+
+// Reboot Remotely
 int remoteReset(String command) {
-    DEBUG_SERIAL_LN("#### Boron has been RESET (remote)");
+
+    DEBUG_SERIAL_LN("#### REMOTE - Boron has been RESET\n");
     System.reset();
     return 1;
+
 }
 
 // Enable Logging Remotely
 int remoteEnableLogging(String command){
-    loggingEnabled = true;
-    DEBUG_SERIAL_LN("#### Logging has been ENABLED (remote)");
+
+    DEBUG_SERIAL("#### REMOTE - ");
+    enableLogging();
     return 1;
+
 }
 
 // Disable Logging Remotely
 int remoteDisableLogging(String command){
-    loggingEnabled = false;
-    DEBUG_SERIAL_LN("#### Logging has been DISABLED (remote)");
+
+    DEBUG_SERIAL("#### REMOTE - ");
+    disableLogging();
     return 1;
+
 }
 
 /**
  * SETUP
  * */
 void setup() {
+
     if(DEBUG_SERIAL_EN){
         Serial.begin(115200);
     }
@@ -143,30 +186,22 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    for (unsigned i = 0; sensors[i]; i++) {
-        sensors[i]->begin();
-    }
-
     dispatcher = CurrentVehicle::buildDispatcher();
 
-    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----");
+    // Begin all handleables
+    Handler::instance().begin();
+
+    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
+
 }
 
 /**
  * LOOP
  * */
 void loop() {
-    // Sensor Handlers
-    for (unsigned i = 0; sensors[i]; i++) {
-        sensors[i]->handle();
-    }
 
-    dataQ.loop();
-    if (loggingEnabled && Time.isValid()){
-        dispatcher->loop();
-    }
-
-    timeLib.handle();
+    // Run all handleables
+    Handler::instance().handle();
 
     handleUI();
 
@@ -174,5 +209,6 @@ void loop() {
         lastDebugSensor = millis();
         debugSensors();
     }
+
 }
 

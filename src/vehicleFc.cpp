@@ -18,7 +18,6 @@ SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "temp1", &Sens
 SensorCommand<SensorThermo, String> thermoTemp2(&dataQ, &thermo2, "temp2", &SensorThermo::getProbeTemp, 5);
 
 // Array Definitions - MUST BE NULL TERMINATED
-Sensor *sensors[] = {&gps, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &gpsVertAccel, &gpsHorAccel, &thermoTemp1, &thermoTemp2, NULL};
 
 String publishName = "BQIngestion";
