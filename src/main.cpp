@@ -14,9 +14,6 @@ void buttonPushed();
 void publish(String payload, DataQueue::PublishStatus status);
 void timeValidCallback();
 
-// Initialize Handler
-Handler Handleable::handler;
-
 // Construct all Handleables
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
@@ -73,7 +70,7 @@ void timeValidCallback() {
 
     DEBUG_SERIAL("#### TIME VALID ");
     if(loggingEnabled){
-        dispatcher->enableLogging();
+        dispatcher->setEnableLogging(TRUE);
     }
 
 }
@@ -83,7 +80,7 @@ void enableLogging() {
 
     if(!loggingEnabled) {
         loggingEnabled = TRUE;
-        dispatcher->enableLogging();
+        dispatcher->setEnableLogging(TRUE);
         DEBUG_SERIAL_LN("Logging has been ENABLED\n");
     }
 
@@ -94,7 +91,7 @@ void disableLogging() {
 
     if(loggingEnabled) {
         loggingEnabled = FALSE;
-        dispatcher->disableLogging();
+        dispatcher->setEnableLogging(FALSE);
         DEBUG_SERIAL_LN("Logging has been DISABLED\n");
     }
 
@@ -191,7 +188,7 @@ void setup() {
     dispatcher = CurrentVehicle::buildDispatcher();
 
     // Begin all handleables
-    Handleable::handler.begin();
+    Handler::instance().begin();
 
     DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
 
@@ -203,7 +200,7 @@ void setup() {
 void loop() {
 
     // Run all handleables
-    Handleable::handler.handle();
+    Handler::instance().handle();
 
     handleUI();
 

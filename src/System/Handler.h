@@ -11,10 +11,16 @@
 // Forward declaration due to mutual inclusion
 class Handleable;
 
-// Keeps track of all handleables and runs them
+// Singleton class which keeps track of all handleables and runs them
 class Handler {
     public:
-        
+        /**
+         * Gets the Singleton instance of this class
+         * 
+         * @return reference to handler instance
+         */
+        static Handler &instance();
+
         /**
          * Add a handleable object to list of handleables
          * 
@@ -40,8 +46,8 @@ class Handler {
         void handle();
     
     private:
+        static Handler* _instance;
         std::vector<Handleable*> _handleables;
-
 };
 
 #endif
