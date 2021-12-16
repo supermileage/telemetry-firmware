@@ -17,7 +17,7 @@ void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 
 	// assign publishing status
 	PublishStatus status;
-	if (_writer->dataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
+	if (getDataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
 		payload =  _recoverDataFromBuffer();
 		status = DataBufferOverflow;
 	} else if (currentPublish - _lastPublish <= 1) {
@@ -95,49 +95,44 @@ void DataQueue::_init() {
 }
 
 String DataQueue::_recoverDataFromBuffer() {
-	// DEBUG_SERIAL_LN("Complete JSON string to be reparsed : '" + String(_buf) + "'");
-	
-	StaticJsonDocument<JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY> doc;
-	DeserializationError error = deserializeJson(doc, _buf);
-	// unsigned nextArrayRemovalIndex = 0;
-	// unsigned nextObjectRemovalIndex = 0;
+	StaticJsonDocument<JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY> doc;	
+	unsigned nextArrayRemovalIndex = 0;
+	unsigned nextObjectRemovalIndex = 0;
+	unsigned dataSize = getDataSize();
 
-	const char* vehicle = doc["v"];
+	while (dataSize > unsigned(JSON_WRITER_BUFFER_SIZE)) {
+		DEBUG_SERIAL_LN("JSON string to be reparsed : '" + String(_buf) + "'");
 
-	DEBUG_SERIAL_LN("vehicle name : \"" + String(vehicle) + "\"");
-	
-	if (error) {
-		DEBUG_SERIAL_LN("Failed to Deserialize Json in buffer.  Unable to recover Json data");
-		return String(_buf);
+		DeserializationError error = deserializeJson(doc, (const char*)_buf);
+
+		if (error) {
+			DEBUG_SERIAL_LN("Failed to Deserialize Json in buffer.  Unable to recover Json data");
+			return String(_buf);
+		}
+
+		JsonArray dataArray = doc["l"].to<JsonArray>();
+		unsigned arrayCount = dataArray.size();
+		DEBUG_SERIAL_LN("Array Length " + String(arrayCount));
+		unsigned arrayRemovalIndex = arrayCount != 0 ? nextArrayRemovalIndex++ % arrayCount : 0;
+		if (arrayCount == 0) break;
+		DEBUG_SERIAL_LN("Getting object at index " + String(arrayRemovalIndex));
+		DEBUG_SERIAL_LN("Object data size: " + String(dataArray[arrayRemovalIndex]["d"].size())); // dataArray[arrayRemovalIndex]["d"].as<String>()
+		JsonObject object = dataArray[arrayRemovalIndex]["d"].as<JsonObject>();
+		unsigned objectCount = object.size();
+
+		if (objectCount <= 1) {
+			DEBUG_SERIAL_LN("object count <= 1, removing " + dataArray[arrayRemovalIndex].to<JsonVariant>().as<String>());
+			dataArray.remove(arrayRemovalIndex);
+		} else {
+			unsigned objectRemovalIndex = nextObjectRemovalIndex++ % object.size();
+			JsonObject::iterator it = object.begin();
+			it += objectRemovalIndex;
+			DEBUG_SERIAL_LN("object count < 1, removing data under key " + String(it->key().c_str()));
+			object.remove(it->key());
+		}
+
+		dataSize = serializeJson(doc, _buf);
 	}
-
-	// JsonArray dataArray = doc["l"].to<JsonArray>();
-	
-	// JsonObject  obj = dataArray[0].as<JsonObject>();
-
-	// JsonObject::iterator it = obj.begin();
-	// obj.remove(it->key());
-
-	// DEBUG_SERIAL_LN("Complete JSON string to be reparsed : '" + String(_buf) + "'");
-
-	// while (_writer->dataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
-	// 	DEBUG_SERIAL_LN("Complete JSON string to be reparsed : '" + String(_buf) + "'");
-
-	// 	unsigned arrayCount = dataArray.size();
-	// 	unsigned arrayRemovalIndex = nextArrayRemovalIndex++ % arrayCount;
-	// 	JsonObject object = dataArray[arrayRemovalIndex].as<JsonObject>()["d"].as<JsonObject>();
-	// 	unsigned objectCount = object.size();
-
-	// 	if (objectCount <= 1) {
-	// 		dataArray.remove(arrayRemovalIndex);
-	// 		continue;
-	// 	}
-
-	// 	unsigned objectRemovalIndex = nextObjectRemovalIndex++ % object.size();
-	// 	JsonObject::iterator it = object.begin();
-	// 	it += objectRemovalIndex;
-	// 	object.remove(it->key());
-	// }
 
 	return String(_buf);
 }
