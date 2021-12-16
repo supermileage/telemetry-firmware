@@ -27,7 +27,7 @@ class SensorCommand : public IntervalCommand {
             _getter = func;
             _propertyName = propertyName;
         }
-
+        
         ~SensorCommand() { }
 
         /**

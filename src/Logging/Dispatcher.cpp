@@ -20,10 +20,12 @@ Dispatcher::~Dispatcher() {
 void Dispatcher::begin() {}
 
 void Dispatcher::setEnableLogging(bool value) {
+    bool newState = _loggingEnabled != value;
     _loggingEnabled = value;
 
-    if (value == FALSE) {
-        // flush
+    if (value == FALSE && newState) {
+        // flush data in data queue
+        _publish();
     }
 }
 
@@ -55,8 +57,7 @@ void Dispatcher::_runLogging() {
                     _dataQ->wrapEnd();
                     dataWrapperIsOpen = false;
                 }
-
-                _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
+                _publish();
             }
 
             if (_loggers[i]->executeThisLoop()) {
@@ -78,6 +79,10 @@ void Dispatcher::_runLogging() {
 
         _logThisLoop = false;
     }
+}
+
+void Dispatcher::_publish() {
+    _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
 }
 
 void Dispatcher::_checkAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {

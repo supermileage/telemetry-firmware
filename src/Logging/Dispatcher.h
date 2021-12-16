@@ -43,6 +43,8 @@ class Dispatcher : public Handleable {
 
         void _runLogging();
 
+        void _publish();
+
         void _checkAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i);
 };
 
