@@ -7,7 +7,6 @@
 #include "mcp2515_can.h"
 #include "can_common.h"
 
-
 class CanInterface : public Handleable {
     public:
 

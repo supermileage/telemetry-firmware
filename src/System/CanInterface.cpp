@@ -19,6 +19,10 @@ void CanInterface::handle() {
             _CAN->readMsgBuf(&len, data);
             unsigned long canId = _CAN->getCanId();
 
+            // check if we're listening for canId, continue if we're not
+            if (_messages.find(canId) == _messages.end())
+                continue;
+
             CanMessage& message = _messages[canId];
             message.dataLength = len;
             for(int i = 0; i < len; i++){
