@@ -2,6 +2,7 @@
 
 #ifdef URBAN
 
+#include <map>
 #include "CanInterface.h"
 #include "SensorCanExample.h"
 
@@ -52,14 +53,13 @@ void CurrentVehicle::debugSensorData() {
     // CAN
     DEBUG_SERIAL_LN("CAN Example: " + canExample.getData() + "\n");
 
-    for(CanInterface::CanMessage m : canInterface.getMessages()){
-        DEBUG_SERIAL_F("CAN ID: 0x%03x - CAN Data:", m.id);
-        for(uint8_t i = 0; i < m.dataLength; i++){
-            DEBUG_SERIAL_F(" 0x%02x", m.data[i]);
+    for(auto const& pair : canInterface.getMessages()){
+        DEBUG_SERIAL_F("CAN ID: 0x%03x - CAN Data:", pair.second.id);
+        for(uint8_t i = 0; i < pair.second.dataLength; i++){
+            DEBUG_SERIAL_F(" 0x%02x", pair.second.data[i]);
         }
         DEBUG_SERIAL_LN("");
     }
-
     DEBUG_SERIAL_LN("");
 }
 

@@ -19,36 +19,25 @@ void CanInterface::handle() {
             _CAN->readMsgBuf(&len, data);
             unsigned long canId = _CAN->getCanId();
 
-            for(CanMessage& m : _messages){
-                if(canId == m.id){
-                    m.dataLength = len;
-                    for(int i = 0; i < len; i++){
-                        m.data[i] = data[i];
-                    }
-                    return;
-                }
+            CanMessage& message = _messages[canId];
+            message.dataLength = len;
+            for(int i = 0; i < len; i++){
+                message.data[i] = data[i];
             }
-            
         }
     }
 }
 
-std::vector<CanInterface::CanMessage>& CanInterface::getMessages(){
+std::map<uint16_t, CanInterface::CanMessage>& CanInterface::getMessages(){
     return _messages;
 }
 
 CanInterface::CanMessage CanInterface::getMessage(uint16_t id) {
-    for(CanMessage m : _messages){
-        if(id == m.id){
-            return m;
-        }
-    }
-
-    return _nullMessage;
+    return _messages[id];
 }
 
 void CanInterface::addMessageListen(uint16_t id) {
     CanMessage newMessage = _nullMessage;
     newMessage.id = id;
-    _messages.push_back(newMessage);
+    _messages[id] = newMessage;
 }

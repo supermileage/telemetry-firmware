@@ -1,7 +1,7 @@
 #ifndef _CAN_INTERFACE_H_
 #define _CAN_INTERFACE_H_
 
-#include <vector>
+#include <map>
 
 #include "Sensor.h"
 #include "mcp2515_can.h"
@@ -41,9 +41,9 @@ class CanInterface : public Handleable {
         void handle();
 
         /**
-         * @return reference to vector of CAN IDs and their latest data
+         * @return reference to dictionary of CAN IDs and their latest data
          **/
-        std::vector<CanMessage>& getMessages();
+        std::map<uint16_t, CanMessage>& getMessages();
 
         /**
          * @param id of the desired CAN message
@@ -58,8 +58,7 @@ class CanInterface : public Handleable {
         void addMessageListen(uint16_t id);
 
     private:
-        std::vector<CanMessage> _messages;
-
+        std::map<uint16_t, CanMessage> _messages;
         uint8_t _intPin;
         mcp2515_can* _CAN;
 
