@@ -95,36 +95,49 @@ void DataQueue::_init() {
 }
 
 String DataQueue::_recoverDataFromBuffer() {
+	// DEBUG_SERIAL_LN("Complete JSON string to be reparsed : '" + String(_buf) + "'");
+	
 	StaticJsonDocument<JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY> doc;
 	DeserializationError error = deserializeJson(doc, _buf);
-	unsigned nextArrayRemovalIndex = 0;
-	unsigned nextObjectRemovalIndex = 0;
+	// unsigned nextArrayRemovalIndex = 0;
+	// unsigned nextObjectRemovalIndex = 0;
+
+	const char* vehicle = doc["v"];
+
+	DEBUG_SERIAL_LN("vehicle name : \"" + String(vehicle) + "\"");
 	
 	if (error) {
 		DEBUG_SERIAL_LN("Failed to Deserialize Json in buffer.  Unable to recover Json data");
 		return String(_buf);
 	}
 
-	JsonArray dataArray = doc["l"].to<JsonArray>();
+	// JsonArray dataArray = doc["l"].to<JsonArray>();
+	
+	// JsonObject  obj = dataArray[0].as<JsonObject>();
 
-	while (_writer->dataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
-		DEBUG_SERIAL_LN("Complete JSON string to be reparsed : " + String(_buf));
+	// JsonObject::iterator it = obj.begin();
+	// obj.remove(it->key());
 
-		unsigned arrayCount = dataArray.size();
-		unsigned arrayRemovalIndex = nextArrayRemovalIndex++ % arrayCount;
-		JsonObject object = dataArray[arrayRemovalIndex].as<JsonObject>()["d"].as<JsonObject>();
-		unsigned objectCount = object.size();
+	// DEBUG_SERIAL_LN("Complete JSON string to be reparsed : '" + String(_buf) + "'");
 
-		if (objectCount <= 1) {
-			dataArray.remove(arrayRemovalIndex);
-			continue;
-		}
+	// while (_writer->dataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
+	// 	DEBUG_SERIAL_LN("Complete JSON string to be reparsed : '" + String(_buf) + "'");
 
-		unsigned objectRemovalIndex = nextObjectRemovalIndex++ % object.size();
-		JsonObject::iterator it = object.begin();
-		it += objectRemovalIndex;
-		object.remove(it->key());
-	}
+	// 	unsigned arrayCount = dataArray.size();
+	// 	unsigned arrayRemovalIndex = nextArrayRemovalIndex++ % arrayCount;
+	// 	JsonObject object = dataArray[arrayRemovalIndex].as<JsonObject>()["d"].as<JsonObject>();
+	// 	unsigned objectCount = object.size();
+
+	// 	if (objectCount <= 1) {
+	// 		dataArray.remove(arrayRemovalIndex);
+	// 		continue;
+	// 	}
+
+	// 	unsigned objectRemovalIndex = nextObjectRemovalIndex++ % object.size();
+	// 	JsonObject::iterator it = object.begin();
+	// 	it += objectRemovalIndex;
+	// 	object.remove(it->key());
+	// }
 
 	return String(_buf);
 }
