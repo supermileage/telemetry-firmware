@@ -9,8 +9,6 @@ void CanAccessoriesListener::begin() {
 	_canInterface.addMessageListen(_id, new CanAccessoriesListener::CanAccessoriesMessageParser(this));
 }
 
-void CanAccessoriesListener::handle() { }
-
 String CanAccessoriesListener::getHumanName() {
 	return "CanAccessoriesListener";
 }
@@ -39,10 +37,9 @@ uint8_t CanAccessoriesListener::_getCanMessageDataIndex(uint8_t id) {
 void CanAccessoriesListener::_updateMessage(uint8_t data) {
 	uint8_t id = data >> 1;
 	uint8_t i = _getCanMessageDataIndex(id);
-	_statusMessage.data[i] = id;
+	_statusMessage.data[i] = data;
 }
 
-// you can probably think of a better pattern for this
 void* CanAccessoriesListener::CanAccessoriesMessageParser::execute(void* arg) {
 	CanInterface::CanMessage message = *((CanInterface::CanMessage*)arg);
 	
@@ -50,7 +47,5 @@ void* CanAccessoriesListener::CanAccessoriesMessageParser::execute(void* arg) {
 		_owner->_updateMessage(message.data[i]);
 	}
 
-	DEBUG_SERIAL_LN("Parsing can message in CanAccessoriesListener");
-
-	return (void*)1;
+	return (void*)nullptr;
 }
