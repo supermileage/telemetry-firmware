@@ -39,7 +39,7 @@ void CanInterface::handle() {
 
             // call delegates if any additional parsing is needed for message
             if (_parsers[canId]) {
-                _parsers[canId]->execute((void*)&message);
+                _parsers[canId]->execute((CommandArgs)&message);
             }
         }
     }

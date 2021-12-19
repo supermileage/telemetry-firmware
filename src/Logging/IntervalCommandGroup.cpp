@@ -20,7 +20,7 @@ IntervalCommandGroup::~IntervalCommandGroup() {
 
 void IntervalCommandGroup::executeCommands() {
     for (uint8_t i = 0; i < _numCommands; i++) {
-        _commands[i]->execute((void*)nullptr);
+        _commands[i]->execute((CommandArgs)nullptr);
     }
 }
 

@@ -3,6 +3,7 @@
 CanAccessoriesListener::CanAccessoriesListener(CanInterface& canInterface, uint16_t id, StatusIds ids)
 	: SensorCanBase(canInterface, id) {
 	_idArray = ids;
+	_statusMessage.dataLength = 7;
 }
 
 void CanAccessoriesListener::begin() {

@@ -14,7 +14,7 @@ class CanAccessoriesListener : public SensorCanBase {
 		 * 
 		 * @param canInterface the can interface which will be reading data from Can buffer
 		 * @param id the id of the Can message we will be reading from
-		 * @param ids the individual ids of the Can accessories whose status we want
+		 * @param ids the individual ids of the Can accessories whose status we want (0xFF == unused)
 		 */
 		typedef std::array<uint8_t, 8> StatusIds;
 		CanAccessoriesListener(CanInterface& canInterface, uint16_t id, StatusIds ids);
@@ -67,12 +67,12 @@ class CanAccessoriesListener : public SensorCanBase {
 				~CanAccessoriesMessageParser() { }
 
 				/**
-				 * Delegate function which will be called in CanInterface
-				 * parse can data and adds to _statusMessage
+				 * Delegate function which will be called in CanInterface:
+				 * parses can data and adds to _statusMessage
 				 * 
 				 * @param arg can message with this CanAccessoriesListener's id
 				 */
-				void* execute(void* arg);
+				void* execute(CommandArgs args);
 			private:
 				CanAccessoriesListener* _owner;
 		};

@@ -3,6 +3,8 @@
 
 #include "DataQueue.h"
 
+typedef void* CommandArgs;
+
 /**
  *  Abstract Command class
  **/
@@ -15,7 +17,7 @@ class Command {
         /**
          * Virtual function executes the instruction owned by this command
          **/
-        virtual void* execute(void* arg) = 0;
+        virtual void* execute(CommandArgs args) = 0;
 };
 
 #endif

@@ -35,7 +35,7 @@ class SensorCommand : public IntervalCommand {
          * 
          * @param dataQ passed in so getter data can be logged to main DataQueue
          **/
-        void* execute(void* arg) {
+        void* execute(CommandArgs args) {
             _dataQ->add(_propertyName, (*_sensor.*_getter)());
             return (void*)nullptr;
         }
