@@ -6,7 +6,7 @@
 #include "Sensor.h"
 #include "mcp2515_can.h"
 #include "can_common.h"
-#include "Delegate.h"
+#include "Command.h"
 
 class CanInterface : public Handleable {
     public:
@@ -58,11 +58,11 @@ class CanInterface : public Handleable {
         /**
          * @param id to listen for on CAN bus
          **/
-        void addMessageListen(uint16_t id, Delegate* delegate = nullptr);
+        void addMessageListen(uint16_t id, Command* parser = nullptr);
 
     private:
         std::map<uint16_t, CanMessage> _messages;
-        std::map<uint16_t, Delegate*> _messageParsers;
+        std::map<uint16_t, Command*> _parsers;
         uint8_t _intPin;
         mcp2515_can* _CAN;
 

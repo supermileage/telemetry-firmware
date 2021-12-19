@@ -6,7 +6,7 @@ CanAccessoriesListener::CanAccessoriesListener(CanInterface& canInterface, uint1
 }
 
 void CanAccessoriesListener::begin() {
-	_canInterface.addMessageListen(_id, new CanAccessoriesMessageParser(this));
+	_canInterface.addMessageListen(_id, new CanAccessoriesListener::CanAccessoriesMessageParser(this));
 }
 
 void CanAccessoriesListener::handle() { }
@@ -49,6 +49,8 @@ void* CanAccessoriesListener::CanAccessoriesMessageParser::execute(void* arg) {
 	for (uint8_t i = 0; i < message.dataLength; i++) {
 		_owner->_updateMessage(message.data[i]);
 	}
+
+	DEBUG_SERIAL_LN("Parsing can message in CanAccessoriesListener");
 
 	return (void*)1;
 }

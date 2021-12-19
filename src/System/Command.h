@@ -1,7 +1,7 @@
-#include "DataQueue.h"
-
 #ifndef _COMMAND_H
 #define _COMMAND_H
+
+#include "DataQueue.h"
 
 /**
  *  Abstract Command class
@@ -15,7 +15,7 @@ class Command {
         /**
          * Virtual function executes the instruction owned by this command
          **/
-        virtual void execute() = 0;
+        virtual void* execute(void* arg) = 0;
 };
 
 #endif

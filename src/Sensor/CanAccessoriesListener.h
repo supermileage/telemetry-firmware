@@ -5,8 +5,7 @@
 
 #include "SensorCanBase.h"
 #include "CanInterface.h"
-#include "Delegate.h"
-
+#include "Command.h"
 
 class CanAccessoriesListener : public SensorCanBase {
 	public:
@@ -28,9 +27,11 @@ class CanAccessoriesListener : public SensorCanBase {
 
 		uint8_t _getCanMessageDataIndex(uint8_t statusId);
 
-		class CanAccessoriesMessageParser : public Delegate {
+		class CanAccessoriesMessageParser : public Command {
 			public:
-				CanAccessoriesMessageParser(CanAccessoriesListener* owner);
+				CanAccessoriesMessageParser(CanAccessoriesListener* owner) : _owner(owner) { }
+
+				~CanAccessoriesMessageParser() { }
 
 				void* execute(void* arg);
 			private:

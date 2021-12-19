@@ -31,12 +31,13 @@ class SensorCommand : public IntervalCommand {
         ~SensorCommand() { }
 
         /**
-         * Constructs a SensorCommand with sensor, property name, getter function and interval
+         * Logs data from this command's logging fn
          * 
          * @param dataQ passed in so getter data can be logged to main DataQueue
          **/
-        void execute() {
+        void* execute(void* arg) {
             _dataQ->add(_propertyName, (*_sensor.*_getter)());
+            return (void*)nullptr;
         }
 
     private:

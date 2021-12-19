@@ -8,10 +8,9 @@ CanInterface::CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin) {
 }
 
 CanInterface::~CanInterface() {
-    for (auto const& pair : _messageParsers) {
+    for (auto const& pair : _parsers) {
         delete pair.second;
     }
-    delete _CAN;
 }
 
 void CanInterface::begin() {
@@ -31,24 +30,26 @@ void CanInterface::handle() {
                 continue;
             }
 
+            // copy incoming data to cache
             CanMessage& message = _messages[canId];
             message.dataLength = len;
             for(int i = 0; i < len; i++){
                 message.data[i] = data[i];
             }
 
-            if (_messageParsers[canId]) {
-                _messageParsers[canId]->execute((void*)&message);
+            // call delegates if any additional parsing is needed for message
+            if (_parsers[canId]) {
+                _parsers[canId]->execute((void*)&message);
             }
         }
     }
 }
 
-void CanInterface::addMessageListen(uint16_t id, Delegate* delegate) {
+void CanInterface::addMessageListen(uint16_t id, Command* delegate) {
     CanMessage newMessage = _nullMessage;
     newMessage.id = id;
     _messages[id] = newMessage;
-    _messageParsers[id] = delegate;
+    _parsers[id] = delegate;
 }
 
 std::map<uint16_t, CanInterface::CanMessage>& CanInterface::getMessages(){
