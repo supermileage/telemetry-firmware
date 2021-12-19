@@ -16,7 +16,7 @@ Led ledGreen(D8, 40);
 Button button(A2, true, false, buttonPushed, NULL);
 
 DataQueue dataQ(VEHICLE_NAME, publish);
-Dispatcher *dispatcher;
+LoggingDispatcher *dispatcher;
 TimeLib timeLib;
 unsigned long lastPublish = 0;
 
@@ -147,7 +147,7 @@ void setup() {
         sensors[i]->begin();
     }
 
-    dispatcher = CurrentVehicle::buildDispatcher();
+    dispatcher = CurrentVehicle::buildLoggingDispatcher();
 
     DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----");
 }

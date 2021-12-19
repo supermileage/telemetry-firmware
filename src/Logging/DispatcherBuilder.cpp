@@ -18,7 +18,7 @@ DispatcherBuilder::~DispatcherBuilder() {
     delete[] _numCommandsAddedOnIntervals;
 }
 
-Dispatcher* DispatcherBuilder::build() {
+LoggingDispatcher* DispatcherBuilder::build() {
     // create array of *IntervalCommandGroup
     IntervalCommandGroup **loggers = new IntervalCommandGroup*[_numIntervals];
 
@@ -38,7 +38,7 @@ Dispatcher* DispatcherBuilder::build() {
     }
 
     // create new dispatcher with set of loggers (_numIntervals == number of loggers)
-    return new Dispatcher(loggers, _numIntervals, _dataQ, _publishName);
+    return new LoggingDispatcher(loggers, _numIntervals, _dataQ, _publishName);
 }
 
 

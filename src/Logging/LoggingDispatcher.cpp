@@ -1,6 +1,9 @@
-#include "Dispatcher.h"
+#include "LoggingDispatcher.h"
 
-Dispatcher::Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName) {
+#define WRAPPER_START 25
+#define WRAPPER_END 4
+
+LoggingDispatcher::LoggingDispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName) {
     _loggers = loggers;
     _numLoggers = numLoggers;
     _maxPublishSizes = new uint16_t[numLoggers]();
@@ -9,7 +12,7 @@ Dispatcher::Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, Data
     _publishName = publishName;
 }
 
-Dispatcher::~Dispatcher() {
+LoggingDispatcher::~LoggingDispatcher() {
     for (uint16_t i = 0; i < _numLoggers; i++) {
         delete _loggers[i];
     }
@@ -17,7 +20,7 @@ Dispatcher::~Dispatcher() {
     delete[] _maxPublishSizes;
 }
 
-void Dispatcher::loop() {
+void LoggingDispatcher::loop() {
     unsigned long time = millis() / 1000;
     // check if it's time to log any data from any of the loggers
     for (uint16_t i = 0; i < _numLoggers; i++) {
@@ -33,7 +36,7 @@ void Dispatcher::loop() {
         bool dataWrapperIsOpen = false;
         for (uint16_t i = 0; i < _numLoggers; i++) {
             // NOTE: max wrapper opening size = 21 bytes; wrapper closing size = 2 bytes; final closing brackets = 2 bytes
-            unsigned additionalBytes = dataWrapperIsOpen ? 4 : 25;
+            unsigned additionalBytes = dataWrapperIsOpen ? WRAPPER_END : WRAPPER_START;
             if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _loggers[i]->executeThisLoop()) {
                 if (dataWrapperIsOpen) {
                     _dataQ->wrapEnd();
@@ -64,7 +67,7 @@ void Dispatcher::loop() {
     }
 }
 
-void Dispatcher::CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
+void LoggingDispatcher::CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
     if (currentPublishSize > _maxPublishSizes[i])
         _maxPublishSizes[i] = currentPublishSize;
 }

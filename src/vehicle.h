@@ -4,7 +4,7 @@
 #include "settings.h"
 
 #include "DataQueue.h"
-#include "SensorCommand.h"
+#include "LoggingCommand.h"
 #include "DispatcherBuilder.h"
 
 #include "Sensor.h"
@@ -21,7 +21,7 @@ namespace CurrentVehicle {
     /**
      *  Returns dispatcher with current vehicle's set of commands
     **/
-    Dispatcher* buildDispatcher();
+    LoggingDispatcher* buildLoggingDispatcher();
 
     /**
      *  Output latest sensor data for debugging

@@ -9,10 +9,10 @@
  *  Templated class which represents a telemetry-logging command
  **/
 template <class S, class R>
-class SensorCommand : public IntervalCommand {
+class LoggingCommand : public IntervalCommand {
     public:
         /**
-         * Constructs a SensorCommand with sensor, property name, getter function and interval
+         * Constructs a LoggingCommand with sensor, property name, getter function and interval
          * 
          * @param dataQ pointer to DataQueue in main
          * @param sensor pointer to sensor which we will call _getter on
@@ -20,7 +20,7 @@ class SensorCommand : public IntervalCommand {
          * @param func pointer to Sensor's member getter function
          * @param interval interval (in seconds) at which this command will be called to execute
          **/
-        SensorCommand(DataQueue *dataQ, S *sensor, String propertyName, R (S::*func)(), uint16_t interval)
+        LoggingCommand(DataQueue *dataQ, S *sensor, String propertyName, R (S::*func)(), uint16_t interval)
         : IntervalCommand(interval) {
             _dataQ = dataQ;
             _sensor = sensor;
@@ -28,15 +28,16 @@ class SensorCommand : public IntervalCommand {
             _propertyName = propertyName;
         }
 
-        ~SensorCommand() { }
+        ~LoggingCommand() { }
 
         /**
-         * Constructs a SensorCommand with sensor, property name, getter function and interval
+         * Constructs a LoggingCommand with sensor, property name, getter function and interval
          * 
          * @param dataQ passed in so getter data can be logged to main DataQueue
          **/
-        void execute() {
+        void* execute(void* arg) {
             _dataQ->add(_propertyName, (*_sensor.*_getter)());
+            return nullptr;
         }
 
     private:

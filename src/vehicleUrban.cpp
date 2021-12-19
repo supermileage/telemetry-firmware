@@ -13,9 +13,9 @@ SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 // command definitions
-SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
-SensorCommand<SensorGps, String> gpsLong(&dataQ, &gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
-SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
+LoggingCommand<SensorGps, String> gpsLong(&dataQ, &gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
+LoggingCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
 
 // Array Definitions - MUST BE NULL TERMINATED
 Sensor *sensors[] = {&gps, &can, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
@@ -24,7 +24,7 @@ IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
 String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
-Dispatcher* CurrentVehicle::buildDispatcher() {
+LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     DispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }

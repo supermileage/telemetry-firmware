@@ -3,7 +3,7 @@
 
 #include "DataQueue.h"
 #include "IntervalCommand.h"
-#include "Dispatcher.h"
+#include "LoggingDispatcher.h"
 #include "IntervalCommandGroup.h"
 
 #define MAX_NUM_INTERVALS 5
@@ -24,14 +24,14 @@ class DispatcherBuilder {
         DispatcherBuilder(IntervalCommand *commands[], DataQueue *dataQ, String publishName);
         
         /**
-         * @brief Destroy the Dispatcher Builder object
+         * @brief Destroy the LoggingDispatcher Builder object
          */
         ~DispatcherBuilder();
 
         /**
          * Builds and returns a dispatcher with all of the logging information you've added
          **/
-        Dispatcher* build();
+        LoggingDispatcher* build();
 
     private:
         // adds interval to this builder's set of intervals

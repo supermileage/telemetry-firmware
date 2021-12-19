@@ -5,19 +5,19 @@
 #include "IntervalCommandGroup.h"
 
 /**
- * Dispatcher owns and operates on a collection of loggers
+ * LoggingDispatcher owns and operates on a collection of loggers
  **/
-class Dispatcher {
+class LoggingDispatcher {
     public:
         /**
-         * Constructs a Dispatcher with loggers, numLoggers, dataQueue and publishName
+         * Constructs a LoggingDispatcher with loggers, numLoggers, dataQueue and publishName
          **/
-        Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName);
+        LoggingDispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName);
 
         /**
-         * @brief Destroy the Dispatcher object
+         * @brief Destroy the LoggingDispatcher object
          */
-        ~Dispatcher();
+        ~LoggingDispatcher();
 
         /**
          *  Must be called from main loop!  Takes times since program start (in seconds) and checks whether
