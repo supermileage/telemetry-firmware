@@ -6,6 +6,7 @@
 #include "Sensor.h"
 #include "mcp2515_can.h"
 #include "can_common.h"
+#include "Delegate.h"
 
 class CanInterface : public Handleable {
     public:
@@ -27,6 +28,9 @@ class CanInterface : public Handleable {
          * @param intPin interrupt pin to use for this CAN module
          **/
         CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin);
+
+        // look into virtual desctructors in c++
+        ~CanInterface();
 
         /**
          * Begin the CAN sensor by setting baud rate and chip freq
@@ -54,10 +58,11 @@ class CanInterface : public Handleable {
         /**
          * @param id to listen for on CAN bus
          **/
-        void addMessageListen(uint16_t id);
+        void addMessageListen(uint16_t id, Delegate* delegate = nullptr);
 
     private:
         std::map<uint16_t, CanMessage> _messages;
+        std::map<uint16_t, Delegate*> _messageParsers;
         uint8_t _intPin;
         mcp2515_can* _CAN;
 
