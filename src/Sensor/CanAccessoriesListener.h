@@ -2,10 +2,11 @@
 #define CAN_ACCESSORIES_LISTENER
 
 #include <array>
+#include <bitset>
 
 #include "SensorCanBase.h"
 #include "CanInterface.h"
-#include "Command.h"
+#include "IntervalCommand.h"
 
 class CanAccessoriesListener : public SensorCanBase {
 	public:
@@ -38,6 +39,34 @@ class CanAccessoriesListener : public SensorCanBase {
 		 */
 		String getStatus(uint8_t statusId);
 
+		/**
+		 * @brief Logging command for 
+		 * 
+		 */
+		class LoggingCommand : public IntervalCommand {
+			public:
+				LoggingCommand(CanAccessoriesListener* owner, String propertyName, uint16_t id, uint16_t interval)
+				: IntervalCommand(interval) {
+					_owner = owner;
+					_propertyName = propertyName;
+					_id = id;
+				}
+
+				~LoggingCommand() { }
+
+				/**
+				 * @brief logs can data to data queue
+				 * 
+				 * @param args DataQueue which will be used to log status for _id
+				 * @return void* 
+				 */
+				void* execute(CommandArgs args);
+			private:
+				CanAccessoriesListener* _owner;
+				String _propertyName;
+				uint16_t _id;
+		};
+
 	private:
 		StatusIds _idArray;
 		CanInterface::CanMessage _statusMessage;
@@ -57,18 +86,18 @@ class CanAccessoriesListener : public SensorCanBase {
 		uint8_t _getCanMessageDataIndex(uint8_t statusId);
 
 		/**
-		 * Internal class which acts as a delegate to CanInterface; allows us to update _statusMessage
-		 *  without overwriting data that we still need
+		 * Internal class which acts as a delegate to CanInterface; allows us to update member
+		 * CanMessage without overwriting data that we still need
 		 */
-		class CanAccessoriesMessageParser : public Command {
+		class CanMessageParser : public Command {
 			public:
-				CanAccessoriesMessageParser(CanAccessoriesListener* owner) : _owner(owner) { }
+				CanMessageParser(CanAccessoriesListener* owner) : _owner(owner) { }
 
-				~CanAccessoriesMessageParser() { }
+				~CanMessageParser() { }
 
 				/**
 				 * Delegate function which will be called in CanInterface:
-				 * parses can data and adds to _statusMessage
+				 * parses can data and adds to CanListener's member CanMessage
 				 * 
 				 * @param arg can message with this CanAccessoriesListener's id
 				 */

@@ -56,9 +56,12 @@ class CanInterface : public Handleable {
         CanMessage getMessage(uint16_t id);
 
         /**
+         * @brief Adds message id for can interface to listen to
+         * 
          * @param id to listen for on CAN bus
+         * @param delegate optional delegate which allows can listeners to specify additional parsing behavior
          **/
-        void addMessageListen(uint16_t id, Command* parser = nullptr);
+        void addMessageListen(uint16_t id, Command* delegate = nullptr);
 
     private:
         std::map<uint16_t, CanMessage> _messages;

@@ -15,15 +15,24 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-CanAccessoriesListener canListener(canInterface, 0x14, { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0xFF });
+CanAccessoriesListener canListener(canInterface, CAN_ACC_STATUS,
+    { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
+    STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS, STATUS_NULL });
 
-// command definitions
-SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
-SensorCommand<SensorGps, String> gpsLong(&dataQ, &gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
-SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+// Command definitions
+SensorCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
+SensorCommand<SensorGps, String> gpsLong(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
+SensorCommand<SensorThermo, String> thermoTemp1(&thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+CanAccessoriesListener::LoggingCommand urbanHeadlights(&canListener, "u-hl", STATUS_HEADLIGHTS, 1);
+CanAccessoriesListener::LoggingCommand urbanBrakelights(&canListener, "u-bl", STATUS_BRAKELIGHTS, 1);
+CanAccessoriesListener::LoggingCommand urbanHorn(&canListener, "u-hrn", STATUS_HORN, 1);
+CanAccessoriesListener::LoggingCommand urbanHazards(&canListener, "u-haz", STATUS_HAZARDS, 1);
+CanAccessoriesListener::LoggingCommand urbanRightSig(&canListener, "u-rsig", STATUS_RIGHT_SIGNAL, 1);
+CanAccessoriesListener::LoggingCommand urbanLeftSig(&canListener, "u-lsig", STATUS_LEFT_SIGNAL, 1);
+CanAccessoriesListener::LoggingCommand urbanWipers(&canListener, "u-wpr", STATUS_WIPERS, 1);
 
 // Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
+IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, NULL};
 
 String publishName = "BQIngestion";
 
@@ -54,7 +63,7 @@ void CurrentVehicle::debugSensorData() {
     // CAN
     for(auto const& pair : canInterface.getMessages()){
         DEBUG_SERIAL_F("CAN ID: 0x%03x - CAN Data:", pair.second.id);
-        for(uint8_t i = 0; i < pair.second.dataLength; i++){
+        for(uint8_t i = 0; i < pair.second.dataLength; i++) {
             DEBUG_SERIAL_F(" 0x%02x", pair.second.data[i]);
         }
         DEBUG_SERIAL_LN("");

@@ -10,12 +10,12 @@ SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 // command definitions
-SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "lat", &SensorGps::getLatitude, 1);
-SensorCommand<SensorGps, String> gpsLong(&dataQ, &gps, "long", &SensorGps::getLongitude, 1);
-SensorCommand<SensorGps, String> gpsVertAccel(&dataQ, &gps, "v-accel", &SensorGps::getVerticalAcceleration, 2);
-SensorCommand<SensorGps, String> gpsHorAccel(&dataQ, &gps, "h-accel", &SensorGps::getHorizontalAcceleration, 2);
-SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "temp1", &SensorThermo::getProbeTemp, 5);
-SensorCommand<SensorThermo, String> thermoTemp2(&dataQ, &thermo2, "temp2", &SensorThermo::getProbeTemp, 5);
+SensorCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
+SensorCommand<SensorGps, String> gpsLong(&gps, "long", &SensorGps::getLongitude, 1);
+SensorCommand<SensorGps, String> gpsVertAccel(&gps, "v-accel", &SensorGps::getVerticalAcceleration, 2);
+SensorCommand<SensorGps, String> gpsHorAccel(&gps, "h-accel", &SensorGps::getHorizontalAcceleration, 2);
+SensorCommand<SensorThermo, String> thermoTemp1(&thermo1, "temp1", &SensorThermo::getProbeTemp, 5);
+SensorCommand<SensorThermo, String> thermoTemp2(&thermo2, "temp2", &SensorThermo::getProbeTemp, 5);
 
 // Array Definitions - MUST BE NULL TERMINATED
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &gpsVertAccel, &gpsHorAccel, &thermoTemp1, &thermoTemp2, NULL};
