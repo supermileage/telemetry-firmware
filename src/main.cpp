@@ -30,19 +30,20 @@ unsigned long lastPublish = 0;
 
 // Publish a message
 void publish(String payload, DataQueue::PublishStatus status) {
-
-    switch (status) {
-        case DataQueue::PublishingAtMaxFrequency:
-            DEBUG_SERIAL_LN("WARNING: Currently Publishing at Max Frequency");
-            error = false;
-            break;
-        case DataQueue::DataBufferOverflow:
-            DEBUG_SERIAL_LN("ERROR: Json Writer Data Buffer has Overflowed");
-            error = true;
-            break;
-        default:
-            error = false;
-            break;
+    if(status == DataQueue::DataBufferOverflow || dataQ.isCacheFull()) {
+        error = true;
+        if(status == DataQueue::DataBufferOverflow) {
+            DEBUG_SERIAL_LN("ERROR: Json Writer Data Buffer has Overflowed!");
+        }
+        if(dataQ.isCacheFull()) {
+            DEBUG_SERIAL_LN("ERROR: Data Queue is full!");
+        }
+    } else {
+        error = false;
+    }
+    
+    if(status == DataQueue::PublishingAtMaxFrequency) {
+        DEBUG_SERIAL_LN("WARNING: Currently Publishing at Max Frequency");
     }
 
     DEBUG_SERIAL_LN("---- PUBLISH MESSAGE ----");

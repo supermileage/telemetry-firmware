@@ -7,7 +7,7 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define FC
+    #define URBAN
 #endif
 
 // Logging enabled at boot-up, control logging with button or Particle Function
@@ -29,9 +29,11 @@
 #if DEBUG_SERIAL_EN
     #define DEBUG_SERIAL_LN(x) Serial.println(x)
     #define DEBUG_SERIAL(x) Serial.print(x)
+    #define DEBUG_SERIAL_F(x, ...) Serial.printf(x, __VA_ARGS__)
 #else
     #define DEBUG_SERIAL_LN(x) x
     #define DEBUG_SERIAL(x) x
+    #define DEBUG_SERIAL_F(X) x
 #endif
 
 #ifdef  PROTO

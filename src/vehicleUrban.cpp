@@ -2,15 +2,19 @@
 
 #ifdef URBAN
 
-#include "SensorCan.h"
+#include <map>
+#include "CanInterface.h"
+#include "SensorCanExample.h"
 
-// sensor definitions
+CanInterface canInterface(&SPI1, D5, D6);
+
+// Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
-SensorCan can(&SPI1, D5, D6);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
+SensorCanExample canExample(canInterface);
 
 // command definitions
 SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
@@ -47,16 +51,16 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
     DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
     // CAN
-    for(int i = 0; i < can.getNumIds(); i++){
-        String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
-        uint8_t canDataLength = can.getDataLen(i);
-        unsigned char* canData = can.getData(i);
-        for(int k = 0; k < canDataLength; k++){
-            output += " 0x";
-            output += String(canData[k], HEX);
+    DEBUG_SERIAL_LN("CAN Example: " + canExample.getData() + "\n");
+
+    for(auto const& pair : canInterface.getMessages()){
+        DEBUG_SERIAL_F("CAN ID: 0x%03x - CAN Data:", pair.second.id);
+        for(uint8_t i = 0; i < pair.second.dataLength; i++){
+            DEBUG_SERIAL_F(" 0x%02x", pair.second.data[i]);
         }
-        DEBUG_SERIAL_LN(output);
+        DEBUG_SERIAL_LN("");
     }
+    DEBUG_SERIAL_LN("");
 }
 
 bool CurrentVehicle::getTimeValid() {
