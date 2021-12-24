@@ -17,7 +17,7 @@ using namespace can;
 class CanListenerAccessories : public CanListener {
 	public:
 		/**
-		 * @brief return values for getStatus methods 
+		 * @brief return values for getStatus methods
 		 */
 		enum Status { Off = 0, On = 1, Unknown = 2 };
 

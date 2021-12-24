@@ -59,8 +59,17 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Altitude: " + gps.getAltitude() + " m - ");
     DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
-    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
+    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");
     DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
+    // CAN: 0 = Off, 1 = On, 2 = Unknown
+    DEBUG_SERIAL("Headlights: " + String(canListenerAccessories.getStatusHeadlights()) + " - ");
+    DEBUG_SERIAL("Brakelights: " + String(canListenerAccessories.getStatusBrakelights()) + " - ");
+    DEBUG_SERIAL("Horn: " + String(canListenerAccessories.getStatusHorn()) + " - ");
+    DEBUG_SERIAL("Hazards: " + String(canListenerAccessories.getStatusHazards()) + " - ");
+    DEBUG_SERIAL("Right Signal: " + String(canListenerAccessories.getStatusRightSignal()) + " - ");
+    DEBUG_SERIAL("Left Signal: " + String(canListenerAccessories.getStatusLeftSignal()) + " - ");
+    DEBUG_SERIAL_LN("Wipers: " + String(canListenerAccessories.getStatusWipers()));
+
     DEBUG_SERIAL_LN("");
 }
 
