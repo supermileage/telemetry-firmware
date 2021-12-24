@@ -33,37 +33,37 @@ class CanListenerAccessories : public CanListener {
 		String getHumanName();
 		
 		/**
-		 * @brief Get the status of urban headlights
+		 * @brief Get the status of headlights
 		 */
 		String getStatusHeadlights();
 
 		/**
-		 * @brief Get the status of urban brakelights
+		 * @brief Get the status of brakelights
 		 */
 		String getStatusBrakelights();
 
 		/**
-		 * @brief Get the status of urban headlights
+		 * @brief Get the status of headlights
 		 */
 		String getStatusHorn();
 
 		/**
-		 * @brief Get the status of urban windshield wipers
+		 * @brief Get the status of hazard lights
 		 */
 		String getStatusHazards();
 
 		/**
-		 * @brief Get the status of urban windshield wipers
+		 * @brief Get the status of right signal
 		 */
 		String getStatusRightSignal();
 
 		/**
-		 * @brief Get the status of urban windshield wipers
+		 * @brief Get the status of left signal
 		 */
 		String getStatusLeftSignal();
 
 		/**
-		 * @brief Get the status of urban windshield wipers
+		 * @brief Get the status of windshield wipers
 		 */
 		String getStatusWipers();
 
