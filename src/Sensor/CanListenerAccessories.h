@@ -20,7 +20,7 @@ class CanListenerAccessories : public CanListener {
 		 * @param ids the individual ids of the Can accessories whose status we want (0xFF == unused)
 		 */
 		typedef std::array<uint8_t, 8> StatusIds;
-		CanListenerAccessories(CanInterface& canInterface, uint16_t id, StatusIds ids);
+		CanListenerAccessories(CanInterface* canInterface, uint16_t id, StatusIds ids);
 
 		/**
 		 * @brief Nothing to handle here

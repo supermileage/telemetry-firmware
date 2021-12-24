@@ -15,7 +15,7 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-CanListenerAccessories canListenerAccessories(canInterface, CAN_ACC_STATUS,
+CanListenerAccessories canListenerAccessories(&canInterface, CAN_ACC_STATUS,
     { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
     STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS, STATUS_NULL });
 

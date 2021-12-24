@@ -1,6 +1,6 @@
 #include "CanListenerAccessories.h"
 
-CanListenerAccessories::CanListenerAccessories(CanInterface& canInterface, uint16_t id, StatusIds ids)
+CanListenerAccessories::CanListenerAccessories(CanInterface* canInterface, uint16_t id, StatusIds ids)
 	: CanListener(canInterface, id) {
 	_idArray = ids;
 	_statusMessage.dataLength = 8;
