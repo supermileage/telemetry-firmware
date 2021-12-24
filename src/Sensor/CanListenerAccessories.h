@@ -10,8 +10,17 @@
 
 using namespace can;
 
+/**
+ * @brief Class which stores and updates status for Can accessories
+ * 
+ */
 class CanListenerAccessories : public CanListener {
 	public:
+		/**
+		 * @brief return values for getStatus methods 
+		 */
+		enum Status { Off = 0, On = 1, Unknown = 2 };
+
 		/**
 		 * @brief Construct for CanListenerAccessories
 		 * 
@@ -35,37 +44,37 @@ class CanListenerAccessories : public CanListener {
 		/**
 		 * @brief Get the status of headlights
 		 */
-		String getStatusHeadlights();
+		int getStatusHeadlights();
 
 		/**
 		 * @brief Get the status of brakelights
 		 */
-		String getStatusBrakelights();
+		int getStatusBrakelights();
 
 		/**
 		 * @brief Get the status of headlights
 		 */
-		String getStatusHorn();
+		int getStatusHorn();
 
 		/**
 		 * @brief Get the status of hazard lights
 		 */
-		String getStatusHazards();
+		int getStatusHazards();
 
 		/**
 		 * @brief Get the status of right signal
 		 */
-		String getStatusRightSignal();
+		int getStatusRightSignal();
 
 		/**
 		 * @brief Get the status of left signal
 		 */
-		String getStatusLeftSignal();
+		int getStatusLeftSignal();
 
 		/**
 		 * @brief Get the status of windshield wipers
 		 */
-		String getStatusWipers();
+		int getStatusWipers();
 
 
 	private:
@@ -77,7 +86,7 @@ class CanListenerAccessories : public CanListener {
 		 * 
 		 * @param statusId the id of the accessory you want to grab
 		 */
-		String _getStatus(uint8_t statusId);
+		int _getStatus(uint8_t statusId);
 
 		/**
 		 * @brief adds data to appropriate byte of _statusMessage's data buffer

@@ -3,6 +3,7 @@
 CanListenerAccessories::CanListenerAccessories(CanInterface* canInterface, uint16_t id, StatusIds ids)
 	: CanListener(canInterface, id) {
 	_idArray = ids;
+	_statusMessage = CAN_MESSAGE_NULL;
 	_statusMessage.dataLength = 8;
 }
 
@@ -10,42 +11,42 @@ String CanListenerAccessories::getHumanName() {
 	return "CanListenerAccessories";
 }
 
-String CanListenerAccessories::_getStatus(uint8_t id) {
+int CanListenerAccessories::_getStatus(uint8_t id) {
 	uint8_t i = _getCanMessageDataIndex(id);
 
 	if (i >= 8)
-		return "NotFound";
+		return Unknown;
 	if (_statusMessage.data[i] == 0x0)
-		return "false";
+		return Unknown;
 	
-	return _statusMessage.data[i] - (id << 1) ? "true" : "false";
+	return _statusMessage.data[i] - (id << 1) ? On : Off;
 }
 
-String CanListenerAccessories::getStatusHeadlights() {
+int CanListenerAccessories::getStatusHeadlights() {
 	return _getStatus(STATUS_HEADLIGHTS);
 }
 
-String CanListenerAccessories::getStatusBrakelights() {
+int CanListenerAccessories::getStatusBrakelights() {
 	return _getStatus(STATUS_BRAKELIGHTS);
 }
 
-String CanListenerAccessories::getStatusHorn() {
+int CanListenerAccessories::getStatusHorn() {
 	return _getStatus(STATUS_HORN);
 }
 
-String CanListenerAccessories::getStatusHazards() {
+int CanListenerAccessories::getStatusHazards() {
 	return _getStatus(STATUS_HAZARDS);
 }
 
-String CanListenerAccessories::getStatusRightSignal() {
+int CanListenerAccessories::getStatusRightSignal() {
 	return _getStatus(STATUS_RIGHT_SIGNAL);
 }
 
-String CanListenerAccessories::getStatusLeftSignal() {
+int CanListenerAccessories::getStatusLeftSignal() {
 	return _getStatus(STATUS_LEFT_SIGNAL);
 }
 
-String CanListenerAccessories::getStatusWipers() {
+int CanListenerAccessories::getStatusWipers() {
 	return _getStatus(STATUS_WIPERS);
 }
 
