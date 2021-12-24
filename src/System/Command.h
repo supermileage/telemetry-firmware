@@ -17,7 +17,7 @@ class Command {
         /**
          * Virtual function executes the instruction owned by this command
          **/
-        virtual void* execute(CommandArgs args) = 0;
+        virtual void execute(CommandArgs args) = 0;
 };
 
 #endif

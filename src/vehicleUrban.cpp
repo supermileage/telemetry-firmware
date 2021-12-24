@@ -4,8 +4,8 @@
 
 #include <map>
 #include "CanInterface.h"
-#include "SensorCanBase.h"
-#include "CanAccessoriesListener.h"
+#include "CanListener.h"
+#include "CanListenerAccessories.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -15,7 +15,7 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-CanAccessoriesListener canListener(canInterface, CAN_ACC_STATUS,
+CanListenerAccessories canListenerAccessories(canInterface, CAN_ACC_STATUS,
     { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
     STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS, STATUS_NULL });
 
@@ -23,16 +23,17 @@ CanAccessoriesListener canListener(canInterface, CAN_ACC_STATUS,
 SensorCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
 SensorCommand<SensorGps, String> gpsLong(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
 SensorCommand<SensorThermo, String> thermoTemp1(&thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
-CanAccessoriesListener::LoggingCommand urbanHeadlights(&canListener, "u-hl", STATUS_HEADLIGHTS, 1);
-CanAccessoriesListener::LoggingCommand urbanBrakelights(&canListener, "u-bl", STATUS_BRAKELIGHTS, 1);
-CanAccessoriesListener::LoggingCommand urbanHorn(&canListener, "u-hrn", STATUS_HORN, 1);
-CanAccessoriesListener::LoggingCommand urbanHazards(&canListener, "u-haz", STATUS_HAZARDS, 1);
-CanAccessoriesListener::LoggingCommand urbanRightSig(&canListener, "u-rsig", STATUS_RIGHT_SIGNAL, 1);
-CanAccessoriesListener::LoggingCommand urbanLeftSig(&canListener, "u-lsig", STATUS_LEFT_SIGNAL, 1);
-CanAccessoriesListener::LoggingCommand urbanWipers(&canListener, "u-wpr", STATUS_WIPERS, 1);
+SensorCommand<CanListenerAccessories, String> urbanHeadlights(&canListenerAccessories, "u-hl", &CanListenerAccessories::getStatusHeadlights, 1);
+SensorCommand<CanListenerAccessories, String> urbanBrakelights(&canListenerAccessories, "u-bl", &CanListenerAccessories::getStatusBrakelights, 1);
+SensorCommand<CanListenerAccessories, String> urbanHorn(&canListenerAccessories, "u-hrn", &CanListenerAccessories::getStatusHorn, 1);
+SensorCommand<CanListenerAccessories, String> urbanHazards(&canListenerAccessories, "u-haz", &CanListenerAccessories::getStatusHazards, 1);
+SensorCommand<CanListenerAccessories, String> urbanRightSig(&canListenerAccessories, "u-rsig", &CanListenerAccessories::getStatusRightSignal, 1);
+SensorCommand<CanListenerAccessories, String> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
+SensorCommand<CanListenerAccessories, String> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
 
 // Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, NULL};
+IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig,
+    &urbanLeftSig, &urbanWipers, NULL};
 
 String publishName = "BQIngestion";
 
@@ -60,14 +61,6 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
     DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
-    // CAN
-    for(auto const& pair : canInterface.getMessages()){
-        DEBUG_SERIAL_F("CAN ID: 0x%03x - CAN Data:", pair.second.id);
-        for(uint8_t i = 0; i < pair.second.dataLength; i++) {
-            DEBUG_SERIAL_F(" 0x%02x", pair.second.data[i]);
-        }
-        DEBUG_SERIAL_LN("");
-    }
     DEBUG_SERIAL_LN("");
 }
 

@@ -32,9 +32,8 @@ class SensorCommand : public IntervalCommand {
          * Logs data from this command's getter method
          * 
          **/
-        void* execute(CommandArgs args) {
+        void execute(CommandArgs args) {
             ((DataQueue*)args)->add(_propertyName, (*_sensor.*_getter)());
-            return nullptr;
         }
 
     private:
