@@ -22,7 +22,7 @@ void Dispatcher::begin() {}
 void Dispatcher::setEnableLogging(bool value) {
     _loggingEnabled = value;
 
-    if (!value) {
+    if (value == FALSE) {
         // flush
     }
 }
