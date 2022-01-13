@@ -36,8 +36,8 @@ class CanListener : public Sensor {
         virtual void update(CanMessage message) = 0;
 
         /**
-		 * CanListener-internal class which acts as a delegate to CanInterface; allows us to specify parsing
-         * behavior in CanInterface without it needing to know about implementation of its listeners
+		 * CanListener-internal class which acts as a delegate to CanInterface; allows
+         * CanListener-derived classes to parse CanMessages received in CanInterface
 		 */
 		class CanListenerDelegate : public Command {
 			public:
@@ -47,9 +47,9 @@ class CanListener : public Sensor {
 
 				/**
 				 * Delegate function which will be called in CanInterface:
-				 * parses can data for CanListener
+				 * takes CanMessage* as argument and passes it to update
 				 * 
-				 * @param args can message with this CanListenerAccessories's id
+				 * @param args cast CanMessage with this CanListenerAccessories's id
 				 */
 				void execute(CommandArgs args);
 			private:
