@@ -67,7 +67,7 @@ void Dispatcher::_runLogging() {
                 }
                 uint16_t dataSizeBeforePublish = _dataQ->getDataSize();
 
-                _loggers[i]->executeCommands();
+                _loggers[i]->executeCommands((CommandArgs)_dataQ);
                 _loggers[i]->executeThisLoop(false);
 
                 uint16_t dataSizeAfterPublish = _dataQ->getDataSize();

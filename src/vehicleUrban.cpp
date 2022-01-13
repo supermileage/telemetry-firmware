@@ -4,7 +4,8 @@
 
 #include <map>
 #include "CanInterface.h"
-#include "SensorCanExample.h"
+#include "CanListener.h"
+#include "CanListenerAccessories.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -14,15 +15,25 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-SensorCanExample canExample(canInterface);
+CanListenerAccessories canListenerAccessories(&canInterface, CAN_ACC_STATUS,
+    { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
+    STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS });
 
-// command definitions
-SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
-SensorCommand<SensorGps, String> gpsLong(&dataQ, &gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
-SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+// Command definitions
+SensorCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
+SensorCommand<SensorGps, String> gpsLong(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
+SensorCommand<SensorThermo, String> thermoTemp1(&thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+SensorCommand<CanListenerAccessories, int> urbanHeadlights(&canListenerAccessories, "u-hl", &CanListenerAccessories::getStatusHeadlights, 1);
+SensorCommand<CanListenerAccessories, int> urbanBrakelights(&canListenerAccessories, "u-bl", &CanListenerAccessories::getStatusBrakelights, 1);
+SensorCommand<CanListenerAccessories, int> urbanHorn(&canListenerAccessories, "u-hrn", &CanListenerAccessories::getStatusHorn, 1);
+SensorCommand<CanListenerAccessories, int> urbanHazards(&canListenerAccessories, "u-haz", &CanListenerAccessories::getStatusHazards, 1);
+SensorCommand<CanListenerAccessories, int> urbanRightSig(&canListenerAccessories, "u-rsig", &CanListenerAccessories::getStatusRightSignal, 1);
+SensorCommand<CanListenerAccessories, int> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
+SensorCommand<CanListenerAccessories, int> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
 
 // Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
+IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig,
+    &urbanLeftSig, &urbanWipers, NULL};
 
 String publishName = "BQIngestion";
 
@@ -48,18 +59,17 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Altitude: " + gps.getAltitude() + " m - ");
     DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
-    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
+    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");
     DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
-    // CAN
-    DEBUG_SERIAL_LN("CAN Example: " + canExample.getData() + "\n");
+    // CAN: 0 = Off, 1 = On, 2 = Unknown
+    DEBUG_SERIAL("Headlights: " + String(canListenerAccessories.getStatusHeadlights()) + " - ");
+    DEBUG_SERIAL("Brakelights: " + String(canListenerAccessories.getStatusBrakelights()) + " - ");
+    DEBUG_SERIAL("Horn: " + String(canListenerAccessories.getStatusHorn()) + " - ");
+    DEBUG_SERIAL("Hazards: " + String(canListenerAccessories.getStatusHazards()) + " - ");
+    DEBUG_SERIAL("Right Signal: " + String(canListenerAccessories.getStatusRightSignal()) + " - ");
+    DEBUG_SERIAL("Left Signal: " + String(canListenerAccessories.getStatusLeftSignal()) + " - ");
+    DEBUG_SERIAL_LN("Wipers: " + String(canListenerAccessories.getStatusWipers()));
 
-    for(auto const& pair : canInterface.getMessages()){
-        DEBUG_SERIAL_F("CAN ID: 0x%03x - CAN Data:", pair.second.id);
-        for(uint8_t i = 0; i < pair.second.dataLength; i++){
-            DEBUG_SERIAL_F(" 0x%02x", pair.second.data[i]);
-        }
-        DEBUG_SERIAL_LN("");
-    }
     DEBUG_SERIAL_LN("");
 }
 

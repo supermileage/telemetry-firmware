@@ -3,23 +3,16 @@
 
 #include <map>
 
+#include "can.h"
 #include "Sensor.h"
 #include "mcp2515_can.h"
 #include "can_common.h"
+#include "Command.h"
+
+using namespace can;
 
 class CanInterface : public Handleable {
     public:
-
-        // This struct contains all the components of a CAN message. dataLength must be <= 8, 
-        // and the first [dataLength] positions of data[] must contain valid data
-        struct CanMessage {
-            uint16_t id;
-            uint8_t dataLength;
-            uint8_t data[8];
-        };
-
-        const CanMessage _nullMessage = {0x0, 0, {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};
-
         /**
          * Constructor 
          * @param *spi bus to use for this CAN module
@@ -27,6 +20,9 @@ class CanInterface : public Handleable {
          * @param intPin interrupt pin to use for this CAN module
          **/
         CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin);
+
+        // look into virtual desctructors in c++
+        ~CanInterface();
 
         /**
          * Begin the CAN sensor by setting baud rate and chip freq
@@ -40,24 +36,15 @@ class CanInterface : public Handleable {
         void handle();
 
         /**
-         * @return reference to dictionary of CAN IDs and their latest data
-         **/
-        std::map<uint16_t, CanMessage>& getMessages();
-
-        /**
-         * @param id of the desired CAN message
+         * @brief Adds message id for can interface to listen to
          * 
-         * @return the CAN message corresponding to the ID, message of length 0 if ID not found
-         **/
-        CanMessage getMessage(uint16_t id);
-
-        /**
          * @param id to listen for on CAN bus
+         * @param delegate delegate command which allows can listeners to specify additional parsing behavior
          **/
-        void addMessageListen(uint16_t id);
+        void addMessageListen(uint16_t id, Command* canListenerDelegate);
 
     private:
-        std::map<uint16_t, CanMessage> _messages;
+        std::map<uint16_t, Command*> _delegates;
         uint8_t _intPin;
         mcp2515_can* _CAN;
 
