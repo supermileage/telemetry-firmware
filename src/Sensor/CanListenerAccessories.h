@@ -1,6 +1,7 @@
 #ifndef CAN_ACCESSORIES_LISTENER
 #define CAN_ACCESSORIES_LISTENER
 
+#include <map>
 #include <array>
 
 #include "can.h"
@@ -22,11 +23,12 @@ class CanListenerAccessories : public CanListener {
 		enum Status { Off = 0, On = 1, Unknown = 2 };
 
 		/**
-		 * @brief Construct for CanListenerAccessories
+		 * @brief Constructor for CanListenerAccessories
 		 * 
 		 * @param canInterface the can interface which will be reading data from Can buffer
 		 * @param id the id of the Can message we will be reading from
 		 * @param ids the individual ids of the Can accessories whose status we want (0xFF == unused)
+		 * @note size of ids array can be increased if we need to listen to more Can status messages
 		 */
 		typedef std::array<uint8_t, 8> StatusIds;
 		CanListenerAccessories(CanInterface* canInterface, uint16_t id, StatusIds ids);
@@ -76,31 +78,16 @@ class CanListenerAccessories : public CanListener {
 		 */
 		int getStatusWipers();
 
-
-	private:
-		StatusIds _idArray;
-		CanMessage _statusMessage;
-
+	protected:
 		/**
-		 * @brief Get the status of 
-		 * 
-		 * @param statusId the id of the accessory you want to grab
-		 */
-		int _getStatus(uint8_t statusId);
-
-		/**
-		 * @brief adds data to appropriate byte of _statusMessage's data buffer
+		 * @brief adds data to appropriate byte of _data's data buffer
 		 * 
 		 * @param data data byte to be added to internal can message
 		 */
-		void _updateMessage(CanMessage message);
+		void update(CanMessage message);
 
-		/**
-		 * @brief returns array index of statusId
-		 * 
-		 * @param statusId the status id whose index we want
-		 */
-		uint8_t _getCanMessageDataIndex(uint8_t statusId);
+	private:
+		std::map<uint8_t, uint8_t> _statuses;
 };
 
 #endif

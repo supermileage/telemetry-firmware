@@ -6,5 +6,5 @@ void CanListener::begin() {
 
 void CanListener::CanListenerDelegate::execute(CommandArgs args) {
 	CanMessage message = *((CanMessage*)args);
-	_owner->_updateMessage(message);
+	_owner->update(message);
 }

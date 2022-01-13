@@ -39,7 +39,7 @@ class CanInterface : public Handleable {
          * @brief Adds message id for can interface to listen to
          * 
          * @param id to listen for on CAN bus
-         * @param delegate optional delegate which allows can listeners to specify additional parsing behavior
+         * @param delegate delegate command which allows can listeners to specify additional parsing behavior
          **/
         void addMessageListen(uint16_t id, Command* canListenerDelegate);
 
