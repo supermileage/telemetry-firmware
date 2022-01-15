@@ -39,12 +39,22 @@ void SensorEcu::handle()
     uint8_t dataLengthField = buffer[3] & 0xFF;
     uint8_t serviceId = buffer[4] & 0xFF;
 
+    uint8_t checkSum = 0;
+    for(int i = 0; i < 26; i++) {
+        checkSum += buffer[i];
+    }
+
+    if(checkSum != buffer[26]) {
+        Serial.println("Error: Checksum not valid");
+    }
+
     if (
         header1 == 0x80 &&
         header2 == 0x8F &&
         header3 == 0xEA &&
         dataLengthField == 0x16 &&
-        serviceId == 0x50){
+        serviceId == 0x50 &&
+        checkSum == buffer[26]){
         // Data is valid
         _rpm = this->_interpretValue(buffer[6], buffer[7], 0.25, 0.0);
         _map = this->_interpretValue(buffer[8], buffer[9], 0.0039, 0.0);
