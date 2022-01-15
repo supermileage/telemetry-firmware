@@ -42,6 +42,12 @@ class CanInterface : public Handleable {
          * @param delegate delegate command which allows can listeners to specify additional parsing behavior
          **/
         void addMessageListen(uint16_t id, Command* canListenerDelegate);
+        /**
+         * @brief Wrapper for sending CAN messages
+         * 
+         * @param message has the id, data length and data of the message that needs to be sent
+         **/
+        void sendMessage(CanMessage message);
 
     private:
         std::map<uint16_t, Command*> _delegates;
