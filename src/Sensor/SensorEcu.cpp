@@ -39,9 +39,13 @@ void SensorEcu::handle()
     uint8_t dataLengthField = buffer[3] & 0xFF;
     uint8_t serviceId = buffer[4] & 0xFF;
 
-    int checkSum = 0;
+    uint8_t checkSum = 0;
     for(int i = 0; i < 26; i++) {
         checkSum += buffer[i];
+    }
+
+    if(checkSum != buffer[26]) {
+        Serial.println("Error: Checksum not valid");
     }
 
     if (
