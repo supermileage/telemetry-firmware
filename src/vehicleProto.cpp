@@ -13,14 +13,14 @@ SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 // command definitions
-SensorCommand<SensorEcu, String> ecuEct(&ecu, "PROTO-ECT", &SensorEcu::getECT, 5);
-SensorCommand<SensorEcu, String> ecuIat(&ecu, "PROTO-IAT", &SensorEcu::getIAT, 5);
-SensorCommand<SensorEcu, String> ecuRpm(&ecu, "PROTO-RPM", &SensorEcu::getRPM, 5);
-SensorCommand<SensorEcu, String> ecuUbAdc(&ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 5);
+SensorCommand<SensorEcu, String> ecuEct(&ecu, "PROTO-ECT", &SensorEcu::getECT, 1);
+SensorCommand<SensorEcu, String> ecuIat(&ecu, "PROTO-IAT", &SensorEcu::getIAT, 2);
+SensorCommand<SensorEcu, String> ecuRpm(&ecu, "PROTO-RPM", &SensorEcu::getRPM, 3);
+SensorCommand<SensorEcu, String> ecuUbAdc(&ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 4);
 SensorCommand<SensorEcu, String> ecu02S(&ecu, "PROTO-O2S", &SensorEcu::getO2S, 5);
-SensorCommand<SensorEcu, String> ecuSpark(&ecu, "PROTO-SPARK", &SensorEcu::getSpark, 5);
-SensorCommand<SensorGps, String> gpsLat(&gps, "PROTO-Latitude", &SensorGps::getLatitude, 1);
-SensorCommand<SensorGps, String> gpsHvel(&gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
+SensorCommand<SensorEcu, String> ecuSpark(&ecu, "PROTO-SPARK", &SensorEcu::getSpark, 6);
+SensorCommand<SensorGps, String> gpsLat(&gps, "PROTO-Latitude", &SensorGps::getLatitude, 7);
+SensorCommand<SensorGps, String> gpsHvel(&gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 8);
 
 // Array Definitions - MUST BE NULL TERMINATED
 IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
