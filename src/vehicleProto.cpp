@@ -13,23 +13,33 @@ SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 // command definitions
-LoggingCommand<SensorEcu, String> ecuEct(&dataQ, &ecu, "PROTO-ECT", &SensorEcu::getECT, 1);
-LoggingCommand<SensorEcu, String> ecuIat(&dataQ, &ecu, "PROTO-IAT", &SensorEcu::getIAT, 2);
-LoggingCommand<SensorEcu, String> ecuRpm(&dataQ, &ecu, "PROTO-RPM", &SensorEcu::getRPM, 3);
-LoggingCommand<SensorEcu, String> ecuUbAdc(&dataQ, &ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 4);
-LoggingCommand<SensorEcu, String> ecu02S(&dataQ, &ecu, "PROTO-O2S", &SensorEcu::getO2S, 5);
-LoggingCommand<SensorEcu, String> ecuSpark(&dataQ, &ecu, "PROTO-SPARK", &SensorEcu::getSpark, 6);
-LoggingCommand<SensorGps, String> gpsLat(&dataQ, &gps, "PROTO-Latitude", &SensorGps::getLatitude, 7);
-LoggingCommand<SensorGps, String> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 8);
+<<<<<<< HEAD
+SensorCommand<SensorEcu, String> ecuEct(&dataQ, &ecu, "PROTO-ECT", &SensorEcu::getECT, 1);
+SensorCommand<SensorEcu, String> ecuIat(&dataQ, &ecu, "PROTO-IAT", &SensorEcu::getIAT, 2);
+SensorCommand<SensorEcu, String> ecuRpm(&dataQ, &ecu, "PROTO-RPM", &SensorEcu::getRPM, 3);
+SensorCommand<SensorEcu, String> ecuUbAdc(&dataQ, &ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 4);
+SensorCommand<SensorEcu, String> ecu02S(&dataQ, &ecu, "PROTO-O2S", &SensorEcu::getO2S, 5);
+SensorCommand<SensorEcu, String> ecuSpark(&dataQ, &ecu, "PROTO-SPARK", &SensorEcu::getSpark, 6);
+SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "PROTO-Latitude", &SensorGps::getLatitude, 7);
+SensorCommand<SensorGps, String> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 8);
+=======
+SensorCommand<SensorEcu, String> ecuEct(&ecu, "PROTO-ECT", &SensorEcu::getECT, 5);
+SensorCommand<SensorEcu, String> ecuIat(&ecu, "PROTO-IAT", &SensorEcu::getIAT, 5);
+SensorCommand<SensorEcu, String> ecuRpm(&ecu, "PROTO-RPM", &SensorEcu::getRPM, 5);
+SensorCommand<SensorEcu, String> ecuUbAdc(&ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 5);
+SensorCommand<SensorEcu, String> ecu02S(&ecu, "PROTO-O2S", &SensorEcu::getO2S, 5);
+SensorCommand<SensorEcu, String> ecuSpark(&ecu, "PROTO-SPARK", &SensorEcu::getSpark, 5);
+SensorCommand<SensorGps, String> gpsLat(&gps, "PROTO-Latitude", &SensorGps::getLatitude, 1);
+SensorCommand<SensorGps, String> gpsHvel(&gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
+>>>>>>> develop
 
 // Array Definitions - MUST BE NULL TERMINATED
-Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
 IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
 
 String publishName = "BQIngestion";
 
 // CurrrentVehicle namespace definitions
-LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+Dispatcher* CurrentVehicle::buildDispatcher() {
     DispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }

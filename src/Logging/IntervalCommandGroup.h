@@ -28,7 +28,7 @@ class IntervalCommandGroup {
         /**
         *  Calls execute on all commands owned by this group
         **/
-        void executeCommands();
+        void executeCommands(CommandArgs args);
 
         /**
         *  Retuns the interval length (in seconds)

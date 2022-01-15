@@ -1,9 +1,9 @@
-#include "LoggingDispatcher.h"
+#include "Dispatcher.h"
 
 #define WRAPPER_START 25
 #define WRAPPER_END 4
 
-LoggingDispatcher::LoggingDispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName) {
+Dispatcher::Dispatcher(IntervalCommandGroup **loggers, uint16_t numLoggers, DataQueue *dataQ, String publishName) {
     _loggers = loggers;
     _numLoggers = numLoggers;
     _maxPublishSizes = new uint16_t[numLoggers]();
@@ -12,7 +12,7 @@ LoggingDispatcher::LoggingDispatcher(IntervalCommandGroup **loggers, uint16_t nu
     _publishName = publishName;
 }
 
-LoggingDispatcher::~LoggingDispatcher() {
+Dispatcher::~Dispatcher() {
     for (uint16_t i = 0; i < _numLoggers; i++) {
         delete _loggers[i];
     }
@@ -20,7 +20,25 @@ LoggingDispatcher::~LoggingDispatcher() {
     delete[] _maxPublishSizes;
 }
 
-void LoggingDispatcher::loop() {
+void Dispatcher::begin() {}
+
+void Dispatcher::setEnableLogging(bool value) {
+    bool newState = _loggingEnabled != value;
+    _loggingEnabled = value;
+
+    if (value == FALSE && newState) {
+        // flush data in data queue
+        _publish();
+    }
+}
+
+void Dispatcher::handle() {
+    if(_loggingEnabled) {
+        _runLogging();
+    }
+}
+
+void Dispatcher::_runLogging() {
     unsigned long time = millis() / 1000;
     // check if it's time to log any data from any of the loggers
     for (uint16_t i = 0; i < _numLoggers; i++) {
@@ -42,8 +60,7 @@ void LoggingDispatcher::loop() {
                     _dataQ->wrapEnd();
                     dataWrapperIsOpen = false;
                 }
-
-                _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
+                _publish();
             }
 
             if (_loggers[i]->executeThisLoop()) {
@@ -53,11 +70,11 @@ void LoggingDispatcher::loop() {
                 }
                 uint16_t dataSizeBeforePublish = _dataQ->getDataSize();
 
-                _loggers[i]->executeCommands();
+                _loggers[i]->executeCommands((CommandArgs)_dataQ);
                 _loggers[i]->executeThisLoop(false);
 
                 uint16_t dataSizeAfterPublish = _dataQ->getDataSize();
-                CheckAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
+                _checkAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
             }
         }
         if (dataWrapperIsOpen)
@@ -67,7 +84,15 @@ void LoggingDispatcher::loop() {
     }
 }
 
-void LoggingDispatcher::CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
+<<<<<<< HEAD:src/Logging/Dispatcher.cpp
+void Dispatcher::CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
+=======
+void Dispatcher::_publish() {
+    _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
+}
+
+void Dispatcher::_checkAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
+>>>>>>> develop:src/Logging/Dispatcher.cpp
     if (currentPublishSize > _maxPublishSizes[i])
         _maxPublishSizes[i] = currentPublishSize;
 }

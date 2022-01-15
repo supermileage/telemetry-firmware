@@ -2,29 +2,50 @@
 
 #ifdef URBAN
 
-#include "SensorCan.h"
+#include <map>
+#include "CanInterface.h"
+#include "CanListener.h"
+#include "CanListenerAccessories.h"
 
-// sensor definitions
+CanInterface canInterface(&SPI1, D5, D6);
+
+// Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
-SensorCan can(&SPI1, D5, D6);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
+CanListenerAccessories canListenerAccessories(&canInterface, CAN_ACC_STATUS,
+    { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
+    STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS });
 
+<<<<<<< HEAD
 // command definitions
-LoggingCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
-LoggingCommand<SensorGps, String> gpsLong(&dataQ, &gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
-LoggingCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+SensorCommand<SensorGps, String> gpsLat(&dataQ, &gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
+SensorCommand<SensorGps, String> gpsLong(&dataQ, &gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
+SensorCommand<SensorThermo, String> thermoTemp1(&dataQ, &thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+=======
+// Command definitions
+SensorCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
+SensorCommand<SensorGps, String> gpsLong(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
+SensorCommand<SensorThermo, String> thermoTemp1(&thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+SensorCommand<CanListenerAccessories, int> urbanHeadlights(&canListenerAccessories, "u-hl", &CanListenerAccessories::getStatusHeadlights, 1);
+SensorCommand<CanListenerAccessories, int> urbanBrakelights(&canListenerAccessories, "u-bl", &CanListenerAccessories::getStatusBrakelights, 1);
+SensorCommand<CanListenerAccessories, int> urbanHorn(&canListenerAccessories, "u-hrn", &CanListenerAccessories::getStatusHorn, 1);
+SensorCommand<CanListenerAccessories, int> urbanHazards(&canListenerAccessories, "u-haz", &CanListenerAccessories::getStatusHazards, 1);
+SensorCommand<CanListenerAccessories, int> urbanRightSig(&canListenerAccessories, "u-rsig", &CanListenerAccessories::getStatusRightSignal, 1);
+SensorCommand<CanListenerAccessories, int> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
+SensorCommand<CanListenerAccessories, int> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
+>>>>>>> develop
 
 // Array Definitions - MUST BE NULL TERMINATED
-Sensor *sensors[] = {&gps, &can, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};
-IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, NULL};
+IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig,
+    &urbanLeftSig, &urbanWipers, NULL};
 
 String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
-LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+Dispatcher* CurrentVehicle::buildDispatcher() {
     DispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }
@@ -45,19 +66,18 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Altitude: " + gps.getAltitude() + " m - ");
     DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
-    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
+    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");
     DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
-    // CAN
-    for(int i = 0; i < can.getNumIds(); i++){
-        String output = "CAN ID: 0x" + String(can.getId(i), HEX) + " - CAN Data:";
-        uint8_t canDataLength = can.getDataLen(i);
-        unsigned char* canData = can.getData(i);
-        for(int k = 0; k < canDataLength; k++){
-            output += " 0x";
-            output += String(canData[k], HEX);
-        }
-        DEBUG_SERIAL_LN(output);
-    }
+    // CAN: 0 = Off, 1 = On, 2 = Unknown
+    DEBUG_SERIAL("Headlights: " + String(canListenerAccessories.getStatusHeadlights()) + " - ");
+    DEBUG_SERIAL("Brakelights: " + String(canListenerAccessories.getStatusBrakelights()) + " - ");
+    DEBUG_SERIAL("Horn: " + String(canListenerAccessories.getStatusHorn()) + " - ");
+    DEBUG_SERIAL("Hazards: " + String(canListenerAccessories.getStatusHazards()) + " - ");
+    DEBUG_SERIAL("Right Signal: " + String(canListenerAccessories.getStatusRightSignal()) + " - ");
+    DEBUG_SERIAL("Left Signal: " + String(canListenerAccessories.getStatusLeftSignal()) + " - ");
+    DEBUG_SERIAL_LN("Wipers: " + String(canListenerAccessories.getStatusWipers()));
+
+    DEBUG_SERIAL_LN("");
 }
 
 bool CurrentVehicle::getTimeValid() {

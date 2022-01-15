@@ -5,6 +5,7 @@
 #define JSON_WRITER_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8
 
+#include "Handleable.h"
 #include "settings.h"
 #include "PublishQueuePosixRK.h"
 
@@ -17,7 +18,7 @@
  * main code, or this object may fail in unpredictable ways.
  **/
 
-class DataQueue {
+class DataQueue : public Handleable {
 
     public:
         /**
@@ -30,6 +31,20 @@ class DataQueue {
          * */
         DataQueue(String publishHeader, void (*publishMessage)(String, PublishStatus));
 
+        ~DataQueue();
+
+        /**
+         * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by
+         * allocating memory on the heap. This method invokes the setup method
+         * for the queue object.
+         * */
+        void begin();
+
+        /**
+         * Wrapper for loop function of PublishQueuePosix
+         * */
+        void handle();
+
         /**
          * Adds an integer value and its ID into the data queue.
          * An ID may not be added twice before publishing the data queue.
@@ -41,11 +56,6 @@ class DataQueue {
          * */
         template <typename T>
         void add(String id, T value) { _writer->name(id).value(value); };
-
-        /**
-         * Wrapper for loop function of PublishQueuePosix
-         * */
-        void loop();
 
         /**
          * Publishes the data stored in the queue to the particle device cloud.
@@ -142,12 +152,7 @@ class DataQueue {
          */
         String _recoverDataFromBuffer();
 
-        /**
-         * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by
-         * allocating memory on the heap. This method invokes the setup method
-         * for the queue object.
-         * */
-        void _init();
+
 };
 
 #endif

@@ -2,8 +2,9 @@
 #define _LED_H_
 
 #include "Particle.h"
+#include "Handleable.h"
 
-class Led {
+class Led : public Handleable {
     public:
         /**
          * Constructor
@@ -13,6 +14,9 @@ class Led {
          * 
          * */
         Led(uint16_t pin, uint8_t brightness);
+        ~Led();
+
+        void begin();
 
         /**
          * Handles flashing and pulsing, should be run as often as possible

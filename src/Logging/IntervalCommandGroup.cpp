@@ -18,9 +18,13 @@ IntervalCommandGroup::~IntervalCommandGroup() {
     delete[] _commands;
 }
 
-void IntervalCommandGroup::executeCommands() {
+void IntervalCommandGroup::executeCommands(CommandArgs args) {
     for (uint8_t i = 0; i < _numCommands; i++) {
+<<<<<<< HEAD
         _commands[i]->execute(nullptr);
+=======
+        _commands[i]->execute(args);
+>>>>>>> develop
     }
 }
 

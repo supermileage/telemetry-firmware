@@ -2,8 +2,9 @@
 #define _BUTTON_H_
 
 #include "Particle.h"
+#include "Handleable.h"
 
-class Button {
+class Button : public Handleable {
     public:
         /**
          * Constructor
@@ -16,13 +17,19 @@ class Button {
          * 
          * */
         Button(uint16_t pin, bool activeHigh, bool normallyOpen, void (*callbackPushed)(), void (*callbackReleased)());
+        ~Button();
+
+        void begin();
 
         /**
          * Handles reading the button, should be run as often as possible
-         * 
-         * @return Current Button State
          * */
-        bool handle();
+        void handle();
+
+        /**
+         * Return button status
+         * */
+        bool get();
 
 
     private:        

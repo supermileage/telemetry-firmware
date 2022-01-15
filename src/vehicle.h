@@ -4,7 +4,7 @@
 #include "settings.h"
 
 #include "DataQueue.h"
-#include "LoggingCommand.h"
+#include "SensorCommand.h"
 #include "DispatcherBuilder.h"
 
 #include "Sensor.h"
@@ -15,13 +15,11 @@
 
 extern DataQueue dataQ;
 
-extern Sensor *sensors[];
-
 namespace CurrentVehicle {
     /**
      *  Returns dispatcher with current vehicle's set of commands
     **/
-    LoggingDispatcher* buildLoggingDispatcher();
+    Dispatcher* buildDispatcher();
 
     /**
      *  Output latest sensor data for debugging

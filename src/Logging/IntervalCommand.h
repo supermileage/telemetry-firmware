@@ -22,7 +22,11 @@ class IntervalCommand : public Command {
         /**
          * Virtual function executes the instruction owned by this command
          **/
+<<<<<<< HEAD
         virtual void* execute(void* arg) = 0;
+=======
+        virtual void execute(CommandArgs args) = 0;
+>>>>>>> develop
 
         /**
          *  Returns interval assigned to this command (_interval is only assigned in constructor of subclasses)
