@@ -100,26 +100,33 @@ String DataQueue::_recoverDataFromBuffer() {
 	unsigned nextObjectRemovalIndex = 0;
 	unsigned dataSize = getDataSize();
 
-	while (dataSize > unsigned(JSON_WRITER_BUFFER_SIZE)) {
-		DEBUG_SERIAL_LN("JSON string to be reparsed : '" + String(_buf) + "'");
-
+	while (dataSize > (unsigned)JSON_WRITER_BUFFER_SIZE) {
 		DeserializationError error = deserializeJson(doc, (const char*)_buf);
 
 		if (error) {
 			DEBUG_SERIAL_LN("Failed to Deserialize Json in buffer.  Unable to recover Json data");
 			return String(_buf);
 		}
+		
+		DEBUG_SERIAL_LN("Data before removal: " + String(_buf));
 
-		JsonArray dataArray = doc["l"].to<JsonArray>();
+		JsonArray dataArray = doc["l"].as<JsonArray>();
 		unsigned arrayCount = dataArray.size();
-		DEBUG_SERIAL_LN("Array Length " + String(arrayCount));
 		unsigned arrayRemovalIndex = arrayCount != 0 ? nextArrayRemovalIndex++ % arrayCount : 0;
-		if (arrayCount == 0) break;
+
+		DEBUG_SERIAL_LN("Array Length " + String(arrayCount));
+
+		if (arrayCount == 0)
+			break;
+		
 		DEBUG_SERIAL_LN("Getting object at index " + String(arrayRemovalIndex));
-		DEBUG_SERIAL_LN("Object data size: " + String(dataArray[arrayRemovalIndex]["d"].size())); // dataArray[arrayRemovalIndex]["d"].as<String>()
+		DEBUG_SERIAL_LN("Object data size: " + String(dataArray[arrayRemovalIndex]["d"].size()));
+
 		JsonObject object = dataArray[arrayRemovalIndex]["d"].as<JsonObject>();
 		unsigned objectCount = object.size();
 
+		// if there is only one key value pair in data object, then we remove the whole object
+		// otherwise, we remove the key value pair at objectRemovalIndex
 		if (objectCount <= 1) {
 			DEBUG_SERIAL_LN("object count <= 1, removing " + dataArray[arrayRemovalIndex].to<JsonVariant>().as<String>());
 			dataArray.remove(arrayRemovalIndex);
@@ -127,7 +134,7 @@ String DataQueue::_recoverDataFromBuffer() {
 			unsigned objectRemovalIndex = nextObjectRemovalIndex++ % object.size();
 			JsonObject::iterator it = object.begin();
 			it += objectRemovalIndex;
-			DEBUG_SERIAL_LN("object count < 1, removing data under key " + String(it->key().c_str()));
+			DEBUG_SERIAL_LN("object count > 1, removing data under key " + String(it->key().c_str()));
 			object.remove(it->key());
 		}
 

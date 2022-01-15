@@ -28,7 +28,7 @@ void LoggingDispatcher::loop() {
             _loggers[i]->setLastExecution(time);
             _logThisLoop = true;
             _loggers[i]->executeThisLoop(true);
-        }   
+        }
     }
 
     // check max publish sizes, publish if DataQueue buffer is close to full, update max publish sizes for each logger

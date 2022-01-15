@@ -13,14 +13,14 @@ SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 // command definitions
-LoggingCommand<SensorEcu, String> ecuEct(&dataQ, &ecu, "PROTO-ECT", &SensorEcu::getECT, 5);
-LoggingCommand<SensorEcu, String> ecuIat(&dataQ, &ecu, "PROTO-IAT", &SensorEcu::getIAT, 5);
-LoggingCommand<SensorEcu, String> ecuRpm(&dataQ, &ecu, "PROTO-RPM", &SensorEcu::getRPM, 5);
-LoggingCommand<SensorEcu, String> ecuUbAdc(&dataQ, &ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 5);
+LoggingCommand<SensorEcu, String> ecuEct(&dataQ, &ecu, "PROTO-ECT", &SensorEcu::getECT, 1);
+LoggingCommand<SensorEcu, String> ecuIat(&dataQ, &ecu, "PROTO-IAT", &SensorEcu::getIAT, 2);
+LoggingCommand<SensorEcu, String> ecuRpm(&dataQ, &ecu, "PROTO-RPM", &SensorEcu::getRPM, 3);
+LoggingCommand<SensorEcu, String> ecuUbAdc(&dataQ, &ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 4);
 LoggingCommand<SensorEcu, String> ecu02S(&dataQ, &ecu, "PROTO-O2S", &SensorEcu::getO2S, 5);
-LoggingCommand<SensorEcu, String> ecuSpark(&dataQ, &ecu, "PROTO-SPARK", &SensorEcu::getSpark, 5);
-LoggingCommand<SensorGps, String> gpsLat(&dataQ, &gps, "PROTO-Latitude", &SensorGps::getLatitude, 1);
-LoggingCommand<SensorGps, String> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
+LoggingCommand<SensorEcu, String> ecuSpark(&dataQ, &ecu, "PROTO-SPARK", &SensorEcu::getSpark, 6);
+LoggingCommand<SensorGps, String> gpsLat(&dataQ, &gps, "PROTO-Latitude", &SensorGps::getLatitude, 7);
+LoggingCommand<SensorGps, String> gpsHvel(&dataQ, &gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 8);
 
 // Array Definitions - MUST BE NULL TERMINATED
 Sensor *sensors[] = {&ecu, &gps, &thermo1, &thermo2, &sigStrength, &inVoltage, NULL};

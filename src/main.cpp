@@ -162,7 +162,7 @@ void loop() {
     }
 
     dataQ.loop();
-    if (loggingEnabled && Time.isValid()){
+    if (loggingEnabled && Time.isValid()) {
         dispatcher->loop();
     }
 
