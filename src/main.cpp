@@ -20,14 +20,8 @@ Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
 Button button(A2, true, false, buttonPushed, NULL);
 DataQueue dataQ(VEHICLE_NAME, publish);
-<<<<<<< HEAD
-Dispatcher *dispatcher;
-TimeLib timeLib;
-unsigned long lastPublish = 0;
-=======
 TimeLib timeLib(timeValidCallback);
 Dispatcher *dispatcher;
->>>>>>> develop
 
 bool loggingEnabled = LOGGING_EN_AT_BOOT;
 bool error = false;
@@ -193,15 +187,7 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-<<<<<<< HEAD
-    for (unsigned i = 0; sensors[i]; i++) {
-        sensors[i]->begin();
-    }
-
     dispatcher = CurrentVehicle::buildDispatcher();
-=======
-    dispatcher = CurrentVehicle::buildDispatcher();
->>>>>>> develop
 
     // Begin all handleables
     Handler::instance().begin();
@@ -215,17 +201,8 @@ void setup() {
  * */
 void loop() {
 
-<<<<<<< HEAD
-    dataQ.loop();
-    if (loggingEnabled && Time.isValid()) {
-        dispatcher->loop();
-    }
-
-    timeLib.handle();
-=======
     // Run all handleables
     Handler::instance().handle();
->>>>>>> develop
 
     handleUI();
 

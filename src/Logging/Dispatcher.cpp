@@ -84,15 +84,11 @@ void Dispatcher::_runLogging() {
     }
 }
 
-<<<<<<< HEAD:src/Logging/Dispatcher.cpp
-void Dispatcher::CheckAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
-=======
 void Dispatcher::_publish() {
     _dataQ->publish(_publishName, PRIVATE, WITH_ACK);
 }
 
 void Dispatcher::_checkAndUpdateMaxPublishSizes(uint16_t currentPublishSize, uint16_t i) {
->>>>>>> develop:src/Logging/Dispatcher.cpp
     if (currentPublishSize > _maxPublishSizes[i])
         _maxPublishSizes[i] = currentPublishSize;
 }
