@@ -36,10 +36,18 @@ IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlight
     &urbanLeftSig, &urbanWipers, NULL};
 
 String publishName = "BQIngestion";
+void getSpeed(float speed){
+    CanMessage message = CAN_MESSAGE_NULL; // construct the message and 
+    message.id = CAN_TELEMETRY_GPS_SPEED;
+    message.data[0] = (uint8_t)speed*3.6;
+    message.dataLength = 1;
+    canInterface.sendMessage(message);
+}
 
 // CurrentVehicle namespace definitions
 Dispatcher* CurrentVehicle::buildDispatcher() {
     DispatcherBuilder builder(commands, &dataQ, publishName);
+    gps.updateSpeedCallback(getSpeed);
     return builder.build();
 }
 
