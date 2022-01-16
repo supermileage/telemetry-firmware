@@ -2,7 +2,6 @@
 #define _SENSOR_ECU_H_
 
 #include "Sensor.h"
-#include "settings.h"
 
 class SensorEcu : public Sensor {
     public:
