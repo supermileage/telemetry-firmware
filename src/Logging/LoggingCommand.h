@@ -1,8 +1,8 @@
 #ifndef _object_COMMAND_H
 #define _object_COMMAND_H
 
+#include "ArduinoJson.h"
 #include "IntervalCommand.h"
-#include "DataQueue.h"
 
 /**
  *  Templated Command class which represents a telemetry-logging command
@@ -30,9 +30,10 @@ class LoggingCommand : public IntervalCommand {
         ~LoggingCommand() { }
 
         /**
-         * Logs data from this command's getter method to JsonObject
+         * @brief Logs data from this command's getter method to JsonObject
          * 
-         **/
+         * @param args pointer to JsonObject
+         */
         void execute(CommandArgs args) {
             (*(JsonObject*)args)[_propertyName] = (*_object.*_getter)();
         }

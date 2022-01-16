@@ -75,13 +75,6 @@ class DataQueue : public Handleable {
         void publish(String event, PublishFlags flag1, PublishFlags flag2);
 
         /**
-         * Returns data in writer buffer and reinstantiates JSONBufferWriter
-         * 
-         * @return Data in writer buffer before reset
-         * */
-        String resetData();
-
-        /**
          * @brief Get the buffer size of DataQueue's JsonWriter
          * 
          * @return size_t - the current buffer size

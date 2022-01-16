@@ -50,12 +50,6 @@ void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	_publishCallback(payload, status);
 }
 
-String DataQueue::resetData() {
-    String payload = _jsonBufferGet();
-    _jsonDocumentRefresh();
-    return payload;
-}
-
 size_t DataQueue::getBufferSize() {
 	return JSON_BUFFER_SIZE;
 }
