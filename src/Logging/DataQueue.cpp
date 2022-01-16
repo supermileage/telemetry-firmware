@@ -105,23 +105,16 @@ String DataQueue::_recoverDataFromBuffer() {
 		DeserializationError error = deserializeJson(doc, (const char*)_buf);
 
 		if (error) {
-			DEBUG_LOGGING_LN("Failed to Deserialize Json in buffer.  Unable to recover Json data");
+			DEBUG_SERIAL_LN("Unable to deserialize Json in string buffer: returning");
 			return String(_buf);
 		}
 		
-		DEBUG_LOGGING_LN("Data before removal: " + String(_buf));
-
 		JsonArray dataArray = doc["l"].as<JsonArray>();
 		unsigned arrayCount = dataArray.size();
 		unsigned arrayRemovalIndex = arrayCount != 0 ? nextArrayRemovalIndex++ % arrayCount : 0;
 
-		DEBUG_LOGGING_LN("Array Length " + String(arrayCount));
-
 		if (arrayCount == 0)
 			break;
-		
-		DEBUG_LOGGING_LN("Getting object at index " + String(arrayRemovalIndex));
-		DEBUG_LOGGING_LN("Object data size: " + String(dataArray[arrayRemovalIndex]["d"].size()));
 
 		JsonObject object = dataArray[arrayRemovalIndex]["d"].as<JsonObject>();
 		unsigned objectCount = object.size();
@@ -129,13 +122,11 @@ String DataQueue::_recoverDataFromBuffer() {
 		// if there is only one key value pair in data object, then we remove the whole object
 		// otherwise, we remove the key value pair at objectRemovalIndex
 		if (objectCount <= 1) {
-			DEBUG_LOGGING_LN("object count <= 1, removing " + dataArray[arrayRemovalIndex].to<JsonVariant>().as<String>());
 			dataArray.remove(arrayRemovalIndex);
 		} else {
 			unsigned objectRemovalIndex = nextObjectRemovalIndex++ % object.size();
 			JsonObject::iterator it = object.begin();
 			it += objectRemovalIndex;
-			DEBUG_LOGGING_LN("object count > 1, removing data under key " + String(it->key().c_str()));
 			object.remove(it->key());
 		}
 

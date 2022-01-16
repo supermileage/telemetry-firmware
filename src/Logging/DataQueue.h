@@ -1,14 +1,6 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#if 0
-    #define DEBUG_LOGGING_LN(x) Serial.println(x)
-    #define DEBUG_LOGGING(x) Serial.print(x)
-#else
-    #define DEBUG_LOGGING_LN(x) x
-    #define DEBUG_LOGGING(x) x
-#endif
-
 #define JSON_WRITER_BUFFER_SIZE 116
 #define JSON_WRITER_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8

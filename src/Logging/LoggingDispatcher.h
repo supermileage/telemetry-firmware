@@ -29,6 +29,9 @@ class LoggingDispatcher : public Handleable {
 
         void begin() { }
 
+        /**
+         * @brief turns on/off logging and publishing: will publish if turned off with data in buffer 
+         */
         void setLoggingEnabled(bool value);
 
     private:

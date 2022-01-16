@@ -2,6 +2,7 @@
 #define _DISPATCHER_BUILDER_H_
 
 #include <map>
+
 #include "DataQueue.h"
 #include "IntervalCommand.h"
 #include "LoggingDispatcher.h"
