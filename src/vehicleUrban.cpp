@@ -23,13 +23,13 @@ CanListenerAccessories canListenerAccessories(&canInterface, CAN_ACC_STATUS,
 LoggingCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
 LoggingCommand<SensorGps, String> gpsLong(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
 LoggingCommand<SensorThermo, String> thermoTemp1(&thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
-LoggingCommand<CanListenerAccessories, String> urbanHeadlights(&canListenerAccessories, "u-hl", &CanListenerAccessories::getStatusHeadlights, 1);
-LoggingCommand<CanListenerAccessories, String> urbanBrakelights(&canListenerAccessories, "u-bl", &CanListenerAccessories::getStatusBrakelights, 1);
-LoggingCommand<CanListenerAccessories, String> urbanHorn(&canListenerAccessories, "u-hrn", &CanListenerAccessories::getStatusHorn, 1);
-LoggingCommand<CanListenerAccessories, String> urbanHazards(&canListenerAccessories, "u-haz", &CanListenerAccessories::getStatusHazards, 1);
-LoggingCommand<CanListenerAccessories, String> urbanRightSig(&canListenerAccessories, "u-rsig", &CanListenerAccessories::getStatusRightSignal, 1);
-LoggingCommand<CanListenerAccessories, String> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
-LoggingCommand<CanListenerAccessories, String> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
+LoggingCommand<CanListenerAccessories, int> urbanHeadlights(&canListenerAccessories, "u-hl", &CanListenerAccessories::getStatusHeadlights, 1);
+LoggingCommand<CanListenerAccessories, int> urbanBrakelights(&canListenerAccessories, "u-bl", &CanListenerAccessories::getStatusBrakelights, 1);
+LoggingCommand<CanListenerAccessories, int> urbanHorn(&canListenerAccessories, "u-hrn", &CanListenerAccessories::getStatusHorn, 1);
+LoggingCommand<CanListenerAccessories, int> urbanHazards(&canListenerAccessories, "u-haz", &CanListenerAccessories::getStatusHazards, 1);
+LoggingCommand<CanListenerAccessories, int> urbanRightSig(&canListenerAccessories, "u-rsig", &CanListenerAccessories::getStatusRightSignal, 1);
+LoggingCommand<CanListenerAccessories, int> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
+LoggingCommand<CanListenerAccessories, int> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
 
 // Array Definitions - MUST BE NULL TERMINATED
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig,

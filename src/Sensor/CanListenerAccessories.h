@@ -46,37 +46,37 @@ class CanListenerAccessories : public CanListener {
 		/**
 		 * @brief Get the status of headlights
 		 */
-		String getStatusHeadlights();
+		int getStatusHeadlights();
 
 		/**
 		 * @brief Get the status of brakelights
 		 */
-		String getStatusBrakelights();
+		int getStatusBrakelights();
 
 		/**
 		 * @brief Get the status of headlights
 		 */
-		String getStatusHorn();
+		int getStatusHorn();
 
 		/**
 		 * @brief Get the status of hazard lights
 		 */
-		String getStatusHazards();
+		int getStatusHazards();
 
 		/**
 		 * @brief Get the status of right signal
 		 */
-		String getStatusRightSignal();
+		int getStatusRightSignal();
 
 		/**
 		 * @brief Get the status of left signal
 		 */
-		String getStatusLeftSignal();
+		int getStatusLeftSignal();
 
 		/**
 		 * @brief Get the status of windshield wipers
 		 */
-		String getStatusWipers();
+		int getStatusWipers();
 
 	protected:
 		/**
