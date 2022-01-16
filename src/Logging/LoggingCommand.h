@@ -6,24 +6,24 @@
 
 /**
  *  Templated Command class which represents a telemetry-logging command
- *  class C is the type of object whose member function will be called on execute
- *  class R is the return type of that member function
+ *  class C is the type of object whose member method will be called on execute
+ *  class R is the return type of that member method
  **/
 template <class C, class R>
 class LoggingCommand : public IntervalCommand {
     public:
         /**
-         * Constructs a LoggingCommand with object, property name, getter function and interval
+         * Constructs a LoggingCommand with object, property name, getter method and interval
          * 
          * @param object pointer to object of class C which we will call _getter on
          * @param propertyName the name of property which will be logged
-         * @param func pointer to object's member getter function
+         * @param getter pointer to object's getter method
          * @param interval interval (in seconds) at which this command will be called to execute
          **/
-        LoggingCommand(C* object, String propertyName, R (C::*func)(), uint16_t interval)
+        LoggingCommand(C* object, String propertyName, R (C::*getter)(), uint16_t interval)
         : IntervalCommand(interval) {
             _object = object;
-            _getter = func;
+            _getter = getter;
             _propertyName = propertyName;
         }
         
@@ -35,7 +35,8 @@ class LoggingCommand : public IntervalCommand {
          * @param args pointer to JsonObject
          */
         void execute(CommandArgs args) {
-            (*(JsonObject*)args).getOrAddMember(_propertyName).set((*_object.*_getter)());
+            // (*(JsonObject*)args)[_propertyName] = (*_object.*_getter)();
+            (*(JsonObject*)args)[_propertyName] = "6";
         }
 
     private:
