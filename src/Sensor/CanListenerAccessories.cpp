@@ -11,32 +11,32 @@ String CanListenerAccessories::getHumanName() {
 	return "CanListenerAccessories";
 }
 
-int CanListenerAccessories::getStatusHeadlights() {
-	return _statuses[STATUS_HEADLIGHTS];
+String CanListenerAccessories::getStatusHeadlights() {
+	return String(_statuses[STATUS_HEADLIGHTS]);
 }
 
-int CanListenerAccessories::getStatusBrakelights() {
-	return _statuses[STATUS_BRAKELIGHTS];
+String CanListenerAccessories::getStatusBrakelights() {
+	return String(_statuses[STATUS_BRAKELIGHTS]);
 }
 
-int CanListenerAccessories::getStatusHorn() {
-	return _statuses[STATUS_HORN];
+String CanListenerAccessories::getStatusHorn() {
+	return String(_statuses[STATUS_HORN]);
 }
 
-int CanListenerAccessories::getStatusHazards() {
-	return _statuses[STATUS_HAZARDS];
+String CanListenerAccessories::getStatusHazards() {
+	return String(_statuses[STATUS_HAZARDS]);
 }
 
-int CanListenerAccessories::getStatusRightSignal() {
-	return _statuses[STATUS_RIGHT_SIGNAL];
+String CanListenerAccessories::getStatusRightSignal() {
+	return String(_statuses[STATUS_RIGHT_SIGNAL]);
 }
 
-int CanListenerAccessories::getStatusLeftSignal() {
-	return _statuses[STATUS_LEFT_SIGNAL];
+String CanListenerAccessories::getStatusLeftSignal() {
+	return String(_statuses[STATUS_LEFT_SIGNAL]);
 }
 
-int CanListenerAccessories::getStatusWipers() {
-	return _statuses[STATUS_WIPERS];
+String CanListenerAccessories::getStatusWipers() {
+	return String(_statuses[STATUS_WIPERS]);
 }
 
 void CanListenerAccessories::update(CanMessage message) {
