@@ -36,6 +36,7 @@ void LoggingDispatcher::handle() {
 }
 
 void LoggingDispatcher::_runLogging() {
+    _handleTime = millis();
     unsigned long time = millis() / 1000;
     // check if it's time to log any data from any of the commandGroups
     for (uint16_t i = 0; i < _numCommandGroups; i++) {
@@ -73,6 +74,8 @@ void LoggingDispatcher::_runLogging() {
             }
         }
         _logThisLoop = false;
+        _handleTime = millis() - _handleTime;
+        DEBUG_SERIAL_LN("Total time to run logging: " + String(_handleTime) + "ms");
     }
 }
 
