@@ -10,12 +10,12 @@ SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 // command definitions
-SensorCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
-SensorCommand<SensorGps, String> gpsLong(&gps, "long", &SensorGps::getLongitude, 1);
-SensorCommand<SensorGps, String> gpsVertAccel(&gps, "v-accel", &SensorGps::getVerticalAcceleration, 2);
-SensorCommand<SensorGps, String> gpsHorAccel(&gps, "h-accel", &SensorGps::getHorizontalAcceleration, 2);
-SensorCommand<SensorThermo, String> thermoTemp1(&thermo1, "temp1", &SensorThermo::getProbeTemp, 5);
-SensorCommand<SensorThermo, String> thermoTemp2(&thermo2, "temp2", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
+LoggingCommand<SensorGps, String> gpsLong(&gps, "long", &SensorGps::getLongitude, 1);
+LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "v-accel", &SensorGps::getVerticalAcceleration, 2);
+LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "h-accel", &SensorGps::getHorizontalAcceleration, 2);
+LoggingCommand<SensorThermo, String> thermoTemp1(&thermo1, "temp1", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorThermo, String> thermoTemp2(&thermo2, "temp2", &SensorThermo::getProbeTemp, 5);
 
 // Array Definitions - MUST BE NULL TERMINATED
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &gpsVertAccel, &gpsHorAccel, &thermoTemp1, &thermoTemp2, NULL};
@@ -23,8 +23,8 @@ IntervalCommand *commands[] = { &gpsLat, &gpsLong, &gpsVertAccel, &gpsHorAccel, 
 String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
-Dispatcher* CurrentVehicle::buildDispatcher() {
-    DispatcherBuilder builder(commands, &dataQ, publishName);
+LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }
 

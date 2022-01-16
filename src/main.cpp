@@ -21,7 +21,7 @@ Led ledGreen(D8, 40);
 Button button(A2, true, false, buttonPushed, NULL);
 DataQueue dataQ(VEHICLE_NAME, publish);
 TimeLib timeLib(timeValidCallback);
-Dispatcher *dispatcher;
+LoggingDispatcher *dispatcher;
 
 bool loggingEnabled = LOGGING_EN_AT_BOOT;
 bool error = false;
@@ -52,7 +52,6 @@ void publish(String payload, DataQueue::PublishStatus status) {
     DEBUG_SERIAL_LN("");
     DEBUG_SERIAL_LN("Publish Queue Size: " + String(dataQ.getNumEventsInQueue()));
     DEBUG_SERIAL_LN("");
-
 }
 
 // Output sensor data over serial
@@ -72,7 +71,7 @@ void timeValidCallback() {
 
     DEBUG_SERIAL("#### TIME VALID ");
     if(loggingEnabled){
-        dispatcher->setEnableLogging(TRUE);
+        dispatcher->setLoggingEnabled(TRUE);
     }
 
 }
@@ -82,7 +81,7 @@ void enableLogging() {
 
     if(!loggingEnabled) {
         loggingEnabled = TRUE;
-        dispatcher->setEnableLogging(TRUE);
+        dispatcher->setLoggingEnabled(TRUE);
         DEBUG_SERIAL_LN("Logging has been ENABLED\n");
     }
 
@@ -93,7 +92,7 @@ void disableLogging() {
 
     if(loggingEnabled) {
         loggingEnabled = FALSE;
-        dispatcher->setEnableLogging(FALSE);
+        dispatcher->setLoggingEnabled(FALSE);
         DEBUG_SERIAL_LN("Logging has been DISABLED\n");
     }
 
@@ -187,7 +186,7 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
-    dispatcher = CurrentVehicle::buildDispatcher();
+    dispatcher = CurrentVehicle::buildLoggingDispatcher();
 
     // Begin all handleables
     Handler::instance().begin();
