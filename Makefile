@@ -8,6 +8,7 @@ include src/build.mk
 
 urban: clean pull-image
 	$(call print, COMPILING URBAN FIRMWARE)
+	$(call print, Extra CFlags: $(EXTRA_CFLAGS))
 	docker run --rm -v $(shell pwd):/app -v $(shell pwd)/$(OUTPUT_DIR):/$(OUTPUT_DIR) $(IMAGE) \
 		make all PLATFORM=boron APPDIR=/app/ TARGET_DIR=/$(OUTPUT_DIR) EXTRA_CFLAGS+='-DURBAN'
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)

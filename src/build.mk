@@ -20,7 +20,7 @@ INCLUDE_DIRS += $(INCLUDE_DIRS_SRC)
 #	-SparkFun_u-blox_GNSS_Arduino_Library
 #	-Adafruit_MAX31855
 #	-ArduinoJson
-EXTRA_CFLAGS += '-DARDUINO=0'
+EXTRA_CFLAGS += '-DARDUINO=1'
 #	-mcp2515_can
 EXTRA_CFLAGS += '-DDEBUG_RXANY=0'
 
