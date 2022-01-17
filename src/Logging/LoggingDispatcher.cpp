@@ -1,7 +1,6 @@
 #include "LoggingDispatcher.h"
 
-#define WRAPPER_START 25
-#define WRAPPER_END 4
+#define DATAOBJECT_AND_TIMESTAMP_SIZE 23
 
 LoggingDispatcher::LoggingDispatcher(IntervalCommandGroup** commandGroups, uint16_t numCommandGroups, DataQueue* dataQ, String publishName) {
     _commandGroups = commandGroups;
@@ -43,41 +42,36 @@ void LoggingDispatcher::_runLogging() {
         if ((_commandGroups[i]->getLastExecution() + _commandGroups[i]->getInterval()) <= time) {
             _commandGroups[i]->setLastExecution(time);
             _logThisLoop = true;
-            _commandGroups[i]->executeThisLoop(true);
+            _commandGroups[i]->setExecuteThisLoop(true);
         }
     }
 
     // check max publish sizes, publish if DataQueue buffer is close to full, update max publish sizes for each logger
     if (_logThisLoop) {
-        bool dataWrapperIsOpen = false;
+        bool createNewDataObject = true;
+        JsonObject dataObject;
         for (uint16_t i = 0; i < _numCommandGroups; i++) {
-            // NOTE: max wrapper opening size = 21 bytes; wrapper closing size = 2 bytes; final closing brackets = 2 bytes
-            unsigned additionalBytes = dataWrapperIsOpen ? WRAPPER_END : WRAPPER_START;
-            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _commandGroups[i]->executeThisLoop()) {
-                if (dataWrapperIsOpen) {
-                    _dataQ->wrapEnd();
-                    dataWrapperIsOpen = false;
-                }
+            // NOTE: creating new JsonObject -> {"t":1642311306,"d":{}} = 23 Bytes
+            unsigned additionalBytes = createNewDataObject ? DATAOBJECT_AND_TIMESTAMP_SIZE : 0;
+            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _commandGroups[i]->getExecuteThisLoop()) {
                 _publish();
+                createNewDataObject = true;
             }
 
-            if (_commandGroups[i]->executeThisLoop()) {
-                if (!dataWrapperIsOpen) { 
-                    _dataQ->wrapStart();
-                    dataWrapperIsOpen = true;
+            if (_commandGroups[i]->getExecuteThisLoop()) {
+                if (createNewDataObject) {
+                    dataObject = _dataQ->createDataObject();
+                    createNewDataObject = false;
                 }
                 uint16_t dataSizeBeforePublish = _dataQ->getDataSize();
 
-                _commandGroups[i]->executeCommands((CommandArgs)_dataQ);
-                _commandGroups[i]->executeThisLoop(false);
+                _commandGroups[i]->executeCommands((CommandArgs)&dataObject);
+                _commandGroups[i]->setExecuteThisLoop(false);
 
                 uint16_t dataSizeAfterPublish = _dataQ->getDataSize();
                 _checkAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
             }
         }
-        if (dataWrapperIsOpen)
-            _dataQ->wrapEnd();
-            
         _logThisLoop = false;
     }
 }

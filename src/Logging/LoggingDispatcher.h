@@ -41,7 +41,6 @@ class LoggingDispatcher : public Handleable {
 		uint16_t _numCommandGroups;
         bool _loggingEnabled = LOGGING_EN_AT_BOOT;
         bool _logThisLoop = FALSE;
-        size_t _handleTime = 0;
         String _publishName;
 
         void _runLogging();
