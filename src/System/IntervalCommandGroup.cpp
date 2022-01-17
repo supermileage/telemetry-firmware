@@ -40,6 +40,6 @@ bool IntervalCommandGroup::getExecuteThisLoop() {
     return _executeThisLoop;
 }
 
-void IntervalCommandGroup::setExecuteThisLoop(bool setExecuteThisLoop) {
-    _executeThisLoop = setExecuteThisLoop;
+void IntervalCommandGroup::setExecuteThisLoop(bool executeThisLoop) {
+    _executeThisLoop = executeThisLoop;
 }
