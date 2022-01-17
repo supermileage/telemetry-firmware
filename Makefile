@@ -2,7 +2,7 @@
 IMAGE := ghcr.io/supermileage/particle-v3.0.0:latest
 OUTPUT_DIR := output
 
-include ./src/build.mk
+include src/build.mk
 
 .PHONY: urban proto pull-image clean
 
