@@ -35,8 +35,7 @@ class LoggingCommand : public IntervalCommand {
          * @param args pointer to JsonObject
          */
         void execute(CommandArgs args) {
-            // (*(JsonObject*)args)[_propertyName] = (*_object.*_getter)();
-            (*(JsonObject*)args)[_propertyName] = "6";
+            (*(JsonObject*)args)[_propertyName] = (*_object.*_getter)();
         }
 
     private:

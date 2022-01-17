@@ -43,7 +43,7 @@ void LoggingDispatcher::_runLogging() {
         if ((_commandGroups[i]->getLastExecution() + _commandGroups[i]->getInterval()) <= time) {
             _commandGroups[i]->setLastExecution(time);
             _logThisLoop = true;
-            _commandGroups[i]->executeThisLoop(true);
+            _commandGroups[i]->setExecuteThisLoop(true);
         }
     }
 
@@ -54,12 +54,12 @@ void LoggingDispatcher::_runLogging() {
         for (uint16_t i = 0; i < _numCommandGroups; i++) {
             // NOTE: creating new JsonObject -> {"t":1642311306,"d":{}} = 23 Bytes
             unsigned additionalBytes = createNewDataObject ? DATAOBJECT_AND_TIMESTAMP_SIZE : 0;
-            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _commandGroups[i]->executeThisLoop()) {
+            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _commandGroups[i]->getExecuteThisLoop()) {
                 _publish();
                 createNewDataObject = true;
             }
 
-            if (_commandGroups[i]->executeThisLoop()) {
+            if (_commandGroups[i]->getExecuteThisLoop()) {
                 if (createNewDataObject) {
                     dataObject = _dataQ->createDataObject();
                     createNewDataObject = false;
@@ -67,7 +67,7 @@ void LoggingDispatcher::_runLogging() {
                 uint16_t dataSizeBeforePublish = _dataQ->getDataSize();
 
                 _commandGroups[i]->executeCommands((CommandArgs)&dataObject);
-                _commandGroups[i]->executeThisLoop(false);
+                _commandGroups[i]->setExecuteThisLoop(false);
 
                 uint16_t dataSizeAfterPublish = _dataQ->getDataSize();
                 _checkAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);

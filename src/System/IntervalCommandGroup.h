@@ -47,19 +47,19 @@ class IntervalCommandGroup {
         /**
         *  Returns true if group has been set to execute
         **/
-        bool executeThisLoop();
+        bool getExecuteThisLoop();
 
         /**
         *  Sets bool for whether or not executeCommands should be called 
         **/
-        void executeThisLoop(bool executeThisLoop);
+        void setExecuteThisLoop(bool setExecuteThisLoop);
 
     protected:
         unsigned long _lastExecution;
         Command **_commands;
         uint16_t _interval;
         uint8_t _numCommands;
-        bool _executeThisLoop;
+        bool _setExecuteThisLoop;
 };
 
 #endif

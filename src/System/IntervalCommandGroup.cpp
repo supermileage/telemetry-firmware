@@ -8,7 +8,7 @@ IntervalCommandGroup::IntervalCommandGroup(Command **commands, uint8_t numComman
     _numCommands = numCommands;
     _interval = interval;
     _lastExecution = 0;
-    _executeThisLoop = false;
+    _setExecuteThisLoop = false;
 }
 
 IntervalCommandGroup::~IntervalCommandGroup() {
@@ -36,10 +36,10 @@ void IntervalCommandGroup::setLastExecution(unsigned int time) {
     _lastExecution = time;
 }
 
-bool IntervalCommandGroup::executeThisLoop() {
-    return _executeThisLoop;
+bool IntervalCommandGroup::getExecuteThisLoop() {
+    return _setExecuteThisLoop;
 }
 
-void IntervalCommandGroup::executeThisLoop(bool executeThisLoop) {
-    _executeThisLoop = executeThisLoop;
+void IntervalCommandGroup::setExecuteThisLoop(bool setExecuteThisLoop) {
+    _setExecuteThisLoop = setExecuteThisLoop;
 }
