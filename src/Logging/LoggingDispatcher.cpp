@@ -1,6 +1,7 @@
 #include "LoggingDispatcher.h"
 
-#define DATAOBJECT_AND_TIMESTAMP_SIZE 23
+#define WRAPPER_START 25
+#define WRAPPER_END 4
 
 LoggingDispatcher::LoggingDispatcher(IntervalCommandGroup** commandGroups, uint16_t numCommandGroups, DataQueue* dataQ, String publishName) {
     _commandGroups = commandGroups;
@@ -36,46 +37,48 @@ void LoggingDispatcher::handle() {
 }
 
 void LoggingDispatcher::_runLogging() {
-    _handleTime = millis();
     unsigned long time = millis() / 1000;
     // check if it's time to log any data from any of the commandGroups
     for (uint16_t i = 0; i < _numCommandGroups; i++) {
         if ((_commandGroups[i]->getLastExecution() + _commandGroups[i]->getInterval()) <= time) {
             _commandGroups[i]->setLastExecution(time);
             _logThisLoop = true;
-            _commandGroups[i]->setExecuteThisLoop(true);
+            _commandGroups[i]->executeThisLoop(true);
         }
     }
 
     // check max publish sizes, publish if DataQueue buffer is close to full, update max publish sizes for each logger
     if (_logThisLoop) {
-        bool createNewDataObject = true;
-        JsonObject dataObject;
+        bool dataWrapperIsOpen = false;
         for (uint16_t i = 0; i < _numCommandGroups; i++) {
-            // NOTE: creating new JsonObject -> {"t":1642311306,"d":{}} = 23 Bytes
-            unsigned additionalBytes = createNewDataObject ? DATAOBJECT_AND_TIMESTAMP_SIZE : 0;
-            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _commandGroups[i]->getExecuteThisLoop()) {
+            // NOTE: max wrapper opening size = 21 bytes; wrapper closing size = 2 bytes; final closing brackets = 2 bytes
+            unsigned additionalBytes = dataWrapperIsOpen ? WRAPPER_END : WRAPPER_START;
+            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _commandGroups[i]->executeThisLoop()) {
+                if (dataWrapperIsOpen) {
+                    _dataQ->wrapEnd();
+                    dataWrapperIsOpen = false;
+                }
                 _publish();
-                createNewDataObject = true;
             }
 
-            if (_commandGroups[i]->getExecuteThisLoop()) {
-                if (createNewDataObject) {
-                    dataObject = _dataQ->createDataObject();
-                    createNewDataObject = false;
+            if (_commandGroups[i]->executeThisLoop()) {
+                if (!dataWrapperIsOpen) { 
+                    _dataQ->wrapStart();
+                    dataWrapperIsOpen = true;
                 }
                 uint16_t dataSizeBeforePublish = _dataQ->getDataSize();
 
-                _commandGroups[i]->executeCommands((CommandArgs)&dataObject);
-                _commandGroups[i]->setExecuteThisLoop(false);
+                _commandGroups[i]->executeCommands((CommandArgs)_dataQ);
+                _commandGroups[i]->executeThisLoop(false);
 
                 uint16_t dataSizeAfterPublish = _dataQ->getDataSize();
                 _checkAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
             }
         }
+        if (dataWrapperIsOpen)
+            _dataQ->wrapEnd();
+            
         _logThisLoop = false;
-        _handleTime = millis() - _handleTime;
-        DEBUG_SERIAL_LN("Total time to run logging: " + String(_handleTime) + "ms");
     }
 }
 
