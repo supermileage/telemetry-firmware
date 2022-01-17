@@ -20,8 +20,10 @@
 /**
  * @brief DataQueue which provides API for logging and publishing of data to Particle cloud
  * 
- * @note SYSTEM_THREAD(ENABLED) must be called in the global scope of the main code, or this object may fail in unpredictable ways
- * @note Json formatting is specified in the methods, _jsonDocumentInit() and createDataObject, in case you wish to change formatting
+ * @note SYSTEM_THREAD(ENABLED) must be called in on startup, or this object may fail in unpredictable ways
+ * 
+ * @note formatting is specified in the methods _jsonDocumentInit and createDataObject.
+ * If you wish to change the formatting, you must also modify (or comment out) _recoverDataFromBuffer
  **/
 
 class DataQueue : public Handleable {
@@ -40,9 +42,7 @@ class DataQueue : public Handleable {
         ~DataQueue();
 
         /**
-         * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by
-         * allocating memory on the heap. This method invokes the setup method
-         * for the queue object.
+         * Initializes PublishQueuePosix and StaticJsonDocument member object
          * */
         void begin();
 
@@ -52,7 +52,7 @@ class DataQueue : public Handleable {
         void handle();
 
         /**
-         * @brief Creates and adds a JsonObject to data array in json string buffer to which you can safely add
+         * @brief Creates and adds a JsonObject to data array in JsonDocument member to which you can safely add
          * data to be published
          * 
          * @return JsonObject to add data to
@@ -111,23 +111,25 @@ class DataQueue : public Handleable {
         
 
         /**
-         * Removes the data stored in the _jsonDocument object and reinitializes its buffer
+         * Removes the data stored in the StaticJsonDocument member and clears its currently held data
          * */
         void _jsonDocumentRefresh();
 
         /**
-         * Initializes StaticJsonDocument for DataQueue
+         * Initializes StaticJsonDocument member
         **/
         void _jsonDocumentInit();
 
         /**
-         * @return A Json string representing the data stored in _jsonDocument
+         * @return A Json string representing the data stored in StaticJsonDocument member
          * */
         String _jsonBufferGet();
 
         /**
          * Reparses Json data and removes entries from varying JObjects in internal JArray
          * Only used in the case that _jsonDocuments's data buffer exceeds Particle cloud publish limits
+         * 
+         * @note this method expects that json data is formatted in a specific way and will fail if the formatting changes 
          * 
          * @return String payload -- json data string
          */
