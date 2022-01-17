@@ -59,7 +59,7 @@ class IntervalCommandGroup {
         Command **_commands;
         uint16_t _interval;
         uint8_t _numCommands;
-        bool _setExecuteThisLoop;
+        bool _executeThisLoop;
 };
 
 #endif
