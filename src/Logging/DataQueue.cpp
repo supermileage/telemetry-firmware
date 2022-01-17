@@ -30,7 +30,7 @@ void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	String payload = _jsonBufferGet();
 	PublishStatus status;
 
-	if (getDataSize() > unsigned(JSON_BUFFER_SIZE)) {
+	if (getDataSize() >= unsigned(JSON_BUFFER_SIZE)) {
 		payload =  _recoverDataFromBuffer();
 		status = DataBufferOverflow;
 	} else if (currentPublish - _lastPublish <= 1) {
@@ -84,13 +84,13 @@ bool DataQueue::isCacheFull() {
 }
 
 String DataQueue::_recoverDataFromBuffer() {
-	StaticJsonDocument<JSON_BUFFER_SIZE + JSON_OVERFLOW_CAPACITY> doc;
+	unsigned dataSize = getDataSize();
 	unsigned nextArrayRemovalIndex = 0;
 	unsigned nextObjectRemovalIndex = 0;
-	unsigned dataSize = getDataSize();
 
-	while (dataSize > (unsigned)JSON_BUFFER_SIZE) {
-		JsonArray dataArray = doc["l"].as<JsonArray>();
+	// each loop: removes key-value pair from one of the JsonObjects in array, shifts removal indexes by one
+	while (dataSize >= (unsigned)JSON_BUFFER_SIZE) {
+		JsonArray dataArray = _jsonDocument["l"].as<JsonArray>();
 		unsigned arrayCount = dataArray.size();
 		unsigned arrayRemovalIndex = arrayCount != 0 ? nextArrayRemovalIndex++ % arrayCount : 0;
 

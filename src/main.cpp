@@ -33,10 +33,10 @@ void publish(String payload, DataQueue::PublishStatus status) {
     if(status == DataQueue::DataBufferOverflow || dataQ.isCacheFull()) {
         error = true;
         if(status == DataQueue::DataBufferOverflow) {
-            DEBUG_SERIAL_LN("ERROR: Json Writer Data Buffer has Overflowed!");
+            DEBUG_SERIAL_LN("WARNING: Json String has Exceeded Maximum Size of " + String(JSON_BUFFER_SIZE) + " Bytes");
         }
         if(dataQ.isCacheFull()) {
-            DEBUG_SERIAL_LN("ERROR: Data Queue is full!");
+            DEBUG_SERIAL_LN("WARNING: Data Queue is full");
         }
     } else {
         error = false;

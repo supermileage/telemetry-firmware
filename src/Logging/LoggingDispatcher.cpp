@@ -53,7 +53,7 @@ void LoggingDispatcher::_runLogging() {
         for (uint16_t i = 0; i < _numCommandGroups; i++) {
             // NOTE: creating new JsonObject -> {"t":1642311306,"d":{}} = 23 Bytes
             unsigned additionalBytes = createNewDataObject ? DATAOBJECT_AND_TIMESTAMP_SIZE : 0;
-            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes > _dataQ->getBufferSize() && _commandGroups[i]->getExecuteThisLoop()) {
+            if (_dataQ->getDataSize() + _maxPublishSizes[i] + additionalBytes >= _dataQ->getBufferSize() && _commandGroups[i]->getExecuteThisLoop()) {
                 _publish();
                 createNewDataObject = true;
             }
