@@ -19,7 +19,8 @@ INCLUDE_DIRS += $(INCLUDE_DIRS_SRC)
 # Define constants to remove compilation warnings from these external libs:
 #	-SparkFun_u-blox_GNSS_Arduino_Library
 #	-Adafruit_MAX31855
-EXTRA_CFLAGS += '-DARDUINO=0'
+#	-ArduinoJson
+EXTRA_CFLAGS += '-DARDUINO=1'
 #	-mcp2515_can
 EXTRA_CFLAGS += '-DDEBUG_RXANY=0'
 
