@@ -42,6 +42,7 @@ class CanInterface : public Handleable {
          * @param delegate delegate command which allows can listeners to specify additional parsing behavior
          **/
         void addMessageListen(uint16_t id, Command* canListenerDelegate);
+         
         /**
          * @brief Wrapper for sending CAN messages
          * 

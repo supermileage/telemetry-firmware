@@ -92,7 +92,7 @@ class SensorGps : public Sensor {
         String getSatellitesInView();
 
         /**
-         * @return Horizontal speed (m/s)
+         * @return Horizontal speed (m/s) fro ethe steering wheel
          **/
         void updateSpeedCallback(void (*speed)(float));
 
