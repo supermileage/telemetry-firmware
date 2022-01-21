@@ -1,7 +1,6 @@
 #ifndef _INTERVAL_COMMAND_GROUP_H_
 #define _INTERVAL_COMMAND_GROUP_H_
 
-#include "DataQueue.h"
 #include "Command.h"
 
 /**

@@ -28,52 +28,52 @@ class SensorEcu : public Sensor {
         String getHumanName();
 
         /**
-         * @return Rotations Per Minute
+         * @return Engine Speed, RPM
          * */
         String getRPM();
 
         /**
-        * @return Manifold Absolute Pressure
+        * @return Manifold Absolute Pressure, kPa
         * */
         String getMap();
 
         /**
-        * @return Throttle Position Sensor
+        * @return Throttle Position Sensor, %
         * */
         String getTPS();
 
         /**
-        * @return Engine Coolant Temperature
+        * @return Engine Coolant Temperature, DegC
         * */
         String getECT();
 
         /**
-        * @return Intake Air Temperature
+        * @return Intake Air Temperature, DegC
         * */
         String getIAT();
 
         /**
-        * @return Oxygen Sensor
+        * @return Oxygen Sensor, V
         * */
         String getO2S();
 
         /**
-        * @return Spark (Advance? Timing?)
+        * @return Spark (Advance/Retard), CrA
         * */
         String getSpark();
 
         /**
-        * @return Fuel Injector 1 PWM Duty Cycle
+        * @return Fuel Injector 1 PWM Duty Cycle, ms
         * */
         String getFuelPW1();
 
         /**
-        * @return Fuel Injector 2 PWM Duty Cycle
+        * @return Fuel Injector 2 PWM Duty Cycle, ms
         * */
         String getFuelPW2();
 
         /**
-        * @return Battery Voltage
+        * @return Battery Voltage, V
         * */
         String getUbAdc();
 
@@ -94,8 +94,8 @@ class SensorEcu : public Sensor {
          * Helper for interpreting raw values from ECU
          * @param high byte
          * @param low byte
-         * @param factor ??
-         * @param offset ??
+         * @param factor 
+         * @param offset 
          * @return Intepreted value
          * */
         float _interpretValue(uint8_t high, uint8_t low, float factor, float offset);

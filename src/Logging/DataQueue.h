@@ -1,13 +1,17 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#define JSON_WRITER_BUFFER_SIZE 1024
+#define JSON_WRITER_BUFFER_SIZE 116
 #define JSON_WRITER_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8
 
 #include "Handleable.h"
 #include "settings.h"
 #include "PublishQueuePosixRK.h"
+
+#undef max
+#define ARDUINOJSON_ENABLE_PROGMEM 0
+#include "ArduinoJson.h"
 
 /**
  * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
