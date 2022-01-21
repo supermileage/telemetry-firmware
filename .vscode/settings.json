@@ -73,7 +73,10 @@
         "set": "cpp",
         "stack": "cpp",
         "unordered_set": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "xmemory": "cpp",
+        "xtr1common": "cpp",
+        "xutility": "cpp"
     },
     "C_Cpp.default.configurationProvider": "particle.particle-vscode-core"
 }

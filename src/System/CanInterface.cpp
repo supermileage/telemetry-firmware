@@ -1,4 +1,5 @@
 #include "CanInterface.h"
+#define CAN_FRAME 0
 
 CanInterface::CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin) {
     pinMode(intPin, INPUT);
@@ -36,4 +37,8 @@ void CanInterface::handle() {
 
 void CanInterface::addMessageListen(uint16_t id, Command* canListenerDelegate) {
     _delegates[id] = canListenerDelegate;
+}
+
+void CanInterface::sendMessage(CanMessage message) {
+        _CAN->sendMsgBuf(message.id, CAN_FRAME, message.dataLength, message.data );   
 }
