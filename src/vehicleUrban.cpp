@@ -36,10 +36,26 @@ IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlight
     &urbanLeftSig, &urbanWipers, NULL};
 
 String publishName = "BQIngestion";
+void sendCanSpeed(float speed){
+    CanMessage message = CAN_MESSAGE_NULL; // construct the message and 
+    message.id = CAN_TELEMETRY_GPS_SPEED;
+    if (speed <= 70.0 && speed >= 0){
+        message.data[0] = (uint8_t)(speed*3.6);
+        message.dataLength = 1;
+        canInterface.sendMessage(message);
+    }
+    else{
+        message.data[0] = (uint8_t)(255);
+        message.dataLength = 1;
+        canInterface.sendMessage(message);
+    }
+    
+}
 
-// CurrentVehicle namespace definitions
+
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    gps.updateSpeedCallback(sendCanSpeed);
     return builder.build();
 }
 
