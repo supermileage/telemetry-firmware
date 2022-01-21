@@ -113,9 +113,7 @@ class DataQueue : public Handleable {
         bool isCacheFull();
 
         /**
-         * @brief Returns false and prints an error message to Serial if StaticJsonDocument has overflowed
-         * 
-         * @note This is just a precaution.  Overflow is extremely unlikely given current project settings
+         * @brief Returns false if StaticJsonDocument has overflowed
          */
         bool verifyJsonStatus();
 
