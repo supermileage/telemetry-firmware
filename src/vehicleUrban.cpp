@@ -54,8 +54,10 @@ void sendCanSpeed(float speed){
 
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    // added here because because this function is called on startup
     gps.updateSpeedCallback(sendCanSpeed);
+
+    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
     return builder.build();
 }
 

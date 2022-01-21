@@ -122,6 +122,7 @@ String SensorGps::getVerticalAccuracy() {
 String SensorGps::getSatellitesInView() {
     return String::format("%d",_gps->getSIV());  
 }
+
 void SensorGps::updateSpeedCallback(void (*speed)(float)){
    _speedCallback  = speed;
 }

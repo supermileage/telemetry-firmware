@@ -36,10 +36,10 @@ void IntervalCommandGroup::setLastExecution(unsigned int time) {
     _lastExecution = time;
 }
 
-bool IntervalCommandGroup::executeThisLoop() {
+bool IntervalCommandGroup::getExecuteThisLoop() {
     return _executeThisLoop;
 }
 
-void IntervalCommandGroup::executeThisLoop(bool executeThisLoop) {
+void IntervalCommandGroup::setExecuteThisLoop(bool executeThisLoop) {
     _executeThisLoop = executeThisLoop;
 }

@@ -1,9 +1,13 @@
 #ifndef _DATAQUEUE_H_
 #define _DATAQUEUE_H_
 
-#define JSON_WRITER_BUFFER_SIZE 116
-#define JSON_WRITER_OVERFLOW_CAPACITY 256
+// Particle cloud publish size limit is 1024B
+#define JSON_BUFFER_SIZE 1024
+#define JSON_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8
+
+// JsonDocument size sets the maximum allocated memory for the object: memory usage depends on complexity of json
+#define JSON_DOCUMENT_SIZE 2048
 
 #include "Handleable.h"
 #include "settings.h"
@@ -14,29 +18,34 @@
 #include "ArduinoJson.h"
 
 /**
- * SYSTEM_THREAD(ENABLED) must be called in the global scope of the 
- * main code, or this object may fail in unpredictable ways.
+ * @brief DataQueue which provides API for logging and publishing of data to Particle cloud
+ * 
+ * @note SYSTEM_THREAD(ENABLED) must be called in on startup, or this object may fail in unpredictable ways
+ * @note formatting is specified in the methods _jsonDocumentInit and createDataObject.
+ * If you wish to change the formatting, you must also modify (or remove) _recoverDataFromBuffer
  **/
 
 class DataQueue : public Handleable {
-
     public:
         /**
          * Describes set of possible publishing states
          **/
-        enum PublishStatus { Normal, PublishingAtMaxFrequency, DataBufferOverflow };
+        enum PublishStatus { Normal, PublishingAtMaxFrequency, DataBufferOverflow, JsonDocumentOverflow };
+
+        struct PublishData {
+            PublishStatus status;
+            size_t jsonDocumentSize;
+        };
 
         /**
          * Constructor
          * */
-        DataQueue(String publishHeader, void (*publishMessage)(String, PublishStatus));
+        DataQueue(String publishHeader, void (*publishMessage)(String, PublishData));
 
         ~DataQueue();
 
         /**
-         * Initializes the PublishQueueAsyncRetained and JSONBufferWriter objects by
-         * allocating memory on the heap. This method invokes the setup method
-         * for the queue object.
+         * Initializes PublishQueuePosix and StaticJsonDocument member object
          * */
         void begin();
 
@@ -46,16 +55,12 @@ class DataQueue : public Handleable {
         void handle();
 
         /**
-         * Adds an integer value and its ID into the data queue.
-         * An ID may not be added twice before publishing the data queue.
+         * @brief Creates and adds a JsonObject to data array in JsonDocument member to which you can safely add
+         * data to be published
          * 
-         * @param id A string representing an id for the data.
-         * 
-         * @param value the data (of type T) to be stored in 
-         *              the queue.
-         * */
-        template <typename T>
-        void add(String id, T value) { _writer->name(id).value(value); };
+         * @return JsonObject to add data to
+         */
+        JsonObject createDataObject();
 
         /**
          * Publishes the data stored in the queue to the particle device cloud.
@@ -73,36 +78,25 @@ class DataQueue : public Handleable {
         void publish(String event, PublishFlags flag1, PublishFlags flag2);
 
         /**
-         * Returns data in writer buffer and reinstantiates JSONBufferWriter
+         * @brief gets the max json string length
          * 
-         * @return Data in writer buffer before reset
-         * */
-        String resetData();
-
-        /**
-         * Defines data wrapping for start of individual logging event:
-         * Opens JObject and adds timestamp
-         **/
-        void wrapStart();
-        
-        /**
-         * Closes data wrapping for individual logging event: closes JObject
-         **/
-        void wrapEnd();
-
-        /**
-         * @brief Get the buffer size of DataQueue's JsonWriter
-         * 
-         * @return size_t - the current buffer size
+         * @return size_t - max length for published json string
          **/
         size_t getBufferSize();
 
         /**
-         * @brief Get the size of data currently held in JsonWriter's buffer
+         * @brief length of serialized json string in StaticJsonDocument
          * 
-         * @return size_t - the current data size
+         * @return size_t - current json string length
          **/
         size_t getDataSize();
+
+                /**
+         * @brief Get the current size in memory of StaticJsonDocument
+         * 
+         * @return size_t - current memory usage of json document
+         **/
+        size_t getMemoryUsage();
 
         /**
          * @brief Get the number of events in the publish queue
@@ -118,41 +112,43 @@ class DataQueue : public Handleable {
          **/
         bool isCacheFull();
 
+        /**
+         * @brief Returns false if StaticJsonDocument has overflowed
+         */
+        bool verifyJsonStatus();
+
     private:
-        JSONBufferWriter* _writer;
-        char _buf[JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY];
+        StaticJsonDocument<JSON_DOCUMENT_SIZE> _jsonDocument;
         PublishQueuePosix* _publishQueue;
-        void (*_publishCallback)(String, PublishStatus);
+        void (*_publishCallback)(String, PublishData);
         unsigned long _lastPublish;
         String _publishHeader;
         
 
         /**
-         * Removes the data stored in the JSON object and reinitializes
-         * writer's buffer.
+         * Removes the data stored in the StaticJsonDocument member and clears its currently held data
          * */
-        void _writerRefresh();
+        void _jsonDocumentRefresh();
 
         /**
-         * Initializes JSON Writer for DataQueue
+         * Initializes StaticJsonDocument member
         **/
-        void _writerInit();
+        void _jsonDocumentInit();
 
         /**
-         * @return A JSON string representing the data stored in the
-         *         JSON object.
+         * @return A Json string representing the data stored in StaticJsonDocument member
          * */
-        String _writerGet();
+        String _jsonBufferGet();
 
         /**
-         * Reparses Json data and removes last entry from JObject at removalIndex in internal JArray
-         * Only used in the case that the JsonWriter's data buffer overflows
+         * Reparses Json data and removes entries from varying JObjects in internal JArray
+         * Only used in the case that _jsonDocuments's data buffer exceeds Particle cloud publish limits
+         * 
+         * @note this method expects that json data is formatted in a specific way and will fail if the formatting changes 
          * 
          * @return String payload -- json data string
          */
         String _recoverDataFromBuffer();
-
-
 };
 
 #endif

@@ -73,6 +73,7 @@
         "set": "cpp",
         "stack": "cpp",
         "unordered_set": "cpp",
+        "filesystem": "cpp",
         "xmemory": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp"

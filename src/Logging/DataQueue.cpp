@@ -1,6 +1,6 @@
 #include "DataQueue.h"
 
-DataQueue::DataQueue(String publishHeader,  void (*callback)(String, PublishStatus)) {
+DataQueue::DataQueue(String publishHeader,  void (*callback)(String, PublishData)) {
 	_publishHeader = publishHeader;
 	_publishCallback = callback;
 	_lastPublish = 0;
@@ -12,79 +12,76 @@ void DataQueue::begin() {
 	_publishQueue = &(PublishQueuePosix::instance());
 	_publishQueue->setup();
 	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
-	_writerInit();
+	_jsonDocumentInit();
 }
 
 void DataQueue::handle() {
 	_publishQueue->loop();
 }
 
+JsonObject DataQueue:: createDataObject() {
+	JsonObject object = _jsonDocument["l"].as<JsonArray>().createNestedObject();
+	object["t"] = Time.now();
+	return object.createNestedObject("d");
+}
+
 void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	unsigned long currentPublish = millis() / 1000;
-	String payload = _writerGet();
+	PublishData data = { Normal, _jsonDocument.memoryUsage() };
+	String payload = _jsonBufferGet();
 
-	// assign publishing status
-	PublishStatus status;
-	if (getDataSize() > unsigned(JSON_WRITER_BUFFER_SIZE)) {
+	if (getDataSize() >= unsigned(JSON_BUFFER_SIZE)) {
 		payload =  _recoverDataFromBuffer();
-		status = DataBufferOverflow;
+		data.status = DataBufferOverflow;
 	} else if (currentPublish - _lastPublish <= 1) {
-		status = PublishingAtMaxFrequency;
-	} else {
-		status = Normal;
+		data.status = PublishingAtMaxFrequency;
+	} else if (_jsonDocument.overflowed()) {
+		data.status = JsonDocumentOverflow;
 	}
 
 	_lastPublish = currentPublish;
 
-	// get payload and publish
+	// publish payload
 	if (PUBLISH_EN) {
 		_publishQueue->publish(event, payload, flag1, flag2);
 	}
 
-	_writerRefresh();
-	_publishCallback(payload, status);
-}
-
-String DataQueue::resetData() {
-    String payload = _writerGet();
-    _writerRefresh();
-    return payload;
-}
-
-void DataQueue::wrapStart() {
-	_writer->beginObject()
-		.name("t").value((int)Time.now())
-		.name("d").beginObject();
-}
-
-void DataQueue::wrapEnd() {
-	_writer->endObject().endObject();
+	// clear and reset reinitialize json document and invoke publish callback
+	_jsonDocumentRefresh();
+	_publishCallback(payload, data);
 }
 
 size_t DataQueue::getBufferSize() {
-	return JSON_WRITER_BUFFER_SIZE;
+	return JSON_BUFFER_SIZE;
 }
 
 size_t DataQueue::getDataSize() {
-	return _writer->dataSize();
+	return measureJson(_jsonDocument);
 }
 
-void DataQueue::_writerRefresh() {
-	if(this->_writer != NULL) delete this->_writer;
-    _writerInit();
+size_t DataQueue::getMemoryUsage() {
+	return _jsonDocument.memoryUsage();
 }
 
-String DataQueue::_writerGet() {
-	_writer->endArray().endObject();
-    return String(_buf);
+bool DataQueue::verifyJsonStatus() {
+	return !_jsonDocument.overflowed();
 }
 
-void DataQueue::_writerInit() {
-    memset(_buf, 0, sizeof(_buf));
-	this->_writer = new JSONBufferWriter(_buf, sizeof(_buf) - 1);
+void DataQueue::_jsonDocumentRefresh() {
+	_jsonDocument.clear();
+    _jsonDocumentInit();
+}
 
-	_writer->beginObject().name("v").value(_publishHeader)
-		.name("l").beginArray();
+String DataQueue::_jsonBufferGet() {
+	char buf[JSON_BUFFER_SIZE + JSON_OVERFLOW_CAPACITY];
+	memset(buf, 0, sizeof(buf));
+	serializeJson(_jsonDocument, buf);
+	return String(buf);
+}
+
+void DataQueue::_jsonDocumentInit() {
+    _jsonDocument["v"] = _publishHeader;
+	_jsonDocument.createNestedArray("l");
 }
 
 size_t DataQueue::getNumEventsInQueue() {
@@ -96,20 +93,13 @@ bool DataQueue::isCacheFull() {
 }
 
 String DataQueue::_recoverDataFromBuffer() {
-	StaticJsonDocument<JSON_WRITER_BUFFER_SIZE + JSON_WRITER_OVERFLOW_CAPACITY> doc;	
+	unsigned dataSize = getDataSize();
 	unsigned nextArrayRemovalIndex = 0;
 	unsigned nextObjectRemovalIndex = 0;
-	unsigned dataSize = getDataSize();
 
-	while (dataSize > (unsigned)JSON_WRITER_BUFFER_SIZE) {
-		DeserializationError error = deserializeJson(doc, (const char*)_buf);
-
-		if (error) {
-			DEBUG_SERIAL_LN("Unable to deserialize Json in string buffer: returning");
-			return String(_buf);
-		}
-		
-		JsonArray dataArray = doc["l"].as<JsonArray>();
+	// each loop: removes key-value pair from one of the JsonObjects in array, shifts removal indexes by one
+	while (dataSize >= (unsigned)JSON_BUFFER_SIZE) {
+		JsonArray dataArray = _jsonDocument["l"].as<JsonArray>();
 		unsigned arrayCount = dataArray.size();
 		unsigned arrayRemovalIndex = arrayCount != 0 ? nextArrayRemovalIndex++ % arrayCount : 0;
 
@@ -130,8 +120,8 @@ String DataQueue::_recoverDataFromBuffer() {
 			object.remove(it->key());
 		}
 
-		dataSize = serializeJson(doc, _buf);
+		dataSize = getDataSize();
 	}
 
-	return String(_buf);
+	return _jsonBufferGet();
 }
