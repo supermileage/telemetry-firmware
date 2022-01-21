@@ -8,9 +8,9 @@
 #include "LoggingDispatcher.h"
 #include "IntervalCommandGroup.h"
 
-// Add all the commands you want to this and call build().  It
-// produces a dispatcher with all logging functionality already set up
-// You can delete this safely after build() has been called
+/**
+ * Add all the commands you want to this and call build().  Produces LoggingDispatcher, which will execute commands on their specified intervals
+ **/
 class LoggingDispatcherBuilder {
     public:
         /**

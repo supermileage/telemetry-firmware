@@ -11,7 +11,7 @@ SYSTEM_THREAD(ENABLED);
 
 // Forward declarations for callback functions
 void buttonPushed();
-void publish(String payload, DataQueue::PublishStatus status);
+void publish(String payload, DataQueue::PublishData status);
 void timeValidCallback();
 
 // Construct all Handleables
@@ -29,28 +29,35 @@ long unsigned int lastDebugSensor = 0;
 unsigned long lastPublish = 0;
 
 // Publish a message
-void publish(String payload, DataQueue::PublishStatus status) {
-    if(status == DataQueue::DataBufferOverflow || dataQ.isCacheFull()) {
+void publish(String payload, DataQueue::PublishData data) {
+    error = false;
+
+    // publish status messages
+    if (data.status == DataQueue::DataBufferOverflow) {
+        DEBUG_SERIAL_LN("ERROR: Json String has Exceeded Maximum Size of " + String(JSON_BUFFER_SIZE) + " Bytes");
         error = true;
-        if(status == DataQueue::DataBufferOverflow) {
-            DEBUG_SERIAL_LN("WARNING: Json String has Exceeded Maximum Size of " + String(JSON_BUFFER_SIZE) + " Bytes");
-        }
-        if(dataQ.isCacheFull()) {
-            DEBUG_SERIAL_LN("WARNING: Data Queue is full");
-        }
-    } else {
-        error = false;
-    }
-    
-    if(status == DataQueue::PublishingAtMaxFrequency) {
+    } else if (data.status == DataQueue::JsonDocumentOverflow) {
+        DEBUG_SERIAL_LN("ERROR: JsonDocument has overflowed due to complexity of unserialized Json in DataQueue::_jsonDocument");
+        DEBUG_SERIAL_LN("Increase JSON_DOCUMENT_SIZE to account for this complexity");
+        DEBUG_SERIAL_LN(" - memory currently allocated for JsonDocument: " + String(JSON_DOCUMENT_SIZE));
+        DEBUG_SERIAL_LN(" - memory usage of JsonDocument: " + String(data.jsonDocumentSize) + " bytes for Json string of " + String(payload.length()) + " bytes");
+        error = true;
+    }  else if (data.status == DataQueue::PublishingAtMaxFrequency) {
         DEBUG_SERIAL_LN("WARNING: Currently Publishing at Max Frequency");
     }
+    if (dataQ.isCacheFull()) {
+        DEBUG_SERIAL_LN("");
+        DEBUG_SERIAL_LN("WARNING: Publish Queue is full");
+    }
 
+    DEBUG_SERIAL_LN("");
     DEBUG_SERIAL_LN("---- PUBLISH MESSAGE ----");
     DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - Publish " + (PUBLISH_EN ? "ENABLED" : "DISABLED") + " - " + timeLib.getTimeString());
     DEBUG_SERIAL_LN(payload);
     DEBUG_SERIAL_LN("");
-    DEBUG_SERIAL_LN("Publish Queue Size: " + String(dataQ.getNumEventsInQueue()));
+    DEBUG_SERIAL("Publish Queue Size: " + String(dataQ.getNumEventsInQueue()) + "/100");
+    DEBUG_SERIAL(" -- JsonString: " + String(payload.length()) + "/" + String(JSON_BUFFER_SIZE) + " bytes");
+    DEBUG_SERIAL_LN(" -- JsonDocument: " + String(data.jsonDocumentSize) + "/" + String(JSON_DOCUMENT_SIZE)  + " bytes");
     DEBUG_SERIAL_LN("");
 }
 

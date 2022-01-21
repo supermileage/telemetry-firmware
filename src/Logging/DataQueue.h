@@ -6,7 +6,7 @@
 #define JSON_OVERFLOW_CAPACITY 256
 #define RAM_QUEUE_EVENT_COUNT 8
 
-// JsonDocument size sets the maximum allocated memory for the object in its entirety, not just the json string
+// JsonDocument size sets the maximum allocated memory for the object: memory usage depends on complexity of json
 #define JSON_DOCUMENT_SIZE 2048
 
 #include "Handleable.h"
@@ -21,23 +21,26 @@
  * @brief DataQueue which provides API for logging and publishing of data to Particle cloud
  * 
  * @note SYSTEM_THREAD(ENABLED) must be called in on startup, or this object may fail in unpredictable ways
- * 
  * @note formatting is specified in the methods _jsonDocumentInit and createDataObject.
- * If you wish to change the formatting, you must also modify (or comment out) _recoverDataFromBuffer
+ * If you wish to change the formatting, you must also modify (or remove) _recoverDataFromBuffer
  **/
 
 class DataQueue : public Handleable {
-
     public:
         /**
          * Describes set of possible publishing states
          **/
-        enum PublishStatus { Normal, PublishingAtMaxFrequency, DataBufferOverflow };
+        enum PublishStatus { Normal, PublishingAtMaxFrequency, DataBufferOverflow, JsonDocumentOverflow };
+
+        struct PublishData {
+            PublishStatus status;
+            size_t jsonDocumentSize;
+        };
 
         /**
          * Constructor
          * */
-        DataQueue(String publishHeader, void (*publishMessage)(String, PublishStatus));
+        DataQueue(String publishHeader, void (*publishMessage)(String, PublishData));
 
         ~DataQueue();
 
@@ -75,18 +78,25 @@ class DataQueue : public Handleable {
         void publish(String event, PublishFlags flag1, PublishFlags flag2);
 
         /**
-         * @brief Get the buffer size of DataQueue's JsonWriter
+         * @brief gets the max json string length
          * 
-         * @return size_t - the current buffer size
+         * @return size_t - max length for published json string
          **/
         size_t getBufferSize();
 
         /**
-         * @brief Get the size of data currently held in JsonWriter's buffer
+         * @brief length of serialized json string in StaticJsonDocument
          * 
-         * @return size_t - the current data size
+         * @return size_t - current json string length
          **/
         size_t getDataSize();
+
+                /**
+         * @brief Get the current size in memory of StaticJsonDocument
+         * 
+         * @return size_t - current memory usage of json document
+         **/
+        size_t getMemoryUsage();
 
         /**
          * @brief Get the number of events in the publish queue
@@ -102,10 +112,17 @@ class DataQueue : public Handleable {
          **/
         bool isCacheFull();
 
+        /**
+         * @brief Returns false and prints an error message to Serial if StaticJsonDocument has overflowed
+         * 
+         * @note This is just a precaution.  Overflow is extremely unlikely given current project settings
+         */
+        bool verifyJsonStatus();
+
     private:
         StaticJsonDocument<JSON_DOCUMENT_SIZE> _jsonDocument;
         PublishQueuePosix* _publishQueue;
-        void (*_publishCallback)(String, PublishStatus);
+        void (*_publishCallback)(String, PublishData);
         unsigned long _lastPublish;
         String _publishHeader;
         

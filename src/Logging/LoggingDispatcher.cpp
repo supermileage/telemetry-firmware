@@ -69,10 +69,16 @@ void LoggingDispatcher::_runLogging() {
                 _commandGroups[i]->setExecuteThisLoop(false);
 
                 uint16_t dataSizeAfterPublish = _dataQ->getDataSize();
+
                 _checkAndUpdateMaxPublishSizes(dataSizeAfterPublish - dataSizeBeforePublish, i);
             }
         }
         _logThisLoop = false;
+
+        // If there is a problem with json, call publish to reset dataQueue
+        if (!_dataQ->verifyJsonStatus()) {
+            _publish();
+        }
     }
 }
 

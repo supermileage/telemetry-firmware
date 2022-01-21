@@ -1,6 +1,6 @@
 #include "DataQueue.h"
 
-DataQueue::DataQueue(String publishHeader,  void (*callback)(String, PublishStatus)) {
+DataQueue::DataQueue(String publishHeader,  void (*callback)(String, PublishData)) {
 	_publishHeader = publishHeader;
 	_publishCallback = callback;
 	_lastPublish = 0;
@@ -27,16 +27,16 @@ JsonObject DataQueue:: createDataObject() {
 
 void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 	unsigned long currentPublish = millis() / 1000;
+	PublishData data = { Normal, _jsonDocument.memoryUsage() };
 	String payload = _jsonBufferGet();
-	PublishStatus status;
 
 	if (getDataSize() >= unsigned(JSON_BUFFER_SIZE)) {
 		payload =  _recoverDataFromBuffer();
-		status = DataBufferOverflow;
+		data.status = DataBufferOverflow;
 	} else if (currentPublish - _lastPublish <= 1) {
-		status = PublishingAtMaxFrequency;
-	} else {
-		status = Normal;
+		data.status = PublishingAtMaxFrequency;
+	} else if (_jsonDocument.overflowed()) {
+		data.status = JsonDocumentOverflow;
 	}
 
 	_lastPublish = currentPublish;
@@ -46,8 +46,9 @@ void DataQueue::publish(String event, PublishFlags flag1, PublishFlags flag2) {
 		_publishQueue->publish(event, payload, flag1, flag2);
 	}
 
+	// clear and reset reinitialize json document and invoke publish callback
 	_jsonDocumentRefresh();
-	_publishCallback(payload, status);
+	_publishCallback(payload, data);
 }
 
 size_t DataQueue::getBufferSize() {
@@ -56,6 +57,14 @@ size_t DataQueue::getBufferSize() {
 
 size_t DataQueue::getDataSize() {
 	return measureJson(_jsonDocument);
+}
+
+size_t DataQueue::getMemoryUsage() {
+	return _jsonDocument.memoryUsage();
+}
+
+bool DataQueue::verifyJsonStatus() {
+	return !_jsonDocument.overflowed();
 }
 
 void DataQueue::_jsonDocumentRefresh() {
