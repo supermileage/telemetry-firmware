@@ -57,17 +57,27 @@ class SensorBms : public CanListener {
         const uint16_t _requestIntervalMs;
 
         const uint8_t _paramIds[NUM_PARAMS] = 
-            {   PARAM_ID_PACK_VOLTAGE, 
-                PARAM_ID_PACK_CURRENT, 
+            {   PARAM_ID_BATTERY_VOLTAGE, 
+                PARAM_ID_BATTERY_CURRENT, 
                 PARAM_ID_MAX_CELL_VOLTAGE, 
                 PARAM_ID_MIN_CELL_VOLTAGE, 
                 PARAM_ID_STATUS, 
                 PARAM_ID_SOC, 
                 PARAM_ID_TEMP};
 
-        
+        // Data
+        float _batteryVoltage;
+        float _batteryCurrent;
+        float _cellVoltageMax;
+        float _cellVoltageMin;
+        String _bmsStatus;
+        float _soc;
+        int _tempBms;
+        int _batteryTemp1;
+        int _batteryTemp2;
 
-        
+        float parseFloat(uint8_t* dataPtr);
+
 };
 
 #endif
