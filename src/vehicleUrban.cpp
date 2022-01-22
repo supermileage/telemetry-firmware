@@ -20,26 +20,42 @@ CanListenerAccessories canListenerAccessories(&canInterface, CAN_ACC_STATUS,
     STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS });
 
 // Command definitions
-SensorCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
-SensorCommand<SensorGps, String> gpsLong(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
-SensorCommand<SensorThermo, String> thermoTemp1(&thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
-SensorCommand<CanListenerAccessories, int> urbanHeadlights(&canListenerAccessories, "u-hl", &CanListenerAccessories::getStatusHeadlights, 1);
-SensorCommand<CanListenerAccessories, int> urbanBrakelights(&canListenerAccessories, "u-bl", &CanListenerAccessories::getStatusBrakelights, 1);
-SensorCommand<CanListenerAccessories, int> urbanHorn(&canListenerAccessories, "u-hrn", &CanListenerAccessories::getStatusHorn, 1);
-SensorCommand<CanListenerAccessories, int> urbanHazards(&canListenerAccessories, "u-haz", &CanListenerAccessories::getStatusHazards, 1);
-SensorCommand<CanListenerAccessories, int> urbanRightSig(&canListenerAccessories, "u-rsig", &CanListenerAccessories::getStatusRightSignal, 1);
-SensorCommand<CanListenerAccessories, int> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
-SensorCommand<CanListenerAccessories, int> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
+LoggingCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
+LoggingCommand<SensorGps, String> gpsLong(&gps, "URBAN-Longitude", &SensorGps::getLongitude, 1);
+LoggingCommand<SensorThermo, String> thermoTemp1(&thermo1, "URBAN-Temperature", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<CanListenerAccessories, int> urbanHeadlights(&canListenerAccessories, "u-hl", &CanListenerAccessories::getStatusHeadlights, 1);
+LoggingCommand<CanListenerAccessories, int> urbanBrakelights(&canListenerAccessories, "u-bl", &CanListenerAccessories::getStatusBrakelights, 1);
+LoggingCommand<CanListenerAccessories, int> urbanHorn(&canListenerAccessories, "u-hrn", &CanListenerAccessories::getStatusHorn, 1);
+LoggingCommand<CanListenerAccessories, int> urbanHazards(&canListenerAccessories, "u-haz", &CanListenerAccessories::getStatusHazards, 1);
+LoggingCommand<CanListenerAccessories, int> urbanRightSig(&canListenerAccessories, "u-rsig", &CanListenerAccessories::getStatusRightSignal, 1);
+LoggingCommand<CanListenerAccessories, int> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
+LoggingCommand<CanListenerAccessories, int> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
 
 // Array Definitions - MUST BE NULL TERMINATED
 IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig,
     &urbanLeftSig, &urbanWipers, NULL};
 
 String publishName = "BQIngestion";
+void sendCanSpeed(float speed){
+    CanMessage message = CAN_MESSAGE_NULL; // construct the message and 
+    message.id = CAN_TELEMETRY_GPS_SPEED;
+    if (speed <= 70.0 && speed >= 0){
+        message.data[0] = (uint8_t)(speed*3.6);
+        message.dataLength = 1;
+        canInterface.sendMessage(message);
+    }
+    else{
+        message.data[0] = (uint8_t)(255);
+        message.dataLength = 1;
+        canInterface.sendMessage(message);
+    }
+    
+}
 
-// CurrentVehicle namespace definitions
-Dispatcher* CurrentVehicle::buildDispatcher() {
-    DispatcherBuilder builder(commands, &dataQ, publishName);
+
+LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    gps.updateSpeedCallback(sendCanSpeed);
     return builder.build();
 }
 

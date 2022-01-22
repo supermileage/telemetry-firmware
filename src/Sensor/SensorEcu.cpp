@@ -1,4 +1,13 @@
 #include "SensorEcu.h"
+#include "settings.h"
+
+#define ECU_PACKET_SIZE         27
+
+#define ECU_HEADER_1            0x80
+#define ECU_HEADER_2            0x8F
+#define ECU_HEADER_3            0xEA
+#define ECU_DATA_FIELD_LENGTH   0x16
+#define ECU_SERVICE_ID          0x50
 
 SensorEcu::SensorEcu(USARTSerial *serial)
 {
@@ -24,49 +33,47 @@ void SensorEcu::flush()
 
 void SensorEcu::handle()
 {
-    if (_serial->available() < 27)
-    {
+    if (_serial->available() < ECU_PACKET_SIZE) {
         return;
     }
+
     uint8_t buffer[27];
 
-    _serial->readBytes((char *)buffer, 27);
-
-    uint8_t header1 = buffer[0] & 0xFF;
-    uint8_t header2 = buffer[1] & 0xFF;
-    uint8_t header3 = buffer[2] & 0xFF;
-
-    uint8_t dataLengthField = buffer[3] & 0xFF;
-    uint8_t serviceId = buffer[4] & 0xFF;
+    _serial->readBytes((char *)buffer, ECU_PACKET_SIZE);
 
     uint8_t checkSum = 0;
     for(int i = 0; i < 26; i++) {
         checkSum += buffer[i];
     }
 
-    if(checkSum != buffer[26]) {
-        Serial.println("Error: Checksum not valid");
-    }
+    // Check if the header is correct
+    if (buffer[0] == ECU_HEADER_1 && 
+        buffer[1] == ECU_HEADER_2 && 
+        buffer[2] == ECU_HEADER_3 && 
+        buffer[3] == ECU_DATA_FIELD_LENGTH && 
+        buffer[4] == ECU_SERVICE_ID) {
 
-    if (
-        header1 == 0x80 &&
-        header2 == 0x8F &&
-        header3 == 0xEA &&
-        dataLengthField == 0x16 &&
-        serviceId == 0x50 &&
-        checkSum == buffer[26]){
-        // Data is valid
-        _rpm = this->_interpretValue(buffer[6], buffer[7], 0.25, 0.0);
-        _map = this->_interpretValue(buffer[8], buffer[9], 0.0039, 0.0);
-        _tps = this->_interpretValue(buffer[10], buffer[11], 0.0015, 0.0);
-        _ect = this->_interpretValue(buffer[12], buffer[13], 1, -40.0);
-        _iat = this->_interpretValue(buffer[14], buffer[15], 1, -40.0);
-        _o2s = this->_interpretValue(buffer[16], buffer[17], 0.0048, 0.0);
-        _spark = this->_interpretValue(buffer[18], buffer[19], 0.5, 0.0);
-        _fuelPW1 = this->_interpretValue(buffer[20], buffer[21], 0.001, 0.0);
-        _fuelPW2 = this->_interpretValue(buffer[22], buffer[23], 0.001, 0.0);
-        _ubAdc = this->_interpretValue(buffer[24], buffer[25], 0.00625, 0.0);
+            // Check if the checksum is correct
+            if(checkSum == buffer[26]){
+
+                // Data is valid, update all fields
+                _rpm = this->_interpretValue(buffer[6], buffer[7], 0.25, 0.0);
+                _map = this->_interpretValue(buffer[8], buffer[9], 0.0039, 0.0);
+                _tps = this->_interpretValue(buffer[10], buffer[11], 0.0015, 0.0);
+                _ect = this->_interpretValue(buffer[12], buffer[13], 1, -40.0);
+                _iat = this->_interpretValue(buffer[14], buffer[15], 1, -40.0);
+                _o2s = this->_interpretValue(buffer[16], buffer[17], 0.0048, 0.0);
+                _spark = this->_interpretValue(buffer[18], buffer[19], 0.5, 0.0);
+                _fuelPW1 = this->_interpretValue(buffer[20], buffer[21], 0.001, 0.0);
+                _fuelPW2 = this->_interpretValue(buffer[22], buffer[23], 0.001, 0.0);
+                _ubAdc = this->_interpretValue(buffer[24], buffer[25], 0.00625, 0.0);
+
+            } else {
+                DEBUG_SERIAL_LN("ERROR: ECU Packet Checksum Invalid");
+            }
+
     }else{
+        // The header is not correct, flush the serial buffer
         flush();
     }
 }

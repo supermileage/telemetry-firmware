@@ -25,3 +25,6 @@
 [submodule "lib/BackgroundPublishRK"]
 	path = lib/BackgroundPublishRK
 	url = https://github.com/rickkas7/BackgroundPublishRK.git
+[submodule "lib/ArduinoJson"]
+	path = lib/ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git

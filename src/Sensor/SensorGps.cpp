@@ -47,6 +47,9 @@ void SensorGps::handle() {
 
         // Calculate XY Acceleration
         float horizontalSpeed = _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
+        if(_speedCallback){
+            _speedCallback(horizontalSpeed); 
+            }       
         _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
         _lastHorizontalSpeed = horizontalSpeed;
 
@@ -119,4 +122,7 @@ String SensorGps::getVerticalAccuracy() {
 
 int SensorGps::getSatellitesInView() {
     return _gps->getSIV();  
+}
+void SensorGps::updateSpeedCallback(void (*speed)(float)){
+   _speedCallback  = speed;
 }

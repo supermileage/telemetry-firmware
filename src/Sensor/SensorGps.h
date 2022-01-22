@@ -91,6 +91,11 @@ class SensorGps : public Sensor {
          **/
         int getSatellitesInView();
 
+        /**
+         * @return Horizontal speed (m/s) fro ethe steering wheel
+         **/
+        void updateSpeedCallback(void (*speed)(float));
+
     private:
         SFE_UBLOX_GNSS* _gps;
         uint8_t _updateFrequency;
@@ -104,6 +109,7 @@ class SensorGps : public Sensor {
         float _verticalSpeed = 0.0;
         float _lastVerticalSpeed = 0.0;
         float _verticalAcceleration = 0.0;
+        void (*_speedCallback)(float) = NULL;
 
 };
 
