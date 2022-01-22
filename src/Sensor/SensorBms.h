@@ -5,8 +5,8 @@
 
 #define NUM_PARAMS                  7
 
-#define PARAM_ID_PACK_VOLTAGE       0x14
-#define PARAM_ID_PACK_CURRENT       0x15
+#define PARAM_ID_BATTERY_VOLTAGE    0x14
+#define PARAM_ID_BATTERY_CURRENT    0x15
 #define PARAM_ID_MAX_CELL_VOLTAGE   0x16
 #define PARAM_ID_MIN_CELL_VOLTAGE   0x17
 #define PARAM_ID_STATUS             0x18
@@ -32,8 +32,6 @@ class SensorBms : public CanListener {
 
         void update(CanMessage message);
 
-        String getSoc();
-
         String getBatteryVolt();
 
         String getBatteryCurrent();
@@ -43,6 +41,8 @@ class SensorBms : public CanListener {
         String getMinVolt();
 
         String getStatusBMS();
+
+        String getSoc();
 
         int getTempBMS();
 
@@ -64,6 +64,10 @@ class SensorBms : public CanListener {
                 PARAM_ID_STATUS, 
                 PARAM_ID_SOC, 
                 PARAM_ID_TEMP};
+
+        
+
+        
 };
 
 #endif
