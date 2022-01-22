@@ -1,15 +1,27 @@
 #ifndef _SENSOR_BMS_H_
 #define _SENSOR_BMS_H_
 
-#include "Sensor.h"
+#include "CanListener.h"
 
-class SensorBms : public Sensor {
+#define NUM_PARAMS                  7
+
+#define PARAM_ID_PACK_VOLTAGE       0x14
+#define PARAM_ID_PACK_CURRENT       0x15
+#define PARAM_ID_MAX_CELL_VOLTAGE   0x16
+#define PARAM_ID_MIN_CELL_VOLTAGE   0x17
+#define PARAM_ID_STATUS             0x18
+#define PARAM_ID_SOC                0x1A
+#define PARAM_ID_TEMP               0x1B
+
+using namespace can;
+
+class SensorBms : public CanListener {
     public:
 
         /**
-         * 
-         **/
-        void begin();
+         * CONSTRUCTOR
+         */
+        SensorBms(CanInterface &canInterface, uint16_t requestIntervalMs);
 
         /**
          * 
@@ -17,6 +29,8 @@ class SensorBms : public Sensor {
         void handle();
 
         String getHumanName();
+
+        void update(CanMessage message);
 
         String getSoc();
 
@@ -38,6 +52,18 @@ class SensorBms : public Sensor {
 
     private:
 
+        unsigned long _lastValidTime = 0;
+
+        const uint16_t _requestIntervalMs;
+
+        const uint8_t _paramIds[NUM_PARAMS] = 
+            {   PARAM_ID_PACK_VOLTAGE, 
+                PARAM_ID_PACK_CURRENT, 
+                PARAM_ID_MAX_CELL_VOLTAGE, 
+                PARAM_ID_MIN_CELL_VOLTAGE, 
+                PARAM_ID_STATUS, 
+                PARAM_ID_SOC, 
+                PARAM_ID_TEMP};
 };
 
 #endif

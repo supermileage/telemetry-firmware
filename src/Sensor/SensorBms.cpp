@@ -1,27 +1,36 @@
 #include "SensorBms.h"
 
-#define PARAM_ID_PACK_VOLTAGE       0x14
-#define PARAM_ID_PACK_CURRENT       0x15
-#define PARAM_ID_MAX_CELL_VOLTAGE   0x16
-#define PARAM_ID_MIN_CELL_VOLTAGE   0x17
-#define PARAM_ID_STATUS             0x18
-#define PARAM_ID_SOC                0x1A
-#define PARAM_ID_TEMP               0x1B
-
 #define TEMP_ID_INTERNAL            0x00
 #define TEMP_ID_BATTERY_1           0x01
 #define TEMP_ID_BATTERY_2           0x02
 
-void SensorBms::begin() {
+#define REQ_DATA_LENGTH             8
 
-}
+SensorBms::SensorBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
+    : CanListener(canInterface, CAN_BMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {}
 
 void SensorBms::handle() {
-    
+    if(millis() - _lastValidTime >= _requestIntervalMs) {
+
+        for(int i = 0; i < NUM_PARAMS; i++) {
+            CanMessage msg = CAN_MESSAGE_NULL;
+            msg.id = CAN_BMS_REQUEST;
+            msg.dataLength = REQ_DATA_LENGTH;
+            msg.data[0] = _paramIds[i];
+            
+            _canInterface.sendMessage(msg);
+        }
+        
+        _lastValidTime = millis();
+    }
 }
 
 String SensorBms::getHumanName() {
     return "BMS";
+}
+
+void SensorBms::update(CanMessage message) {
+    DEBUG_SERIAL_LN("RECEIVED RESPONSE FROM BMS");
 }
 
 String SensorBms::getSoc() {

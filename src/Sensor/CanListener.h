@@ -13,7 +13,7 @@ class CanListener : public Sensor {
          * 
          * @param &can object to use
          **/
-        CanListener(CanInterface* canInterface, uint16_t id) : _canInterface(canInterface), _id(id) { }
+        CanListener(CanInterface &canInterface, uint16_t id) : _canInterface(canInterface), _id(id) { }
 
         /**
 		 * @brief Called on setup: adds id and delegate to can interface
@@ -25,7 +25,7 @@ class CanListener : public Sensor {
         virtual String getHumanName() = 0;
 
     protected:
-        CanInterface* _canInterface;
+        CanInterface &_canInterface;
         uint16_t _id;
 
         /**
@@ -33,7 +33,7 @@ class CanListener : public Sensor {
          * 
          * @param message CanMessage received from CanInterface
          */
-        virtual void update(CanMessage message) = 0;
+        virtual void update(CanMessage message)=0;
 
         /**
 		 * CanListener-internal class which acts as a delegate to CanInterface; allows

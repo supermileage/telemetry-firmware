@@ -31,7 +31,7 @@ class CanListenerAccessories : public CanListener {
 		 * @note size of ids array can be increased if we need to listen to more Can status messages
 		 */
 		typedef std::array<uint8_t, 7> StatusIds;
-		CanListenerAccessories(CanInterface* canInterface, uint16_t id, StatusIds ids);
+		CanListenerAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids);
 
 		/**
 		 * @brief Nothing to handle here
