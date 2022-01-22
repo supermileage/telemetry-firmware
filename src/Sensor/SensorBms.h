@@ -18,10 +18,25 @@ class SensorBms : public Sensor {
 
         String getHumanName();
 
-        float getSoc();
+        String getSoc();
+
+        String getBatteryVolt();
+
+        String getBatteryCurrent();
+
+        String getMaxVolt();
+
+        String getMinVolt();
+
+        String getStatusBMS();
+
+        int getTempBMS();
+
+        int getBatteryTemp1();
+
+        int getBatteryTemp2();
 
     private:
-
 
 };
 

@@ -1,4 +1,5 @@
 #include "SensorGps.h"
+#include "settings.h"
 
 // GPS Update Frequency in Hz (1-10)
 #define UPDATE_FREQ 4
@@ -72,50 +73,50 @@ uint32_t SensorGps::getUnixTime() {
 }
 
 String SensorGps::getLongitude() {
-    return String::format("%.7f",_gps->getLongitude() / TEN_POWER_SEVEN);
+    return FLOAT_TO_STRING(_gps->getLongitude() / TEN_POWER_SEVEN, 6);
 }
 
 String SensorGps::getLatitude() {
-    return String::format("%.7f",_gps->getLatitude() / TEN_POWER_SEVEN);
+    return FLOAT_TO_STRING(_gps->getLatitude() / TEN_POWER_SEVEN, 6);
 }
 
 String SensorGps::getHeading() {
-    return String::format("%.5f",_gps->getHeading() / TEN_POWER_FIVE);    
+    return FLOAT_TO_STRING(_gps->getHeading() / TEN_POWER_FIVE, 5);    
 }
 
 String SensorGps::getHorizontalSpeed() {
-    return String::format("%.2f",_gps->getGroundSpeed() / MILIMETERS_IN_METERS);  
+    return FLOAT_TO_STRING(_gps->getGroundSpeed() / MILIMETERS_IN_METERS, 2);  
 }
 
 String SensorGps::getHorizontalAcceleration() {
-    return String::format("%.2f",_horizontalAcceleration);  
+    return FLOAT_TO_STRING(_horizontalAcceleration, 2);  
 }
 
 String SensorGps::getHorizontalAccuracy() {
     float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
     if (value < 0.0001 || value > 10000.0) value = 10000.0;
-    return String::format("%.2f",value);  
+    return FLOAT_TO_STRING(value, 2);  
 }
 
 String SensorGps::getAltitude() {
     if(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS < 0.0001) return "0.00";
-    return String::format("%.2f",_gps->getAltitudeMSL() / MILIMETERS_IN_METERS);  
+    return FLOAT_TO_STRING(_gps->getAltitudeMSL() / MILIMETERS_IN_METERS, 2);  
 }
 
 String SensorGps::getVerticalSpeed() {
-    return String::format("%.2f",_verticalSpeed);  
+    return FLOAT_TO_STRING(_verticalSpeed, 2);  
 }
 
 String SensorGps::getVerticalAcceleration() {
-    return String::format("%.2f",_verticalAcceleration);  
+    return FLOAT_TO_STRING(_verticalAcceleration, 2);  
 }
 
 String SensorGps::getVerticalAccuracy() {
     float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
     if (value < 0.0001 || value > 10000.0) value = 10000.0;
-    return String::format("%.2f",value);  
+    return FLOAT_TO_STRING(value, 2);  
 }
 
-String SensorGps::getSatellitesInView() {
-    return String::format("%d",_gps->getSIV());  
+int SensorGps::getSatellitesInView() {
+    return _gps->getSIV();  
 }

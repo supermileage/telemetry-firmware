@@ -89,7 +89,7 @@ class SensorGps : public Sensor {
         /**
          * @return Number of Satellites currently seen by GPS
          **/
-        String getSatellitesInView();
+        int getSatellitesInView();
 
     private:
         SFE_UBLOX_GNSS* _gps;
