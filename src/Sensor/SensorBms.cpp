@@ -37,7 +37,7 @@ void SensorBms::update(CanMessage message) {
     DEBUG_SERIAL_LN("RECEIVED RESPONSE FROM BMS");
 
     if(message.data[RSP_STATUS_BYTE] != TRUE) {
-        DEBUG_SERIAL_LN("BAD DATA?");
+        DEBUG_SERIAL_LN("Poor Data Received");
     }
     else {
         switch (message.data[RSP_PARAM_ID_BYTE]) {
@@ -45,29 +45,53 @@ void SensorBms::update(CanMessage message) {
                 _batteryVoltage = parseFloat(message.data + RSP_DATA_BYTE);
             break;
             case PARAM_ID_BATTERY_CURRENT:
-                _batteryVoltage = parseFloat(message.data + RSP_DATA_BYTE);
+                _batteryCurrent = parseFloat(message.data + RSP_DATA_BYTE);
             break;
             case PARAM_ID_MAX_CELL_VOLTAGE:
-                
+                _cellVoltageMax = parseFloat(message.data + RSP_DATA_BYTE);    
             break;
             case PARAM_ID_MIN_CELL_VOLTAGE:
-                
+                _cellVoltageMin = parseFloat(message.data + RSP_DATA_BYTE);    
             break;
             case PARAM_ID_STATUS:
-                
+                unsigned int statusCode = (message.data[3] << 8) + message.data[2];
+                if(statusCode == STATUS_CHARGING) {
+                    _bmsStatus = "BMS Charging...";
+                    DEBUG_SERIAL_LN("BMS Charging...");
+                }
+                else if(statusCode == STATUS_CHARGED) {
+                    _bmsStatus = "BMS Charged!";
+                    DEBUG_SERIAL_LN("BMS Charged!");
+                }
+                else if(statusCode == STATUS_DISCHARGING) {
+                    _bmsStatus = "BMS Discharging...";
+                    DEBUG_SERIAL_LN("BMS Discharging...");
+                }
+                else if(statusCode == STATUS_REGENERATION) {
+                    _bmsStatus = "BMS Regeneration";
+                    DEBUG_SERIAL_LN("BMS Regeneration");
+                }
+                else if(statusCode == STATUS_IDLE) {
+                    _bmsStatus = "BMS Idle";
+                    DEBUG_SERIAL_LN("BMS Idle");
+                }
+                else {
+                    _bmsStatus = "BMS Fault Error";
+                    DEBUG_SERIAL_LN("BMS Fault Error");
+                }
             break;
             case PARAM_ID_SOC:
-                
+                _soc = parseFloat(message.data + RSP_DATA_BYTE);    
             break;
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
-                    _tempBms =
+                    _tempBms = (message.data[4] << 8) + message.data[3]
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_1) {
-                    _batteryTemp1 = 
+                    _batteryTemp1 = (message.data[4] << 8) + message.data[3]
                 }
                 else {
-                    _batteryTemp2 = 
+                    _batteryTemp2 = (message.data[4] << 8) + message.data[3]
                 }
             break;
             default:
@@ -75,40 +99,40 @@ void SensorBms::update(CanMessage message) {
     }
 }
 
-String SensorBms::getSoc() {
-    return "0.0"; 
+float SensorBms::getBatteryVolt() {
+    return _batteryVoltage;
 }
 
-String SensorBms::getBatteryVolt() {
-    return "0.0";
+float SensorBms::getBatteryCurrent() {
+    return _batteryCurrent;
 }
 
-String SensorBms::getBatteryCurrent() {
-    return "0.0";
+float SensorBms::getMaxVolt() {
+    return _cellVoltageMax;
 }
 
-String SensorBms::getMaxVolt() {
-    return "0.0";
+float SensorBms::getMinVolt() {
+    return _cellVoltageMin;
 }
 
-String SensorBms::getMinVolt() {
-    return "0.0";
+float SensorBms::getSoc() {
+    return _soc; 
 }
 
-String SensorBms::getStatusBMS() {
-    return "0.0";
+String SensorBms::getStatusBms() {
+    return _bmsStatus;
 }
 
-int SensorBms::getTempBMS() {
-    return 0;
+int SensorBms::getTempBms() {
+    return _tempBms;
 }
 
 int SensorBms::getBatteryTemp1() {
-    return 0;
+    return _batteryTemp1;
 }
 
 int SensorBms::getBatteryTemp2() {
-    return 0;
+    return _batteryTemp2;
 }
 
 float SensorBms::parseFloat(uint8_t* dataPtr) {

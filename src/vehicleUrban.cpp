@@ -54,7 +54,6 @@ void sendCanSpeed(float speed){
     
 }
 
-
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
     gps.updateSpeedCallback(sendCanSpeed);
@@ -87,8 +86,18 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Right Signal: " + String(canListenerAccessories.getStatusRightSignal()) + " - ");
     DEBUG_SERIAL("Left Signal: " + String(canListenerAccessories.getStatusLeftSignal()) + " - ");
     DEBUG_SERIAL_LN("Wipers: " + String(canListenerAccessories.getStatusWipers()));
-
-    DEBUG_SERIAL_LN("");
+    // BMS
+    DEBUG_SERIAL("Battery Voltage: " + bms.getBatteryVolt() + "V");
+    DEBUG_SERIAL("Battery Current: " + bms.getBatteryCurrent() + "V");
+    DEBUG_SERIAL("Max Cell Voltage: " + bms.getMaxVolt() + "V");
+    DEBUG_SERIAL("Min Cell Voltage: " + bms.getMinVolt() + "V");
+    DEBUG_SERIAL("State of Charge: " + bms.getSoc() + "%");
+    DEBUG_SERIAL("BMS Status: " + bms.getStatusBms());
+    DEBUG_SERIAL("BMS Temperature: " + bms.getTempBms() + "°C");
+    DEBUG_SERIAL("Battery Temperature 1: " + bms.getBatteryTemp1() + "°C");
+    DEBUG_SERIAL_LN("Battery Temperature 2: " + bms.getBatteryTemp2() + "°C");
+  
+    DEBUG_SERIAL_LN();
 }
 
 bool CurrentVehicle::getTimeValid() {

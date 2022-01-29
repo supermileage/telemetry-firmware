@@ -13,6 +13,13 @@
 #define PARAM_ID_SOC                0x1A
 #define PARAM_ID_TEMP               0x1B
 
+#define STATUS_CHARGING             0x91
+#define STATUS_CHARGED              0x92
+#define STATUS_DISCHARGING          0x93
+#define STATUS_REGENERATION         0x96
+#define STATUS_IDLE                 0x97
+#define STATUS_FAULT_ERROR          0x9B
+
 using namespace can;
 
 class SensorBms : public CanListener {
@@ -32,19 +39,19 @@ class SensorBms : public CanListener {
 
         void update(CanMessage message);
 
-        String getBatteryVolt();
+        float getBatteryVolt();
 
-        String getBatteryCurrent();
+        float getBatteryCurrent();
 
-        String getMaxVolt();
+        float getMaxVolt();
 
-        String getMinVolt();
+        float getMinVolt();
 
-        String getStatusBMS();
+        float getSoc();
 
-        String getSoc();
+        String getStatusBms();
 
-        int getTempBMS();
+        int getTempBms();
 
         int getBatteryTemp1();
 
@@ -70,8 +77,8 @@ class SensorBms : public CanListener {
         float _batteryCurrent;
         float _cellVoltageMax;
         float _cellVoltageMin;
-        String _bmsStatus;
         float _soc;
+        String _bmsStatus;
         int _tempBms;
         int _batteryTemp1;
         int _batteryTemp2;
