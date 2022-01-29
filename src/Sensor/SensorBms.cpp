@@ -40,21 +40,22 @@ void SensorBms::update(CanMessage message) {
         DEBUG_SERIAL_LN("Poor Data Received");
     }
     else {
+        unsigned statusCode = 0;
         switch (message.data[RSP_PARAM_ID_BYTE]) {
             case PARAM_ID_BATTERY_VOLTAGE:
                 _batteryVoltage = parseFloat(message.data + RSP_DATA_BYTE);
-            break;
+                break;
             case PARAM_ID_BATTERY_CURRENT:
                 _batteryCurrent = parseFloat(message.data + RSP_DATA_BYTE);
-            break;
+                break;
             case PARAM_ID_MAX_CELL_VOLTAGE:
                 _cellVoltageMax = parseFloat(message.data + RSP_DATA_BYTE);    
-            break;
+                break;
             case PARAM_ID_MIN_CELL_VOLTAGE:
                 _cellVoltageMin = parseFloat(message.data + RSP_DATA_BYTE);    
-            break;
+                break;
             case PARAM_ID_STATUS:
-                unsigned int statusCode = (message.data[3] << 8) + message.data[2];
+                statusCode = (message.data[3] << 8) + message.data[2];
                 if(statusCode == STATUS_CHARGING) {
                     _bmsStatus = "BMS Charging...";
                     DEBUG_SERIAL_LN("BMS Charging...");
@@ -79,22 +80,23 @@ void SensorBms::update(CanMessage message) {
                     _bmsStatus = "BMS Fault Error";
                     DEBUG_SERIAL_LN("BMS Fault Error");
                 }
-            break;
+                break;
             case PARAM_ID_SOC:
                 _soc = parseFloat(message.data + RSP_DATA_BYTE);    
-            break;
+                break;
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
-                    _tempBms = (message.data[4] << 8) + message.data[3]
+                    _tempBms = (message.data[4] << 8) + message.data[3];
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_1) {
-                    _batteryTemp1 = (message.data[4] << 8) + message.data[3]
+                    _batteryTemp1 = (message.data[4] << 8) + message.data[3];
                 }
                 else {
-                    _batteryTemp2 = (message.data[4] << 8) + message.data[3]
+                    _batteryTemp2 = (message.data[4] << 8) + message.data[3];
                 }
-            break;
+                break;
             default:
+                break;
         }
     }
 }

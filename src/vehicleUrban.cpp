@@ -87,15 +87,15 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Left Signal: " + String(canListenerAccessories.getStatusLeftSignal()) + " - ");
     DEBUG_SERIAL_LN("Wipers: " + String(canListenerAccessories.getStatusWipers()));
     // BMS
-    DEBUG_SERIAL("Battery Voltage: " + bms.getBatteryVolt() + "V");
-    DEBUG_SERIAL("Battery Current: " + bms.getBatteryCurrent() + "V");
-    DEBUG_SERIAL("Max Cell Voltage: " + bms.getMaxVolt() + "V");
-    DEBUG_SERIAL("Min Cell Voltage: " + bms.getMinVolt() + "V");
-    DEBUG_SERIAL("State of Charge: " + bms.getSoc() + "%");
+    DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "V");
+    DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "V");
+    DEBUG_SERIAL("Max Cell Voltage: " + String(bms.getMaxVolt()) + "V");
+    DEBUG_SERIAL("Min Cell Voltage: " + String(bms.getMinVolt()) + "V");
+    DEBUG_SERIAL("State of Charge: " + String(bms.getSoc()) + "%");
     DEBUG_SERIAL("BMS Status: " + bms.getStatusBms());
-    DEBUG_SERIAL("BMS Temperature: " + bms.getTempBms() + "°C");
-    DEBUG_SERIAL("Battery Temperature 1: " + bms.getBatteryTemp1() + "°C");
-    DEBUG_SERIAL_LN("Battery Temperature 2: " + bms.getBatteryTemp2() + "°C");
+    DEBUG_SERIAL("BMS Temperature: " + String(bms.getTempBms()) + "°C");
+    DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getBatteryTemp1()) + "°C");
+    DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getBatteryTemp2()) + "°C");
   
     DEBUG_SERIAL_LN();
 }
