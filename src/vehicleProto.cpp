@@ -22,14 +22,11 @@ LoggingCommand<SensorEcu, String> ecuSpark(&ecu, "PROTO-SPARK", &SensorEcu::getS
 LoggingCommand<SensorGps, String> gpsLat(&gps, "PROTO-Latitude", &SensorGps::getLatitude, 5);
 LoggingCommand<SensorGps, String> gpsHvel(&gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
 
-// Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
-
 String publishName = "BQIngestion";
 
 // CurrrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
 

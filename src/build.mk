@@ -24,3 +24,6 @@ EXTRA_CFLAGS += '-DARDUINO=1'
 #	-mcp2515_can
 EXTRA_CFLAGS += '-DDEBUG_RXANY=0'
 
+# Get rid of pragma region warnings
+EXTRA_CFLAGS += '-Wno-unknown-pragmas'
+

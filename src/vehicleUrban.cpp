@@ -31,10 +31,6 @@ LoggingCommand<CanListenerAccessories, int> urbanRightSig(&canListenerAccessorie
 LoggingCommand<CanListenerAccessories, int> urbanLeftSig(&canListenerAccessories, "u-lsig", &CanListenerAccessories::getStatusLeftSignal, 1);
 LoggingCommand<CanListenerAccessories, int> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
 
-// Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &gpsLat, &gpsLong, &thermoTemp1, &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig,
-    &urbanLeftSig, &urbanWipers, NULL};
-
 String publishName = "BQIngestion";
 void sendCanSpeed(float speed){
     CanMessage message = CAN_MESSAGE_NULL; // construct the message and 
@@ -57,7 +53,7 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
     gps.updateSpeedCallback(sendCanSpeed);
 
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
 
