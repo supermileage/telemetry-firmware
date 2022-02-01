@@ -6,7 +6,7 @@
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanListenerAccessories.h"
-#include "SensorBms.h"
+#include "CanSensorBms.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -19,7 +19,7 @@ SensorVoltage inVoltage;
 CanListenerAccessories canListenerAccessories(canInterface, CAN_ACC_STATUS,
     { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
     STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS });
-SensorBms bms(canInterface, 250);
+CanSensorBms bms(canInterface, 250);
 
 // Command definitions
 LoggingCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);

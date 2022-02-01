@@ -1,19 +1,10 @@
-#include "SensorBms.h"
+#include "CanSensorBms.h"
+#include "settings.h"
 
-#define TEMP_ID_INTERNAL    0x00
-#define TEMP_ID_BATTERY_1   0x01
-#define TEMP_ID_BATTERY_2   0x02
-
-#define REQ_DATA_LENGTH     8
-
-#define RSP_STATUS_BYTE     0x0
-#define RSP_PARAM_ID_BYTE   0x1
-#define RSP_DATA_BYTE       0x2
-
-SensorBms::SensorBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
+CanSensorBms::CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
     : CanListener(canInterface, CAN_BMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {}
 
-void SensorBms::handle() {
+void CanSensorBms::handle() {
     if(millis() - _lastValidTime >= _requestIntervalMs) {
 
         for(int i = 0; i < NUM_PARAMS; i++) {
@@ -24,20 +15,18 @@ void SensorBms::handle() {
             
             _canInterface.sendMessage(msg);
         }
-        
         _lastValidTime = millis();
     }
 }
 
-String SensorBms::getHumanName() {
-    return "BMS";
+String CanSensorBms::getHumanName() {
+    return "CanSensorBms";
 }
 
-void SensorBms::update(CanMessage message) {
-    DEBUG_SERIAL_LN("RECEIVED RESPONSE FROM BMS");
+void CanSensorBms::update(CanMessage message) {
 
     if(message.data[RSP_STATUS_BYTE] != TRUE) {
-        DEBUG_SERIAL_LN("Poor Data Received");
+        DEBUG_SERIAL_LN("Poor BMS Data Received");
     }
     else {
         unsigned statusCode = 0;
@@ -58,27 +47,21 @@ void SensorBms::update(CanMessage message) {
                 statusCode = (message.data[3] << 8) + message.data[2];
                 if(statusCode == STATUS_CHARGING) {
                     _bmsStatus = "BMS Charging...";
-                    DEBUG_SERIAL_LN("BMS Charging...");
                 }
                 else if(statusCode == STATUS_CHARGED) {
                     _bmsStatus = "BMS Charged!";
-                    DEBUG_SERIAL_LN("BMS Charged!");
                 }
                 else if(statusCode == STATUS_DISCHARGING) {
                     _bmsStatus = "BMS Discharging...";
-                    DEBUG_SERIAL_LN("BMS Discharging...");
                 }
                 else if(statusCode == STATUS_REGENERATION) {
                     _bmsStatus = "BMS Regeneration";
-                    DEBUG_SERIAL_LN("BMS Regeneration");
                 }
                 else if(statusCode == STATUS_IDLE) {
                     _bmsStatus = "BMS Idle";
-                    DEBUG_SERIAL_LN("BMS Idle");
                 }
                 else {
                     _bmsStatus = "BMS Fault Error";
-                    DEBUG_SERIAL_LN("BMS Fault Error");
                 }
                 break;
             case PARAM_ID_SOC:
@@ -91,7 +74,7 @@ void SensorBms::update(CanMessage message) {
                 else if(message.data[5] == TEMP_ID_BATTERY_1) {
                     _batteryTemp1 = (message.data[4] << 8) + message.data[3];
                 }
-                else {
+                else if(message.data[5] == TEMP_ID_BATTERY_2) {
                     _batteryTemp2 = (message.data[4] << 8) + message.data[3];
                 }
                 break;
@@ -101,43 +84,43 @@ void SensorBms::update(CanMessage message) {
     }
 }
 
-float SensorBms::getBatteryVolt() {
-    return _batteryVoltage;
+String CanSensorBms::getBatteryVolt() {
+    return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
-float SensorBms::getBatteryCurrent() {
-    return _batteryCurrent;
+String CanSensorBms::getBatteryCurrent() {
+    return FLOAT_TO_STRING(_batteryCurrent, 3);
 }
 
-float SensorBms::getMaxVolt() {
-    return _cellVoltageMax;
+String CanSensorBms::getMaxVolt() {
+    return FLOAT_TO_STRING(_cellVoltageMax, 2);
 }
 
-float SensorBms::getMinVolt() {
-    return _cellVoltageMin;
+String CanSensorBms::getMinVolt() {
+    return FLOAT_TO_STRING(_cellVoltageMin, 2);
 }
 
-float SensorBms::getSoc() {
-    return _soc; 
+String CanSensorBms::getSoc() {
+    return FLOAT_TO_STRING(_soc, 1); 
 }
 
-String SensorBms::getStatusBms() {
+String CanSensorBms::getStatusBms() {
     return _bmsStatus;
 }
 
-int SensorBms::getTempBms() {
+int CanSensorBms::getTempBms() {
     return _tempBms;
 }
 
-int SensorBms::getBatteryTemp1() {
+int CanSensorBms::getBatteryTemp1() {
     return _batteryTemp1;
 }
 
-int SensorBms::getBatteryTemp2() {
+int CanSensorBms::getBatteryTemp2() {
     return _batteryTemp2;
 }
 
-float SensorBms::parseFloat(uint8_t* dataPtr) {
+float CanSensorBms::parseFloat(uint8_t* dataPtr) {
     float output;
     memcpy((void*)&output, (void*)dataPtr, 4);
     return output;
