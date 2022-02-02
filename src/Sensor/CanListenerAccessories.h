@@ -78,16 +78,15 @@ class CanListenerAccessories : public CanListener {
 		 */
 		int getStatusWipers();
 
-	protected:
+	private:
+		std::map<uint8_t, uint8_t> _statuses;
+
 		/**
 		 * @brief adds data to appropriate byte of _data's data buffer
 		 * 
 		 * @param data data byte to be added to internal can message
 		 */
 		void update(CanMessage message);
-
-	private:
-		std::map<uint8_t, uint8_t> _statuses;
 };
 
 #endif

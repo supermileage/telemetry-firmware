@@ -98,14 +98,6 @@ class CanSensorBms : public CanListener {
          */
         int getBatteryTemp2();
 
-    protected:
-        /**
-         * @brief Determines type of bms data and stores respectively
-         * 
-         * @param message data byte to be added to internal can message
-         */
-        void update(CanMessage message);
-
     private:
 
         unsigned long _lastValidTime = 0;
@@ -133,6 +125,13 @@ class CanSensorBms : public CanListener {
         int _batteryTemp2;
 
         float parseFloat(uint8_t* dataPtr);
+
+        /**
+         * @brief Determines type of bms data and stores respectively
+         * 
+         * @param message data byte to be added to internal can message
+         */
+        void update(CanMessage message);
 };
 
 #endif
