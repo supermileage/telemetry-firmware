@@ -9,7 +9,7 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define URBAN
+    #define FC
 #endif
 
 // Logging enabled at boot-up, control logging with button or Particle Function
@@ -47,5 +47,7 @@
 #endif
 
 #define FLOAT_TO_STRING(x,y) String(x).substring(0,String(x).indexOf('.') + y + 1)
+
+#define BOOL_TO_STRING(x) String((x < 2) ? ((x == 1) ? "ON" : "OFF") : "N/A")
 
 #endif
