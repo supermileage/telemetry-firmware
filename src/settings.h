@@ -1,6 +1,8 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
+#include "Particle.h"
+
 /**
  *  SETTINGS
 **/
@@ -43,5 +45,7 @@
 #elif   defined(FC)
     #define VEHICLE_NAME "FC"
 #endif
+
+#define FLOAT_TO_STRING(x,y) String(x).substring(0,String(x).indexOf('.') + y + 1)
 
 #endif

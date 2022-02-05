@@ -6,6 +6,7 @@
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanListenerAccessories.h"
+#include "CanSensorBms.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -15,9 +16,10 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-CanListenerAccessories canListenerAccessories(&canInterface, CAN_ACC_STATUS,
+CanListenerAccessories canListenerAccessories(canInterface, CAN_ACC_STATUS,
     { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
     STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS });
+CanSensorBms bms(canInterface, 250);
 
 // Command definitions
 LoggingCommand<SensorGps, String> gpsLat(&gps, "URBAN-Latitude", &SensorGps::getLatitude, 1);
@@ -51,7 +53,6 @@ void sendCanSpeed(float speed){
     }
     
 }
-
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
@@ -87,8 +88,18 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Right Signal: " + String(canListenerAccessories.getStatusRightSignal()) + " - ");
     DEBUG_SERIAL("Left Signal: " + String(canListenerAccessories.getStatusLeftSignal()) + " - ");
     DEBUG_SERIAL_LN("Wipers: " + String(canListenerAccessories.getStatusWipers()));
-
-    DEBUG_SERIAL_LN("");
+    // BMS
+    DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "V");
+    DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "V");
+    DEBUG_SERIAL("Max Cell Voltage: " + String(bms.getMaxVolt()) + "V");
+    DEBUG_SERIAL("Min Cell Voltage: " + String(bms.getMinVolt()) + "V");
+    DEBUG_SERIAL("State of Charge: " + String(bms.getSoc()) + "%");
+    DEBUG_SERIAL("BMS Status: " + bms.getStatusBms());
+    DEBUG_SERIAL("BMS Temperature: " + String(bms.getTempBms()) + "°C");
+    DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getBatteryTemp1()) + "°C");
+    DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getBatteryTemp2()) + "°C");
+  
+    DEBUG_SERIAL_LN();
 }
 
 bool CurrentVehicle::getTimeValid() {

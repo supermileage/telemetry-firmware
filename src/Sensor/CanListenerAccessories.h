@@ -31,7 +31,7 @@ class CanListenerAccessories : public CanListener {
 		 * @note size of ids array can be increased if we need to listen to more Can status messages
 		 */
 		typedef std::array<uint8_t, 7> StatusIds;
-		CanListenerAccessories(CanInterface* canInterface, uint16_t id, StatusIds ids);
+		CanListenerAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids);
 
 		/**
 		 * @brief Nothing to handle here
@@ -78,16 +78,15 @@ class CanListenerAccessories : public CanListener {
 		 */
 		int getStatusWipers();
 
-	protected:
+	private:
+		std::map<uint8_t, uint8_t> _statuses;
+
 		/**
 		 * @brief adds data to appropriate byte of _data's data buffer
 		 * 
 		 * @param data data byte to be added to internal can message
 		 */
 		void update(CanMessage message);
-
-	private:
-		std::map<uint8_t, uint8_t> _statuses;
 };
 
 #endif
