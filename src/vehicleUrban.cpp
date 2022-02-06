@@ -60,7 +60,7 @@ IntervalCommand *commands[] = { &signalStrength, &signalQuality, &voltage, &ther
                                 &gpsLong, &gpsLat, &gpsHorSpeed, &gpsHorAccel, &gpsVertAccel, &gpsHorAccuracy, &gpsVerAccuracy, &gpsHorAccuracy, &gpsVerAccuracy, 
                                 &thermoMotor,
                                 &bmsSoc, &bmsVoltage, &bmsCurrent, &bmsCellMax, &bmsCellMin, &bmsStatus, &bmsTempInternal, &bmsTempBatt1, &bmsTempBatt2, 
-                                &urbanHeadlights, &urbanBrakeLights, &urbanHorn, &urbanHazards, &urbanRightSig, &urbanLeftSig, &urbanWipers, 
+                                &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig, &urbanLeftSig, &urbanWipers, 
                                 NULL};
 
 String publishName = "BQIngestion";
@@ -90,7 +90,7 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 }
 
 void CurrentVehicle::debugSensorData() {
-    // Diagnostic
+    // System
     DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "% - ");
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "% - ");
     DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + "v - ");
@@ -116,7 +116,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("BMS Temperature: " + String(bms.getTempBms()) + "°C - ");
     DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getBatteryTemp1()) + "°C - ");
     DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getBatteryTemp2()) + "°C");
-    // CAN ACCESSORIES
+    // CAN Accessories
     DEBUG_SERIAL("Headlights: " + BOOL_TO_STRING(canSensorAccessories.getStatusHeadlights()) + " - ");
     DEBUG_SERIAL("Brakelights: " + BOOL_TO_STRING(canSensorAccessories.getStatusBrakelights()) + " - ");
     DEBUG_SERIAL("Horn: " + BOOL_TO_STRING(canSensorAccessories.getStatusHorn()) + " - ");

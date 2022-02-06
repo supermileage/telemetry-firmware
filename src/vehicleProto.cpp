@@ -53,7 +53,7 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 }
 
 void CurrentVehicle::debugSensorData() {
-    // Diagnostic
+    // System
     DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "% - ");
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "% - ");
     DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + "v - ");
@@ -77,9 +77,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("ECU Intake Temp: " + String(ecu.getIAT()) + "°C - ");
     DEBUG_SERIAL("ECU O2 Sensor: " + ecu.getO2S() + "v - ");
     DEBUG_SERIAL("ECU Spark Advance: " + String(ecu.getSpark()) + "° - ");
-    DEBUG_SERIAL("ECU Fuel PWM 1: " + ecu.getFuelPW1() + "ms - ");
-    DEBUG_SERIAL("ECU Fuel PWM 2: " + ecu.getFuelPW2() + "ms - ");
-    DEBUG_SERIAL_LN("ECU Input Voltage: " + ecu.getUbAdc() + "v");
+    DEBUG_SERIAL_LN("ECU Fuel PWM 1: " + ecu.getFuelPW1() + "ms");
 
     DEBUG_SERIAL_LN();
 }
