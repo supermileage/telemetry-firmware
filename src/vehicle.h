@@ -16,6 +16,7 @@
 extern DataQueue dataQ;
 
 namespace CurrentVehicle {
+
     /**
      *  Returns dispatcher with current vehicle's set of commands
     **/
@@ -36,6 +37,10 @@ namespace CurrentVehicle {
     **/
     uint32_t getUnixTime(); 
 
+    /**
+     * @brief Toggle override for GPS position greenlist
+    **/
+    void toggleGpsOverride();
 }
 
 #endif

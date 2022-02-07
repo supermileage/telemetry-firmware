@@ -74,4 +74,8 @@ uint32_t CurrentVehicle::getUnixTime() {
     return gps.getUnixTime();
 }
 
+void CurrentVehicle::toggleGpsOverride() {
+    gps.toggleOverride();
+}
+
 #endif
