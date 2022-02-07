@@ -42,7 +42,7 @@ LoggingCommand<CanSensorBms, String> bmsVoltage(&bms, "bmsv", &CanSensorBms::get
 LoggingCommand<CanSensorBms, String> bmsCurrent(&bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
 LoggingCommand<CanSensorBms, String> bmsCellMax(&bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
 LoggingCommand<CanSensorBms, String> bmsCellMin(&bms, "cminv", &CanSensorBms::getMinVolt, 5);
-LoggingCommand<CanSensorBms, String> bmsStatus(&bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
+LoggingCommand<CanSensorBms, int> bmsStatus(&bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
 LoggingCommand<CanSensorBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorBms::getTempBms, 5);
 LoggingCommand<CanSensorBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorBms::getBatteryTemp1, 5);
 LoggingCommand<CanSensorBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorBms::getBatteryTemp2, 5);
@@ -112,7 +112,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Max Cell Voltage: " + String(bms.getMaxVolt()) + "v - ");
     DEBUG_SERIAL("Min Cell Voltage: " + String(bms.getMinVolt()) + "v - ");
     DEBUG_SERIAL("State of Charge: " + String(bms.getSoc()) + "% - ");
-    DEBUG_SERIAL("BMS Status: " + bms.getStatusBms() + " - ");
+    DEBUG_SERIAL("BMS Status: " + bms.getStatusBmsString() + " - ");
     DEBUG_SERIAL("BMS Temperature: " + String(bms.getTempBms()) + "°C - ");
     DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getBatteryTemp1()) + "°C - ");
     DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getBatteryTemp2()) + "°C");
