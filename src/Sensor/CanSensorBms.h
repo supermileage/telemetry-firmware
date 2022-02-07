@@ -99,10 +99,9 @@ class CanSensorBms : public CanListener {
         int getBatteryTemp2();
 
     private:
-
         unsigned long _lastValidTime = 0;
-
         const uint16_t _requestIntervalMs;
+        String _bmsStatus;
 
         const uint8_t _paramIds[NUM_PARAMS] = 
             {   PARAM_ID_BATTERY_VOLTAGE, 
