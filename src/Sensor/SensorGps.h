@@ -89,7 +89,7 @@ class SensorGps : public Sensor {
         /**
          * @return Number of Satellites currently seen by GPS
          **/
-        String getSatellitesInView();
+        int getSatellitesInView();
 
         /**
          * @return Horizontal speed (m/s) fro ethe steering wheel
