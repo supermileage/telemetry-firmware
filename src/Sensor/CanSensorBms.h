@@ -111,6 +111,8 @@ class CanSensorBms : public CanListener {
                 PARAM_ID_STATUS, 
                 PARAM_ID_SOC, 
                 PARAM_ID_TEMP};
+        
+        uint8_t _currentParam = 0;
 
         // Data
         float _batteryVoltage;
@@ -118,12 +120,16 @@ class CanSensorBms : public CanListener {
         float _cellVoltageMax;
         float _cellVoltageMin;
         float _soc;
-        String _bmsStatus;
+        String _bmsStatus = "BMS Unknown";
         int _tempBms;
         int _batteryTemp1;
         int _batteryTemp2;
 
         float parseFloat(uint8_t* dataPtr);
+
+        uint16_t parseInt16(uint8_t* dataPtr);
+
+        uint32_t parseInt32(uint8_t* dataPtr);
 
         /**
          * @brief Determines type of bms data and stores respectively

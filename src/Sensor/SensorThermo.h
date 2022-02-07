@@ -30,12 +30,12 @@ class SensorThermo : public Sensor {
         /**
          * @return current probe temperature in Celsius
          **/
-        String getProbeTemp();
+        int getProbeTemp();
 
         /**
          * @return current internal temperature in Celsius
          **/
-        String getInternalTemp();
+        int getInternalTemp();
 
     private:
         Adafruit_MAX31855* _probe;

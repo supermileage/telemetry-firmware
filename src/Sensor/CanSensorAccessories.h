@@ -15,7 +15,7 @@ using namespace can;
  * @brief Class which stores and updates status for Can accessories
  * 
  */
-class CanListenerAccessories : public CanListener {
+class CanSensorAccessories : public CanListener {
 	public:
 		/**
 		 * @brief return values for getStatus methods
@@ -23,7 +23,7 @@ class CanListenerAccessories : public CanListener {
 		enum Status { Off = 0, On = 1, Unknown = 2 };
 
 		/**
-		 * @brief Constructor for CanListenerAccessories
+		 * @brief Constructor for CanSensorAccessories
 		 * 
 		 * @param canInterface the can interface which will be reading data from Can buffer
 		 * @param id the id of the Can message this object will listen for
@@ -31,7 +31,7 @@ class CanListenerAccessories : public CanListener {
 		 * @note size of ids array can be increased if we need to listen for more Can status messages
 		 */
 		typedef std::array<uint8_t, 7> StatusIds;
-		CanListenerAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids);
+		CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids);
 
 		/**
 		 * @brief Nothing to handle here

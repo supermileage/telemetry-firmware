@@ -31,7 +31,7 @@ class SensorEcu : public Sensor {
         /**
          * @return Engine Speed, RPM
          * */
-        String getRPM();
+        int getRPM();
 
         /**
         * @return Manifold Absolute Pressure, kPa
@@ -41,17 +41,17 @@ class SensorEcu : public Sensor {
         /**
         * @return Throttle Position Sensor, %
         * */
-        String getTPS();
+        int getTPS();
 
         /**
         * @return Engine Coolant Temperature, DegC
         * */
-        String getECT();
+        int getECT();
 
         /**
         * @return Intake Air Temperature, DegC
         * */
-        String getIAT();
+        int getIAT();
 
         /**
         * @return Oxygen Sensor, V
@@ -61,7 +61,7 @@ class SensorEcu : public Sensor {
         /**
         * @return Spark (Advance/Retard), CrA
         * */
-        String getSpark();
+        int getSpark();
 
         /**
         * @return Fuel Injector 1 PWM Duty Cycle, ms
@@ -80,13 +80,13 @@ class SensorEcu : public Sensor {
 
     private:
         USARTSerial * _serial;
-        float _rpm = 0;
+        int _rpm = 0;
         float _map = 0;
-        float _tps = 0;
-        float _ect = 0;
-        float _iat = 0;
+        int _tps = 0;
+        int _ect = 0;
+        int _iat = 0;
         float _o2s = 0;
-        float _spark = 0;
+        int _spark = 0;
         float _fuelPW1 = 0;
         float _fuelPW2 = 0;
         float _ubAdc = 0;

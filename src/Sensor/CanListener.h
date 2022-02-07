@@ -59,7 +59,7 @@ class CanListener : public Sensor {
 				 * Delegate function which will be called in CanInterface:
 				 * takes CanMessage* as argument and passes it to update
 				 * 
-				 * @param args cast CanMessage with this CanListenerAccessories's id
+				 * @param args cast CanMessage with this CanSensorAccessories's id
 				 */
 				void execute(CommandArgs args) override;
 			private:

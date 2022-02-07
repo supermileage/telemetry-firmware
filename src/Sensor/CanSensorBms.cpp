@@ -7,14 +7,19 @@ CanSensorBms::CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalM
 void CanSensorBms::handle() {
     if(millis() - _lastValidTime >= _requestIntervalMs) {
 
-        for(int i = 0; i < NUM_PARAMS; i++) {
-            CanMessage msg = CAN_MESSAGE_NULL;
-            msg.id = CAN_BMS_REQUEST;
-            msg.dataLength = REQ_DATA_LENGTH;
-            msg.data[0] = _paramIds[i];
+        CanMessage msg = CAN_MESSAGE_NULL;
+        msg.id = CAN_BMS_REQUEST;
+        msg.dataLength = REQ_DATA_LENGTH;
+        msg.data[0] = _paramIds[_currentParam];
             
-            _canInterface.sendMessage(msg);
+        _canInterface.sendMessage(msg);
+
+        if(_currentParam == NUM_PARAMS) {
+            _currentParam = 0;
+        } else {
+            _currentParam++;
         }
+
         _lastValidTime = millis();
     }
 }
@@ -29,22 +34,21 @@ void CanSensorBms::update(CanMessage message) {
         DEBUG_SERIAL_LN("Poor BMS Data Received");
     }
     else {
-        unsigned statusCode = 0;
         switch (message.data[RSP_PARAM_ID_BYTE]) {
             case PARAM_ID_BATTERY_VOLTAGE:
-                _batteryVoltage = parseFloat(message.data + RSP_DATA_BYTE);
+                _batteryVoltage = parseFloat(message.data);
                 break;
             case PARAM_ID_BATTERY_CURRENT:
-                _batteryCurrent = parseFloat(message.data + RSP_DATA_BYTE);
+                _batteryCurrent = parseFloat(message.data);
                 break;
             case PARAM_ID_MAX_CELL_VOLTAGE:
-                _cellVoltageMax = parseFloat(message.data + RSP_DATA_BYTE);    
+                _cellVoltageMax = (float)parseInt16(message.data) / 1000.0; 
                 break;
             case PARAM_ID_MIN_CELL_VOLTAGE:
-                _cellVoltageMin = parseFloat(message.data + RSP_DATA_BYTE);    
+                _cellVoltageMin = (float)parseInt16(message.data) / 1000.0; 
                 break;
-            case PARAM_ID_STATUS:
-                statusCode = (message.data[3] << 8) + message.data[2];
+            case PARAM_ID_STATUS: {
+                unsigned statusCode = parseInt16(message.data);
                 if(statusCode == STATUS_CHARGING) {
                     _bmsStatus = "charge";
                 }
@@ -64,18 +68,19 @@ void CanSensorBms::update(CanMessage message) {
                     _bmsStatus = "fault";
                 }
                 break;
+            }
             case PARAM_ID_SOC:
-                _soc = parseFloat(message.data + RSP_DATA_BYTE);    
+                _soc = (float)parseInt32(message.data) / 1000000.0;    
                 break;
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
-                    _tempBms = (message.data[4] << 8) + message.data[3];
+                    _tempBms = parseInt16(message.data + 1) / 10;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_1) {
-                    _batteryTemp1 = (message.data[4] << 8) + message.data[3];
+                    _batteryTemp1 = parseInt16(message.data + 1) / 10;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_2) {
-                    _batteryTemp2 = (message.data[4] << 8) + message.data[3];
+                    _batteryTemp2 = parseInt16(message.data + 1) / 10;
                 }
                 break;
             default:
@@ -122,6 +127,18 @@ int CanSensorBms::getBatteryTemp2() {
 
 float CanSensorBms::parseFloat(uint8_t* dataPtr) {
     float output;
-    memcpy((void*)&output, (void*)dataPtr, 4);
+    memcpy((void*)&output, (void*)(dataPtr + RSP_DATA_BYTE), 4);
     return output;
+}
+
+uint16_t CanSensorBms::parseInt16(uint8_t* dataPtr) {
+    return ((uint16_t)dataPtr[RSP_DATA_BYTE + 1] << 8) 
+            | dataPtr[RSP_DATA_BYTE];
+}
+
+uint32_t CanSensorBms::parseInt32(uint8_t* dataPtr) {
+    return ((uint32_t)dataPtr[RSP_DATA_BYTE + 3] << 24) 
+            | ((uint32_t)dataPtr[RSP_DATA_BYTE + 2] << 16)
+            | ((uint32_t)dataPtr[RSP_DATA_BYTE + 1] << 8)
+            | dataPtr[RSP_DATA_BYTE];
 }
