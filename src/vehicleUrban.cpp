@@ -32,6 +32,7 @@ LoggingCommand<CanListenerAccessories, int> urbanLeftSig(&canListenerAccessories
 LoggingCommand<CanListenerAccessories, int> urbanWipers(&canListenerAccessories, "u-wpr", &CanListenerAccessories::getStatusWipers, 1);
 
 String publishName = "BQIngestion";
+
 void sendCanSpeed(float speed){
     CanMessage message = CAN_MESSAGE_NULL; // construct the message and 
     message.id = CAN_TELEMETRY_GPS_SPEED;
@@ -47,7 +48,6 @@ void sendCanSpeed(float speed){
     }
     
 }
-
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup

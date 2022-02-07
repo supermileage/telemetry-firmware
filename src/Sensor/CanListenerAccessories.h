@@ -36,7 +36,7 @@ class CanListenerAccessories : public CanListener {
 		/**
 		 * @brief Nothing to handle here
 		 */
-		void handle() { }
+		void handle() override { }
 
 		/**
 		 * @brief Get the string name of this object
@@ -78,16 +78,15 @@ class CanListenerAccessories : public CanListener {
 		 */
 		int getStatusWipers();
 
-	protected:
+	private:
+		std::map<uint8_t, uint8_t> _statuses;
+
 		/**
 		 * @brief adds data to appropriate byte of _data's data buffer
 		 * 
 		 * @param data data byte to be added to internal can message
 		 */
-		void update(CanMessage message);
-
-	private:
-		std::map<uint8_t, uint8_t> _statuses;
+		void update(CanMessage message) override;
 };
 
 #endif

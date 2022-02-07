@@ -25,9 +25,9 @@ class LoggingDispatcher : public Handleable {
          *  Must be called from main loop!  Takes times since program start (in seconds) and checks whether
          *  execute needs to be called on any of its commandGroups
          **/
-        void handle();
+        void handle() override;
 
-        void begin() { }
+        void begin() override { }
 
         /**
          * @brief turns on/off logging and publishing: will publish if turned off with data in buffer 
@@ -35,9 +35,9 @@ class LoggingDispatcher : public Handleable {
         void setLoggingEnabled(bool value);
 
     private:
-        DataQueue *_dataQ;
+        DataQueue* _dataQ;
         uint16_t* _maxPublishSizes;
-        IntervalCommandGroup **_commandGroups;
+        IntervalCommandGroup** _commandGroups;
 		uint16_t _numCommandGroups;
         bool _loggingEnabled = LOGGING_EN_AT_BOOT;
         bool _logThisLoop = FALSE;

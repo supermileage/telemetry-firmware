@@ -13,7 +13,7 @@ template <class C, class R>
 class LoggingCommand : public IntervalCommand {
     public:
         /**
-         * Constructs a LoggingCommand with object, property name, getter method and interval.
+         * Constructs a LoggingCommand with object, property name, getter method pointer and interval.
          * Adds this to static collection of interval commands
          * 
          * @param object pointer to object of class C which we will call _getter on
@@ -36,7 +36,7 @@ class LoggingCommand : public IntervalCommand {
          * 
          * @param args pointer to JsonObject
          */
-        void execute(CommandArgs args) {
+        void execute(CommandArgs args) override {
             (*(JsonObject*)args)[_propertyName] = (*_object.*_getter)();
         }
 

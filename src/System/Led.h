@@ -16,12 +16,12 @@ class Led : public Handleable {
         Led(uint16_t pin, uint8_t brightness);
         ~Led();
 
-        void begin();
+        void begin() override;
 
         /**
          * Handles flashing and pulsing, should be run as often as possible
          * */
-        void handle();
+        void handle() override;
 
         /**
          * Turn LED on
