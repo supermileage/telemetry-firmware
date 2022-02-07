@@ -34,6 +34,7 @@ using namespace can;
 
 class CanSensorBms : public CanListener {
     public:
+        enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, Unknown };
     
         /**
          * @brief Constructor for CanSensorBms
@@ -81,7 +82,12 @@ class CanSensorBms : public CanListener {
         /**
          * @brief Get the current Bms status
          */
-        String getStatusBms();
+        int getStatusBms();
+
+        /**
+         * @brief Get current Bms status as string
+         */
+        String getStatusBmsString();
 
         /**
          * @brief Get the Bms internal temperature
@@ -120,11 +126,12 @@ class CanSensorBms : public CanListener {
         float _batteryCurrent;
         float _cellVoltageMax;
         float _cellVoltageMin;
-        float _soc;
-        String _bmsStatus = "BMS Unknown";
+        float _soc;        
         int _tempBms;
         int _batteryTemp1;
         int _batteryTemp2;
+        BmsStatus _bmsStatus = Unknown;
+        const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
 
         float parseFloat(uint8_t* dataPtr);
 
