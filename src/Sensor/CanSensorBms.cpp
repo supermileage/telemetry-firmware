@@ -50,6 +50,7 @@ void CanSensorBms::update(CanMessage message) {
             case PARAM_ID_STATUS: {
                 unsigned statusCode = parseInt16(message.data);
                 if(statusCode == STATUS_CHARGING) {
+<<<<<<< HEAD
                     _bmsStatus = "charge";
                 }
                 else if(statusCode == STATUS_CHARGED) {
@@ -66,6 +67,25 @@ void CanSensorBms::update(CanMessage message) {
                 }
                 else {
                     _bmsStatus = "fault";
+=======
+                    _bmsStatus = Charging;
+                }
+                else if(statusCode == STATUS_CHARGED) {
+                    _bmsStatus = Charged;
+                }
+                else if(statusCode == STATUS_DISCHARGING) {
+                    _bmsStatus = Discharging;
+                }
+                else if(statusCode == STATUS_REGENERATION) {
+                    _bmsStatus = Regeneration;
+                }
+                else if(statusCode == STATUS_IDLE) {
+                    _bmsStatus = Idle;
+                }
+                else
+                {
+                    _bmsStatus = FaultError;
+>>>>>>> develop_misc
                 }
                 break;
             }
@@ -109,8 +129,12 @@ String CanSensorBms::getSoc() {
     return FLOAT_TO_STRING(_soc, 1); 
 }
 
-String CanSensorBms::getStatusBms() {
+int CanSensorBms::getStatusBms() {
     return _bmsStatus;
+}
+
+String CanSensorBms::getStatusBmsString() {
+    return String(bmsStatuses[_bmsStatus]);
 }
 
 int CanSensorBms::getTempBms() {
