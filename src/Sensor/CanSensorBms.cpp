@@ -50,24 +50,6 @@ void CanSensorBms::update(CanMessage message) {
             case PARAM_ID_STATUS: {
                 unsigned statusCode = parseInt16(message.data);
                 if(statusCode == STATUS_CHARGING) {
-<<<<<<< HEAD
-                    _bmsStatus = "charge";
-                }
-                else if(statusCode == STATUS_CHARGED) {
-                    _bmsStatus = "charged";
-                }
-                else if(statusCode == STATUS_DISCHARGING) {
-                    _bmsStatus = "discharge";
-                }
-                else if(statusCode == STATUS_REGENERATION) {
-                    _bmsStatus = "regen";
-                }
-                else if(statusCode == STATUS_IDLE) {
-                    _bmsStatus = "idle";
-                }
-                else {
-                    _bmsStatus = "fault";
-=======
                     _bmsStatus = Charging;
                 }
                 else if(statusCode == STATUS_CHARGED) {
@@ -85,7 +67,6 @@ void CanSensorBms::update(CanMessage message) {
                 else
                 {
                     _bmsStatus = FaultError;
->>>>>>> develop_misc
                 }
                 break;
             }
