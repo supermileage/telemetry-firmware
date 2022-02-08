@@ -43,7 +43,7 @@ class CanListener : public Sensor {
          * 
          * @param message CanMessage received from CanInterface
          */
-        virtual void update(CanMessage message)=0;
+        virtual void update(CanMessage message) = 0;
 
         /**
 		 * CanListener-internal class which acts as a delegate to CanInterface; allows

@@ -109,7 +109,7 @@ String CanSensorBms::getSoc() {
     return FLOAT_TO_STRING(_soc, 1); 
 }
 
-String CanSensorBms::getStatusBmsAs() {
+String CanSensorBms::getStatusBms() {
     return _bmsStatus;
 }
 
