@@ -1,5 +1,6 @@
 #include "SensorGps.h"
 #include "settings.h"
+#include "gpsGreenlist.h"
 
 // GPS Update Frequency in Hz (1-10)
 #define UPDATE_FREQ 4
@@ -76,11 +77,33 @@ uint32_t SensorGps::getUnixTime() {
 }
 
 String SensorGps::getLongitude() {
-    return FLOAT_TO_STRING(_gps->getLongitude() / TEN_POWER_SEVEN, 6);
+    double longitude = _gps->getLongitude() / TEN_POWER_SEVEN;
+    double latitude = _gps->getLatitude() / TEN_POWER_SEVEN;
+    if(_override) {
+        return FLOAT_TO_STRING(longitude, 6);
+    } else {
+        for(positionBox p : GREEN_LIST) {
+            if(p.isWithin(longitude, latitude)) {
+                return FLOAT_TO_STRING(longitude, 6);
+            }
+        }
+    }
+    return "?";
 }
 
 String SensorGps::getLatitude() {
-    return FLOAT_TO_STRING(_gps->getLatitude() / TEN_POWER_SEVEN, 6);
+    double longitude = _gps->getLongitude() / TEN_POWER_SEVEN;
+    double latitude = _gps->getLatitude() / TEN_POWER_SEVEN;
+    if(_override) {
+        return FLOAT_TO_STRING(latitude, 6);
+    } else {
+        for(positionBox p : GREEN_LIST) {
+            if(p.isWithin(longitude, latitude)) {
+                return FLOAT_TO_STRING(latitude, 6);
+            }
+        }
+    }
+    return "?";
 }
 
 String SensorGps::getHeading() {
@@ -127,3 +150,9 @@ int SensorGps::getSatellitesInView() {
 void SensorGps::updateSpeedCallback(void (*speed)(float)){
    _speedCallback  = speed;
 }
+
+void SensorGps::toggleOverride() {
+    _override = !_override;
+}
+
+

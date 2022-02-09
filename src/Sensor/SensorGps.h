@@ -92,9 +92,16 @@ class SensorGps : public Sensor {
         int getSatellitesInView();
 
         /**
-         * @return Horizontal speed (m/s) fro ethe steering wheel
+         * @brief Update the callback function used by GPS to notify higher-level class of new GPS speed
+         * 
+         * @param speed() Pointer to function to call when there is a new speed
          **/
         void updateSpeedCallback(void (*speed)(float));
+
+        /**
+         * @brief Toggle greenlist override
+         **/
+        void toggleOverride();
 
     private:
         SFE_UBLOX_GNSS* _gps;
@@ -110,6 +117,7 @@ class SensorGps : public Sensor {
         float _lastVerticalSpeed = 0.0;
         float _verticalAcceleration = 0.0;
         void (*_speedCallback)(float) = NULL;
+        bool _override = false;
 
 };
 
