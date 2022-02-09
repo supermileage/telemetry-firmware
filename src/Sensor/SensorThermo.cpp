@@ -18,14 +18,14 @@ void SensorThermo::begin() {
 void SensorThermo::handle() {
 }
 
-int SensorThermo::getProbeTemp() {
+int SensorThermo::getProbeTemp(bool &valid) {
     int value = _probe->readCelsius();
-    if (value == NAN) value = 0;
+    valid = (value != NAN);
     return value;
 }
 
-int SensorThermo::getInternalTemp() {
+int SensorThermo::getInternalTemp(bool &valid) {
     int value = _probe->readInternal();
-    if (value == NAN) value = 0;
+    valid = (value != NAN);
     return value;
 }

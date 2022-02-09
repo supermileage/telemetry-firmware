@@ -20,7 +20,7 @@ class LoggingCommand : public IntervalCommand {
          * @param getter pointer to object's getter method
          * @param interval interval (in seconds) at which this command will be called to execute
          **/
-        LoggingCommand(C* object, String propertyName, R (C::*getter)(), uint16_t interval)
+        LoggingCommand(C* object, String propertyName, R (C::*getter)(bool&), uint16_t interval)
         : IntervalCommand(interval) {
             _object = object;
             _getter = getter;
@@ -35,11 +35,15 @@ class LoggingCommand : public IntervalCommand {
          * @param args pointer to JsonObject
          */
         void execute(CommandArgs args) {
-            (*(JsonObject*)args)[_propertyName] = (*_object.*_getter)();
+            bool valid;
+            R value = (*_object.*_getter)(valid);
+            if(valid) {
+                (*(JsonObject*)args)[_propertyName] = value;
+            }
         }
 
     private:
-        R (C::*_getter)();
+        R (C::*_getter)(bool&);
         C *_object;
         String _propertyName;
 };

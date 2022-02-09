@@ -26,7 +26,7 @@ class SensorVoltage : public Sensor
         /**
          * @return //input voltage of Boron device
         **/
-        String getVoltage();
+        String getVoltage(bool &valid);
 
         
 };

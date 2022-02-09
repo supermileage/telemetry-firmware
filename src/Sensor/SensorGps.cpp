@@ -65,6 +65,13 @@ void SensorGps::handle() {
 
         _lastUpdateMicros = thisUpdateMicros;
     }
+
+    float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
+    if (value > 0.0001 || value < 1000.0) {
+        _valid = true;
+    } else{
+        _valid = false;
+    }
         
 }
 
@@ -76,9 +83,12 @@ uint32_t SensorGps::getUnixTime() {
     return _gps->getUnixEpoch();
 }
 
-String SensorGps::getLongitude() {
+String SensorGps::getLongitude(bool &valid) {
+    valid = _valid;
+
     double longitude = _gps->getLongitude() / TEN_POWER_SEVEN;
     double latitude = _gps->getLatitude() / TEN_POWER_SEVEN;
+
     if(_override) {
         return FLOAT_TO_STRING(longitude, 6);
     } else {
@@ -88,12 +98,17 @@ String SensorGps::getLongitude() {
             }
         }
     }
-    return "?";
+
+    valid = false;
+    return "NA";
 }
 
-String SensorGps::getLatitude() {
+String SensorGps::getLatitude(bool &valid) {
+    valid = _valid;
+
     double longitude = _gps->getLongitude() / TEN_POWER_SEVEN;
     double latitude = _gps->getLatitude() / TEN_POWER_SEVEN;
+
     if(_override) {
         return FLOAT_TO_STRING(latitude, 6);
     } else {
@@ -103,47 +118,53 @@ String SensorGps::getLatitude() {
             }
         }
     }
-    return "?";
+
+    valid = false;
+    return "NA";
 }
 
-String SensorGps::getHeading() {
+String SensorGps::getHeading(bool &valid) {
+    valid = _valid;
     return FLOAT_TO_STRING(_gps->getHeading() / TEN_POWER_FIVE, 5);    
 }
 
-String SensorGps::getHorizontalSpeed() {
+String SensorGps::getHorizontalSpeed(bool &valid) {
+    valid = _valid;
     return FLOAT_TO_STRING(_gps->getGroundSpeed() / MILIMETERS_IN_METERS, 2);  
 }
 
-String SensorGps::getHorizontalAcceleration() {
+String SensorGps::getHorizontalAcceleration(bool &valid) {
+    valid = _valid;
     return FLOAT_TO_STRING(_horizontalAcceleration, 2);  
 }
 
-String SensorGps::getHorizontalAccuracy() {
-    float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
-    if (value < 0.0001 || value > 10000.0) value = 10000.0;
-    return FLOAT_TO_STRING(value, 2);  
+String SensorGps::getHorizontalAccuracy(bool &valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS, 2);  
 }
 
-String SensorGps::getAltitude() {
-    if(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS < 0.0001) return "0.00";
+String SensorGps::getAltitude(bool &valid) {
+    valid = _valid;
     return FLOAT_TO_STRING(_gps->getAltitudeMSL() / MILIMETERS_IN_METERS, 2);  
 }
 
-String SensorGps::getVerticalSpeed() {
+String SensorGps::getVerticalSpeed(bool &valid) {
+    valid = _valid;
     return FLOAT_TO_STRING(_verticalSpeed, 2);  
 }
 
-String SensorGps::getVerticalAcceleration() {
+String SensorGps::getVerticalAcceleration(bool &valid) {
+    valid = _valid;
     return FLOAT_TO_STRING(_verticalAcceleration, 2);  
 }
 
-String SensorGps::getVerticalAccuracy() {
-    float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
-    if (value < 0.0001 || value > 10000.0) value = 10000.0;
-    return FLOAT_TO_STRING(value, 2);  
+String SensorGps::getVerticalAccuracy(bool &valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_gps->getVerticalAccEst() / MILIMETERS_IN_METERS, 2);  
 }
 
-int SensorGps::getSatellitesInView() {
+int SensorGps::getSatellitesInView(bool &valid) {
+    valid = true;
     return _gps->getSIV();  
 }
 

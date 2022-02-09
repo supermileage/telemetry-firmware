@@ -39,57 +39,57 @@ class SensorGps : public Sensor {
         /**
          * @return Longitude (degrees)
          **/
-        String getLongitude();
+        String getLongitude(bool &valid);
 
         /**
          * @return Latitude (degrees)
          **/
-        String getLatitude();
+        String getLatitude(bool &valid);
 
         /**
          * @return Heading of motion (degrees)
          **/
-        String getHeading();
+        String getHeading(bool &valid);
 
         /**
          * @return Horizontal speed (m/s)
          **/
-        String getHorizontalSpeed();
+        String getHorizontalSpeed(bool &valid);
 
         /**
          * @return Horizontal acceleration (m/s^2)
          **/
-        String getHorizontalAcceleration();
+        String getHorizontalAcceleration(bool &valid);
 
         /**
          * @return Horizontal position accuracy (m), max 10,000m
          **/
-        String getHorizontalAccuracy();
+        String getHorizontalAccuracy(bool &valid);
 
         /**
          * @return Vertical Position relative to Mean Sea Level (m)
          **/
-        String getAltitude();
+        String getAltitude(bool &valid);
 
         /**
          * @return Vertical speed (m/s)
          **/
-        String getVerticalSpeed();
+        String getVerticalSpeed(bool &valid);
         
         /**
          * @return Vertical acceleration b (m/s^2)
          **/
-        String getVerticalAcceleration();
+        String getVerticalAcceleration(bool &valid);
 
         /**
          * @return Vertical position accuracy (m), max 10,000m
          **/
-        String getVerticalAccuracy();
+        String getVerticalAccuracy(bool &valid);
 
         /**
          * @return Number of Satellites currently seen by GPS
          **/
-        int getSatellitesInView();
+        int getSatellitesInView(bool &valid);
 
         /**
          * @brief Update the callback function used by GPS to notify higher-level class of new GPS speed
@@ -106,6 +106,8 @@ class SensorGps : public Sensor {
     private:
         SFE_UBLOX_GNSS* _gps;
         uint8_t _updateFrequency;
+
+        bool _valid = false;
 
         uint64_t _lastUpdateMicros = 0;
 
