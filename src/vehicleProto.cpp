@@ -7,23 +7,42 @@
 // sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
-SensorThermo thermo2(&SPI, A4);
+// SensorThermo thermo2(&SPI, A4); // Currently unused
 SensorEcu ecu(&Serial1);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 // command definitions
-LoggingCommand<SensorEcu, String> ecuEct(&ecu, "PROTO-ECT", &SensorEcu::getECT, 1);
-LoggingCommand<SensorEcu, String> ecuIat(&ecu, "PROTO-IAT", &SensorEcu::getIAT, 1);
-LoggingCommand<SensorEcu, String> ecuRpm(&ecu, "PROTO-RPM", &SensorEcu::getRPM, 1);
-LoggingCommand<SensorEcu, String> ecuUbAdc(&ecu, "PROTO-UBADC", &SensorEcu::getUbAdc, 1);
-LoggingCommand<SensorEcu, String> ecu02S(&ecu, "PROTO-O2S", &SensorEcu::getO2S, 5);
-LoggingCommand<SensorEcu, String> ecuSpark(&ecu, "PROTO-SPARK", &SensorEcu::getSpark, 5);
-LoggingCommand<SensorGps, String> gpsLat(&gps, "PROTO-Latitude", &SensorGps::getLatitude, 5);
-LoggingCommand<SensorGps, String> gpsHvel(&gps, "PROTO-Speed", &SensorGps::getHorizontalSpeed, 1);
+LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
+LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
+LoggingCommand<SensorVoltage, String> voltage(&inVoltage, "vin", &SensorVoltage::getVoltage, 10);
+LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 10);
+
+LoggingCommand<SensorGps, String> gpsLong(&gps, "lon", &SensorGps::getLongitude, 1);
+LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
+LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1);
+LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1);
+LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1);
+LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10);
+LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
+
+LoggingCommand<SensorThermo, int> thermoEng(&thermo1, "tmpeng", &SensorThermo::getProbeTemp, 5);
+
+LoggingCommand<SensorEcu, int> ecuRpm(&ecu, "rpm", &SensorEcu::getRPM, 1);
+LoggingCommand<SensorEcu, String> ecuMap(&ecu, "map", &SensorEcu::getMap, 1);
+LoggingCommand<SensorEcu, int> ecuTps(&ecu, "tps", &SensorEcu::getTPS, 1);
+LoggingCommand<SensorEcu, int> ecuEct(&ecu, "ect", &SensorEcu::getECT, 5);
+LoggingCommand<SensorEcu, int> ecuIat(&ecu, "iat", &SensorEcu::getIAT, 5);
+LoggingCommand<SensorEcu, String> ecuO2s(&ecu, "o2s", &SensorEcu::getO2S, 1);
+LoggingCommand<SensorEcu, int> ecuSpark(&ecu, "spar", &SensorEcu::getSpark, 1);
+LoggingCommand<SensorEcu, String> ecuFuel(&ecu, "pw1", &SensorEcu::getFuelPW1, 1);
 
 // Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &ecuEct, &ecuIat, &ecuRpm, &ecuUbAdc, &ecu02S, &ecuSpark, &gpsLat, &gpsHvel, NULL};
+IntervalCommand *commands[] = { &signalStrength, &signalQuality, &voltage, &thermoInt, 
+                                &gpsLong, &gpsLat, &gpsHorSpeed, &gpsHorAccel, &gpsVertAccel, &gpsHorAccuracy, &gpsVerAccuracy, &gpsHorAccuracy, &gpsVerAccuracy, 
+                                &thermoEng, 
+                                &ecuRpm, &ecuTps, &ecuEct, &ecuIat, &ecuO2s, &ecuSpark, &ecuFuel, 
+                                NULL};
 
 String publishName = "BQIngestion";
 
@@ -34,34 +53,32 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 }
 
 void CurrentVehicle::debugSensorData() {
-    // Diagnostic
-    DEBUG_SERIAL("Signal Strength: " + sigStrength.getStrength() + " % - ");
-    DEBUG_SERIAL("Signal Quality: " + sigStrength.getQuality() + " % - ");
-    DEBUG_SERIAL_LN("Input Voltage: "+ String(inVoltage.getVoltage()) + " V");
-    // Thermocouples
-    DEBUG_SERIAL("Temperature (Thermo1): " + thermo1.getProbeTemp() + "°C - ");
-    DEBUG_SERIAL("Temperature (Thermo2): " + thermo2.getProbeTemp() + "°C - ");
-    DEBUG_SERIAL_LN("Internal Temperature (Thermo1): " + thermo1.getInternalTemp() + "°C");
+    // System
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "% - ");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "% - ");
+    DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + "v - ");
+    DEBUG_SERIAL_LN("Internal Temperature (Thermo1): " + String(thermo1.getInternalTemp()) + "°C");
     // GPS
     DEBUG_SERIAL("Longitude: " + gps.getLongitude() + "° - ");
     DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
-    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
-    DEBUG_SERIAL("Altitude: " + gps.getAltitude() + " m - ");
-    DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + " m/s^2 - ");
-    DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + " m - ");
-    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + " m - ");  
-    DEBUG_SERIAL_LN("Satellites in View: " + gps.getSatellitesInView());
+    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Altitude: " + gps.getAltitude() + "m - ");
+    DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + "m - ");
+    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");
+    DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
+    // Thermo
+    DEBUG_SERIAL_LN("Engine Temp (Thermocouple): " + String(thermo1.getProbeTemp()) + "°C");
     // Engine Computer
-    DEBUG_SERIAL("ECU RPM: " + ecu.getRPM() + " - ");
-    DEBUG_SERIAL("ECU MAP: " + ecu.getMap() + " kPa - ");
-    DEBUG_SERIAL("ECU TPS: " + ecu.getTPS() + " % - ");
-    DEBUG_SERIAL("ECU Coolant Temp: " + ecu.getECT() + "°C - ");
-    DEBUG_SERIAL("ECU Intake Temp: " + ecu.getIAT() + "°C - ");
-    DEBUG_SERIAL("ECU O2 Sensor: " + ecu.getO2S() + " V - ");
-    DEBUG_SERIAL("ECU Spark Advance: " + ecu.getSpark() + "° - ");
-    DEBUG_SERIAL("ECU Fuel PWM 1: " + ecu.getFuelPW1() + " ms - ");
-    DEBUG_SERIAL("ECU Fuel PWM 2: " + ecu.getFuelPW2() + " ms - ");
-    DEBUG_SERIAL_LN("ECU Input Voltage: " + ecu.getUbAdc() + " v");
+    DEBUG_SERIAL("ECU RPM: " + String(ecu.getRPM()) + " - ");
+    DEBUG_SERIAL("ECU MAP: " + ecu.getMap() + "kPa - ");
+    DEBUG_SERIAL("ECU TPS: " + String(ecu.getTPS()) + "% - ");
+    DEBUG_SERIAL("ECU Coolant Temp: " + String(ecu.getECT()) + "°C - ");
+    DEBUG_SERIAL("ECU Intake Temp: " + String(ecu.getIAT()) + "°C - ");
+    DEBUG_SERIAL("ECU O2 Sensor: " + ecu.getO2S() + "v - ");
+    DEBUG_SERIAL("ECU Spark Advance: " + String(ecu.getSpark()) + "° - ");
+    DEBUG_SERIAL_LN("ECU Fuel PWM 1: " + ecu.getFuelPW1() + "ms");
+
     DEBUG_SERIAL_LN();
 }
 

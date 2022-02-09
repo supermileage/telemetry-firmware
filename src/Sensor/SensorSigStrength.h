@@ -27,12 +27,12 @@ class SensorSigStrength : public Sensor
         /**
          * @return Signal strength in percentage
         **/
-        String getStrength(); 
+        int getStrength(); 
 
         /**
          * @return Signal quality in percentage
         **/
-        String getQuality();
+        int getQuality();
 
 
     
