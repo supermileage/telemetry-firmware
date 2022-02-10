@@ -96,11 +96,6 @@ class SensorGps : public Sensor {
          **/
         void updateSpeedCallback(void (*speed)(float));
 
-        template <class R>
-        bool validate(R value) {
-            return _gps->isConnected();
-        }
-
     private:
         SFE_UBLOX_GNSS* _gps;
         uint8_t _updateFrequency;

@@ -27,33 +27,33 @@ CanSensorBms bms(canInterface, 100);
 // LoggingCommand<SensorVoltage, String> voltage(&inVoltage, "vin", &SensorVoltage::getVoltage, 10);
 // LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 10);
 
-LoggingCommand<SensorGps, String> gpsLong(&gps, "lon", &SensorGps::getLongitude, 1, &SensorGps::validate);
-// LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1, &SensorGps::validate);
-// LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1, &SensorGps::validate);
-// LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1, &SensorGps::validate);
-// LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1, &SensorGps::validate);
-// LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10, &SensorGps::validate);
-// LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10, &SensorGps::validate);
+LoggingCommand<SensorGps, String> gpsLong(&gps, "lon", &SensorGps::getLongitude, 1);
+LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
+LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1);
+LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1);
+LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1);
+LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10);
+LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
-// LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 
-// LoggingCommand<CanSensorBms, String> bmsSoc(&bms, "soc", &CanSensorBms::getSoc, 10);
-// LoggingCommand<CanSensorBms, String> bmsVoltage(&bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
-// LoggingCommand<CanSensorBms, String> bmsCurrent(&bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
-// LoggingCommand<CanSensorBms, String> bmsCellMax(&bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
-// LoggingCommand<CanSensorBms, String> bmsCellMin(&bms, "cminv", &CanSensorBms::getMinVolt, 5);
-// LoggingCommand<CanSensorBms, int> bmsStatus(&bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
-// LoggingCommand<CanSensorBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorBms::getTempBms, 5);
-// LoggingCommand<CanSensorBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorBms::getBatteryTemp1, 5);
-// LoggingCommand<CanSensorBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorBms::getBatteryTemp2, 5);
+LoggingCommand<CanSensorBms, String> bmsSoc(&bms, "soc", &CanSensorBms::getSoc, 10);
+LoggingCommand<CanSensorBms, String> bmsVoltage(&bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
+LoggingCommand<CanSensorBms, String> bmsCurrent(&bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
+LoggingCommand<CanSensorBms, String> bmsCellMax(&bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
+LoggingCommand<CanSensorBms, String> bmsCellMin(&bms, "cminv", &CanSensorBms::getMinVolt, 5);
+LoggingCommand<CanSensorBms, int> bmsStatus(&bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
+LoggingCommand<CanSensorBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorBms::getTempBms, 5);
+LoggingCommand<CanSensorBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorBms::getBatteryTemp1, 5);
+LoggingCommand<CanSensorBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorBms::getBatteryTemp2, 5);
 
-// LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
-// LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);
-// LoggingCommand<CanSensorAccessories, int> urbanHorn(&canSensorAccessories, "horn", &CanSensorAccessories::getStatusHorn, 1);
-// LoggingCommand<CanSensorAccessories, int> urbanHazards(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHazards, 1);
-// LoggingCommand<CanSensorAccessories, int> urbanRightSig(&canSensorAccessories, "ltr", &CanSensorAccessories::getStatusRightSignal, 1);
-// LoggingCommand<CanSensorAccessories, int> urbanLeftSig(&canSensorAccessories, "ltl", &CanSensorAccessories::getStatusLeftSignal, 1);
-// LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wipe", &CanSensorAccessories::getStatusWipers, 5);
+LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
+LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);
+LoggingCommand<CanSensorAccessories, int> urbanHorn(&canSensorAccessories, "horn", &CanSensorAccessories::getStatusHorn, 1);
+LoggingCommand<CanSensorAccessories, int> urbanHazards(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHazards, 1);
+LoggingCommand<CanSensorAccessories, int> urbanRightSig(&canSensorAccessories, "ltr", &CanSensorAccessories::getStatusRightSignal, 1);
+LoggingCommand<CanSensorAccessories, int> urbanLeftSig(&canSensorAccessories, "ltl", &CanSensorAccessories::getStatusLeftSignal, 1);
+LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wipe", &CanSensorAccessories::getStatusWipers, 5);
 
 String publishName = "BQIngestion";
 
