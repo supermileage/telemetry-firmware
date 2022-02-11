@@ -27,12 +27,12 @@ class SensorSigStrength : public Sensor
         /**
          * @return Signal strength in percentage
         **/
-        int getStrength(bool &valid); 
+        int getStrength(bool &valid = Sensor::dummy); 
 
         /**
          * @return Signal quality in percentage
         **/
-        int getQuality(bool &valid);
+        int getQuality(bool &valid = Sensor::dummy);
 
 
     

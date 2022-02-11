@@ -39,57 +39,57 @@ class SensorGps : public Sensor {
         /**
          * @return Longitude (degrees)
          **/
-        String getLongitude(bool &valid);
+        String getLongitude(bool &valid = Sensor::dummy);
 
         /**
          * @return Latitude (degrees)
          **/
-        String getLatitude(bool &valid);
+        String getLatitude(bool &valid = Sensor::dummy);
 
         /**
          * @return Heading of motion (degrees)
          **/
-        String getHeading(bool &valid);
+        String getHeading(bool &valid = Sensor::dummy);
 
         /**
          * @return Horizontal speed (m/s)
          **/
-        String getHorizontalSpeed(bool &valid);
+        String getHorizontalSpeed(bool &valid = Sensor::dummy);
 
         /**
          * @return Horizontal acceleration (m/s^2)
          **/
-        String getHorizontalAcceleration(bool &valid);
+        String getHorizontalAcceleration(bool &valid = Sensor::dummy);
 
         /**
          * @return Horizontal position accuracy (m), max 10,000m
          **/
-        String getHorizontalAccuracy(bool &valid);
+        String getHorizontalAccuracy(bool &valid = Sensor::dummy);
 
         /**
          * @return Vertical Position relative to Mean Sea Level (m)
          **/
-        String getAltitude(bool &valid);
+        String getAltitude(bool &valid = Sensor::dummy);
 
         /**
          * @return Vertical speed (m/s)
          **/
-        String getVerticalSpeed(bool &valid);
+        String getVerticalSpeed(bool &valid = Sensor::dummy);
         
         /**
          * @return Vertical acceleration b (m/s^2)
          **/
-        String getVerticalAcceleration(bool &valid);
+        String getVerticalAcceleration(bool &valid = Sensor::dummy);
 
         /**
          * @return Vertical position accuracy (m), max 10,000m
          **/
-        String getVerticalAccuracy(bool &valid);
+        String getVerticalAccuracy(bool &valid = Sensor::dummy);
 
         /**
          * @return Number of Satellites currently seen by GPS
          **/
-        int getSatellitesInView(bool &valid);
+        int getSatellitesInView(bool &valid = Sensor::dummy);
 
         /**
          * @brief Update the callback function used by GPS to notify higher-level class of new GPS speed

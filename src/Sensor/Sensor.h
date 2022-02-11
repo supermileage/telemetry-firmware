@@ -23,8 +23,9 @@ class Sensor : public Handleable {
          * */
         virtual String getHumanName() = 0;
 
-    private:
-
+    protected:
+    
+        static bool dummy;
 };
 
 #endif

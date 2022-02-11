@@ -40,24 +40,23 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 }
 
 void CurrentVehicle::debugSensorData() {
-    bool dummy;
     // Diagnostic
-    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength(dummy)) + "% - ");
-    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality(dummy)) + "% - ");
-    DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage(dummy)) + "v - ");
-    DEBUG_SERIAL_LN("Internal Temp: " + String(thermo1.getInternalTemp(dummy)) + "°C");
+    DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "% - ");
+    DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "% - ");
+    DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + "v - ");
+    DEBUG_SERIAL_LN("Internal Temp: " + String(thermo1.getInternalTemp()) + "°C");
     // GPS
-    DEBUG_SERIAL("Longitude: " + gps.getLongitude(dummy) + "° - ");
-    DEBUG_SERIAL("Latitude: " + gps.getLatitude(dummy) + "° - ");
-    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration(dummy) + "m/s^2 - ");
-    DEBUG_SERIAL("Altitude: " + gps.getAltitude(dummy) + "m - ");
-    DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration(dummy) + "m/s^2 - ");
-    DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy(dummy) + "m - ");
-    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy(dummy) + "m - ");
-    DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView(dummy)));
+    DEBUG_SERIAL("Longitude: " + gps.getLongitude() + "° - ");
+    DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
+    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Altitude: " + gps.getAltitude() + "m - ");
+    DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + "m - ");
+    DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");
+    DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
     // Thermo
-    DEBUG_SERIAL("Motor Temp: " + String(thermo1.getProbeTemp(dummy)) + "°C - ");
-    DEBUG_SERIAL_LN("Fuel Cell Temp: " + String(thermo2.getProbeTemp(dummy)) + "°C");
+    DEBUG_SERIAL("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C - ");
+    DEBUG_SERIAL_LN("Fuel Cell Temp: " + String(thermo2.getProbeTemp()) + "°C");
 
     DEBUG_SERIAL_LN();
 

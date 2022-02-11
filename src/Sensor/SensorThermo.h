@@ -30,12 +30,12 @@ class SensorThermo : public Sensor {
         /**
          * @return current probe temperature in Celsius
          **/
-        int getProbeTemp(bool &valid);
+        int getProbeTemp(bool &valid = Sensor::dummy);
 
         /**
          * @return current internal temperature in Celsius
          **/
-        int getInternalTemp(bool &valid);
+        int getInternalTemp(bool &valid = Sensor::dummy);
 
     private:
         Adafruit_MAX31855* _probe;
