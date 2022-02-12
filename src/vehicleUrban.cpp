@@ -3,12 +3,14 @@
 #ifdef URBAN
 
 #include <map>
+#include "Mcp2515CanWrapper.h"
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
 #include "CanSensorBms.h"
 
-CanInterface canInterface(&SPI1, D5, D6);
+Mcp2515CanWrapper canBus(&SPI1, D5, D6);
+CanInterface canInterface((CanBus*)&canBus);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
