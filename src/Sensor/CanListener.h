@@ -28,6 +28,7 @@ class CanListener : public Sensor {
         CanInterface &_canInterface;
         uint16_t _id;
 
+    private:
         /**
          * @brief Specifies CanMessage updating behavior
          * 
