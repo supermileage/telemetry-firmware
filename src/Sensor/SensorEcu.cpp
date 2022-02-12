@@ -78,9 +78,9 @@ void SensorEcu::handle()
     }
 }
 
-String SensorEcu::getRPM()
+int SensorEcu::getRPM()
 {
-    return String::format("%.0f",this->_rpm);
+    return this->_rpm;
 }
 
 String SensorEcu::getMap()
@@ -88,19 +88,19 @@ String SensorEcu::getMap()
     return String::format("%.2f",this->_map);
 }
 
-String SensorEcu::getTPS()
+int SensorEcu::getTPS()
 {
-    return String::format("%.0f",this->_tps);
+    return this->_tps;
 }
 
-String SensorEcu::getECT()
+int SensorEcu::getECT()
 {
-    return String::format("%.0f",this->_ect);
+    return this->_ect;
 }
 
-String SensorEcu::getIAT()
+int SensorEcu::getIAT()
 {
-    return String::format("%.0f",this->_iat);
+    return this->_iat;
 }
 
 String SensorEcu::getO2S()
@@ -108,9 +108,9 @@ String SensorEcu::getO2S()
     return String::format("%.2f",this->_o2s);
 }
 
-String SensorEcu::getSpark()
+int SensorEcu::getSpark()
 {
-    return String::format("%.0f",this->_spark);
+    return this->_spark;
 }
 
 String SensorEcu::getFuelPW1()

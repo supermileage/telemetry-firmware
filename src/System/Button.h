@@ -14,9 +14,15 @@ class Button : public Handleable {
          * @param normallyOpen is true if the button is normall open
          * @param callbackPushed void function to call when the button is pushed down
          * @param callbackReleased void function to call when the button is released
+         * @param callbackHeld void function to call when the button is held for 2s
          * 
          * */
-        Button(uint16_t pin, bool activeHigh, bool normallyOpen, void (*callbackPushed)(), void (*callbackReleased)());
+        Button( uint16_t pin, 
+                bool activeHigh, 
+                bool normallyOpen, 
+                void (*callbackPushed)() = NULL, 
+                void (*callbackReleased)() = NULL, 
+                void (*callbackHolding)() = NULL);
         ~Button();
 
         void begin();
@@ -37,9 +43,11 @@ class Button : public Handleable {
         bool _activeHigh;
 
         bool _state = false;
+        bool _holding = false;
         uint32_t _lastChange = 0;
         void (*_callbackPushed)();
         void (*_callbackReleased)();
+        void (*_callbackHolding)();
 };
 
 #endif

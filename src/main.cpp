@@ -11,6 +11,7 @@ SYSTEM_THREAD(ENABLED);
 
 // Forward declarations for callback functions
 void buttonPushed();
+void buttonHeld();
 void publish(String payload, DataQueue::PublishData status);
 void timeValidCallback();
 
@@ -18,30 +19,31 @@ void timeValidCallback();
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
-Button button(A2, true, false, buttonPushed, NULL);
+Button button(A2, true, false, buttonPushed, NULL, buttonHeld);
 DataQueue dataQ(VEHICLE_NAME, publish);
 TimeLib timeLib(timeValidCallback);
 LoggingDispatcher *dispatcher;
 
 bool loggingEnabled = LOGGING_EN_AT_BOOT;
-bool error = false;
+bool loggingError = false;
+bool gpsOverride = false;
 long unsigned int lastDebugSensor = 0;
 unsigned long lastPublish = 0;
 
 // Publish a message
 void publish(String payload, DataQueue::PublishData data) {
-    error = false;
+    loggingError = false;
 
     // publish status messages
     if (data.status == DataQueue::DataBufferOverflow) {
         DEBUG_SERIAL_LN("ERROR: Json String has Exceeded Maximum Size of " + String(JSON_BUFFER_SIZE) + " Bytes");
-        error = true;
+        loggingError = true;
     } else if (data.status == DataQueue::JsonDocumentOverflow) {
         DEBUG_SERIAL_LN("ERROR: JsonDocument has overflowed due to complexity of unserialized Json in DataQueue::_jsonDocument");
         DEBUG_SERIAL_LN("Increase JSON_DOCUMENT_SIZE to account for this complexity");
         DEBUG_SERIAL_LN(" - memory currently allocated for JsonDocument: " + String(JSON_DOCUMENT_SIZE));
         DEBUG_SERIAL_LN(" - memory usage of JsonDocument: " + String(data.jsonDocumentSize) + " bytes for Json string of " + String(payload.length()) + " bytes");
-        error = true;
+        loggingError = true;
     }  else if (data.status == DataQueue::PublishingAtMaxFrequency) {
         DEBUG_SERIAL_LN("WARNING: Currently Publishing at Max Frequency");
     }
@@ -67,7 +69,9 @@ void debugSensors(){
     DEBUG_SERIAL_LN("---- SENSOR DATA ----");
     DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - " + timeLib.getTimeString());
     CurrentVehicle::debugSensorData();
-
+    if(gpsOverride) {
+        DEBUG_SERIAL_LN("!!WARNING!! GPS GREENLIST OVERRIDE IS ENABLED");
+    }
     DEBUG_SERIAL_LN("Free Memory: " + String(System.freeMemory()/1000) + "kB / 128kB");
     DEBUG_SERIAL_LN("");
     
@@ -96,13 +100,11 @@ void enableLogging() {
 
 // Disable logging of sensor data
 void disableLogging() {
-
     if(loggingEnabled) {
         loggingEnabled = FALSE;
         dispatcher->setLoggingEnabled(FALSE);
         DEBUG_SERIAL_LN("Logging has been DISABLED\n");
     }
-
 }
 
 // Action to take when button pushed
@@ -112,6 +114,18 @@ void buttonPushed(){
         disableLogging();
     }else{
         enableLogging();
+    }
+}
+
+// Action to take when button held for 2s
+void buttonHeld() {
+    CurrentVehicle::toggleGpsOverride();
+    gpsOverride = !gpsOverride;
+    DEBUG_SERIAL("#### BUTTON HELD - ");
+    if(gpsOverride) {
+        DEBUG_SERIAL_LN("GPS GREENLIST OVERRIDE ENABLED - !!WARNING!! YOUR GPS POSITION COULD BE RECORDED OUTSIDE OF A DESIGNATED ZONE");
+    } else {
+        DEBUG_SERIAL_LN("GPS GREENLIST OVERRIDE DISABLED");
     }
 }
 
@@ -127,7 +141,7 @@ void handleUI(){
 
     // Blue LED Behaviour
     if(loggingEnabled){
-        if(Time.isValid() && !error){
+        if(Time.isValid() && !loggingError){
             ledBlue.on();
         }else{
             ledBlue.flashRepeat(LED_FLASH_INT);
@@ -137,7 +151,7 @@ void handleUI(){
     }
 
     // Orange LED Behaviour
-    if(error){
+    if(loggingError || gpsOverride){
         ledOrange.flashRepeat(LED_FLASH_INT);
     }else{
         ledOrange.off();
