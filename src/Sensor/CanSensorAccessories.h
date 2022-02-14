@@ -28,7 +28,7 @@ class CanSensorAccessories : public CanListener {
 		 * @param canInterface the can interface which will be reading data from Can buffer
 		 * @param id the id of the Can message this object will listen for
 		 * @param ids the individual ids of the Can accessories whose status we want (0xFF == unused)
-		 * @note size of ids array can be increased if we need to listen to more Can status messages
+		 * @note size of ids array can be increased if we need to listen for more Can status messages
 		 */
 		typedef std::array<uint8_t, 7> StatusIds;
 		CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids);
@@ -36,7 +36,7 @@ class CanSensorAccessories : public CanListener {
 		/**
 		 * @brief Nothing to handle here
 		 */
-		void handle() { }
+		void handle() override { }
 
 		/**
 		 * @brief Get the string name of this object
@@ -86,7 +86,7 @@ class CanSensorAccessories : public CanListener {
 		 * 
 		 * @param data data byte to be added to internal can message
 		 */
-		void update(CanMessage message);
+		void update(CanMessage message) override;
 };
 
 #endif

@@ -1,13 +1,13 @@
 #include "LoggingDispatcherBuilder.h"
 
-LoggingDispatcherBuilder::LoggingDispatcherBuilder(IntervalCommand *commands[], DataQueue *dataQ, String publishName) {
+LoggingDispatcherBuilder::LoggingDispatcherBuilder(DataQueue *dataQ, String publishName, const std::vector<IntervalCommand*>& commands) {
     _dataQ = dataQ;
     _commands = commands;
     _publishName = publishName;
 
     // add command intervals to map and increment interval counts
-    for (uint16_t i = 0; commands[i]; i++) {
-        ++_intervalMap[commands[i]->getInterval()];
+    for (IntervalCommand* command : commands) {
+        ++_intervalMap[command->getInterval()];
     }
 }
 
@@ -26,9 +26,9 @@ LoggingDispatcher* LoggingDispatcherBuilder::build() {
         Command **commandsOnInterval = new Command*[numCommandsOnInterval];
 
         uint16_t commandCount = 0;
-        for (uint16_t i = 0; _commands[i]; i++) {
-            if (_commands[i]->getInterval() == interval)
-                commandsOnInterval[commandCount++] = _commands[i];
+        for (IntervalCommand* command : _commands) {
+            if (command->getInterval() == interval)
+                commandsOnInterval[commandCount++] = command;
         }
         commandGroups[i++] = new IntervalCommandGroup(commandsOnInterval, numCommandsOnInterval, interval);
     }
