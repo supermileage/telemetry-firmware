@@ -84,43 +84,40 @@ uint32_t SensorGps::getUnixTime() {
 }
 
 String SensorGps::getLongitude(bool &valid) {
-    valid = _valid;
-
+    valid = false;
     double longitude = _gps->getLongitude() / TEN_POWER_SEVEN;
     double latitude = _gps->getLatitude() / TEN_POWER_SEVEN;
 
     if(_override) {
-        return FLOAT_TO_STRING(longitude, 6);
+        valid = _valid;
     } else {
         for(positionBox p : GREEN_LIST) {
             if(p.isWithin(longitude, latitude)) {
-                return FLOAT_TO_STRING(longitude, 6);
+                valid = _valid;
             }
         }
     }
-
-    valid = false;
-    return "NA";
+    
+    return FLOAT_TO_STRING(longitude, 6);
 }
 
 String SensorGps::getLatitude(bool &valid) {
-    valid = _valid;
+    valid = false;
 
     double longitude = _gps->getLongitude() / TEN_POWER_SEVEN;
     double latitude = _gps->getLatitude() / TEN_POWER_SEVEN;
 
-    if(_override) {
-        return FLOAT_TO_STRING(latitude, 6);
+    if (_override) {
+        valid = _valid;
     } else {
-        for(positionBox p : GREEN_LIST) {
-            if(p.isWithin(longitude, latitude)) {
-                return FLOAT_TO_STRING(latitude, 6);
+        for (positionBox p : GREEN_LIST) {
+            if (p.isWithin(longitude, latitude)) {
+                valid = _valid;
             }
         }
     }
 
-    valid = false;
-    return "NA";
+    return FLOAT_TO_STRING(latitude, 6);
 }
 
 String SensorGps::getHeading(bool &valid) {
