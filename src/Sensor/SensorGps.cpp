@@ -67,7 +67,7 @@ void SensorGps::handle() {
     }
 
     float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
-    if (value > 0.0001 || value < 1000.0) {
+    if (value > 0.0001 && value < 1000.0) {
         _valid = true;
     } else{
         _valid = false;
