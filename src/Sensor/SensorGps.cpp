@@ -14,7 +14,6 @@
 
 SensorGps::SensorGps(SFE_UBLOX_GNSS *gps) {
     _gps = gps;
-
 }
 
 String SensorGps::getHumanName() {
