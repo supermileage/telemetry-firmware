@@ -18,14 +18,14 @@ class SensorThermo : public Sensor {
         /**
          * Begin the Thermocouple sensor by setting up over SPI
          **/
-        void begin();
+        void begin() override;
 
         /**
          * Polls Thermocouple for any new data based on the specified interval
          **/
-        void handle();
+        void handle() override;
 
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @return current probe temperature in Celsius

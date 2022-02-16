@@ -17,11 +17,11 @@ class SensorVoltage : public Sensor
         **/
         SensorVoltage();
 
-        void begin();
+        void begin() override;
 
-        void handle();
+        void handle() override;
 
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @return //input voltage of Boron device

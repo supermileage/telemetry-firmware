@@ -47,12 +47,12 @@ class CanSensorBms : public CanListener {
         /**
          * @brief Repeatedly requests and stores bms data on interval
          */
-        void handle();
+        void handle() override;
         
         /**
          * @brief Get the string name of this object
          */
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @brief Get the battery voltage
@@ -105,9 +105,7 @@ class CanSensorBms : public CanListener {
         int getBatteryTemp2();
 
     private:
-
         unsigned long _lastValidTime = 0;
-
         const uint16_t _requestIntervalMs;
 
         const uint8_t _paramIds[NUM_PARAMS] = 
@@ -122,14 +120,14 @@ class CanSensorBms : public CanListener {
         uint8_t _currentParam = 0;
 
         // Data
-        float _batteryVoltage;
-        float _batteryCurrent;
-        float _cellVoltageMax;
-        float _cellVoltageMin;
-        float _soc;        
-        int _tempBms;
-        int _batteryTemp1;
-        int _batteryTemp2;
+        float _batteryVoltage = 0.0f;
+        float _batteryCurrent = 0.0f;
+        float _cellVoltageMax = 0.0f;
+        float _cellVoltageMin = 0.0f;
+        float _soc = 0.0f;        
+        int _tempBms = 0;
+        int _batteryTemp1 = 0;
+        int _batteryTemp2 = 0;
         BmsStatus _bmsStatus = Unknown;
         const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
 
@@ -144,7 +142,7 @@ class CanSensorBms : public CanListener {
          * 
          * @param message data byte to be added to internal can message
          */
-        void update(CanMessage message);
+        void update(CanMessage message) override;
 };
 
 #endif

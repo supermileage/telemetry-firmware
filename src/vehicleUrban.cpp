@@ -55,14 +55,6 @@ LoggingCommand<CanSensorAccessories, int> urbanRightSig(&canSensorAccessories, "
 LoggingCommand<CanSensorAccessories, int> urbanLeftSig(&canSensorAccessories, "ltl", &CanSensorAccessories::getStatusLeftSignal, 1);
 LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wipe", &CanSensorAccessories::getStatusWipers, 5);
 
-// Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &signalStrength, &signalQuality, &voltage, &thermoInt, 
-                                &gpsLong, &gpsLat, &gpsHorSpeed, &gpsHorAccel, &gpsVertAccel, &gpsHorAccuracy, &gpsVerAccuracy, &gpsHorAccuracy, &gpsVerAccuracy, 
-                                &thermoMotor,
-                                &bmsSoc, &bmsVoltage, &bmsCurrent, &bmsCellMax, &bmsCellMin, &bmsStatus, &bmsTempInternal, &bmsTempBatt1, &bmsTempBatt2, 
-                                &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig, &urbanLeftSig, &urbanWipers, 
-                                NULL};
-
 String publishName = "BQIngestion";
 
 void sendCanSpeed(float speed){
@@ -85,7 +77,7 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
     gps.updateSpeedCallback(sendCanSpeed);
 
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
 

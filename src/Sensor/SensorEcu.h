@@ -14,7 +14,8 @@ class SensorEcu : public Sensor {
         /**
          * Begins ECU receive
          * */
-        void begin();
+        void begin() override;
+        
         /**
          * Flushes all data out of Serial receive buffer
          * */
@@ -23,9 +24,9 @@ class SensorEcu : public Sensor {
         /**
          * Checks Serial buffer for incoming data. If a full ECU data frame is in buffer, parses and saves it
          * */
-        void handle();
+        void handle() override;
 
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @return Engine Speed, RPM
