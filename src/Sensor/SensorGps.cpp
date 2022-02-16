@@ -106,8 +106,8 @@ String SensorGps::getLatitude() {
     return "?";
 }
 
-String SensorGps::getHeading() {
-    return FLOAT_TO_STRING(_gps->getHeading() / TEN_POWER_FIVE, 5);    
+int SensorGps::getHeading() {
+    return _gps->getHeading() / TEN_POWER_FIVE;    
 }
 
 String SensorGps::getHorizontalSpeed() {

@@ -49,7 +49,7 @@ class SensorGps : public Sensor {
         /**
          * @return Heading of motion (degrees)
          **/
-        String getHeading();
+        int getHeading();
 
         /**
          * @return Horizontal speed (m/s)
