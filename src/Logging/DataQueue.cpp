@@ -97,7 +97,7 @@ String DataQueue::_recoverDataFromBuffer() {
 	unsigned nextArrayRemovalIndex = 0;
 	unsigned nextObjectRemovalIndex = 0;
 
-	// each loop: removes key-value pair from one of the JsonObjects in array, shifts removal indexes by one
+	// each loop: removes key-value pair from one of the JsonObjects in array, shifts removal indices by one
 	while (dataSize >= (unsigned)JSON_BUFFER_SIZE) {
 		JsonArray dataArray = _jsonDocument["l"].as<JsonArray>();
 		unsigned arrayCount = dataArray.size();

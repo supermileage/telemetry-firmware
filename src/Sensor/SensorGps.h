@@ -17,14 +17,14 @@ class SensorGps : public Sensor {
         /**
          * Initialize the GPS sensor and i2c interface
          **/
-        void begin();
+        void begin() override;
 
         /**
          * Polls GPS for any new data. Run as frequently as possible 
          **/
-        void handle();
+        void handle() override;
 
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @return true if current time is valid

@@ -39,18 +39,11 @@ LoggingCommand<SensorEcu, String> ecuO2s(&ecu, "o2s", &SensorEcu::getO2S, 1);
 LoggingCommand<SensorEcu, int> ecuSpark(&ecu, "spar", &SensorEcu::getSpark, 1);
 LoggingCommand<SensorEcu, String> ecuFuel(&ecu, "pw1", &SensorEcu::getFuelPW1, 1);
 
-// Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &signalStrength, &signalQuality, &voltage, &thermoInt, 
-                                &gpsLong, &gpsLat, &gpsHeading, &gpsAltitude, &gpsHorSpeed, &gpsHorAccel, &gpsVertAccel, &gpsHorAccuracy, &gpsVerAccuracy, &gpsHorAccuracy, &gpsVerAccuracy, 
-                                &thermoEng, 
-                                &ecuRpm, &ecuTps, &ecuEct, &ecuIat, &ecuO2s, &ecuSpark, &ecuFuel, 
-                                NULL};
-
 String publishName = "BQIngestion";
 
 // CurrrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
 

@@ -16,12 +16,12 @@ class TimeLib : public Handleable {
         TimeLib(void (*timeValidCallback)());
         ~TimeLib();
 
-        void begin();
+        void begin() override;
         
         /**
          * @return checks and updates based on time validity
          **/
-        void handle();
+        void handle() override;
 
         String getTimeString();
 

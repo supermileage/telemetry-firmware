@@ -1,4 +1,5 @@
 #include "vehicle.h"
+#include <vector>
 
 #ifdef FC
 
@@ -27,17 +28,11 @@ LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getV
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);
 
-// Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &signalStrength, &signalQuality, &voltage, &thermoInt, 
-                                &gpsLong, &gpsLat, &gpsHeading, &gpsAltitude, &gpsHorSpeed, &gpsHorAccel, &gpsVertAccel, &gpsHorAccuracy, &gpsVerAccuracy, &gpsHorAccuracy, &gpsVerAccuracy, 
-                                &thermoMotor, &thermoFuelCell, 
-                                NULL};
-
 String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
 
@@ -67,7 +62,6 @@ void CurrentVehicle::debugSensorData() {
 
 bool CurrentVehicle::getTimeValid() {
     return gps.getTimeValid();
-
 }
 
 uint32_t CurrentVehicle::getUnixTime() {
