@@ -1,8 +1,47 @@
 #include "CanSensorBms.h"
 #include "settings.h"
 
+#define VALIDATION_INTERVAL  1000
+
+const uint8_t VALIDATION_IDS[] {
+    PARAM_ID_BATTERY_VOLTAGE,
+    PARAM_ID_BATTERY_CURRENT, 
+    PARAM_ID_MAX_CELL_VOLTAGE,
+    PARAM_ID_MIN_CELL_VOLTAGE,
+    PARAM_ID_STATUS,
+    PARAM_ID_SOC,
+    PARAM_ID_TEMP,
+    TEMP_ID_INTERNAL,
+    TEMP_ID_BATTERY_1,
+    TEMP_ID_BATTERY_2
+};
+
+#define PARAM_ID_BATTERY_VOLTAGE    0x14
+#define PARAM_ID_BATTERY_CURRENT    0x15
+#define PARAM_ID_MAX_CELL_VOLTAGE   0x16
+#define PARAM_ID_MIN_CELL_VOLTAGE   0x17
+#define PARAM_ID_STATUS             0x18
+#define PARAM_ID_SOC                0x1A
+#define PARAM_ID_TEMP               0x1B
+
+#define STATUS_CHARGING             0x91
+#define STATUS_CHARGED              0x92
+#define STATUS_DISCHARGING          0x93
+#define STATUS_REGENERATION         0x96
+#define STATUS_IDLE                 0x97
+#define STATUS_FAULT_ERROR          0x9B
+
+#define TEMP_ID_INTERNAL    0x00
+#define TEMP_ID_BATTERY_1   0x01
+#define TEMP_ID_BATTERY_2   0x02
+
 CanSensorBms::CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
-    : CanListener(canInterface, CAN_BMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {}
+    : CanListener(canInterface, CAN_BMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
+        // create dictionary of validation properties with 
+        for (auto id : VALIDATION_IDS)  {
+            _validationMap[id] = 0;
+        }
+    }
 
 void CanSensorBms::handle() {
     if(millis() - _lastValidTime >= _requestIntervalMs) {
@@ -34,7 +73,9 @@ void CanSensorBms::update(CanMessage message) {
         DEBUG_SERIAL_LN("Poor BMS Data Received");
     }
     else {
-        switch (message.data[RSP_PARAM_ID_BYTE]) {
+        uint8_t id = message.data[RSP_PARAM_ID_BYTE];
+        uint64_t time = millis();
+        switch (id) {
             case PARAM_ID_BATTERY_VOLTAGE:
                 _batteryVoltage = parseFloat(message.data);
                 break;
@@ -76,57 +117,75 @@ void CanSensorBms::update(CanMessage message) {
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
                     _tempBms = parseInt16(message.data + 1) / 10;
+                    _validationMap[TEMP_ID_INTERNAL] = time;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_1) {
                     _batteryTemp1 = parseInt16(message.data + 1) / 10;
+                    _validationMap[TEMP_ID_BATTERY_1] = time;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_2) {
                     _batteryTemp2 = parseInt16(message.data + 1) / 10;
+                    _validationMap[TEMP_ID_BATTERY_2] = time;
                 }
                 break;
             default:
                 break;
+
+            // update validation dict--exclude temp because it needs special handling for 3 cases
+            if (id != PARAM_ID_TEMP && _validationMap.find(id) != _validationMap.end()) {
+                _validationMap[id] = time;
+            }
         }
     }
 }
 
-String CanSensorBms::getBatteryVolt() {
+String CanSensorBms::getBatteryVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_BATTERY_VOLTAGE);
     return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
-String CanSensorBms::getBatteryCurrent() {
+String CanSensorBms::getBatteryCurrent(bool& valid) {
+    valid  = _validate(PARAM_ID_BATTERY_CURRENT);
     return FLOAT_TO_STRING(_batteryCurrent, 3);
 }
 
-String CanSensorBms::getMaxVolt() {
+String CanSensorBms::getMaxVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_MAX_CELL_VOLTAGE);
     return FLOAT_TO_STRING(_cellVoltageMax, 2);
 }
 
-String CanSensorBms::getMinVolt() {
+String CanSensorBms::getMinVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_MIN_CELL_VOLTAGE);
     return FLOAT_TO_STRING(_cellVoltageMin, 2);
 }
 
-String CanSensorBms::getSoc() {
+String CanSensorBms::getSoc(bool& valid) {
+    valid  = _validate(PARAM_ID_SOC);
     return FLOAT_TO_STRING(_soc, 1); 
 }
 
-int CanSensorBms::getStatusBms() {
+int CanSensorBms::getStatusBms(bool& valid) {
+    valid  = _validate(PARAM_ID_STATUS);
     return _bmsStatus;
 }
 
-String CanSensorBms::getStatusBmsString() {
+String CanSensorBms::getStatusBmsString(bool& valid) {
+    valid  = _validate(PARAM_ID_STATUS);
     return String(bmsStatuses[_bmsStatus]);
 }
 
-int CanSensorBms::getTempBms() {
+int CanSensorBms::getTempBms(bool& valid) {
+    valid  = _validate(TEMP_ID_INTERNAL);
     return _tempBms;
 }
 
-int CanSensorBms::getBatteryTemp1() {
+int CanSensorBms::getBatteryTemp1(bool& valid) {
+    valid  = _validate(TEMP_ID_BATTERY_1);
     return _batteryTemp1;
 }
 
-int CanSensorBms::getBatteryTemp2() {
+int CanSensorBms::getBatteryTemp2(bool& valid) {
+    valid  = _validate(TEMP_ID_BATTERY_2);
     return _batteryTemp2;
 }
 
@@ -146,4 +205,8 @@ uint32_t CanSensorBms::parseInt32(uint8_t* dataPtr) {
             | ((uint32_t)dataPtr[RSP_DATA_BYTE + 2] << 16)
             | ((uint32_t)dataPtr[RSP_DATA_BYTE + 1] << 8)
             | dataPtr[RSP_DATA_BYTE];
+}
+
+bool CanSensorBms::_validate(uint8_t id) {
+    return (millis() - _validationMap[id]) >= VALIDATION_INTERVAL;
 }

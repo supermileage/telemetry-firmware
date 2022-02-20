@@ -39,7 +39,7 @@ class LoggingCommand : public IntervalCommand {
         void execute(CommandArgs args) override {
             bool valid;
             R value = (*_object.*_getter)(valid);
-            if(valid) {
+            if (valid) {
                 (*(JsonObject*)args)[_propertyName] = value;
             }
         }
