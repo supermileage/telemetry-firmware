@@ -122,7 +122,7 @@ class DataQueue : public Handleable {
         PublishQueuePosix* _publishQueue;
         void (*_publishCallback)(String, PublishData);
         unsigned long _lastPublish;
-        String _publishHeader;
+        String _vehicleName;
         
 
         /**
