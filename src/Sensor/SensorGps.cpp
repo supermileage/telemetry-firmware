@@ -14,7 +14,6 @@
 
 SensorGps::SensorGps(SFE_UBLOX_GNSS *gps) {
     _gps = gps;
-
 }
 
 String SensorGps::getHumanName() {
@@ -120,9 +119,9 @@ String SensorGps::getLatitude(bool &valid) {
     return FLOAT_TO_STRING(latitude, 6);
 }
 
-String SensorGps::getHeading(bool &valid) {
+int SensorGps::getHeading(bool &valid) {
     valid = _valid;
-    return FLOAT_TO_STRING(_gps->getHeading() / TEN_POWER_FIVE, 5);    
+    return _gps->getHeading() / TEN_POWER_FIVE;    
 }
 
 String SensorGps::getHorizontalSpeed(bool &valid) {
