@@ -93,6 +93,7 @@ String SensorGps::getLongitude(bool &valid) {
         for(positionBox p : GREEN_LIST) {
             if(p.isWithin(longitude, latitude)) {
                 valid = _valid;
+                break;
             }
         }
     }
@@ -112,6 +113,7 @@ String SensorGps::getLatitude(bool &valid) {
         for (positionBox p : GREEN_LIST) {
             if (p.isWithin(longitude, latitude)) {
                 valid = _valid;
+                break;
             }
         }
     }

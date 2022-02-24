@@ -19,13 +19,12 @@ void SensorThermo::handle() {
 }
 
 int SensorThermo::getProbeTemp(bool &valid) {
-    int value = _probe->readCelsius();
-    valid = (value != NAN);
+    double value = _probe->readCelsius();
+    valid = !_probe->readError();
     return value;
 }
 
 int SensorThermo::getInternalTemp(bool &valid) {
-    int value = _probe->readInternal();
-    valid = (value != NAN);
-    return value;
+    valid = true;
+    return _probe->readInternal();
 }
