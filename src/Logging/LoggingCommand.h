@@ -6,14 +6,15 @@
 
 /**
  *  Templated Command class which represents a telemetry-logging command
- *  class C is the type of object whose member method will be called on execute
- *  class R is the return type of that member method
+ *  class C is the type of object whose getter method will be called on execute
+ *  class R is the return type of getter
  **/
 template <class C, class R>
 class LoggingCommand : public IntervalCommand {
     public:
         /**
-         * Constructs a LoggingCommand with object, property name, getter method and interval
+         * Constructs a LoggingCommand with object, property name, getter method pointer and interval.
+         * Adds this to static collection of interval commands
          * 
          * @param object pointer to object of class C which we will call _getter on
          * @param propertyName the name of property which will be logged
@@ -25,6 +26,7 @@ class LoggingCommand : public IntervalCommand {
             _object = object;
             _getter = getter;
             _propertyName = propertyName;
+            IntervalCommandHandler::instance().add(this);
         }
         
         ~LoggingCommand() { }
@@ -34,7 +36,7 @@ class LoggingCommand : public IntervalCommand {
          * 
          * @param args pointer to JsonObject
          */
-        void execute(CommandArgs args) {
+        void execute(CommandArgs args) override {
             (*(JsonObject*)args)[_propertyName] = (*_object.*_getter)();
         }
 

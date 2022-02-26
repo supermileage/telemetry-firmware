@@ -5,20 +5,29 @@
 #include "CanInterface.h"
 #include "can_common.h"
 
+/**
+ * @brief Base CanListener class for specifying parsing behavior of can messages with id.
+ * update is called every time CanInterface receives a message with id
+ * 
+ * @note if for whatever reason you want to recieve can messages of multiple different ids, you will
+ * need to override begin() in derived class and invoke CanInterface.addMessageListen multiple times
+ * 
+ */
 class CanListener : public Sensor {
 
     public:
         /**
          * Constructor
          * 
-         * @param &can object to use
+         * @param canInterface can interface object
+         * @param id the can id that this class will listen for
          **/
         CanListener(CanInterface &canInterface, uint16_t id) : _canInterface(canInterface), _id(id) { }
 
         /**
 		 * @brief Called on setup: adds id and delegate to can interface
 		 */
-        virtual void begin();
+        virtual void begin() override;
 
         virtual void handle() = 0;
 
@@ -34,7 +43,7 @@ class CanListener : public Sensor {
          * 
          * @param message CanMessage received from CanInterface
          */
-        virtual void update(CanMessage message)=0;
+        virtual void update(CanMessage message) = 0;
 
         /**
 		 * CanListener-internal class which acts as a delegate to CanInterface; allows
@@ -52,7 +61,7 @@ class CanListener : public Sensor {
 				 * 
 				 * @param args cast CanMessage with this CanSensorAccessories's id
 				 */
-				void execute(CommandArgs args);
+				void execute(CommandArgs args) override;
 			private:
 				CanListener* _owner;
 		};

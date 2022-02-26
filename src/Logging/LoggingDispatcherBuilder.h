@@ -2,6 +2,7 @@
 #define _DISPATCHER_BUILDER_H_
 
 #include <map>
+#include <vector>
 
 #include "DataQueue.h"
 #include "IntervalCommand.h"
@@ -21,7 +22,7 @@ class LoggingDispatcherBuilder {
          * @param dataQ the Data Queue from main
          * @param publishName the name under which any data from interval commands will be published
          * */
-        LoggingDispatcherBuilder(IntervalCommand *commands[], DataQueue *dataQ, String publishName);
+        LoggingDispatcherBuilder(DataQueue *dataQ, String publishName, const std::vector<IntervalCommand*>& commands);
         
         /**
          * @brief Destroy the LoggingDispatcher Builder object
@@ -34,7 +35,7 @@ class LoggingDispatcherBuilder {
         LoggingDispatcher* build();
 
     private:
-        IntervalCommand** _commands;
+        std::vector<IntervalCommand*> _commands;
         DataQueue* _dataQ;
         std::map<uint16_t, uint16_t> _intervalMap;
         String _publishName;

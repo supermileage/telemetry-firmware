@@ -25,10 +25,12 @@ CanSensorBms bms(canInterface, 100);
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
 LoggingCommand<SensorVoltage, String> voltage(&inVoltage, "vin", &SensorVoltage::getVoltage, 10);
-LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 10);
+LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 5);
 
 LoggingCommand<SensorGps, String> gpsLong(&gps, "lon", &SensorGps::getLongitude, 1);
 LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
+LoggingCommand<SensorGps, int> gpsHeading(&gps, "hea", &SensorGps::getHeading, 1);
+LoggingCommand<SensorGps, String> gpsAltitude(&gps, "alt", &SensorGps::getAltitude, 1);
 LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1);
 LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1);
 LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1);
@@ -55,14 +57,6 @@ LoggingCommand<CanSensorAccessories, int> urbanRightSig(&canSensorAccessories, "
 LoggingCommand<CanSensorAccessories, int> urbanLeftSig(&canSensorAccessories, "ltl", &CanSensorAccessories::getStatusLeftSignal, 1);
 LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wipe", &CanSensorAccessories::getStatusWipers, 5);
 
-// Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &signalStrength, &signalQuality, &voltage, &thermoInt, 
-                                &gpsLong, &gpsLat, &gpsHorSpeed, &gpsHorAccel, &gpsVertAccel, &gpsHorAccuracy, &gpsVerAccuracy, &gpsHorAccuracy, &gpsVerAccuracy, 
-                                &thermoMotor,
-                                &bmsSoc, &bmsVoltage, &bmsCurrent, &bmsCellMax, &bmsCellMin, &bmsStatus, &bmsTempInternal, &bmsTempBatt1, &bmsTempBatt2, 
-                                &urbanHeadlights, &urbanBrakelights, &urbanHorn, &urbanHazards, &urbanRightSig, &urbanLeftSig, &urbanWipers, 
-                                NULL};
-
 String publishName = "BQIngestion";
 
 void sendCanSpeed(float speed){
@@ -85,7 +79,7 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
     gps.updateSpeedCallback(sendCanSpeed);
 
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
 
@@ -98,8 +92,9 @@ void CurrentVehicle::debugSensorData() {
     // GPS
     DEBUG_SERIAL("Longitude: " + gps.getLongitude() + "° - ");
     DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
-    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Heading: " + String(gps.getHeading()) + "° - ");
     DEBUG_SERIAL("Altitude: " + gps.getAltitude() + "m - ");
+    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
     DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + "m - ");
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");

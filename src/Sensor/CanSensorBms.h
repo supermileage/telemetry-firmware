@@ -47,12 +47,12 @@ class CanSensorBms : public CanListener {
         /**
          * @brief Repeatedly requests and stores bms data on interval
          */
-        void handle();
+        void handle() override;
         
         /**
          * @brief Get the string name of this object
          */
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @brief Get the battery voltage
@@ -105,9 +105,7 @@ class CanSensorBms : public CanListener {
         int getBatteryTemp2();
 
     private:
-
         unsigned long _lastValidTime = 0;
-
         const uint16_t _requestIntervalMs;
 
         const uint8_t _paramIds[NUM_PARAMS] = 
@@ -144,7 +142,7 @@ class CanSensorBms : public CanListener {
          * 
          * @param message data byte to be added to internal can message
          */
-        void update(CanMessage message);
+        void update(CanMessage message) override;
 };
 
 #endif

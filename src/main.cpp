@@ -30,6 +30,8 @@ bool gpsOverride = false;
 long unsigned int lastDebugSensor = 0;
 unsigned long lastPublish = 0;
 
+#pragma region DebugMessages
+
 // Publish a message
 void publish(String payload, DataQueue::PublishData data) {
     loggingError = false;
@@ -77,6 +79,10 @@ void debugSensors(){
     
 }
 
+#pragma endregion
+
+#pragma region Logging
+
 // Action to take when time becomes valid
 void timeValidCallback() {
 
@@ -106,6 +112,10 @@ void disableLogging() {
         DEBUG_SERIAL_LN("Logging has been DISABLED\n");
     }
 }
+
+#pragma endregion
+
+#pragma region UI
 
 // Action to take when button pushed
 void buttonPushed(){
@@ -159,6 +169,10 @@ void handleUI(){
 
 }
 
+#pragma endregion
+
+#pragma region RemoteFunctions
+
 // Reboot Remotely
 int remoteReset(String command) {
 
@@ -185,6 +199,8 @@ int remoteDisableLogging(String command){
     return 1;
 
 }
+
+#pragma endregion
 
 /**
  * SETUP
