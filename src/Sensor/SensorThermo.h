@@ -41,6 +41,7 @@ class SensorThermo : public Sensor {
         Adafruit_MAX31855* _probe;
         SPIClass *_spi;
         uint8_t _csPin;
+        uint32_t _lastDebug = 0;
 };
 
 #endif
