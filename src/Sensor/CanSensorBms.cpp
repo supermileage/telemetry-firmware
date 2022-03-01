@@ -80,7 +80,8 @@ void CanSensorBms::update(CanMessage message) {
                 _batteryVoltage = parseFloat(message.data);
                 break;
             case PARAM_ID_BATTERY_CURRENT:
-                _batteryCurrent = parseFloat(message.data);
+                // tiny bms returns -A for discharging and +A for charging: we want the inverse so flip sign here
+                _batteryCurrent = -parseFloat(message.data);
                 break;
             case PARAM_ID_MAX_CELL_VOLTAGE:
                 _cellVoltageMax = (float)parseInt16(message.data) / 1000.0; 

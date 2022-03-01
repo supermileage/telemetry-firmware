@@ -49,7 +49,7 @@ class SensorGps : public Sensor {
         /**
          * @return Heading of motion (degrees)
          **/
-        String getHeading(bool &valid = Sensor::dummy);
+        int getHeading(bool &valid = Sensor::dummy);
 
         /**
          * @return Horizontal speed (m/s)

@@ -14,7 +14,6 @@
 
 SensorGps::SensorGps(SFE_UBLOX_GNSS *gps) {
     _gps = gps;
-
 }
 
 String SensorGps::getHumanName() {
@@ -94,6 +93,7 @@ String SensorGps::getLongitude(bool &valid) {
         for(positionBox p : GREEN_LIST) {
             if(p.isWithin(longitude, latitude)) {
                 valid = _valid;
+                break;
             }
         }
     }
@@ -113,6 +113,7 @@ String SensorGps::getLatitude(bool &valid) {
         for (positionBox p : GREEN_LIST) {
             if (p.isWithin(longitude, latitude)) {
                 valid = _valid;
+                break;
             }
         }
     }
@@ -120,9 +121,9 @@ String SensorGps::getLatitude(bool &valid) {
     return FLOAT_TO_STRING(latitude, 6);
 }
 
-String SensorGps::getHeading(bool &valid) {
+int SensorGps::getHeading(bool &valid) {
     valid = _valid;
-    return FLOAT_TO_STRING(_gps->getHeading() / TEN_POWER_FIVE, 5);    
+    return _gps->getHeading() / TEN_POWER_FIVE;    
 }
 
 String SensorGps::getHorizontalSpeed(bool &valid) {
@@ -136,8 +137,10 @@ String SensorGps::getHorizontalAcceleration(bool &valid) {
 }
 
 String SensorGps::getHorizontalAccuracy(bool &valid) {
-    valid = _valid;
-    return FLOAT_TO_STRING(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS, 2);  
+    valid = true;
+    float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
+    if (value < 0.0001 || value > 1000.0) value = 1000.0;
+    return FLOAT_TO_STRING(value, 2);  
 }
 
 String SensorGps::getAltitude(bool &valid) {
@@ -156,8 +159,10 @@ String SensorGps::getVerticalAcceleration(bool &valid) {
 }
 
 String SensorGps::getVerticalAccuracy(bool &valid) {
-    valid = _valid;
-    return FLOAT_TO_STRING(_gps->getVerticalAccEst() / MILIMETERS_IN_METERS, 2);  
+    valid = true;
+        float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
+    if (value < 0.0001 || value > 1000.0) value = 1000.0;
+    return FLOAT_TO_STRING(value, 2);  
 }
 
 int SensorGps::getSatellitesInView(bool &valid) {
