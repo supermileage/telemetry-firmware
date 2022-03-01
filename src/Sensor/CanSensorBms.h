@@ -108,16 +108,15 @@ class CanSensorBms : public CanListener {
     private:
         const uint16_t _requestIntervalMs;
         const uint8_t _paramIds[NUM_PARAMS] =  {
-            PARAM_ID_BATTERY_VOLTAGE, 
-            PARAM_ID_BATTERY_CURRENT, 
-            PARAM_ID_MAX_CELL_VOLTAGE, 
-            PARAM_ID_MIN_CELL_VOLTAGE, 
-            PARAM_ID_STATUS, 
-            PARAM_ID_SOC, 
+            PARAM_ID_BATTERY_VOLTAGE,
+            PARAM_ID_BATTERY_CURRENT,
+            PARAM_ID_MAX_CELL_VOLTAGE,
+            PARAM_ID_MIN_CELL_VOLTAGE,
+            PARAM_ID_STATUS,
+            PARAM_ID_SOC,
             PARAM_ID_TEMP
         };
         const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
-        // stores time (in millis) at which bms values were last updated
         std::map<uint8_t, uint64_t> _validationMap;
         unsigned long _lastValidTime = 0;
         uint8_t _currentParam = 0;
@@ -127,7 +126,7 @@ class CanSensorBms : public CanListener {
         float _batteryCurrent = 0.0f;
         float _cellVoltageMax = 0.0f;
         float _cellVoltageMin = 0.0f;
-        float _soc = 0.0f;        
+        float _soc = 0.0f;  
         int _tempBms = 0;
         int _batteryTemp1 = 0;
         int _batteryTemp2 = 0;

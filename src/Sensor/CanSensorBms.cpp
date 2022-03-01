@@ -1,20 +1,7 @@
 #include "CanSensorBms.h"
 #include "settings.h"
 
-#define VALIDATION_INTERVAL  1000
-
-const uint8_t VALIDATION_IDS[] {
-    PARAM_ID_BATTERY_VOLTAGE,
-    PARAM_ID_BATTERY_CURRENT, 
-    PARAM_ID_MAX_CELL_VOLTAGE,
-    PARAM_ID_MIN_CELL_VOLTAGE,
-    PARAM_ID_STATUS,
-    PARAM_ID_SOC,
-    PARAM_ID_TEMP,
-    TEMP_ID_INTERNAL,
-    TEMP_ID_BATTERY_1,
-    TEMP_ID_BATTERY_2
-};
+#define VALIDATION_INTERVAL  1500
 
 #define PARAM_ID_BATTERY_VOLTAGE    0x14
 #define PARAM_ID_BATTERY_CURRENT    0x15
@@ -34,6 +21,19 @@ const uint8_t VALIDATION_IDS[] {
 #define TEMP_ID_INTERNAL    0x00
 #define TEMP_ID_BATTERY_1   0x01
 #define TEMP_ID_BATTERY_2   0x02
+
+const uint8_t VALIDATION_IDS[] {
+    PARAM_ID_BATTERY_VOLTAGE,
+    PARAM_ID_BATTERY_CURRENT,
+    PARAM_ID_MAX_CELL_VOLTAGE,
+    PARAM_ID_MIN_CELL_VOLTAGE,
+    PARAM_ID_STATUS,
+    PARAM_ID_SOC,
+    PARAM_ID_TEMP,
+    TEMP_ID_INTERNAL,
+    TEMP_ID_BATTERY_1,
+    TEMP_ID_BATTERY_2
+};
 
 CanSensorBms::CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
     : CanListener(canInterface, CAN_BMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
@@ -130,12 +130,12 @@ void CanSensorBms::update(CanMessage message) {
                 break;
             default:
                 break;
-
-            // update validation dict--exclude temp because it needs special handling for 3 cases
-            if (id != PARAM_ID_TEMP && _validationMap.find(id) != _validationMap.end()) {
-                _validationMap[id] = time;
-            }
         }
+
+		// update validation map--exclude temp because it needs special handling for 3 cases
+		if (id != PARAM_ID_TEMP && _validationMap.find(id) != _validationMap.end()) {
+			_validationMap[id] = time;
+		}
     }
 }
 
@@ -196,7 +196,7 @@ float CanSensorBms::parseFloat(uint8_t* dataPtr) {
 }
 
 uint16_t CanSensorBms::parseInt16(uint8_t* dataPtr) {
-    return ((uint16_t)dataPtr[RSP_DATA_BYTE + 1] << 8) 
+    return ((uint16_t)dataPtr[RSP_DATA_BYTE + 1] << 8)
             | dataPtr[RSP_DATA_BYTE];
 }
 
@@ -208,5 +208,5 @@ uint32_t CanSensorBms::parseInt32(uint8_t* dataPtr) {
 }
 
 bool CanSensorBms::_validate(uint8_t id) {
-    return (millis() - _validationMap[id]) >= VALIDATION_INTERVAL;
+    return (millis() - _validationMap[id]) <= VALIDATION_INTERVAL;
 }
