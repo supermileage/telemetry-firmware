@@ -31,6 +31,13 @@ void SensorEcu::flush() {
 }
 
 void SensorEcu::handle() {
+
+    if(millis() < _lastUpdate + STALE_INTERVAL) {
+        _valid = true;
+    } else {
+        _valid = false;
+    }
+    
     if (_serial->available() < ECU_PACKET_SIZE) {
         return;
     }
@@ -75,12 +82,6 @@ void SensorEcu::handle() {
     }else{
         // The header is not correct, flush the serial buffer
         flush();
-    }
-
-    if(millis() < _lastUpdate + STALE_INTERVAL) {
-        _valid = true;
-    } else {
-        _valid = false;
     }
 
 }
