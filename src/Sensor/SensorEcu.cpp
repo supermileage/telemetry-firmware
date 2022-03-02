@@ -9,8 +9,7 @@
 #define ECU_DATA_FIELD_LENGTH   0x16
 #define ECU_SERVICE_ID          0x50
 
-SensorEcu::SensorEcu(USARTSerial *serial)
-{
+SensorEcu::SensorEcu(USARTSerial *serial) {
     _serial = serial;
 }
 
@@ -18,21 +17,25 @@ String SensorEcu::getHumanName() {
     return "ECU";
 }
 
-void SensorEcu::begin()
-{
+void SensorEcu::begin() {
     _serial->begin(115200, SERIAL_8N1);
 }
 
-void SensorEcu::flush()
-{
+void SensorEcu::flush() {
     while (_serial->available())
     {
         _serial->read();
     }
 }
 
-void SensorEcu::handle()
-{
+void SensorEcu::handle() {
+
+    if(millis() < _lastUpdate + STALE_INTERVAL) {
+        _valid = true;
+    } else {
+        _valid = false;
+    }
+    
     if (_serial->available() < ECU_PACKET_SIZE) {
         return;
     }
@@ -56,6 +59,8 @@ void SensorEcu::handle()
             // Check if the checksum is correct
             if(checkSum == buffer[26]){
 
+                _lastUpdate = millis();
+
                 // Data is valid, update all fields
                 _rpm = this->_interpretValue(buffer[6], buffer[7], 0.25, 0.0);
                 _map = this->_interpretValue(buffer[8], buffer[9], 0.0039, 0.0);
@@ -76,60 +81,60 @@ void SensorEcu::handle()
         // The header is not correct, flush the serial buffer
         flush();
     }
+
 }
 
-int SensorEcu::getRPM()
-{
+int SensorEcu::getRPM(bool &valid) {
+    valid = _valid;
     return this->_rpm;
 }
 
-String SensorEcu::getMap()
-{
-    return String::format("%.2f",this->_map);
+String SensorEcu::getMap(bool &valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(this->_map, 2);
 }
 
-int SensorEcu::getTPS()
-{
+int SensorEcu::getTPS(bool &valid) {
+    valid = _valid;
     return this->_tps;
 }
 
-int SensorEcu::getECT()
-{
+int SensorEcu::getECT(bool &valid) {
+    valid = _valid;
     return this->_ect;
 }
 
-int SensorEcu::getIAT()
-{
+int SensorEcu::getIAT(bool &valid) {
+    valid = _valid;
     return this->_iat;
 }
 
-String SensorEcu::getO2S()
-{
-    return String::format("%.2f",this->_o2s);
+String SensorEcu::getO2S(bool &valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(this->_o2s, 2);
 }
 
-int SensorEcu::getSpark()
-{
+int SensorEcu::getSpark(bool &valid) {
+    valid = _valid;
     return this->_spark;
 }
 
-String SensorEcu::getFuelPW1()
-{
-    return String::format("%.3f",this->_fuelPW1);
+String SensorEcu::getFuelPW1(bool &valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(this->_fuelPW1, 3);
 }
 
-String SensorEcu::getFuelPW2()
-{
-    return String::format("%.3f",this->_fuelPW2);
+String SensorEcu::getFuelPW2(bool &valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(this->_fuelPW2, 3);
 }
 
-String SensorEcu::getUbAdc()
-{
-    return String::format("%.2f",this->_ubAdc);
+String SensorEcu::getUbAdc(bool &valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(this->_ubAdc, 1);
 }
 
-float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset)
-{
+float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset) {
     return (float)((int)high * 256 + (int)low) * factor + offset;
 }
 
