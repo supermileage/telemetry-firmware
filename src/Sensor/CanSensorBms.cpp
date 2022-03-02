@@ -1,8 +1,6 @@
 #include "CanSensorBms.h"
 #include "settings.h"
 
-#define VALIDATION_INTERVAL  1500
-
 #define PARAM_ID_BATTERY_VOLTAGE    0x14
 #define PARAM_ID_BATTERY_CURRENT    0x15
 #define PARAM_ID_MAX_CELL_VOLTAGE   0x16
@@ -113,7 +111,7 @@ void CanSensorBms::update(CanMessage message) {
                 break;
             }
             case PARAM_ID_SOC:
-                _soc = (float)parseInt32(message.data) / 1000000.0;    
+                _soc = (float)parseInt32(message.data) / 1000000.0;
                 break;
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
@@ -209,5 +207,5 @@ uint32_t CanSensorBms::parseInt32(uint8_t* dataPtr) {
 }
 
 bool CanSensorBms::_validate(uint8_t id) {
-    return (millis() - _validationMap[id]) <= VALIDATION_INTERVAL;
+    return (millis() - _validationMap[id]) < STALE_INTERVAL;
 }

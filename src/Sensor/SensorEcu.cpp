@@ -9,8 +9,6 @@
 #define ECU_DATA_FIELD_LENGTH   0x16
 #define ECU_SERVICE_ID          0x50
 
-#define STALE_INTERVAL          2000
-
 SensorEcu::SensorEcu(USARTSerial *serial) {
     _serial = serial;
 }

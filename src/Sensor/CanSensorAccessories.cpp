@@ -1,7 +1,5 @@
 #include "CanSensorAccessories.h"
 
-#define VALID_INTERVAL 2000;
-
 CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids)
 	: CanListener(canInterface, id) {
 	
@@ -56,6 +54,6 @@ void CanSensorAccessories::update(CanMessage message) {
 
 int CanSensorAccessories::_getStatus(uint8_t id, bool& valid) {
 	CanSensorAccessories::StatusProperty status = _statuses[id];
-	valid = status.value != Unknown && (millis() - status.lastUpdated) <= VALID_INTERVAL;
+	valid = status.value != Unknown && (millis() - status.lastUpdated) < STALE_INTERVAL;
 	return status.value;
 }
