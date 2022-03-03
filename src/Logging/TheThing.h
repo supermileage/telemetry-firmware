@@ -35,7 +35,8 @@ class TheThing : public Handleable {
 			uint32_t status;
 			uint8_t note;
 		};
-		const CanMessage DEFAULT_MESSAGE = { CAN_ACC_OPERATION, 0x1, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 } };
+		// Default message with data[0] set to operation mode 2 (Accessory On/Off mode)
+		const CanMessage DEFAULT_MESSAGE = { CAN_ACC_OPERATION, 0x1, { 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 } };
 		CanInterface& _can;
 		CanMessage _nextMessage;
 		uint64_t _nextMessageTime = 0;
