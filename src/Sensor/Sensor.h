@@ -4,6 +4,9 @@
 #include "Particle.h"
 #include "Handleable.h"
 
+// Interval (in ms) after which telemetry will consider data to be invalid
+#define STALE_INTERVAL          2000
+
 class Sensor : public Handleable {
     public:
 
@@ -23,8 +26,8 @@ class Sensor : public Handleable {
          * */
         virtual String getHumanName() = 0;
 
-    private:
-
+    protected:
+        static bool dummy;
 };
 
 #endif

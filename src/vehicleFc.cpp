@@ -41,7 +41,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Signal Strength: " + String(sigStrength.getStrength()) + "% - ");
     DEBUG_SERIAL("Signal Quality: " + String(sigStrength.getQuality()) + "% - ");
     DEBUG_SERIAL("Input Voltage: "+ String(inVoltage.getVoltage()) + "v - ");
-    DEBUG_SERIAL_LN("Internal Temperature (Thermo1): " + String(thermo1.getInternalTemp()) + "°C");
+    DEBUG_SERIAL_LN("Internal Temp: " + String(thermo1.getInternalTemp()) + "°C");
     // GPS
     DEBUG_SERIAL("Longitude: " + gps.getLongitude() + "° - ");
     DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
