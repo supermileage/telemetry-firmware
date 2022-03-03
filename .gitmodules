@@ -28,3 +28,6 @@
 [submodule "lib/ArduinoJson"]
 	path = lib/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "lib/midi-parser"]
+	path = lib/midi-parser
+	url = https://github.com/abique/midi-parser.git
