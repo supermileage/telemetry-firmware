@@ -8,20 +8,27 @@ TheThing::TheThing(CanInterface& can) : _can(can) { }
 
 TheThing::~TheThing() { }
 
-void TheThing::start(const uint8_t *input, const uint32_t size) {
+void TheThing::start(uint16_t bpm) {
+	_bpm = bpm;
 	_play = true;
+
+	uint32_t length = sizeof(MIDI_FILE) / sizeof(MIDI_FILE[0]);
+	uint8_t* buffer = _convertString(MIDI_FILE, &length);
+
+	_parse(buffer, length);
 	_buildNextCanMessage();
+	DEBUG_SERIAL_LN("Queue has " + String(_midiEvents.size()) + " events");
 }
 
 void TheThing::stop() {
 	_play = false;
+
+	// clear event queue
+	std::queue<MidiEvent> empty;
+	std::swap(_midiEvents, empty);
 }
 
-void TheThing::begin() {
-	uint32_t length = sizeof(MIDI_FILE) / sizeof(MIDI_FILE[0]);
-	uint8_t* buffer = _convertString(MIDI_FILE, &length);
-	_parse(buffer, length);
-}
+void TheThing::begin() { }
 
 void TheThing::handle() {
 	if (_play) {
@@ -33,9 +40,7 @@ void TheThing::_buildNextCanMessage() {
 	_nextMessage = DEFAULT_MESSAGE;
 	_nextMessageTime = micros() + (_midiEvents.front().time * _microsPerUnit);
 
-	uint8_t i = 1;
-
-	while (i < 8) {
+	for (uint8_t i = 1; i < 8; i++) {
 		if (_midiEvents.front().status == MIDI_META_END_OF_TRACK)
 			break;
 
@@ -44,14 +49,27 @@ void TheThing::_buildNextCanMessage() {
 		++_nextMessage.dataLength;
 		_nextMessage.data[i] = ((midiEvent.note - MIDI_C3) << 1) | (midiEvent.status == MIDI_STATUS_NOTE_ON);
 
-		if (_midiEvents.front().time != midiEvent.time)
+		DEBUG_SERIAL_LN("Adding midi event -- note: " + String(midiEvent.note) + " -- time: " + String((long)midiEvent.time) + " -- status: " + String(midiEvent.status));
+
+		// if the next midi event has a time of 0, it means it occurs in unison with the current
+		if (_midiEvents.front().time != 0)
 			break;
+	}
+
+	DEBUG_SERIAL("Can message added with value : { " + String(_nextMessage.id) + ", 0x" + String(_nextMessage.dataLength) + ", { ");
+
+	for (uint8_t i = 0; i < _nextMessage.dataLength; i++) {
+		DEBUG_SERIAL("0x" + String(_nextMessage.data[i]));
+		if (i != (_nextMessage.dataLength - 1))
+			DEBUG_SERIAL(", ");
+		else
+			DEBUG_SERIAL(" } }\n");
 	}
 }
 
 void TheThing::_playInternal() {
 	if (_nextMessage.dataLength == 1) {
-		_play = false;
+		stop();
 		return;
 	}
 
@@ -71,11 +89,12 @@ void TheThing::_parse(const uint8_t *input, const uint32_t size) {
 	parser.size = size;
 
 	bool breakFromLoop = false;
+	enum midi_parser_status status;
 
 	while (true) {
-		midi_parse(&parser);
+		status = midi_parse(&parser);
 
-		switch (parser.state) {
+		switch (status) {
 			case MIDI_PARSER_EOB:
 				breakFromLoop = TRUE;
 				break;
@@ -102,43 +121,52 @@ void TheThing::_parse(const uint8_t *input, const uint32_t size) {
 				break;
 		}
 
-		if (breakFromLoop)
-			break;
+		if (breakFromLoop) {
+			delete[] input;
+			return;
+		}
 	}
 }
 
 void TheThing::_parseHeader(midi_parser* parser) {
 	_microsPerUnit = (MICROS_PER_MINUTE / _bpm) / parser->header.time_division;
+	DEBUG_SERIAL_LN("Micros per time unit set to : " + String(parser->header.time_division));
 }
 
 void TheThing::_parseTrackMidi(midi_parser* parser) {
 	MidiEvent newEvent = { parser->vtime, parser->midi.status, parser->midi.param1 };
+	DEBUG_SERIAL_LN("Midi event added with time: " + String((unsigned long)parser->vtime));
 	_midiEvents.push(newEvent);
 }
 
 void TheThing::_parseTrackMeta(midi_parser* parser) {
 	if (parser->meta.type == MIDI_META_END_OF_TRACK) {
+		DEBUG_SERIAL_LN("End of track event added with time: " + String((unsigned long)parser->vtime));
 		MidiEvent newEvent = { parser->vtime, MIDI_META_END_OF_TRACK, 0 };
 		_midiEvents.push(newEvent);
 	}
 }
 
-uint8_t _getHexValue(char **bufferPtr) {
+// Dynamically allocates memory for returned buffer: Make sure to delete uint8_t buffer once you are finished using it 
+uint8_t* TheThing::_convertString(const char* buf, uint32_t *length) {
+	// get size of char buffer ("0BF45601 " == 9 characters -> 4 bytes in buffer)
+	uint8_t* output = new uint8_t[((*length + 1) / 9) * 4];
+	uint8_t* s_ptr;
+
+	// buffer pointer is incremented in getHexValue
+	for (s_ptr = output; *buf; s_ptr++) {
+		*s_ptr = _getHexValue((char**)&buf);
+	}
+
+	*length = s_ptr - output;
+  	return output;
+}
+
+uint8_t TheThing::_getHexValue(char **bufferPtr) {
 	while (isspace(**bufferPtr))
 		(*bufferPtr)++;
 	char nextByte[2] = { **bufferPtr, *((*bufferPtr) + 1) };
 	*bufferPtr += 2;
 	char* dummyPtr = nextByte;
 	return strtoul(nextByte, &dummyPtr, 16);
-}
-
-uint8_t* TheThing::_convertString(const char* buf, uint32_t *length) {
-	// get size of char buffer ("0BF45601 " == 9 characters -> 4 bytes in buffer)
-	uint8_t* output = new uint8_t[((*length + 1) / 9) * 4];
-	uint8_t* s_ptr;
-	for (s_ptr = output; *buf; s_ptr++) {
-		*s_ptr = _getHexValue((char**)&buf);
-	}
-	*length = s_ptr - output;
-  	return output;
 }
