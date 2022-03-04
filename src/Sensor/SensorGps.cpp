@@ -2,6 +2,8 @@
 #include "settings.h"
 #include "gpsGreenlist.h"
 
+#define DEBUG_GPS
+
 // GPS Update Frequency in Hz (1-10)
 #define UPDATE_FREQ 4
 
@@ -63,6 +65,16 @@ void SensorGps::handle() {
         _lastVerticalSpeed = _verticalSpeed;
 
         _lastUpdateMicros = thisUpdateMicros;
+
+        #ifdef DEBUG_GPS
+            DEBUG_SERIAL("SIV: ");
+            DEBUG_SERIAL(_gps->getSIV());
+            DEBUG_SERIAL(" - Accuracy X: ");
+            DEBUG_SERIAL(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS);
+            DEBUG_SERIAL("m - Accuracy Y: ");
+            DEBUG_SERIAL(_gps->getVerticalAccEst() / MILIMETERS_IN_METERS);
+            DEBUG_SERIAL_LN("m");
+        #endif
     }
         
 }

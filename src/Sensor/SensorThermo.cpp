@@ -3,6 +3,7 @@
 
 // #define DEBUG_THERMO
 
+
 #define DEBUG_THERMO_INTERVAL 250
 
 SensorThermo::SensorThermo(SPIClass *spi, uint8_t csPin){
