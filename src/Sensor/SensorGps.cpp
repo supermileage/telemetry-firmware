@@ -2,7 +2,7 @@
 #include "settings.h"
 #include "gpsGreenlist.h"
 
-#define DEBUG_GPS
+// #define DEBUG_GPS
 
 // GPS Update Frequency in Hz (1-10)
 #define UPDATE_FREQ 4
