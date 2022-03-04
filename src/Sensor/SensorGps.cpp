@@ -149,9 +149,11 @@ String SensorGps::getHorizontalAcceleration(bool &valid) {
 }
 
 String SensorGps::getHorizontalAccuracy(bool &valid) {
-    valid = true;
+    valid = _valid;
     float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
-    if (value < 0.0001 || value > 1000.0) value = 1000.0;
+    if (value > 1000.0){
+        return "1000.00";
+    }
     return FLOAT_TO_STRING(value, 2);  
 }
 
@@ -171,9 +173,11 @@ String SensorGps::getVerticalAcceleration(bool &valid) {
 }
 
 String SensorGps::getVerticalAccuracy(bool &valid) {
-    valid = true;
-        float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
-    if (value < 0.0001 || value > 1000.0) value = 1000.0;
+    valid = _valid;
+    float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
+    if (value > 1000.0){
+        return "1000.00";
+    }
     return FLOAT_TO_STRING(value, 2);  
 }
 
