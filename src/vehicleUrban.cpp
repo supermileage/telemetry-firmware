@@ -7,6 +7,7 @@
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
 #include "CanSensorBms.h"
+#include "CanAccessoriesMidiPlayer.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -20,7 +21,7 @@ CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS,
     { STATUS_HEADLIGHTS, STATUS_BRAKELIGHTS, STATUS_HORN, STATUS_HAZARDS,
     STATUS_RIGHT_SIGNAL, STATUS_LEFT_SIGNAL, STATUS_WIPERS });
 CanSensorBms bms(canInterface, 100);
-TheThing theThing(canInterface);
+CanAccessoriesMidiPlayer midiPlayer(canInterface);
 
 // Command definitions
 // LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -77,12 +78,12 @@ void sendCanSpeed(float speed){
 }
 
 int shoutOutToMyHomeBoys(String command) {
-	DEBUG_SERIAL_LN("#### REMOTE - TheThing Has Been Called Into Action");
+	DEBUG_SERIAL_LN("#### REMOTE - CanAccessoriesMidiPlayer Has Been Called Into Action");
 	int bpm = command.toInt();
 	if (bpm <= 0)
 		return -1;
 
-	theThing.start((uint16_t)bpm);
+	midiPlayer.start((uint16_t)bpm);
 	return 1;
 }
 

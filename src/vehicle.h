@@ -12,7 +12,6 @@
 #include "SensorThermo.h"
 #include "SensorSigStrength.h"
 #include "SensorVoltage.h"
-#include "TheThing.h"
 
 extern DataQueue dataQ;
 

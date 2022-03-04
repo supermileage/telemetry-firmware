@@ -1,14 +1,14 @@
-#include "TheThing.h"
+#include "CanAccessoriesMidiPlayer.h"
 
 #define MICROS_PER_MINUTE 60000000
 // note number of middle C
 #define MIDI_C3 60
 
-TheThing::TheThing(CanInterface& can) : _can(can) { }
+CanAccessoriesMidiPlayer::CanAccessoriesMidiPlayer(CanInterface& can) : _can(can) { }
 
-TheThing::~TheThing() { }
+CanAccessoriesMidiPlayer::~CanAccessoriesMidiPlayer() { }
 
-void TheThing::start(uint16_t bpm) {
+void CanAccessoriesMidiPlayer::start(uint16_t bpm) {
 	_bpm = bpm;
 	_play = true;
 
@@ -20,7 +20,7 @@ void TheThing::start(uint16_t bpm) {
 	DEBUG_SERIAL_LN("Queue has " + String(_midiEvents.size()) + " events");
 }
 
-void TheThing::stop() {
+void CanAccessoriesMidiPlayer::stop() {
 	_play = false;
 
 	// clear event queue
@@ -28,15 +28,15 @@ void TheThing::stop() {
 	std::swap(_midiEvents, empty);
 }
 
-void TheThing::begin() { }
+void CanAccessoriesMidiPlayer::begin() { }
 
-void TheThing::handle() {
+void CanAccessoriesMidiPlayer::handle() {
 	if (_play) {
 		_playInternal();
 	}
 }
 
-void TheThing::_buildNextCanMessage() {
+void CanAccessoriesMidiPlayer::_buildNextCanMessage() {
 	_nextMessage = DEFAULT_MESSAGE;
 	_nextMessageTime = micros() + (_midiEvents.front().time * _microsPerUnit);
 
@@ -67,7 +67,7 @@ void TheThing::_buildNextCanMessage() {
 	}
 }
 
-void TheThing::_playInternal() {
+void CanAccessoriesMidiPlayer::_playInternal() {
 	if (_nextMessage.dataLength == 1) {
 		stop();
 		return;
@@ -79,7 +79,7 @@ void TheThing::_playInternal() {
 	}
 }
 
-void TheThing::_parse(const uint8_t *input, const uint32_t size) {
+void CanAccessoriesMidiPlayer::_parse(const uint8_t *input, const uint32_t size) {
 	if (size == 0)
 		return;
 
@@ -128,18 +128,18 @@ void TheThing::_parse(const uint8_t *input, const uint32_t size) {
 	}
 }
 
-void TheThing::_parseHeader(midi_parser* parser) {
+void CanAccessoriesMidiPlayer::_parseHeader(midi_parser* parser) {
 	_microsPerUnit = (MICROS_PER_MINUTE / _bpm) / parser->header.time_division;
 	DEBUG_SERIAL_LN("Micros per time unit set to : " + String(parser->header.time_division));
 }
 
-void TheThing::_parseTrackMidi(midi_parser* parser) {
+void CanAccessoriesMidiPlayer::_parseTrackMidi(midi_parser* parser) {
 	MidiEvent newEvent = { parser->vtime, parser->midi.status, parser->midi.param1 };
 	DEBUG_SERIAL_LN("Midi event added with time: " + String((unsigned long)parser->vtime));
 	_midiEvents.push(newEvent);
 }
 
-void TheThing::_parseTrackMeta(midi_parser* parser) {
+void CanAccessoriesMidiPlayer::_parseTrackMeta(midi_parser* parser) {
 	if (parser->meta.type == MIDI_META_END_OF_TRACK) {
 		DEBUG_SERIAL_LN("End of track event added with time: " + String((unsigned long)parser->vtime));
 		MidiEvent newEvent = { parser->vtime, MIDI_META_END_OF_TRACK, 0 };
@@ -148,7 +148,7 @@ void TheThing::_parseTrackMeta(midi_parser* parser) {
 }
 
 // Dynamically allocates memory for returned buffer: Make sure to delete uint8_t buffer once you are finished using it 
-uint8_t* TheThing::_convertString(const char* buf, uint32_t *length) {
+uint8_t* CanAccessoriesMidiPlayer::_convertString(const char* buf, uint32_t *length) {
 	// get size of char buffer ("0BF45601 " == 9 characters -> 4 bytes in buffer)
 	uint8_t* output = new uint8_t[((*length + 1) / 9) * 4];
 	uint8_t* s_ptr;
@@ -162,7 +162,7 @@ uint8_t* TheThing::_convertString(const char* buf, uint32_t *length) {
   	return output;
 }
 
-uint8_t TheThing::_getHexValue(char **bufferPtr) {
+uint8_t CanAccessoriesMidiPlayer::_getHexValue(char **bufferPtr) {
 	while (isspace(**bufferPtr))
 		(*bufferPtr)++;
 	char nextByte[2] = { **bufferPtr, *((*bufferPtr) + 1) };
