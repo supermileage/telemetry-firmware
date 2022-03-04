@@ -1,7 +1,7 @@
 #include "DataQueue.h"
 
-DataQueue::DataQueue(String publishHeader,  void (*callback)(String, PublishData)) {
-	_publishHeader = publishHeader;
+DataQueue::DataQueue(String vehicleName,  void (*callback)(String, PublishData)) {
+	_vehicleName = vehicleName;
 	_publishCallback = callback;
 	_lastPublish = 0;
 }
@@ -80,7 +80,7 @@ String DataQueue::_jsonBufferGet() {
 }
 
 void DataQueue::_jsonDocumentInit() {
-    _jsonDocument["v"] = _publishHeader;
+    _jsonDocument["v"] = _vehicleName;
 	_jsonDocument.createNestedArray("l");
 }
 
