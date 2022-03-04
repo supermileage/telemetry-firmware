@@ -9,13 +9,19 @@ CanAccessoriesMidiPlayer::CanAccessoriesMidiPlayer(CanInterface& can) : _can(can
 CanAccessoriesMidiPlayer::~CanAccessoriesMidiPlayer() { }
 
 void CanAccessoriesMidiPlayer::start(uint16_t bpm) {
+	if (_play) {
+		stop();
+	}
+
 	_bpm = bpm;
 	_play = true;
 
 	uint32_t length = sizeof(MIDI_FILE) / sizeof(MIDI_FILE[0]);
 	uint8_t* buffer = _convertString(MIDI_FILE, &length);
-
+	
 	_parse(buffer, length);
+	delete[] buffer;
+	DEBUG_SERIAL_LN("Queue has " + String(_midiEvents.size()) + " events");
 	_buildNextCanMessage();
 	DEBUG_SERIAL_LN("Queue has " + String(_midiEvents.size()) + " events");
 }
@@ -65,6 +71,8 @@ void CanAccessoriesMidiPlayer::_buildNextCanMessage() {
 		else
 			DEBUG_SERIAL(" } }\n");
 	}
+
+	DEBUG_SERIAL_LN("Queue has " + String(_midiEvents.size()) + " events");
 }
 
 void CanAccessoriesMidiPlayer::_playInternal() {
@@ -122,7 +130,6 @@ void CanAccessoriesMidiPlayer::_parse(const uint8_t *input, const uint32_t size)
 		}
 
 		if (breakFromLoop) {
-			delete[] input;
 			return;
 		}
 	}
@@ -135,13 +142,13 @@ void CanAccessoriesMidiPlayer::_parseHeader(midi_parser* parser) {
 
 void CanAccessoriesMidiPlayer::_parseTrackMidi(midi_parser* parser) {
 	MidiEvent newEvent = { parser->vtime, parser->midi.status, parser->midi.param1 };
-	DEBUG_SERIAL_LN("Midi event added with time: " + String((unsigned long)parser->vtime));
+	DEBUG_SERIAL_LN("Midi event added with time: " + String((long)parser->vtime));
 	_midiEvents.push(newEvent);
 }
 
 void CanAccessoriesMidiPlayer::_parseTrackMeta(midi_parser* parser) {
 	if (parser->meta.type == MIDI_META_END_OF_TRACK) {
-		DEBUG_SERIAL_LN("End of track event added with time: " + String((unsigned long)parser->vtime));
+		DEBUG_SERIAL_LN("End of track event added with time: " + String((long)parser->vtime));
 		MidiEvent newEvent = { parser->vtime, MIDI_META_END_OF_TRACK, 0 };
 		_midiEvents.push(newEvent);
 	}
@@ -150,8 +157,11 @@ void CanAccessoriesMidiPlayer::_parseTrackMeta(midi_parser* parser) {
 // Dynamically allocates memory for returned buffer: Make sure to delete uint8_t buffer once you are finished using it 
 uint8_t* CanAccessoriesMidiPlayer::_convertString(const char* buf, uint32_t *length) {
 	// get size of char buffer ("0BF45601 " == 9 characters -> 4 bytes in buffer)
-	uint8_t* output = new uint8_t[((*length + 1) / 9) * 4];
+	int padding = (*length % 8) / 2;
+	uint8_t* output = new uint8_t[(((*length + 1) / 9) * 4) + padding];
 	uint8_t* s_ptr;
+
+	DEBUG_SERIAL_LN("Predicted length : " + String((((*length + 1) / 9) * 4) + padding));
 
 	// buffer pointer is incremented in getHexValue
 	for (s_ptr = output; *buf; s_ptr++) {
@@ -159,6 +169,7 @@ uint8_t* CanAccessoriesMidiPlayer::_convertString(const char* buf, uint32_t *len
 	}
 
 	*length = s_ptr - output;
+	DEBUG_SERIAL_LN("Actual length : " + String(*length));
   	return output;
 }
 
