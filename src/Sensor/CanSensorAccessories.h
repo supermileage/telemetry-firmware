@@ -46,40 +46,45 @@ class CanSensorAccessories : public CanListener {
 		/**
 		 * @brief Get the status of headlights
 		 */
-		int getStatusHeadlights();
+		int getStatusHeadlights(bool& valid = Sensor::dummy);
 
 		/**
 		 * @brief Get the status of brakelights
 		 */
-		int getStatusBrakelights();
+		int getStatusBrakelights(bool& valid = Sensor::dummy);
 
 		/**
 		 * @brief Get the status of headlights
 		 */
-		int getStatusHorn();
+		int getStatusHorn(bool& valid = Sensor::dummy);
 
 		/**
 		 * @brief Get the status of hazard lights
 		 */
-		int getStatusHazards();
+		int getStatusHazards(bool& valid = Sensor::dummy);
 
 		/**
 		 * @brief Get the status of right signal
 		 */
-		int getStatusRightSignal();
+		int getStatusRightSignal(bool& valid = Sensor::dummy);
 
 		/**
 		 * @brief Get the status of left signal
 		 */
-		int getStatusLeftSignal();
+		int getStatusLeftSignal(bool& valid = Sensor::dummy);
 
 		/**
 		 * @brief Get the status of windshield wipers
 		 */
-		int getStatusWipers();
+		int getStatusWipers(bool& valid = Sensor::dummy);
 
 	private:
-		std::map<uint8_t, uint8_t> _statuses;
+		// struct to store status and validation data for accessories
+		struct StatusProperty {
+            unsigned long lastUpdated;
+            int value;
+        };
+		std::map<uint8_t, StatusProperty> _statuses;
 
 		/**
 		 * @brief adds data to appropriate byte of _data's data buffer
@@ -87,6 +92,12 @@ class CanSensorAccessories : public CanListener {
 		 * @param data data byte to be added to internal can message
 		 */
 		void update(CanMessage message) override;
+
+		/**
+		 * @brief Internal get status method
+		 * 
+		 */
+		int _getStatus(uint8_t id, bool& valid);
 };
 
 #endif
