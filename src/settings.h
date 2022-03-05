@@ -13,11 +13,11 @@
 #endif
 
 // Logging enabled at boot-up, control logging with button or Particle Function
-#define LOGGING_EN_AT_BOOT      1
+#define LOGGING_EN_AT_BOOT      0
 // Publish to Cloud
 #define PUBLISH_EN              1
 // Output Serial messages (disable for production)
-#define DEBUG_SERIAL_EN         1
+#define DEBUG_SERIAL_EN         0
 // Sensor Debug Interval in s, 0 for off
 #define DEBUG_SENSOR_INT        5
 // LED Flash interval in ms

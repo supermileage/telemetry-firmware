@@ -80,10 +80,13 @@ void sendCanSpeed(float speed){
 int shoutOutToMyHomeBoys(String command) {
 	DEBUG_SERIAL_LN("#### REMOTE - CanAccessoriesMidiPlayer Has Been Called Into Action");
 	int bpm = command.toInt();
-	if (bpm <= 0)
+	if (bpm == -1) {
+		midiPlayer.stop();
+	} else if (bpm <= 0) {
 		return -1;
-
-	midiPlayer.start((uint16_t)bpm);
+	} else {
+		midiPlayer.start((uint16_t)bpm);
+	}
 	return 1;
 }
 
