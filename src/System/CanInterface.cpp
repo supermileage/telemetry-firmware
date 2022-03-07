@@ -1,7 +1,7 @@
 #include "CanInterface.h"
 #define CAN_FRAME 0
 
-#define DEBUG_CAN
+// #define DEBUG_CAN
 
 CanInterface::CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin) {
     pinMode(intPin, INPUT);
