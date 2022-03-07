@@ -34,7 +34,7 @@ const uint8_t VALIDATION_IDS[] {
 };
 
 CanSensorBms::CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
-    : CanListener(canInterface, CAN_BMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
+    : CanListener(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
         // create dictionary of validation properties with 
         for (auto id : VALIDATION_IDS)  {
             _validationMap[id] = 0;
@@ -45,7 +45,7 @@ void CanSensorBms::handle() {
     if(millis() - _lastValidTime >= _requestIntervalMs) {
 
         CanMessage msg = CAN_MESSAGE_NULL;
-        msg.id = CAN_BMS_REQUEST;
+        msg.id = CAN_TINYBMS_REQUEST;
         msg.dataLength = REQ_DATA_LENGTH;
         msg.data[0] = _paramIds[_currentParam];
             
