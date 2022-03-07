@@ -19,7 +19,7 @@
 // Output Serial messages (disable for production)
 #define DEBUG_SERIAL_EN         1
 // Sensor Debug Interval in s, 0 for off
-#define DEBUG_SENSOR_INT        60
+#define DEBUG_SENSOR_INT        5
 // LED Flash interval in ms
 #define LED_FLASH_INT           500
 // Time zone in UTC offset (must manually adjust for DST)
