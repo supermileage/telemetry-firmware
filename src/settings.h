@@ -13,7 +13,7 @@
 #endif
 
 // Logging enabled at boot-up, control logging with button or Particle Function
-#define LOGGING_EN_AT_BOOT      1
+#define LOGGING_EN_AT_BOOT      0
 // Publish to Cloud
 #define PUBLISH_EN              1
 // Output Serial messages (disable for production)
