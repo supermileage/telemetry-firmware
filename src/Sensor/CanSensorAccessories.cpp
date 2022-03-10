@@ -12,31 +12,31 @@ String CanSensorAccessories::getHumanName() {
 }
 
 int CanSensorAccessories::getStatusHeadlights(bool& valid) {
-	return _getStatus(STATUS_HEADLIGHTS, valid);
+	return _getStatus(ACC_STATUS_HEADLIGHTS, valid);
 }
 
 int CanSensorAccessories::getStatusBrakelights(bool& valid) {
-	return _getStatus(STATUS_BRAKELIGHTS, valid);
+	return _getStatus(ACC_STATUS_BRAKELIGHTS, valid);
 }
 
 int CanSensorAccessories::getStatusHorn(bool& valid) {
-	return _getStatus(STATUS_HORN, valid);
+	return _getStatus(ACC_STATUS_HORN, valid);
 }
 
 int CanSensorAccessories::getStatusHazards(bool& valid) {
-	return _getStatus(STATUS_HAZARDS, valid);
+	return _getStatus(ACC_STATUS_HAZARDS, valid);
 }
 
 int CanSensorAccessories::getStatusRightSignal(bool& valid) {
-	return _getStatus(STATUS_RIGHT_SIGNAL, valid);
+	return _getStatus(ACC_STATUS_RIGHT_SIGNAL, valid);
 }
 
 int CanSensorAccessories::getStatusLeftSignal(bool& valid) {
-	return _getStatus(STATUS_LEFT_SIGNAL, valid);
+	return _getStatus(ACC_STATUS_LEFT_SIGNAL, valid);
 }
 
 int CanSensorAccessories::getStatusWipers(bool& valid) {
-	return _getStatus(STATUS_WIPERS, valid);
+	return _getStatus(ACC_STATUS_WIPERS, valid);
 }
 
 void CanSensorAccessories::update(CanMessage message) {
