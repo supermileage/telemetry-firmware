@@ -1,5 +1,5 @@
-#ifndef _SENSOR_BMS_H_
-#define _SENSOR_BMS_H_
+#ifndef _CAN_SENSOR_TINY_BMS_H_
+#define _CAN_SENSOR_TINY_BMS_H_
 
 #include <map>
 #include "CanListener.h"
@@ -33,17 +33,17 @@
 
 using namespace can;
 
-class CanSensorBms : public CanListener {
+class CanSensorTinyBms : public CanListener {
     public:
         enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, Unknown };
     
         /**
-         * @brief Constructor for CanSensorBms
+         * @brief Constructor for CanSensorTinyBms
          * 
          * @param canInterface - the can interface which will be reading data from Can buffer
          * @param requestIntervalMs - frequency to request Bms data
          */
-        CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs);
+        CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs);
 
         /**
          * @brief Repeatedly requests and stores bms data on interval
