@@ -16,6 +16,8 @@
 #define PARAM_ID_TEMP               0x1B
 
 #define PARAM_ID_EVENTS             0x11
+#define PARAM_ID_RESET              0x02
+#define RESET_ID_BMS                0x05
 
 #define REQ_DATA_LENGTH     8
 
@@ -101,6 +103,11 @@ class CanSensorBms : public CanListener {
          * @brief Get the universal BMS fault code (if any)
          */
         int getFault(bool& valid = Sensor::dummy);
+
+        /**
+         * @brief Send a restart message to the BMS
+         */
+        void restart();
 
     private:
         const uint16_t _requestIntervalMs;

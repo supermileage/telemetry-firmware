@@ -41,6 +41,12 @@ namespace CurrentVehicle {
      * @brief Toggle override for GPS position greenlist
     **/
     void toggleGpsOverride();
+
+    /**
+     * @brief Send Restart message to TinyBMS
+    **/
+    void restartTinyBms();
+
 }
 
 #endif

@@ -215,6 +215,15 @@ int CanSensorBms::getFault(bool& valid) {
     
 }
 
+void CanSensorBms::restart() {
+    CanMessage msg = CAN_MESSAGE_NULL;
+    msg.id = CAN_TINYBMS_REQUEST;
+    msg.dataLength = REQ_DATA_LENGTH;
+    msg.data[0] = PARAM_ID_RESET;
+    msg.data[1] = RESET_ID_BMS;
+    _canInterface.sendMessage(msg);
+}
+
 float CanSensorBms::parseFloat(uint8_t* dataPtr) {
     float output;
     memcpy((void*)&output, (void*)(dataPtr + RSP_DATA_BYTE), 4);
