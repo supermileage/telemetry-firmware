@@ -47,12 +47,12 @@ class DataQueue : public Handleable {
         /**
          * Initializes PublishQueuePosix and StaticJsonDocument member object
          * */
-        void begin();
+        void begin() override;
 
         /**
          * Wrapper for loop function of PublishQueuePosix
          * */
-        void handle();
+        void handle() override;
 
         /**
          * @brief Creates and adds a JsonObject to data array in JsonDocument member to which you can safely add
@@ -122,7 +122,7 @@ class DataQueue : public Handleable {
         PublishQueuePosix* _publishQueue;
         void (*_publishCallback)(String, PublishData);
         unsigned long _lastPublish;
-        String _publishHeader;
+        String _vehicleName;
         
 
         /**

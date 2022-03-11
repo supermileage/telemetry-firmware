@@ -18,29 +18,30 @@ class SensorThermo : public Sensor {
         /**
          * Begin the Thermocouple sensor by setting up over SPI
          **/
-        void begin();
+        void begin() override;
 
         /**
          * Polls Thermocouple for any new data based on the specified interval
          **/
-        void handle();
+        void handle() override;
 
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @return current probe temperature in Celsius
          **/
-        int getProbeTemp();
+        int getProbeTemp(bool &valid = Sensor::dummy);
 
         /**
          * @return current internal temperature in Celsius
          **/
-        int getInternalTemp();
+        int getInternalTemp(bool &valid = Sensor::dummy);
 
     private:
         Adafruit_MAX31855* _probe;
         SPIClass *_spi;
         uint8_t _csPin;
+        uint32_t _lastDebug = 0;
 };
 
 #endif

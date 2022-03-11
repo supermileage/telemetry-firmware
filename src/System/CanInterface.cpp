@@ -1,7 +1,7 @@
 #include "CanInterface.h"
 #define CAN_FRAME 0
 
-// #define DEBUG_MODE
+// #define DEBUG_CAN
 
 CanInterface::CanInterface(CanBus* can) {
     _CAN = can;
@@ -24,7 +24,7 @@ void CanInterface::handle() {
             _CAN->readMsgBuffer(&message.dataLength, message.data);
             message.id = _CAN->getCanId();
 
-            #ifdef DEBUG_MODE 
+            #ifdef DEBUG_CAN 
                 DEBUG_SERIAL_LN("-----------------------------");
                 DEBUG_SERIAL_F("CAN MESSAGE RECEIVED - ID: 0x%X\n", message.id);
 

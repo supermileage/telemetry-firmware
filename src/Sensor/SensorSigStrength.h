@@ -15,24 +15,24 @@ class SensorSigStrength : public Sensor
         /**
          *Empty handle since signal strength and quality run on publish
         **/
-        void begin();
+        void begin() override;
 
         /**
          * Empty handle since signal strength and quality run on publish
         **/
-        void handle();
+        void handle() override;
 
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @return Signal strength in percentage
         **/
-        int getStrength(); 
+        int getStrength(bool &valid = Sensor::dummy); 
 
         /**
          * @return Signal quality in percentage
         **/
-        int getQuality();
+        int getQuality(bool &valid = Sensor::dummy);
 
 
     

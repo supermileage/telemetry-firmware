@@ -16,10 +16,12 @@ SensorVoltage inVoltage;
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
 LoggingCommand<SensorVoltage, String> voltage(&inVoltage, "vin", &SensorVoltage::getVoltage, 10);
-LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 10);
+LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 5);
 
 LoggingCommand<SensorGps, String> gpsLong(&gps, "lon", &SensorGps::getLongitude, 1);
 LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
+LoggingCommand<SensorGps, int> gpsHeading(&gps, "hea", &SensorGps::getHeading, 1);
+LoggingCommand<SensorGps, String> gpsAltitude(&gps, "alt", &SensorGps::getAltitude, 1);
 LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1);
 LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1);
 LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1);
@@ -37,18 +39,11 @@ LoggingCommand<SensorEcu, String> ecuO2s(&ecu, "o2s", &SensorEcu::getO2S, 1);
 LoggingCommand<SensorEcu, int> ecuSpark(&ecu, "spar", &SensorEcu::getSpark, 1);
 LoggingCommand<SensorEcu, String> ecuFuel(&ecu, "pw1", &SensorEcu::getFuelPW1, 1);
 
-// Array Definitions - MUST BE NULL TERMINATED
-IntervalCommand *commands[] = { &signalStrength, &signalQuality, &voltage, &thermoInt, 
-                                &gpsLong, &gpsLat, &gpsHorSpeed, &gpsHorAccel, &gpsVertAccel, &gpsHorAccuracy, &gpsVerAccuracy, &gpsHorAccuracy, &gpsVerAccuracy, 
-                                &thermoEng, 
-                                &ecuRpm, &ecuTps, &ecuEct, &ecuIat, &ecuO2s, &ecuSpark, &ecuFuel, 
-                                NULL};
-
 String publishName = "BQIngestion";
 
 // CurrrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-    LoggingDispatcherBuilder builder(commands, &dataQ, publishName);
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
 
@@ -61,8 +56,9 @@ void CurrentVehicle::debugSensorData() {
     // GPS
     DEBUG_SERIAL("Longitude: " + gps.getLongitude() + "° - ");
     DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
-    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Heading: " + String(gps.getHeading()) + "° - ");
     DEBUG_SERIAL("Altitude: " + gps.getAltitude() + "m - ");
+    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
     DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + "m - ");
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");

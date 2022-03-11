@@ -14,7 +14,8 @@ class SensorEcu : public Sensor {
         /**
          * Begins ECU receive
          * */
-        void begin();
+        void begin() override;
+        
         /**
          * Flushes all data out of Serial receive buffer
          * */
@@ -23,62 +24,66 @@ class SensorEcu : public Sensor {
         /**
          * Checks Serial buffer for incoming data. If a full ECU data frame is in buffer, parses and saves it
          * */
-        void handle();
+        void handle() override;
 
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @return Engine Speed, RPM
          * */
-        int getRPM();
+        int getRPM(bool &valid = Sensor::dummy);
 
         /**
         * @return Manifold Absolute Pressure, kPa
         * */
-        String getMap();
+        String getMap(bool &valid = Sensor::dummy);
 
         /**
         * @return Throttle Position Sensor, %
         * */
-        int getTPS();
+        int getTPS(bool &valid = Sensor::dummy);
 
         /**
         * @return Engine Coolant Temperature, DegC
         * */
-        int getECT();
+        int getECT(bool &valid = Sensor::dummy);
 
         /**
         * @return Intake Air Temperature, DegC
         * */
-        int getIAT();
+        int getIAT(bool &valid = Sensor::dummy);
 
         /**
         * @return Oxygen Sensor, V
         * */
-        String getO2S();
+        String getO2S(bool &valid = Sensor::dummy);
 
         /**
         * @return Spark (Advance/Retard), CrA
         * */
-        int getSpark();
+        int getSpark(bool &valid = Sensor::dummy);
 
         /**
         * @return Fuel Injector 1 PWM Duty Cycle, ms
         * */
-        String getFuelPW1();
+        String getFuelPW1(bool &valid = Sensor::dummy);
 
         /**
         * @return Fuel Injector 2 PWM Duty Cycle, ms
         * */
-        String getFuelPW2();
+        String getFuelPW2(bool &valid = Sensor::dummy);
 
         /**
         * @return Battery Voltage, V
         * */
-        String getUbAdc();
+        String getUbAdc(bool &valid = Sensor::dummy);
 
     private:
         USARTSerial * _serial;
+
+        uint32_t _lastUpdate = 0;
+        bool _valid = false;
+
         int _rpm = 0;
         float _map = 0;
         int _tps = 0;

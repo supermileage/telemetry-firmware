@@ -1,6 +1,7 @@
 #ifndef _SENSOR_BMS_H_
 #define _SENSOR_BMS_H_
 
+#include <map>
 #include "CanListener.h"
 
 #define NUM_PARAMS                  7
@@ -47,91 +48,89 @@ class CanSensorBms : public CanListener {
         /**
          * @brief Repeatedly requests and stores bms data on interval
          */
-        void handle();
+        void handle() override;
         
         /**
          * @brief Get the string name of this object
          */
-        String getHumanName();
+        String getHumanName() override;
 
         /**
          * @brief Get the battery voltage
          */
-        String getBatteryVolt();
+        String getBatteryVolt(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the battery current
          */
-        String getBatteryCurrent();
+        String getBatteryCurrent(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the cell maximum voltage
          */
-        String getMaxVolt();
+        String getMaxVolt(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the cell minimum voltage
          */
-        String getMinVolt();
+        String getMinVolt(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the battery state of charge
          */
-        String getSoc();
+        String getSoc(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the current Bms status
          */
-        int getStatusBms();
+        int getStatusBms(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get current Bms status as string
          */
-        String getStatusBmsString();
+        String getStatusBmsString(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the Bms internal temperature
          */
-        int getTempBms();
+        int getTempBms(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the Bank 1 battery temperature
          */
-        int getBatteryTemp1();
+        int getBatteryTemp1(bool& valid = Sensor::dummy);
 
         /**
          * @brief Get the Bank 2 battery temperature
          */
-        int getBatteryTemp2();
+        int getBatteryTemp2(bool& valid = Sensor::dummy);
 
     private:
-
-        unsigned long _lastValidTime = 0;
-
         const uint16_t _requestIntervalMs;
-
-        const uint8_t _paramIds[NUM_PARAMS] = 
-            {   PARAM_ID_BATTERY_VOLTAGE, 
-                PARAM_ID_BATTERY_CURRENT, 
-                PARAM_ID_MAX_CELL_VOLTAGE, 
-                PARAM_ID_MIN_CELL_VOLTAGE, 
-                PARAM_ID_STATUS, 
-                PARAM_ID_SOC, 
-                PARAM_ID_TEMP};
-        
+        const uint8_t _paramIds[NUM_PARAMS] =  {
+            PARAM_ID_BATTERY_VOLTAGE,
+            PARAM_ID_BATTERY_CURRENT,
+            PARAM_ID_MAX_CELL_VOLTAGE,
+            PARAM_ID_MIN_CELL_VOLTAGE,
+            PARAM_ID_STATUS,
+            PARAM_ID_SOC,
+            PARAM_ID_TEMP
+        };
+        const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
+        std::map<uint8_t, uint64_t> _validationMap;
+        unsigned long _lastValidTime = 0;
         uint8_t _currentParam = 0;
 
         // Data
-        float _batteryVoltage;
-        float _batteryCurrent;
-        float _cellVoltageMax;
-        float _cellVoltageMin;
-        float _soc;        
-        int _tempBms;
-        int _batteryTemp1;
-        int _batteryTemp2;
+        float _batteryVoltage = 0.0f;
+        float _batteryCurrent = 0.0f;
+        float _cellVoltageMax = 0.0f;
+        float _cellVoltageMin = 0.0f;
+        float _soc = 0.0f;  
+        int _tempBms = 0;
+        int _batteryTemp1 = 0;
+        int _batteryTemp2 = 0;
         BmsStatus _bmsStatus = Unknown;
-        const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
 
         float parseFloat(uint8_t* dataPtr);
 
@@ -139,12 +138,14 @@ class CanSensorBms : public CanListener {
 
         uint32_t parseInt32(uint8_t* dataPtr);
 
+        bool _validate(uint8_t id);
+
         /**
          * @brief Determines type of bms data and stores respectively
          * 
          * @param message data byte to be added to internal can message
          */
-        void update(CanMessage message);
+        void update(CanMessage message) override;
 };
 
 #endif
