@@ -3,6 +3,7 @@
 
 #include <map>
 #include "CanListener.h"
+#include "BmsFault.h"
 
 #define NUM_PARAMS                  7
 
@@ -14,16 +15,7 @@
 #define PARAM_ID_SOC                0x1A
 #define PARAM_ID_TEMP               0x1B
 
-#define STATUS_CHARGING             0x91
-#define STATUS_CHARGED              0x92
-#define STATUS_DISCHARGING          0x93
-#define STATUS_REGENERATION         0x96
-#define STATUS_IDLE                 0x97
-#define STATUS_FAULT_ERROR          0x9B
-
-#define TEMP_ID_INTERNAL    0x00
-#define TEMP_ID_BATTERY_1   0x01
-#define TEMP_ID_BATTERY_2   0x02
+#define PARAM_ID_EVENTS             0x11
 
 #define REQ_DATA_LENGTH     8
 
@@ -105,6 +97,11 @@ class CanSensorBms : public CanListener {
          */
         int getBatteryTemp2(bool& valid = Sensor::dummy);
 
+        /**
+         * @brief Get the universal BMS fault code (if any)
+         */
+        int getFault(bool& valid = Sensor::dummy);
+
     private:
         const uint16_t _requestIntervalMs;
         const uint8_t _paramIds[NUM_PARAMS] =  {
@@ -131,11 +128,27 @@ class CanSensorBms : public CanListener {
         int _batteryTemp1 = 0;
         int _batteryTemp2 = 0;
         BmsStatus _bmsStatus = Unknown;
+        uint8_t _fault = 0;
 
+        /**
+         * @brief Parse number in TinyBMS Float format
+         * 
+         * @param dataPtr Base address of data
+         */
         float parseFloat(uint8_t* dataPtr);
 
+        /**
+         * @brief Parse number in TinyBMS 16-bit int format
+         * 
+         * @param dataPtr Base address of data
+         */
         uint16_t parseInt16(uint8_t* dataPtr);
 
+        /**
+         * @brief Parse number in TinyBMS 32-bit int format
+         * 
+         * @param dataPtr Base address of data
+         */
         uint32_t parseInt32(uint8_t* dataPtr);
 
         bool _validate(uint8_t id);
@@ -146,6 +159,13 @@ class CanSensorBms : public CanListener {
          * @param message data byte to be added to internal can message
          */
         void update(CanMessage message) override;
+
+        /**
+         * @brief Converts TinyBMS fault code into universal fault code
+         * 
+         * @param fault TinyBMS fault code
+         */
+        uint8_t _getFaultCode(uint8_t fault);
 };
 
 #endif
