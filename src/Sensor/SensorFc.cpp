@@ -22,19 +22,40 @@ void SensorFc::handle() {
     while(_serial->available()) {
         char nextChar = _serial->read();
         if(nextChar == FC_STOP_CHAR) {
+
             if(millis() >= _lastUpdate + PUBLISH_INTERVAL) {
-                Particle.publish("fcdata", _buffer, PRIVATE, WITH_ACK);
                 _lastUpdate = millis();
+                _publish();
             }
-            
-            memset(_buffer, 0, FC_BUFFER_SIZE);
+
+            _emptyBuffer();
+
         } else {
+
             uint16_t position = 0;
-            while(_buffer[position]) {
+            while(position < FC_BUFFER_SIZE && _buffer[position]) {
                 position++;
             }
+
+            if(position >= FC_BUFFER_SIZE) {
+                DEBUG_SERIAL_LN("ERROR: FC SERIAL BUFFER OVERFLOW");
+                _publish();
+                _emptyBuffer();
+            }
+
             _buffer[position] = nextChar;
         }
     }
 
+}
+
+void SensorFc::_publish() {
+    DEBUG_SERIAL_LN("------------- FUEL CELL DATA:");
+    DEBUG_SERIAL_LN(_buffer);
+    DEBUG_SERIAL_LN();
+    Particle.publish("fcdata", _buffer, PRIVATE, WITH_ACK);
+}
+
+void SensorFc::_emptyBuffer() {
+    memset(_buffer, 0, FC_BUFFER_SIZE);
 }
