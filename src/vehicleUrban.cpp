@@ -16,9 +16,7 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4); 
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS,
-    { ACC_STATUS_HEADLIGHTS, ACC_STATUS_BRAKELIGHTS, ACC_STATUS_HORN, ACC_STATUS_HAZARDS,
-    ACC_STATUS_RIGHT_SIGNAL, ACC_STATUS_LEFT_SIGNAL, ACC_STATUS_WIPERS });
+CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
 CanSensorTinyBms bms(canInterface, 25);
 
 // Command definitions

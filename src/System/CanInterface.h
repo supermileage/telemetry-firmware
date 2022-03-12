@@ -1,15 +1,6 @@
 #ifndef _CAN_INTERFACE_H_
 #define _CAN_INTERFACE_H_
 
-#define ACC_STATUS_HEADLIGHTS		0x0
-#define ACC_STATUS_BRAKELIGHTS		0x1
-#define ACC_STATUS_HORN				0x2
-#define ACC_STATUS_HAZARDS			0x3
-#define ACC_STATUS_RIGHT_SIGNAL		0x4
-#define ACC_STATUS_LEFT_SIGNAL		0x5
-#define ACC_STATUS_WIPERS			0x6
-#define ACC_STATUS_NULL				0xFF
-
 #include <map>
 
 #include "can.h"

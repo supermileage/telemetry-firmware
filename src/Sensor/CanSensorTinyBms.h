@@ -4,33 +4,6 @@
 #include <map>
 #include "CanListener.h"
 
-#define NUM_PARAMS                  7
-
-#define PARAM_ID_BATTERY_VOLTAGE    0x14
-#define PARAM_ID_BATTERY_CURRENT    0x15
-#define PARAM_ID_MAX_CELL_VOLTAGE   0x16
-#define PARAM_ID_MIN_CELL_VOLTAGE   0x17
-#define PARAM_ID_STATUS             0x18
-#define PARAM_ID_SOC                0x1A
-#define PARAM_ID_TEMP               0x1B
-
-#define STATUS_CHARGING             0x91
-#define STATUS_CHARGED              0x92
-#define STATUS_DISCHARGING          0x93
-#define STATUS_REGENERATION         0x96
-#define STATUS_IDLE                 0x97
-#define STATUS_FAULT_ERROR          0x9B
-
-#define TEMP_ID_INTERNAL    0x00
-#define TEMP_ID_BATTERY_1   0x01
-#define TEMP_ID_BATTERY_2   0x02
-
-#define REQ_DATA_LENGTH     8
-
-#define RSP_STATUS_BYTE     0x0
-#define RSP_PARAM_ID_BYTE   0x1
-#define RSP_DATA_BYTE       0x2
-
 using namespace can;
 
 class CanSensorTinyBms : public CanListener {
@@ -106,20 +79,11 @@ class CanSensorTinyBms : public CanListener {
         int getBatteryTemp2(bool& valid = Sensor::dummy);
 
     private:
+		// Control
         const uint16_t _requestIntervalMs;
-        const uint8_t _paramIds[NUM_PARAMS] =  {
-            PARAM_ID_BATTERY_VOLTAGE,
-            PARAM_ID_BATTERY_CURRENT,
-            PARAM_ID_MAX_CELL_VOLTAGE,
-            PARAM_ID_MIN_CELL_VOLTAGE,
-            PARAM_ID_STATUS,
-            PARAM_ID_SOC,
-            PARAM_ID_TEMP
-        };
-        const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
-        std::map<uint8_t, uint64_t> _validationMap;
         unsigned long _lastValidTime = 0;
         uint8_t _currentParam = 0;
+        std::map<uint8_t, uint64_t> _validationMap;
 
         // Data
         float _batteryVoltage = 0.0f;
