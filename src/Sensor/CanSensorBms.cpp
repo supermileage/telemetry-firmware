@@ -1,6 +1,9 @@
 #include "CanSensorBms.h"
 #include "settings.h"
 
+#define NUM_PARAMS                  7
+#define REQ_DATA_LENGTH     		8
+
 #define PARAM_ID_BATTERY_VOLTAGE    0x14
 #define PARAM_ID_BATTERY_CURRENT    0x15
 #define PARAM_ID_MAX_CELL_VOLTAGE   0x16
@@ -16,9 +19,23 @@
 #define STATUS_IDLE                 0x97
 #define STATUS_FAULT_ERROR          0x9B
 
-#define TEMP_ID_INTERNAL    0x00
-#define TEMP_ID_BATTERY_1   0x01
-#define TEMP_ID_BATTERY_2   0x02
+#define TEMP_ID_INTERNAL    		0x00
+#define TEMP_ID_BATTERY_1   		0x01
+#define TEMP_ID_BATTERY_2   		0x02
+
+#define RSP_STATUS_BYTE     		0x0
+#define RSP_PARAM_ID_BYTE   		0x1
+#define RSP_DATA_BYTE       		0x2
+
+const uint8_t PARAM_IDS[] =  {
+	PARAM_ID_BATTERY_VOLTAGE,
+	PARAM_ID_BATTERY_CURRENT,
+	PARAM_ID_MAX_CELL_VOLTAGE,
+	PARAM_ID_MIN_CELL_VOLTAGE,
+	PARAM_ID_STATUS,
+	PARAM_ID_SOC,
+	PARAM_ID_TEMP
+};
 
 const uint8_t VALIDATION_IDS[] {
     PARAM_ID_BATTERY_VOLTAGE,
@@ -33,9 +50,11 @@ const uint8_t VALIDATION_IDS[] {
     TEMP_ID_BATTERY_2
 };
 
+const char* BMS_STATUSES[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
+
 CanSensorBms::CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
     : CanListener(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
-        // create dictionary of validation properties with 
+
         for (auto id : VALIDATION_IDS)  {
             _validationMap[id] = 0;
         }
@@ -47,7 +66,7 @@ void CanSensorBms::handle() {
         CanMessage msg = CAN_MESSAGE_NULL;
         msg.id = CAN_TINYBMS_REQUEST;
         msg.dataLength = REQ_DATA_LENGTH;
-        msg.data[0] = _paramIds[_currentParam];
+        msg.data[0] = PARAM_IDS[_currentParam];
             
         _canInterface.sendMessage(msg);
 
@@ -170,7 +189,7 @@ int CanSensorBms::getStatusBms(bool& valid) {
 
 String CanSensorBms::getStatusBmsString(bool& valid) {
     valid  = _validate(PARAM_ID_STATUS);
-    return String(bmsStatuses[_bmsStatus]);
+    return String(BMS_STATUSES[_bmsStatus]);
 }
 
 int CanSensorBms::getTempBms(bool& valid) {
