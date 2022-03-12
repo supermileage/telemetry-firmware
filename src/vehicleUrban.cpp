@@ -6,20 +6,20 @@
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
-#include "CanSensorBms.h"
+#include "CanSensorTinyBms.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
-// SensorThermo thermo2(&SPI, A4); // Currently Unused
+SensorThermo thermo2(&SPI, A4); 
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS,
     { ACC_STATUS_HEADLIGHTS, ACC_STATUS_BRAKELIGHTS, ACC_STATUS_HORN, ACC_STATUS_HAZARDS,
     ACC_STATUS_RIGHT_SIGNAL, ACC_STATUS_LEFT_SIGNAL, ACC_STATUS_WIPERS });
-CanSensorBms bms(canInterface, 100);
+CanSensorTinyBms bms(canInterface, 25);
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -38,16 +38,17 @@ LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getH
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorThermo, int> thermoMotorController(&thermo2, "tmpmc", &SensorThermo::getProbeTemp, 5);
 
-LoggingCommand<CanSensorBms, String> bmsSoc(&bms, "soc", &CanSensorBms::getSoc, 10);
-LoggingCommand<CanSensorBms, String> bmsVoltage(&bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
-LoggingCommand<CanSensorBms, String> bmsCurrent(&bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
-LoggingCommand<CanSensorBms, String> bmsCellMax(&bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
-LoggingCommand<CanSensorBms, String> bmsCellMin(&bms, "cminv", &CanSensorBms::getMinVolt, 5);
-LoggingCommand<CanSensorBms, int> bmsStatus(&bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
-LoggingCommand<CanSensorBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorBms::getTempBms, 5);
-LoggingCommand<CanSensorBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorBms::getBatteryTemp1, 5);
-LoggingCommand<CanSensorBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorBms::getBatteryTemp2, 5);
+LoggingCommand<CanSensorTinyBms, String> bmsSoc(&bms, "soc", &CanSensorTinyBms::getSoc, 10);
+LoggingCommand<CanSensorTinyBms, String> bmsVoltage(&bms, "bmsv", &CanSensorTinyBms::getBatteryVolt, 1);
+LoggingCommand<CanSensorTinyBms, String> bmsCurrent(&bms, "bmsa", &CanSensorTinyBms::getBatteryCurrent, 1);
+LoggingCommand<CanSensorTinyBms, String> bmsCellMax(&bms, "cmaxv", &CanSensorTinyBms::getMaxVolt, 5);
+LoggingCommand<CanSensorTinyBms, String> bmsCellMin(&bms, "cminv", &CanSensorTinyBms::getMinVolt, 5);
+LoggingCommand<CanSensorTinyBms, int> bmsStatus(&bms, "bmsstat", &CanSensorTinyBms::getStatusBms, 5);
+LoggingCommand<CanSensorTinyBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorTinyBms::getTempBms, 5);
+LoggingCommand<CanSensorTinyBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorTinyBms::getBatteryTemp1, 5);
+LoggingCommand<CanSensorTinyBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorTinyBms::getBatteryTemp2, 5);
 
 LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
 LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);
@@ -101,6 +102,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
     // Thermo
     DEBUG_SERIAL_LN("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C");
+    DEBUG_SERIAL_LN("Motor Controller Temp: " + String(thermo2.getProbeTemp()) + "°C");
     // BMS
     DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "v - ");
     DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "A - ");
