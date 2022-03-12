@@ -157,7 +157,7 @@ void CanAccessoriesMidiPlayer::_parseTrackMeta(midi_parser* parser) {
 // Dynamically allocates memory for returned buffer: Make sure to delete uint8_t buffer once you are finished using it 
 uint8_t* CanAccessoriesMidiPlayer::_convertString(const char* buf, uint32_t *length) {
 	// get size of char buffer ("0BF45601 " == 9 characters -> 4 bytes in buffer)
-	int padding = (*length % 8) / 2;
+	int padding = (*length % 9) / 2;
 	uint8_t* output = new uint8_t[(((*length + 1) / 9) * 4) + padding];
 	uint8_t* s_ptr;
 
