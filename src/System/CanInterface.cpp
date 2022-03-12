@@ -52,5 +52,5 @@ void CanInterface::addMessageListen(uint16_t id, Command* canListenerDelegate) {
 }
 
 void CanInterface::sendMessage(CanMessage message) {
-        _CAN->sendMsgBuf(message.id, CAN_FRAME, message.dataLength, message.data );   
+    _CAN->sendMsgBuf(message.id, CAN_FRAME, message.dataLength, message.data );   
 }

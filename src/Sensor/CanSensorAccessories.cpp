@@ -1,9 +1,27 @@
 #include "CanSensorAccessories.h"
 
-CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids)
+#define ACC_STATUS_HEADLIGHTS		0x0
+#define ACC_STATUS_BRAKELIGHTS		0x1
+#define ACC_STATUS_HORN				0x2
+#define ACC_STATUS_HAZARDS			0x3
+#define ACC_STATUS_RIGHT_SIGNAL		0x4
+#define ACC_STATUS_LEFT_SIGNAL		0x5
+#define ACC_STATUS_WIPERS			0x6
+
+const uint8_t STATUS_IDS[] {
+    ACC_STATUS_HEADLIGHTS,
+    ACC_STATUS_BRAKELIGHTS,
+    ACC_STATUS_HORN,
+    ACC_STATUS_HAZARDS,
+    ACC_STATUS_RIGHT_SIGNAL,
+    ACC_STATUS_LEFT_SIGNAL,
+	ACC_STATUS_WIPERS
+};
+
+CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id)
 	: CanListener(canInterface, id) {
 	
-	for (uint8_t id : ids)
+	for (uint8_t id : STATUS_IDS)
 		_statuses[id] = CanSensorAccessories::StatusProperty { 0, Unknown };
 }
 
@@ -12,31 +30,31 @@ String CanSensorAccessories::getHumanName() {
 }
 
 int CanSensorAccessories::getStatusHeadlights(bool& valid) {
-	return _getStatus(STATUS_HEADLIGHTS, valid);
+	return _getStatus(ACC_STATUS_HEADLIGHTS, valid);
 }
 
 int CanSensorAccessories::getStatusBrakelights(bool& valid) {
-	return _getStatus(STATUS_BRAKELIGHTS, valid);
+	return _getStatus(ACC_STATUS_BRAKELIGHTS, valid);
 }
 
 int CanSensorAccessories::getStatusHorn(bool& valid) {
-	return _getStatus(STATUS_HORN, valid);
+	return _getStatus(ACC_STATUS_HORN, valid);
 }
 
 int CanSensorAccessories::getStatusHazards(bool& valid) {
-	return _getStatus(STATUS_HAZARDS, valid);
+	return _getStatus(ACC_STATUS_HAZARDS, valid);
 }
 
 int CanSensorAccessories::getStatusRightSignal(bool& valid) {
-	return _getStatus(STATUS_RIGHT_SIGNAL, valid);
+	return _getStatus(ACC_STATUS_RIGHT_SIGNAL, valid);
 }
 
 int CanSensorAccessories::getStatusLeftSignal(bool& valid) {
-	return _getStatus(STATUS_LEFT_SIGNAL, valid);
+	return _getStatus(ACC_STATUS_LEFT_SIGNAL, valid);
 }
 
 int CanSensorAccessories::getStatusWipers(bool& valid) {
-	return _getStatus(STATUS_WIPERS, valid);
+	return _getStatus(ACC_STATUS_WIPERS, valid);
 }
 
 void CanSensorAccessories::update(CanMessage message) {
