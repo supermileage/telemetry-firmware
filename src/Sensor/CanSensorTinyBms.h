@@ -1,10 +1,11 @@
-#ifndef _SENSOR_BMS_H_
-#define _SENSOR_BMS_H_
+#ifndef _CAN_SENSOR_TINY_BMS_H_
+#define _CAN_SENSOR_TINY_BMS_H_
 
 #include <map>
 #include "CanListener.h"
 #include "BmsFault.h"
 
+<<<<<<< HEAD:src/Sensor/CanSensorBms.h
 #define NUM_PARAMS                  7
 
 #define PARAM_ID_BATTERY_VOLTAGE    0x14
@@ -25,19 +26,21 @@
 #define RSP_PARAM_ID_BYTE   0x1
 #define RSP_DATA_BYTE       0x2
 
+=======
+>>>>>>> develop:src/Sensor/CanSensorTinyBms.h
 using namespace can;
 
-class CanSensorBms : public CanListener {
+class CanSensorTinyBms : public CanListener {
     public:
         enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, Unknown };
     
         /**
-         * @brief Constructor for CanSensorBms
+         * @brief Constructor for CanSensorTinyBms
          * 
          * @param canInterface - the can interface which will be reading data from Can buffer
          * @param requestIntervalMs - frequency to request Bms data
          */
-        CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs);
+        CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs);
 
         /**
          * @brief Repeatedly requests and stores bms data on interval
@@ -110,20 +113,11 @@ class CanSensorBms : public CanListener {
         void restart();
 
     private:
+		// Control
         const uint16_t _requestIntervalMs;
-        const uint8_t _paramIds[NUM_PARAMS] =  {
-            PARAM_ID_BATTERY_VOLTAGE,
-            PARAM_ID_BATTERY_CURRENT,
-            PARAM_ID_MAX_CELL_VOLTAGE,
-            PARAM_ID_MIN_CELL_VOLTAGE,
-            PARAM_ID_STATUS,
-            PARAM_ID_SOC,
-            PARAM_ID_TEMP
-        };
-        const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
-        std::map<uint8_t, uint64_t> _validationMap;
         unsigned long _lastValidTime = 0;
         uint8_t _currentParam = 0;
+        std::map<uint8_t, uint64_t> _validationMap;
 
         // Data
         float _batteryVoltage = 0.0f;

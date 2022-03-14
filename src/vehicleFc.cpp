@@ -1,4 +1,5 @@
 #include "vehicle.h"
+#include "SensorFc.h"
 #include <vector>
 
 #ifdef FC
@@ -9,6 +10,7 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
+SensorFc fc(&Serial1);
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);

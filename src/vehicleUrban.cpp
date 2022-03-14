@@ -6,20 +6,18 @@
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
-#include "CanSensorBms.h"
+#include "CanSensorTinyBms.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
-// SensorThermo thermo2(&SPI, A4); // Currently Unused
+SensorThermo thermo2(&SPI, A4); 
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS,
-    { ACC_STATUS_HEADLIGHTS, ACC_STATUS_BRAKELIGHTS, ACC_STATUS_HORN, ACC_STATUS_HAZARDS,
-    ACC_STATUS_RIGHT_SIGNAL, ACC_STATUS_LEFT_SIGNAL, ACC_STATUS_WIPERS });
-CanSensorBms bms(canInterface, 100);
+CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
+CanSensorTinyBms bms(canInterface, 25);
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -38,6 +36,7 @@ LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getH
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorThermo, int> thermoMotorController(&thermo2, "tmpmc", &SensorThermo::getProbeTemp, 5);
 
 LoggingCommand<CanSensorBms, String> bmsSoc(&bms, "soc", &CanSensorBms::getSoc, 10);
 LoggingCommand<CanSensorBms, String> bmsVoltage(&bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
@@ -102,6 +101,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
     // Thermo
     DEBUG_SERIAL_LN("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C");
+    DEBUG_SERIAL_LN("Motor Controller Temp: " + String(thermo2.getProbeTemp()) + "°C");
     // BMS
     DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "v - ");
     DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "A - ");

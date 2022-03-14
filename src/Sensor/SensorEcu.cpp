@@ -1,6 +1,8 @@
 #include "SensorEcu.h"
 #include "settings.h"
 
+#define ECU_BAUD                115200
+
 #define ECU_PACKET_SIZE         27
 
 #define ECU_HEADER_1            0x80
@@ -18,7 +20,7 @@ String SensorEcu::getHumanName() {
 }
 
 void SensorEcu::begin() {
-    _serial->begin(115200, SERIAL_8N1);
+    _serial->begin(ECU_BAUD, SERIAL_8N1);
 }
 
 void SensorEcu::flush() {
