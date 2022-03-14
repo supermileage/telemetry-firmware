@@ -1,8 +1,6 @@
 #include "CanSensorTinyBms.h"
 #include "settings.h"
 
-<<<<<<< HEAD:src/Sensor/CanSensorBms.cpp
-=======
 #define NUM_PARAMS                  7
 #define REQ_DATA_LENGTH     		8
 
@@ -14,7 +12,10 @@
 #define PARAM_ID_SOC                0x1A
 #define PARAM_ID_TEMP               0x1B
 
->>>>>>> develop:src/Sensor/CanSensorTinyBms.cpp
+#define PARAM_ID_EVENTS             0x11
+#define PARAM_ID_RESET              0x02
+#define RESET_ID_BMS                0x05
+
 #define STATUS_CHARGING             0x91
 #define STATUS_CHARGED              0x92
 #define STATUS_DISCHARGING          0x93
@@ -83,18 +84,14 @@ void CanSensorTinyBms::handle() {
         CanMessage msg = CAN_MESSAGE_NULL;
         msg.id = CAN_TINYBMS_REQUEST;
         msg.dataLength = REQ_DATA_LENGTH;
-<<<<<<< HEAD:src/Sensor/CanSensorBms.cpp
 
         if(_bmsStatus == FaultError) {
             msg.data[0] = PARAM_ID_EVENTS;
             _canInterface.sendMessage(msg);
         }
 
-        msg.data[0] = _paramIds[_currentParam];
-=======
         msg.data[0] = PARAM_IDS[_currentParam];
             
->>>>>>> develop:src/Sensor/CanSensorTinyBms.cpp
         _canInterface.sendMessage(msg);
 
         if(_currentParam == NUM_PARAMS) {
@@ -239,8 +236,7 @@ int CanSensorTinyBms::getBatteryTemp2(bool& valid) {
     return _batteryTemp2;
 }
 
-<<<<<<< HEAD:src/Sensor/CanSensorBms.cpp
-int CanSensorBms::getFault(bool& valid) {
+int CanSensorTinyBms::getFault(bool& valid) {
     valid = _validate(PARAM_ID_STATUS) && _validate(PARAM_ID_EVENTS);
 
     if(_bmsStatus == FaultError) {
@@ -251,7 +247,7 @@ int CanSensorBms::getFault(bool& valid) {
     
 }
 
-void CanSensorBms::restart() {
+void CanSensorTinyBms::restart() {
     CanMessage msg = CAN_MESSAGE_NULL;
     msg.id = CAN_TINYBMS_REQUEST;
     msg.dataLength = REQ_DATA_LENGTH;
@@ -260,10 +256,7 @@ void CanSensorBms::restart() {
     _canInterface.sendMessage(msg);
 }
 
-float CanSensorBms::parseFloat(uint8_t* dataPtr) {
-=======
 float CanSensorTinyBms::parseFloat(uint8_t* dataPtr) {
->>>>>>> develop:src/Sensor/CanSensorTinyBms.cpp
     float output;
     memcpy((void*)&output, (void*)(dataPtr + RSP_DATA_BYTE), 4);
     return output;
@@ -285,7 +278,7 @@ bool CanSensorTinyBms::_validate(uint8_t id) {
     return (millis() - _validationMap[id]) < STALE_INTERVAL;
 }
 
-uint8_t CanSensorBms::_getFaultCode(uint8_t fault) {
+uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
     switch(fault) {
         case FAULT_UNDER_VOLTAGE:
             return BmsFault::VOLTAGE_LOW;           

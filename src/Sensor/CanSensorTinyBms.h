@@ -5,29 +5,6 @@
 #include "CanListener.h"
 #include "BmsFault.h"
 
-<<<<<<< HEAD:src/Sensor/CanSensorBms.h
-#define NUM_PARAMS                  7
-
-#define PARAM_ID_BATTERY_VOLTAGE    0x14
-#define PARAM_ID_BATTERY_CURRENT    0x15
-#define PARAM_ID_MAX_CELL_VOLTAGE   0x16
-#define PARAM_ID_MIN_CELL_VOLTAGE   0x17
-#define PARAM_ID_STATUS             0x18
-#define PARAM_ID_SOC                0x1A
-#define PARAM_ID_TEMP               0x1B
-
-#define PARAM_ID_EVENTS             0x11
-#define PARAM_ID_RESET              0x02
-#define RESET_ID_BMS                0x05
-
-#define REQ_DATA_LENGTH     8
-
-#define RSP_STATUS_BYTE     0x0
-#define RSP_PARAM_ID_BYTE   0x1
-#define RSP_DATA_BYTE       0x2
-
-=======
->>>>>>> develop:src/Sensor/CanSensorTinyBms.h
 using namespace can;
 
 class CanSensorTinyBms : public CanListener {
