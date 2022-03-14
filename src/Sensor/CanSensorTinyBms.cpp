@@ -94,7 +94,7 @@ void CanSensorTinyBms::handle() {
             
         _canInterface.sendMessage(msg);
 
-        if(_currentParam == NUM_PARAMS) {
+        if(_currentParam == NUM_PARAMS - 1) {
             _currentParam = 0;
         } else {
             _currentParam++;
