@@ -51,8 +51,8 @@ namespace BmsFault {
                 return "High BMS Temperature";
             case THERMISTOR_PACK:
                 return "Battery Pack Thermistor";
-            case THERMISTOR_INTERNAL,
-                return "BMS THermistor"
+            case THERMISTOR_INTERNAL:
+                return "BMS Thermistor";
             case CURRENT_DISCHARGE_HIGH:
                 return "High Discharge Current";
             case CURRENT_CHARGE_HIGH:
