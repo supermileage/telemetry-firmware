@@ -7,6 +7,7 @@
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
 #include "CanSensorBms.h"
+#include "CanSensorSteering.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -20,6 +21,7 @@ CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS,
     { ACC_STATUS_HEADLIGHTS, ACC_STATUS_BRAKELIGHTS, ACC_STATUS_HORN, ACC_STATUS_HAZARDS,
     ACC_STATUS_RIGHT_SIGNAL, ACC_STATUS_LEFT_SIGNAL, ACC_STATUS_WIPERS });
 CanSensorBms bms(canInterface, 100);
+CanSensorSteering steering(canInterface);
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -38,6 +40,11 @@ LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getH
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
+
+LoggingCommand<CanSensorSteering, int> steeringThrottle(&steering, "tps", &CanSensorSteering::getThrottle, 1);
+LoggingCommand<CanSensorSteering, int> steeringIgnition(&steering, "ign", &CanSensorSteering::getIgnition, 1);
+LoggingCommand<CanSensorSteering, int> steeringDms(&steering, "dms", &CanSensorSteering::getDms, 1);
+LoggingCommand<CanSensorSteering, int> steeringBrake(&steering, "br", &CanSensorSteering::getBrake, 1);
 
 LoggingCommand<CanSensorBms, String> bmsSoc(&bms, "soc", &CanSensorBms::getSoc, 10);
 LoggingCommand<CanSensorBms, String> bmsVoltage(&bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
@@ -101,6 +108,11 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
     // Thermo
     DEBUG_SERIAL_LN("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C");
+    // Steering
+    DEBUG_SERIAL("Throttle: " + String(steering.getThrottle()) + "% - ");
+    DEBUG_SERIAL("Ignition: " + BOOL_TO_STRING(steering.getIgnition()) + " - ");
+    DEBUG_SERIAL("DMS: " + BOOL_TO_STRING(steering.getDms()) + " - ");
+    DEBUG_SERIAL_LN("Brake: " + BOOL_TO_STRING(steering.getBrake()));
     // BMS
     DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "v - ");
     DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "A - ");
