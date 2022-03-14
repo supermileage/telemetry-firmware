@@ -1,9 +1,27 @@
 #include "CanSensorAccessories.h"
 
-CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids)
+#define ACC_STATUS_HEADLIGHTS		0x0
+#define ACC_STATUS_BRAKELIGHTS		0x1
+#define ACC_STATUS_HORN				0x2
+#define ACC_STATUS_HAZARDS			0x3
+#define ACC_STATUS_RIGHT_SIGNAL		0x4
+#define ACC_STATUS_LEFT_SIGNAL		0x5
+#define ACC_STATUS_WIPERS			0x6
+
+const uint8_t STATUS_IDS[] {
+    ACC_STATUS_HEADLIGHTS,
+    ACC_STATUS_BRAKELIGHTS,
+    ACC_STATUS_HORN,
+    ACC_STATUS_HAZARDS,
+    ACC_STATUS_RIGHT_SIGNAL,
+    ACC_STATUS_LEFT_SIGNAL,
+	ACC_STATUS_WIPERS
+};
+
+CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id)
 	: CanListener(canInterface, id) {
 	
-	for (uint8_t id : ids)
+	for (uint8_t id : STATUS_IDS)
 		_statuses[id] = CanSensorAccessories::StatusProperty { 0, Unknown };
 }
 
