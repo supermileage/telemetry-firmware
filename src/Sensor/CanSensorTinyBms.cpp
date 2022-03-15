@@ -95,6 +95,7 @@ void CanSensorTinyBms::update(CanMessage message) {
         switch (id) {
             case PARAM_ID_BATTERY_VOLTAGE:
                 _batteryVoltage = parseFloat(message.data);
+				_voltageCallback(_batteryVoltage);
                 break;
             case PARAM_ID_BATTERY_CURRENT:
                 // tiny bms returns -A for discharging and +A for charging: we want the inverse so flip sign here
@@ -205,6 +206,10 @@ int CanSensorTinyBms::getBatteryTemp1(bool& valid) {
 int CanSensorTinyBms::getBatteryTemp2(bool& valid) {
     valid  = _validate(TEMP_ID_BATTERY_2);
     return _batteryTemp2;
+}
+
+void CanSensorTinyBms::setCanCallback(void (*callback)(float)) {
+	_voltageCallback = callback;
 }
 
 float CanSensorTinyBms::parseFloat(uint8_t* dataPtr) {

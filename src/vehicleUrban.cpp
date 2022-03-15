@@ -58,25 +58,30 @@ LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wi
 
 String publishName = "BQIngestion";
 
-void sendCanSpeed(float speed){
-    CanMessage message = CAN_MESSAGE_NULL;
-    message.id = CAN_TELEMETRY_GPS_SPEED;
-    if (speed <= 70.0 && speed >= 0){
-        message.data[0] = (uint8_t)(speed*3.6);
+void sendCanGpsData(float speed) {
+    if (speed <= 70.0f && speed >= 0.0f) {
+		CanMessage message = CAN_MESSAGE_NULL;
+    	message.id = CAN_TELEMETRY_GPS_DATA;
+        message.data[0] = (uint8_t)(speed * 3.6f);
         message.dataLength = 1;
-        canInterface.sendMessage(message);
+		canInterface.sendMessage(message);
     }
-    else{
-        message.data[0] = (uint8_t)(255);
+}
+
+void sendCanBmsData(float speed) {
+    if (speed <= 70.0f && speed >= 0.0f) {
+		CanMessage message = CAN_MESSAGE_NULL;
+    	message.id = CAN_TELEMETRY_BMS_DATA;
+        message.data[0] = (uint8_t)(speed * 3.6f);
         message.dataLength = 1;
-        canInterface.sendMessage(message);
+		canInterface.sendMessage(message);
     }
-    
 }
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
-    gps.updateSpeedCallback(sendCanSpeed);
+    gps.setCanCallback(sendCanGpsData);
+	bms.setCanCallback(sendCanBmsData);
 
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
