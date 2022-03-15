@@ -82,7 +82,7 @@ class CanSensorTinyBms : public CanListener {
 		 * @brief Sets a Can Callback message to be updated with voltage data
 		 * 
 		 */
-		void setCanCallback(void (*callback)(float));
+		void setVoltageCallback(void (*callback)(float,float));
 
     private:
 		// Control
@@ -103,7 +103,7 @@ class CanSensorTinyBms : public CanListener {
         BmsStatus _bmsStatus = Unknown;
 
 		// Callback fn to pass current voltage to steering
-		void (*_voltageCallback)(float) = NULL;
+		void (*_voltageCallback)(float,float) = NULL;
 
         float parseFloat(uint8_t* dataPtr);
 

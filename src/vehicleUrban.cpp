@@ -63,7 +63,7 @@ String publishName = "BQIngestion";
  * 
  * @param speed current gps speed
  */
-void sendCanGpsData(float speed) {
+void speedCallbackGps(float speed) {
     if (speed <= 70.0f && speed >= 0.0f) {
 		CanMessage message = CAN_MESSAGE_NULL;
     	message.id = CAN_TELEMETRY_GPS_DATA;
@@ -78,16 +78,17 @@ void sendCanGpsData(float speed) {
  * 
  * @param voltage current bms voltage
  */
-void sendCanBmsData(float voltage) {
-	CanMessage message = { CAN_TELEMETRY_BMS_DATA, 0x4, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };
+void socCallbackBms(float soc, float voltage) {
+	CanMessage message = { CAN_TELEMETRY_BMS_DATA, 0x8, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };
 	memcpy((void*)message.data, (void*)&voltage, 4);
+	memcpy((void*)(message.data + 4), (void*)&voltage, 4);
 	canInterface.sendMessage(message);
 }
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
-    gps.setCanCallback(sendCanGpsData);
-	bms.setCanCallback(sendCanBmsData);
+    gps.setSpeedCallback(speedCallbackGps);
+	bms.setVoltageCallback(socCallbackBms);
 
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();

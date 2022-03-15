@@ -184,7 +184,7 @@ int SensorGps::getSatellitesInView(bool &valid) {
     return _gps->getSIV();  
 }
 
-void SensorGps::setCanCallback(void (*speed)(float)){
+void SensorGps::setSpeedCallback(void (*speed)(float)){
    _speedCallback  = speed;
 }
 
