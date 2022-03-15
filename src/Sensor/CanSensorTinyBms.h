@@ -77,6 +77,12 @@ class CanSensorTinyBms : public CanListener {
          * @brief Get the Bank 2 battery temperature
          */
         int getBatteryTemp2(bool& valid = Sensor::dummy);
+		
+		/**
+		 * @brief Sets a Can Callback message to be updated with voltage data
+		 * 
+		 */
+		void setVoltageCallback(void (*callback)(float,float));
 
     private:
 		// Control
@@ -95,6 +101,9 @@ class CanSensorTinyBms : public CanListener {
         int _batteryTemp1 = 0;
         int _batteryTemp2 = 0;
         BmsStatus _bmsStatus = Unknown;
+
+		// Callback fn to pass current voltage to steering
+		void (*_voltageCallback)(float,float) = NULL;
 
         float parseFloat(uint8_t* dataPtr);
 

@@ -58,25 +58,37 @@ LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wi
 
 String publishName = "BQIngestion";
 
-void sendCanSpeed(float speed){
-    CanMessage message = CAN_MESSAGE_NULL;
-    message.id = CAN_TELEMETRY_GPS_SPEED;
-    if (speed <= 70.0 && speed >= 0){
-        message.data[0] = (uint8_t)(speed*3.6);
+/**
+ * @brief callback fn passed to gps which receieves current speed, which is sent as can message to steering 
+ * 
+ * @param speed current gps speed
+ */
+void speedCallbackGps(float speed) {
+    if (speed <= 70.0f && speed >= 0.0f) {
+		CanMessage message = CAN_MESSAGE_NULL;
+    	message.id = CAN_TELEMETRY_GPS_DATA;
+        message.data[0] = (uint8_t)(speed * 3.6f);
         message.dataLength = 1;
-        canInterface.sendMessage(message);
+		canInterface.sendMessage(message);
     }
-    else{
-        message.data[0] = (uint8_t)(255);
-        message.dataLength = 1;
-        canInterface.sendMessage(message);
-    }
-    
+}
+
+/**
+ * @brief callback fn passed to bms which receieves current voltage, which is sent as can message to steering 
+ * 
+ * @param voltage current bms voltage
+ */
+void socCallbackBms(float soc, float voltage) {
+	CanMessage message = { CAN_TELEMETRY_BMS_DATA, 0x8, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };
+	memcpy((void*)message.data, (void*)&voltage, 4);
+	memcpy((void*)(message.data + 4), (void*)&voltage, 4);
+	canInterface.sendMessage(message);
 }
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
-    gps.updateSpeedCallback(sendCanSpeed);
+    gps.setSpeedCallback(speedCallbackGps);
+	bms.setVoltageCallback(socCallbackBms);
 
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
