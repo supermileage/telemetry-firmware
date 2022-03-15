@@ -23,7 +23,7 @@
 // LED Flash interval in ms
 #define LED_FLASH_INT           500
 // Time zone in UTC offset (must manually adjust for DST)
-#define TIME_ZONE               -8
+#define TIME_ZONE               -7
 
 /**
  *  MACROS

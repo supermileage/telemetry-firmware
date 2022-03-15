@@ -6,7 +6,9 @@
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
+#include "CanSensorSteering.h"
 #include "CanSensorTinyBms.h"
+
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -16,8 +18,10 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4); 
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
+
 CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
 CanSensorTinyBms bms(canInterface, 25);
+CanSensorSteering steering(canInterface);
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -37,6 +41,11 @@ LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getV
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoMotorController(&thermo2, "tmpmc", &SensorThermo::getProbeTemp, 5);
+
+LoggingCommand<CanSensorSteering, int> steeringThrottle(&steering, "tps", &CanSensorSteering::getThrottle, 1);
+LoggingCommand<CanSensorSteering, int> steeringIgnition(&steering, "ign", &CanSensorSteering::getIgnition, 1);
+LoggingCommand<CanSensorSteering, int> steeringDms(&steering, "dms", &CanSensorSteering::getDms, 1);
+LoggingCommand<CanSensorSteering, int> steeringBrake(&steering, "br", &CanSensorSteering::getBrake, 1);
 
 LoggingCommand<CanSensorTinyBms, String> bmsSoc(&bms, "soc", &CanSensorTinyBms::getSoc, 10);
 LoggingCommand<CanSensorTinyBms, String> bmsVoltage(&bms, "bmsv", &CanSensorTinyBms::getBatteryVolt, 1);
@@ -111,8 +120,13 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");
     DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
     // Thermo
-    DEBUG_SERIAL_LN("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C");
+    DEBUG_SERIAL("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C - ");
     DEBUG_SERIAL_LN("Motor Controller Temp: " + String(thermo2.getProbeTemp()) + "°C");
+    // Steering
+    DEBUG_SERIAL("Throttle: " + String(steering.getThrottle()) + "% - ");
+    DEBUG_SERIAL("Ignition: " + BOOL_TO_STRING(steering.getIgnition()) + " - ");
+    DEBUG_SERIAL("DMS: " + BOOL_TO_STRING(steering.getDms()) + " - ");
+    DEBUG_SERIAL_LN("Brake: " + BOOL_TO_STRING(steering.getBrake()));
     // BMS
     DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "v - ");
     DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "A - ");
