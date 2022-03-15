@@ -58,6 +58,11 @@ LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wi
 
 String publishName = "BQIngestion";
 
+/**
+ * @brief callback fn passed to gps which receieves current speed, which is sent as can message to steering 
+ * 
+ * @param speed current gps speed
+ */
 void sendCanGpsData(float speed) {
     if (speed <= 70.0f && speed >= 0.0f) {
 		CanMessage message = CAN_MESSAGE_NULL;
@@ -68,14 +73,15 @@ void sendCanGpsData(float speed) {
     }
 }
 
-void sendCanBmsData(float speed) {
-    if (speed <= 70.0f && speed >= 0.0f) {
-		CanMessage message = CAN_MESSAGE_NULL;
-    	message.id = CAN_TELEMETRY_BMS_DATA;
-        message.data[0] = (uint8_t)(speed * 3.6f);
-        message.dataLength = 1;
-		canInterface.sendMessage(message);
-    }
+/**
+ * @brief callback fn passed to bms which receieves current voltage, which is sent as can message to steering 
+ * 
+ * @param voltage current bms voltage
+ */
+void sendCanBmsData(float voltage) {
+	CanMessage message = { CAN_TELEMETRY_BMS_DATA, 0x4, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };
+	memcpy((void*)message.data, (void*)&voltage, 4);
+	canInterface.sendMessage(message);
 }
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
