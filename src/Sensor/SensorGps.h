@@ -96,7 +96,7 @@ class SensorGps : public Sensor {
          * 
          * @param speed() Pointer to function to call when there is a new speed
          **/
-        void updateSpeedCallback(void (*speed)(float));
+        void setSpeedCallback(void (*speed)(float));
 
         /**
          * @brief Toggle greenlist override

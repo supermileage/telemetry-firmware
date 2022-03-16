@@ -155,6 +155,7 @@ void CanSensorTinyBms::update(CanMessage message) {
             }
             case PARAM_ID_SOC:
                 _soc = (float)parseInt32(message.data) / 1000000.0;
+				_voltageCallback(_soc, _batteryVoltage);
                 break;
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
@@ -254,6 +255,10 @@ void CanSensorTinyBms::restart() {
     msg.data[0] = PARAM_ID_RESET;
     msg.data[1] = RESET_ID_BMS;
     _canInterface.sendMessage(msg);
+}
+
+void CanSensorTinyBms::setVoltageCallback(void (*callback)(float,float)) {
+	_voltageCallback = callback;
 }
 
 float CanSensorTinyBms::parseFloat(uint8_t* dataPtr) {

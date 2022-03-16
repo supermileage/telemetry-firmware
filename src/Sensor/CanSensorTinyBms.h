@@ -78,6 +78,12 @@ class CanSensorTinyBms : public CanListener {
          * @brief Get the Bank 2 battery temperature
          */
         int getBatteryTemp2(bool& valid = Sensor::dummy);
+		
+		/**
+		 * @brief Sets a Can Callback message to be updated with voltage data
+		 * 
+		 */
+		void setVoltageCallback(void (*callback)(float,float));
 
         /**
          * @brief Get the universal BMS fault code (if any)
@@ -107,6 +113,9 @@ class CanSensorTinyBms : public CanListener {
         int _batteryTemp2 = 0;
         BmsStatus _bmsStatus = Unknown;
         uint8_t _fault = 0;
+        
+		// Callback fn to pass current voltage to steering
+		void (*_voltageCallback)(float,float) = NULL;
 
         /**
          * @brief Parse number in TinyBMS Float format
