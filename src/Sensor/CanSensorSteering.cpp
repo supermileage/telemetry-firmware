@@ -9,8 +9,9 @@ CanSensorSteering::CanSensorSteering(CanInterface &canInterface)
     : CanListener(canInterface, CAN_STEERING_THROTTLE) {}
 
 void CanSensorSteering::begin() {
-    _canInterface.addMessageListen(CAN_STEERING_THROTTLE, new CanListener::CanListenerDelegate(this));
-    _canInterface.addMessageListen(CAN_STEERING_READY, new CanListener::CanListenerDelegate(this));
+    CanListenerDelegate* steeringDelegate = new CanListener::CanListenerDelegate(this);
+    _canInterface.addMessageListen(CAN_STEERING_THROTTLE, steeringDelegate);
+    _canInterface.addMessageListen(CAN_STEERING_READY, steeringDelegate);
 }
 
 void CanSensorSteering::handle() {
