@@ -37,14 +37,6 @@ class CanListener : public Sensor {
         CanInterface &_canInterface;
         uint16_t _id;
 
-    private:
-        /**
-         * @brief Specifies CanMessage updating behavior
-         * 
-         * @param message CanMessage received from CanInterface
-         */
-        virtual void update(CanMessage message) = 0;
-
         /**
 		 * CanListener-internal class which acts as a delegate to CanInterface; allows
          * CanListener-derived classes to parse CanMessages received in CanInterface
@@ -65,6 +57,14 @@ class CanListener : public Sensor {
 			private:
 				CanListener* _owner;
 		};
+
+    private:
+        /**
+         * @brief Specifies CanMessage updating behavior
+         * 
+         * @param message CanMessage received from CanInterface
+         */
+        virtual void update(CanMessage message) = 0;
 
 };
 

@@ -6,7 +6,9 @@
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
+#include "CanSensorSteering.h"
 #include "CanSensorTinyBms.h"
+
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -16,8 +18,10 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4); 
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
+
 CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
 CanSensorTinyBms bms(canInterface, 25);
+CanSensorSteering steering(canInterface);
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -38,6 +42,11 @@ LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getV
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoMotorController(&thermo2, "tmpmc", &SensorThermo::getProbeTemp, 5);
 
+LoggingCommand<CanSensorSteering, int> steeringThrottle(&steering, "tps", &CanSensorSteering::getThrottle, 1);
+LoggingCommand<CanSensorSteering, int> steeringIgnition(&steering, "ign", &CanSensorSteering::getIgnition, 1);
+LoggingCommand<CanSensorSteering, int> steeringDms(&steering, "dms", &CanSensorSteering::getDms, 1);
+LoggingCommand<CanSensorSteering, int> steeringBrake(&steering, "br", &CanSensorSteering::getBrake, 1);
+
 LoggingCommand<CanSensorTinyBms, String> bmsSoc(&bms, "soc", &CanSensorTinyBms::getSoc, 10);
 LoggingCommand<CanSensorTinyBms, String> bmsVoltage(&bms, "bmsv", &CanSensorTinyBms::getBatteryVolt, 1);
 LoggingCommand<CanSensorTinyBms, String> bmsCurrent(&bms, "bmsa", &CanSensorTinyBms::getBatteryCurrent, 1);
@@ -47,6 +56,7 @@ LoggingCommand<CanSensorTinyBms, int> bmsStatus(&bms, "bmsstat", &CanSensorTinyB
 LoggingCommand<CanSensorTinyBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorTinyBms::getTempBms, 5);
 LoggingCommand<CanSensorTinyBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorTinyBms::getBatteryTemp1, 5);
 LoggingCommand<CanSensorTinyBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorTinyBms::getBatteryTemp2, 5);
+LoggingCommand<CanSensorTinyBms, int> bmsFault(&bms, "bmsf", &CanSensorTinyBms::getFault, 5);
 
 LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
 LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);
@@ -58,25 +68,37 @@ LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wi
 
 String publishName = "BQIngestion";
 
-void sendCanSpeed(float speed){
-    CanMessage message = CAN_MESSAGE_NULL;
-    message.id = CAN_TELEMETRY_GPS_SPEED;
-    if (speed <= 70.0 && speed >= 0){
-        message.data[0] = (uint8_t)(speed*3.6);
+/**
+ * @brief callback fn passed to gps which receieves current speed, which is sent as can message to steering 
+ * 
+ * @param speed current gps speed
+ */
+void speedCallbackGps(float speed) {
+    if (speed <= 70.0f && speed >= 0.0f) {
+		CanMessage message = CAN_MESSAGE_NULL;
+    	message.id = CAN_TELEMETRY_GPS_DATA;
+        message.data[0] = (uint8_t)(speed * 3.6f);
         message.dataLength = 1;
-        canInterface.sendMessage(message);
+		canInterface.sendMessage(message);
     }
-    else{
-        message.data[0] = (uint8_t)(255);
-        message.dataLength = 1;
-        canInterface.sendMessage(message);
-    }
-    
+}
+
+/**
+ * @brief callback fn passed to bms which receieves current voltage, which is sent as can message to steering 
+ * 
+ * @param voltage current bms voltage
+ */
+void socCallbackBms(float soc, float voltage) {
+	CanMessage message = { CAN_TELEMETRY_BMS_DATA, 0x8, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };
+	memcpy((void*)message.data, (void*)&voltage, 4);
+	memcpy((void*)(message.data + 4), (void*)&voltage, 4);
+	canInterface.sendMessage(message);
 }
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
-    gps.updateSpeedCallback(sendCanSpeed);
+    gps.setSpeedCallback(speedCallbackGps);
+	bms.setVoltageCallback(socCallbackBms);
 
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
@@ -99,8 +121,13 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");
     DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
     // Thermo
-    DEBUG_SERIAL_LN("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C");
+    DEBUG_SERIAL("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C - ");
     DEBUG_SERIAL_LN("Motor Controller Temp: " + String(thermo2.getProbeTemp()) + "°C");
+    // Steering
+    DEBUG_SERIAL("Throttle: " + String(steering.getThrottle()) + "% - ");
+    DEBUG_SERIAL("Ignition: " + BOOL_TO_STRING(steering.getIgnition()) + " - ");
+    DEBUG_SERIAL("DMS: " + BOOL_TO_STRING(steering.getDms()) + " - ");
+    DEBUG_SERIAL_LN("Brake: " + BOOL_TO_STRING(steering.getBrake()));
     // BMS
     DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "v - ");
     DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "A - ");
@@ -108,6 +135,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Min Cell Voltage: " + String(bms.getMinVolt()) + "v - ");
     DEBUG_SERIAL("State of Charge: " + String(bms.getSoc()) + "% - ");
     DEBUG_SERIAL("BMS Status: " + bms.getStatusBmsString() + " - ");
+    DEBUG_SERIAL("BMS Fault: " + BmsFault::toString(bms.getFault()) + " - ");
     DEBUG_SERIAL("BMS Temperature: " + String(bms.getTempBms()) + "°C - ");
     DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getBatteryTemp1()) + "°C - ");
     DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getBatteryTemp2()) + "°C");
@@ -134,6 +162,10 @@ uint32_t CurrentVehicle::getUnixTime() {
 
 void CurrentVehicle::toggleGpsOverride() {
     gps.toggleOverride();
+}
+
+void CurrentVehicle::restartTinyBms() {
+    bms.restart();
 }
 
 #endif

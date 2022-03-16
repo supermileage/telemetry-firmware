@@ -50,9 +50,11 @@ void SensorFc::handle() {
 }
 
 void SensorFc::_publish() {
-    DEBUG_SERIAL_LN("------------- FUEL CELL DATA:");
-    DEBUG_SERIAL_LN(_buffer);
+    DEBUG_SERIAL_LN("---- FUEL CELL DATA ----");
+    DEBUG_SERIAL(_buffer);
+    DEBUG_SERIAL_LN("------------------------");
     DEBUG_SERIAL_LN();
+
     Particle.publish("fcdata", _buffer, PRIVATE, WITH_ACK);
 }
 
