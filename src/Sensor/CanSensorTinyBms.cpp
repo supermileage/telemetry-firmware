@@ -12,6 +12,10 @@
 #define PARAM_ID_SOC                0x1A
 #define PARAM_ID_TEMP               0x1B
 
+#define PARAM_ID_EVENTS             0x11
+#define PARAM_ID_RESET              0x02
+#define RESET_ID_BMS                0x05
+
 #define STATUS_CHARGING             0x91
 #define STATUS_CHARGED              0x92
 #define STATUS_DISCHARGING          0x93
@@ -37,6 +41,19 @@ const uint8_t PARAM_IDS[] =  {
 	PARAM_ID_TEMP
 };
 
+#define FAULT_UNDER_VOLTAGE                 0x02
+#define FAULT_OVER_VOLTAGE                  0x03
+#define FAULT_OVER_TEMP                     0x04
+#define FAULT_OVER_CURRENT_DISCHARGE        0x05
+#define FAULT_OVER_CURRENT_CHARGE           0x06
+#define FAULT_OVER_CURRENT_REGEN            0x07
+#define FAULT_LOW_TEMP                      0x0A
+#define FAULT_CHARGER_SWITCH                0x0B
+#define FAULT_LOAD_SWITCH                   0x0C
+#define FAULT_SINGLE_PORT_SWITCH            0x0D
+#define FAULT_CURRENT_SENSOR_DISCONNECTED   0x0E
+#define FAULT_CURRENT_SENSOR_CONNECTED      0x0F
+
 const uint8_t VALIDATION_IDS[] {
     PARAM_ID_BATTERY_VOLTAGE,
     PARAM_ID_BATTERY_CURRENT,
@@ -47,7 +64,8 @@ const uint8_t VALIDATION_IDS[] {
     PARAM_ID_TEMP,
     TEMP_ID_INTERNAL,
     TEMP_ID_BATTERY_1,
-    TEMP_ID_BATTERY_2
+    TEMP_ID_BATTERY_2,
+    PARAM_ID_EVENTS
 };
 
 const char* BMS_STATUSES[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
@@ -66,11 +84,17 @@ void CanSensorTinyBms::handle() {
         CanMessage msg = CAN_MESSAGE_NULL;
         msg.id = CAN_TINYBMS_REQUEST;
         msg.dataLength = REQ_DATA_LENGTH;
+
+        if(_bmsStatus == FaultError) {
+            msg.data[0] = PARAM_ID_EVENTS;
+            _canInterface.sendMessage(msg);
+        }
+
         msg.data[0] = PARAM_IDS[_currentParam];
             
         _canInterface.sendMessage(msg);
 
-        if(_currentParam == NUM_PARAMS) {
+        if(_currentParam == NUM_PARAMS - 1) {
             _currentParam = 0;
         } else {
             _currentParam++;
@@ -147,6 +171,11 @@ void CanSensorTinyBms::update(CanMessage message) {
                     _validationMap[TEMP_ID_BATTERY_2] = time;
                 }
                 break;
+            case PARAM_ID_EVENTS:
+                if(message.data[7] == 1 && message.data[6] <= 0x0F) {
+                    _fault = message.data[6];
+                }
+                break; 
             default:
                 break;
         }
@@ -208,6 +237,26 @@ int CanSensorTinyBms::getBatteryTemp2(bool& valid) {
     return _batteryTemp2;
 }
 
+int CanSensorTinyBms::getFault(bool& valid) {
+    valid = _validate(PARAM_ID_STATUS) && _validate(PARAM_ID_EVENTS);
+
+    if(_bmsStatus == FaultError) {
+        return _getFaultCode(_fault);
+    }
+
+    return BmsFault::NONE;
+    
+}
+
+void CanSensorTinyBms::restart() {
+    CanMessage msg = CAN_MESSAGE_NULL;
+    msg.id = CAN_TINYBMS_REQUEST;
+    msg.dataLength = REQ_DATA_LENGTH;
+    msg.data[0] = PARAM_ID_RESET;
+    msg.data[1] = RESET_ID_BMS;
+    _canInterface.sendMessage(msg);
+}
+
 void CanSensorTinyBms::setVoltageCallback(void (*callback)(float,float)) {
 	_voltageCallback = callback;
 }
@@ -232,4 +281,35 @@ uint32_t CanSensorTinyBms::parseInt32(uint8_t* dataPtr) {
 
 bool CanSensorTinyBms::_validate(uint8_t id) {
     return (millis() - _validationMap[id]) < STALE_INTERVAL;
+}
+
+uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
+    switch(fault) {
+        case FAULT_UNDER_VOLTAGE:
+            return BmsFault::VOLTAGE_LOW;           
+        case FAULT_OVER_VOLTAGE:
+            return BmsFault::VOLTAGE_HIGH;         
+        case FAULT_OVER_TEMP:
+            return BmsFault::TEMP_HIGH;                   
+        case FAULT_OVER_CURRENT_DISCHARGE: 
+            return BmsFault::CURRENT_DISCHARGE_HIGH;       
+        case FAULT_OVER_CURRENT_CHARGE:    
+            return BmsFault::CURRENT_CHARGE_HIGH;       
+        case FAULT_OVER_CURRENT_REGEN:  
+            return BmsFault::CURRENT_REGEN_HIGH;          
+        case FAULT_LOW_TEMP:       
+            return BmsFault::TEMP_LOW;               
+        case FAULT_CHARGER_SWITCH:      
+            return BmsFault::SWITCH_CHARGE;          
+        case FAULT_LOAD_SWITCH: 
+            return BmsFault::SWITCH_DISCHARGE;                  
+        case FAULT_SINGLE_PORT_SWITCH:        
+            return BmsFault::SWITCH_DISCHARGE;    
+        case FAULT_CURRENT_SENSOR_DISCONNECTED: 
+            return BmsFault::CURRENT_SENSOR_DISCONNECT;  
+        case FAULT_CURRENT_SENSOR_CONNECTED:     
+            return BmsFault::CURRENT_SENSOR_CONNECT; 
+        default: 
+            return BmsFault::NONE;               
+    }
 }
