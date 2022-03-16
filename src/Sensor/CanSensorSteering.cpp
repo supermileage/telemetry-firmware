@@ -6,7 +6,7 @@
 #define STEERING_READY_BIT_BRAKE    0x02
 
 CanSensorSteering::CanSensorSteering(CanInterface &canInterface) 
-    : CanListener(canInterface, CAN_STEERING_THROTTLE) {}
+    : CanListener(canInterface) { }
 
 void CanSensorSteering::begin() {
     CanListenerDelegate* steeringDelegate = new CanListener::CanListenerDelegate(this);

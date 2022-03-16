@@ -71,7 +71,7 @@ const uint8_t VALIDATION_IDS[] {
 const char* BMS_STATUSES[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
 
 CanSensorTinyBms::CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
-    : CanListener(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
+    : CanSensorBms(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
 
         for (auto id : VALIDATION_IDS)  {
             _validationMap[id] = 0;
@@ -279,10 +279,6 @@ uint32_t CanSensorTinyBms::parseInt32(uint8_t* dataPtr) {
             | dataPtr[RSP_DATA_BYTE];
 }
 
-bool CanSensorTinyBms::_validate(uint8_t id) {
-    return (millis() - _validationMap[id]) < STALE_INTERVAL;
-}
-
 uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
     switch(fault) {
         case FAULT_UNDER_VOLTAGE:
@@ -292,9 +288,9 @@ uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
         case FAULT_OVER_TEMP:
             return BmsFault::TEMP_HIGH;                   
         case FAULT_OVER_CURRENT_DISCHARGE: 
-            return BmsFault::CURRENT_DISCHARGE_HIGH;       
-        case FAULT_OVER_CURRENT_CHARGE:    
-            return BmsFault::CURRENT_CHARGE_HIGH;       
+            return BmsFault::CURRENT_DISCHARGE_HIGH;
+        case FAULT_OVER_CURRENT_CHARGE:
+            return BmsFault::CURRENT_CHARGE_HIGH;
         case FAULT_OVER_CURRENT_REGEN:  
             return BmsFault::CURRENT_REGEN_HIGH;          
         case FAULT_LOW_TEMP:       
