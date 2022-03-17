@@ -72,7 +72,7 @@ class CanListener : public Sensor {
 
     private:
         /**
-         * @brief Specifies CanMessage updating behavior
+         * @brief Specifies CanMessage updating behavior -- invoked by delegate in CanInterface
          * 
          * @param message CanMessage received from CanInterface
          */
