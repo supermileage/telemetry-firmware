@@ -19,6 +19,10 @@ void Handler::remove(Handleable* handleable) {
     _handleables.erase(std::remove(_handleables.begin(), _handleables.end(), handleable), _handleables.end());
 }
 
+bool Handler::contains(Handleable* handleable) {
+	return std::find(_handleables.begin(), _handleables.end(), handleable) != _handleables.end();
+}
+
 void Handler::begin() {
     for(Handleable *h : _handleables) {
         h->begin();

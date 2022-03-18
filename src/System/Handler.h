@@ -35,6 +35,13 @@ class Handler {
          * */
         void remove(Handleable* handleable);
 
+		/**
+		 * @brief Checks whether the handler contains handleable
+		 * 
+		 * @returns true if handler contains handleable
+		 */
+		bool contains(Handleable* handleable);
+
         /**
          * Run the begin() function of all handleables
          * */

@@ -1,8 +1,12 @@
 #include "CanSensorBms.h"
 
-CanSensorBms::CanSensorBms(CanInterface& canInterface) : CanListener(canInterface) { }
+CanSensorBms::CanSensorBms(CanInterface& canInterface) : CanListener(canInterface) {
+	Handler::instance().remove(this);
+}
 
-CanSensorBms::CanSensorBms(CanInterface& canInterface, uint16_t id) : CanListener(canInterface, id) { }
+CanSensorBms::CanSensorBms(CanInterface& canInterface, uint16_t id) : CanListener(canInterface, id) {
+	Handler::instance().remove(this);
+}
 
 CanSensorBms::~CanSensorBms() { }
 

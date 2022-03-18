@@ -2,12 +2,15 @@
 
 #ifdef URBAN
 
+#define RUN_ORION_BMS 1
+
 #include <map>
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
 #include "CanSensorSteering.h"
 #include "CanSensorTinyBms.h"
+#include "CanSensorOrionBms.h"
 
 
 CanInterface canInterface(&SPI1, D5, D6);
@@ -15,13 +18,20 @@ CanInterface canInterface(&SPI1, D5, D6);
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
-SensorThermo thermo2(&SPI, A4); 
+SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
-CanSensorTinyBms bms(canInterface, 25);
+
+CanSensorTinyBms tinyBms(canInterface, 25);
+CanSensorOrionBms orionBms(canInterface);
 CanSensorSteering steering(canInterface);
+#if RUN_ORION_BMS
+CanSensorBms* bms = &orionBms;
+#else
+CanSensorBms* bms = &tinyBms;
+#endif
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -47,16 +57,16 @@ LoggingCommand<CanSensorSteering, int> steeringIgnition(&steering, "ign", &CanSe
 LoggingCommand<CanSensorSteering, int> steeringDms(&steering, "dms", &CanSensorSteering::getDms, 1);
 LoggingCommand<CanSensorSteering, int> steeringBrake(&steering, "br", &CanSensorSteering::getBrake, 1);
 
-LoggingCommand<CanSensorTinyBms, String> bmsSoc(&bms, "soc", &CanSensorTinyBms::getSoc, 10);
-LoggingCommand<CanSensorTinyBms, String> bmsVoltage(&bms, "bmsv", &CanSensorTinyBms::getBatteryVolt, 1);
-LoggingCommand<CanSensorTinyBms, String> bmsCurrent(&bms, "bmsa", &CanSensorTinyBms::getBatteryCurrent, 1);
-LoggingCommand<CanSensorTinyBms, String> bmsCellMax(&bms, "cmaxv", &CanSensorTinyBms::getMaxVolt, 5);
-LoggingCommand<CanSensorTinyBms, String> bmsCellMin(&bms, "cminv", &CanSensorTinyBms::getMinVolt, 5);
-LoggingCommand<CanSensorTinyBms, int> bmsStatus(&bms, "bmsstat", &CanSensorTinyBms::getStatusBms, 5);
-LoggingCommand<CanSensorTinyBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorTinyBms::getTempBms, 5);
-LoggingCommand<CanSensorTinyBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorTinyBms::getMaxBatteryTemp, 5);
-LoggingCommand<CanSensorTinyBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorTinyBms::getMinBatteryTemp, 5);
-LoggingCommand<CanSensorTinyBms, int> bmsFault(&bms, "bmsf", &CanSensorTinyBms::getFault, 5);
+LoggingCommand<CanSensorBms, String> bmsSoc(bms, "soc", &CanSensorBms::getSoc, 10);
+LoggingCommand<CanSensorBms, String> bmsVoltage(bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
+LoggingCommand<CanSensorBms, String> bmsCurrent(bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
+LoggingCommand<CanSensorBms, String> bmsCellMax(bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
+LoggingCommand<CanSensorBms, String> bmsCellMin(bms, "cminv", &CanSensorBms::getMinVolt, 5);
+LoggingCommand<CanSensorBms, int> bmsStatus(bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
+LoggingCommand<CanSensorBms, int> bmsTempInternal(bms, "tmpbms", &CanSensorBms::getTempBms, 5);
+LoggingCommand<CanSensorBms, int> bmsTempBatt1(bms, "tmpbt1", &CanSensorBms::getMaxBatteryTemp, 5);
+LoggingCommand<CanSensorBms, int> bmsTempBatt2(bms, "tmpbt2", &CanSensorBms::getMinBatteryTemp, 5);
+LoggingCommand<CanSensorBms, int> bmsFault(bms, "bmsf", &CanSensorBms::getFault, 5);
 
 LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
 LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);
@@ -95,10 +105,45 @@ void socCallbackBms(float soc, float voltage) {
 	canInterface.sendMessage(message);
 }
 
+// Set Bms Remotely
+int remoteSetBms(String command){
+	DEBUG_SERIAL("#### REMOTE - Attempting to set BMS to " + command + "BMS");
+
+	bool orionIsRunning = Handler::instance().contains(&orionBms);
+	bool tinyIsRunning = Handler::instance().contains(&tinyBms);
+
+	if (command.equalsIgnoreCase("tiny") && !tinyIsRunning) {
+		Handler::instance().add(&tinyBms);
+
+		if (orionIsRunning)
+			Handler::instance().remove(&orionBms);
+
+		bms = &tinyBms;
+	} else if (command.equalsIgnoreCase("orion") && !orionIsRunning) {
+		Handler::instance().add(&orionBms);
+		
+		if (tinyIsRunning) 
+			Handler::instance().remove(&tinyBms);
+		
+		bms = &orionBms;
+	} else {
+		return -1;
+	}
+
+    return 1;
+}
+
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
     gps.setSpeedCallback(speedCallbackGps);
-	bms.setVoltageCallback(socCallbackBms);
+	bms->setVoltageCallback(socCallbackBms);
+
+	if (RUN_ORION_BMS) {
+		bms = &orionBms;
+	} else {
+		bms = &tinyBms;
+	}
+	Handler::instance().add(bms);
 
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
@@ -129,16 +174,19 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("DMS: " + BOOL_TO_STRING(steering.getDms()) + " - ");
     DEBUG_SERIAL_LN("Brake: " + BOOL_TO_STRING(steering.getBrake()));
     // BMS
-    DEBUG_SERIAL("Battery Voltage: " + String(bms.getBatteryVolt()) + "v - ");
-    DEBUG_SERIAL("Battery Current: " + String(bms.getBatteryCurrent()) + "A - ");
-    DEBUG_SERIAL("Max Cell Voltage: " + String(bms.getMaxVolt()) + "v - ");
-    DEBUG_SERIAL("Min Cell Voltage: " + String(bms.getMinVolt()) + "v - ");
-    DEBUG_SERIAL("State of Charge: " + String(bms.getSoc()) + "% - ");
-    DEBUG_SERIAL("BMS Status: " + bms.getStatusBmsString() + " - ");
-    DEBUG_SERIAL("BMS Fault: " + BmsFault::toString(bms.getFault()) + " - ");
-    DEBUG_SERIAL("BMS Temperature: " + String(bms.getTempBms()) + "°C - ");
-    DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getMaxBatteryTemp()) + "°C - ");
-    DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getMinBatteryTemp()) + "°C");
+    DEBUG_SERIAL("Battery Voltage: " + String(bms->getBatteryVolt()) + "v - ");
+    DEBUG_SERIAL("Battery Current: " + String(bms->getBatteryCurrent()) + "A - ");
+    DEBUG_SERIAL("Max Cell Voltage: " + String(bms->getMaxVolt()) + "v - ");
+    DEBUG_SERIAL("Min Cell Voltage: " + String(bms->getMinVolt()) + "v - ");
+    DEBUG_SERIAL("Avg Cell Voltage: " + String(bms->getAvgVolt()) + "v - ");
+    DEBUG_SERIAL("State of Charge: " + String(bms->getSoc()) + "% - ");
+    DEBUG_SERIAL("BMS Status: " + bms->getStatusBmsString() + " - ");
+    DEBUG_SERIAL("BMS Fault: " + BmsFault::toString(bms->getFault()) + " - ");
+    DEBUG_SERIAL("BMS Temperature: " + String(bms->getTempBms()) + "°C - ");
+    DEBUG_SERIAL("Min Battery Temperature: " + String(bms->getMaxBatteryTemp()) + "°C - ");
+    DEBUG_SERIAL_LN("Max Battery Temperature: " + String(bms->getMinBatteryTemp()) + "°C");
+    DEBUG_SERIAL_LN("Avg Battery Temperature: " + String(bms->getAvgBatteryTemp()) + "°C");
+
     // CAN Accessories
     DEBUG_SERIAL("Headlights: " + BOOL_TO_STRING(canSensorAccessories.getStatusHeadlights()) + " - ");
     DEBUG_SERIAL("Brakelights: " + BOOL_TO_STRING(canSensorAccessories.getStatusBrakelights()) + " - ");
@@ -165,7 +213,7 @@ void CurrentVehicle::toggleGpsOverride() {
 }
 
 void CurrentVehicle::restartTinyBms() {
-    bms.restart();
+    bms->restart();
 }
 
 #endif

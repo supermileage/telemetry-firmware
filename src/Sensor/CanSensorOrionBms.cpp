@@ -133,7 +133,7 @@ String CanSensorOrionBms::getStatusBmsString(bool& valid) {
 }
 
 int16_t CanSensorOrionBms::_parseInt16(uint8_t* buf) {
-	return (float)( (*(buf + 1) << 8) | *buf );
+	return (float)( *buf << 8 | *(buf + 1) );
 }
 
 // Faults are prioritized from left to right, most significant bit to least significant
