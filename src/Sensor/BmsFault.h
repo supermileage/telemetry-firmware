@@ -7,22 +7,17 @@ namespace BmsFault {
         TEMP_HIGH, 
         CELL_OVER_5V,
         VOLTAGE_HIGH, 
-        TEMP_BMS_HIGH,
         CURRENT_DISCHARGE_HIGH,
-        CURRENT_REGEN_HIGH,
         CURRENT_CHARGE_HIGH,
         SWITCH_CHARGE,
         SWITCH_DISCHARGE,
+        OPEN_WIRING,
         CURRENT_SENSOR_DISCONNECT,
         HARDWARE,
         INTERNAL_LOGIC,
         COMMUNICATION_INTERNAL,
-        SOFTWARE,
-        HIGH_VOLTAGE_ISOLATION,
-        POWER_SUPPLY,
         CELL_BANK,    
         BALANCING,
-        OPEN_WIRING,
         THERMISTOR_PACK,
         THERMISTOR_INTERNAL, 
         COMMUNICATION_CAN,
@@ -43,12 +38,8 @@ namespace BmsFault {
                 return "Cell Voltage >5v";
             case VOLTAGE_HIGH:
                 return "High Voltage";
-            case TEMP_BMS_HIGH:
-                return "High BMS Temperature";
             case CURRENT_DISCHARGE_HIGH:
                 return "High Discharge Current";
-            case CURRENT_REGEN_HIGH:
-                return "High Regen Current";
             case CURRENT_CHARGE_HIGH:
                 return "High Charge Current";
             case SWITCH_CHARGE:
@@ -63,12 +54,6 @@ namespace BmsFault {
                 return "Internal Logic";
             case COMMUNICATION_INTERNAL:
                 return "Internal Communication";
-            case SOFTWARE:
-                return "Software";
-            case HIGH_VOLTAGE_ISOLATION:
-                return "High Voltage Isolation";
-            case POWER_SUPPLY:
-                return "Power Supply";
             case CELL_BANK:
                 return "Cell Bank";
             case BALANCING:
@@ -85,10 +70,10 @@ namespace BmsFault {
                 return "Low Voltage";
             case TEMP_LOW:
                 return "Low Temperature";
-            case WEAK_CELL:
-                return "Weak Cell";
             case WEAK_PACK:
                 return "Weak Pack";
+            case WEAK_CELL:
+                return "Weak Cell";
             case CURRENT_SENSOR_CONNECT:
                 return "Current Sensor Connected";
             default:
