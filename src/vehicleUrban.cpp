@@ -54,8 +54,8 @@ LoggingCommand<CanSensorTinyBms, String> bmsCellMax(&bms, "cmaxv", &CanSensorTin
 LoggingCommand<CanSensorTinyBms, String> bmsCellMin(&bms, "cminv", &CanSensorTinyBms::getMinVolt, 5);
 LoggingCommand<CanSensorTinyBms, int> bmsStatus(&bms, "bmsstat", &CanSensorTinyBms::getStatusBms, 5);
 LoggingCommand<CanSensorTinyBms, int> bmsTempInternal(&bms, "tmpbms", &CanSensorTinyBms::getTempBms, 5);
-LoggingCommand<CanSensorTinyBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorTinyBms::getBatteryTemp1, 5);
-LoggingCommand<CanSensorTinyBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorTinyBms::getBatteryTemp2, 5);
+LoggingCommand<CanSensorTinyBms, int> bmsTempBatt1(&bms, "tmpbt1", &CanSensorTinyBms::getMaxBatteryTemp, 5);
+LoggingCommand<CanSensorTinyBms, int> bmsTempBatt2(&bms, "tmpbt2", &CanSensorTinyBms::getMinBatteryTemp, 5);
 LoggingCommand<CanSensorTinyBms, int> bmsFault(&bms, "bmsf", &CanSensorTinyBms::getFault, 5);
 
 LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
@@ -137,8 +137,8 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("BMS Status: " + bms.getStatusBmsString() + " - ");
     DEBUG_SERIAL("BMS Fault: " + BmsFault::toString(bms.getFault()) + " - ");
     DEBUG_SERIAL("BMS Temperature: " + String(bms.getTempBms()) + "°C - ");
-    DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getBatteryTemp1()) + "°C - ");
-    DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getBatteryTemp2()) + "°C");
+    DEBUG_SERIAL("Battery Temperature 1: " + String(bms.getMaxBatteryTemp()) + "°C - ");
+    DEBUG_SERIAL_LN("Battery Temperature 2: " + String(bms.getMinBatteryTemp()) + "°C");
     // CAN Accessories
     DEBUG_SERIAL("Headlights: " + BOOL_TO_STRING(canSensorAccessories.getStatusHeadlights()) + " - ");
     DEBUG_SERIAL("Brakelights: " + BOOL_TO_STRING(canSensorAccessories.getStatusBrakelights()) + " - ");

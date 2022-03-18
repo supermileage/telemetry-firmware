@@ -1,9 +1,78 @@
 #include "CanSensorTinyBms.h"
 #include "settings.h"
 
+#define NUM_PARAMS                  7
+#define REQ_DATA_LENGTH     		8
+
+#define PARAM_ID_BATTERY_VOLTAGE    0x14
+#define PARAM_ID_BATTERY_CURRENT    0x15
+#define PARAM_ID_MAX_CELL_VOLTAGE   0x16
+#define PARAM_ID_MIN_CELL_VOLTAGE   0x17
+#define PARAM_ID_STATUS             0x18
+#define PARAM_ID_SOC                0x1A
+#define PARAM_ID_TEMP               0x1B
+
+#define PARAM_ID_EVENTS             0x11
+#define PARAM_ID_RESET              0x02
+#define RESET_ID_BMS                0x05
+
+#define STATUS_CHARGING             0x91
+#define STATUS_CHARGED              0x92
+#define STATUS_DISCHARGING          0x93
+#define STATUS_REGENERATION         0x96
+#define STATUS_IDLE                 0x97
+#define STATUS_FAULT_ERROR          0x9B
+
+#define TEMP_ID_INTERNAL    		0x00
+#define TEMP_ID_BATTERY_1   		0x01
+#define TEMP_ID_BATTERY_2   		0x02
+
+#define RSP_STATUS_BYTE     		0x0
+#define RSP_PARAM_ID_BYTE   		0x1
+#define RSP_DATA_BYTE       		0x2
+
+#define FAULT_UNDER_VOLTAGE                 0x02
+#define FAULT_OVER_VOLTAGE                  0x03
+#define FAULT_OVER_TEMP                     0x04
+#define FAULT_OVER_CURRENT_DISCHARGE        0x05
+#define FAULT_OVER_CURRENT_CHARGE           0x06
+#define FAULT_OVER_CURRENT_REGEN            0x07
+#define FAULT_LOW_TEMP                      0x0A
+#define FAULT_CHARGER_SWITCH                0x0B
+#define FAULT_LOAD_SWITCH                   0x0C
+#define FAULT_SINGLE_PORT_SWITCH            0x0D
+#define FAULT_CURRENT_SENSOR_DISCONNECTED   0x0E
+#define FAULT_CURRENT_SENSOR_CONNECTED      0x0F
+
+const uint8_t PARAM_IDS[] =  {
+	PARAM_ID_BATTERY_VOLTAGE,
+	PARAM_ID_BATTERY_CURRENT,
+	PARAM_ID_MAX_CELL_VOLTAGE,
+	PARAM_ID_MIN_CELL_VOLTAGE,
+	PARAM_ID_STATUS,
+	PARAM_ID_SOC,
+	PARAM_ID_TEMP
+};
+
+const uint8_t VALIDATION_IDS[] {
+    PARAM_ID_BATTERY_VOLTAGE,
+    PARAM_ID_BATTERY_CURRENT,
+    PARAM_ID_MAX_CELL_VOLTAGE,
+    PARAM_ID_MIN_CELL_VOLTAGE,
+    PARAM_ID_STATUS,
+    PARAM_ID_SOC,
+    PARAM_ID_TEMP,
+    TEMP_ID_INTERNAL,
+    TEMP_ID_BATTERY_1,
+    TEMP_ID_BATTERY_2,
+    PARAM_ID_EVENTS
+};
+
 CanSensorTinyBms::CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
     : CanSensorBms(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
-
+		for (uint16_t id : VALIDATION_IDS)  {
+        	_validationMap[id] = 0;
+    	}
     }
 
 void CanSensorTinyBms::handle() {
@@ -113,6 +182,66 @@ void CanSensorTinyBms::update(CanMessage message) {
 			_validationMap[id] = time;
 		}
     }
+}
+
+String CanSensorTinyBms::getBatteryVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_BATTERY_VOLTAGE);
+    return FLOAT_TO_STRING(_batteryVoltage, 1);
+}
+
+String CanSensorTinyBms::getBatteryCurrent(bool& valid) {
+    valid  = _validate(PARAM_ID_BATTERY_CURRENT);
+    return FLOAT_TO_STRING(_batteryCurrent, 1);
+}
+
+String CanSensorTinyBms::getMaxVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_MAX_CELL_VOLTAGE);
+    return FLOAT_TO_STRING(_cellVoltageMax, 3);
+}
+
+String CanSensorTinyBms::getMinVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_MIN_CELL_VOLTAGE);
+    return FLOAT_TO_STRING(_cellVoltageMin, 3);
+}
+
+String CanSensorTinyBms::getAvgVolt(bool& valid) {
+	valid = _validate(PARAM_ID_MIN_CELL_VOLTAGE);
+	return FLOAT_TO_STRING(_cellVoltageAvg, 3);
+}
+
+String CanSensorTinyBms::getSoc(bool& valid) {
+    valid  = _validate(PARAM_ID_SOC);
+    return FLOAT_TO_STRING(_soc, 1); 
+}
+
+int CanSensorTinyBms::getTempBms(bool& valid) {
+    valid  = _validate(TEMP_ID_INTERNAL);
+    return _tempBms;
+}
+
+int CanSensorTinyBms::getMinBatteryTemp(bool& valid) {
+    valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
+    return min(_batteryTemp1, _batteryTemp2);
+}
+
+int CanSensorTinyBms::getMaxBatteryTemp(bool& valid) {
+    valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
+    return max(_batteryTemp1, _batteryTemp2);
+}
+
+int CanSensorTinyBms::getAvgBatteryTemp(bool& valid) {
+	valid  = _validate(TEMP_ID_BATTERY_1) && _validate(TEMP_ID_BATTERY_2);
+    return (_batteryTemp1 + _batteryTemp2) / 2;
+}
+
+int CanSensorTinyBms::getStatusBms(bool& valid) {
+    valid  = _validate(PARAM_ID_STATUS);
+    return _bmsStatus;
+}
+
+String CanSensorTinyBms::getStatusBmsString(bool& valid) {
+    valid  = _validate(PARAM_ID_STATUS);
+    return String(BMS_STATUS_STRINGS[_bmsStatus]);
 }
 
 int CanSensorTinyBms::getFault(bool& valid) {
