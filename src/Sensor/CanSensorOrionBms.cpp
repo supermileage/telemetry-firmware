@@ -45,6 +45,7 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_batteryVoltage = (float)_parseInt16(message.data) / 10.0f;
 			_batteryCurrent = (float)_parseInt16(message.data + 2) / 10.0f;
 			_soc = (float)message.data[4] / 2.0f;
+			_voltageCallback(_soc, _batteryVoltage);
 			_validationMap[CAN_ORIONBMS_PACK] = time;
 			break;
 		case CAN_ORIONBMS_CELL:
