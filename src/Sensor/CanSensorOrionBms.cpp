@@ -149,7 +149,7 @@ int CanSensorOrionBms::_parseFault(CanMessage message) {
 
 		for (int j = 0; j < bitCount; j++) {
 			if (currentByte & (1 << (bitCount - j - 1))) {
-				return fault;
+				return fault > 5 ? fault + 2 : fault;
 			}
 			fault++;
 		}
