@@ -31,7 +31,8 @@ void Handler::begin() {
 
 void Handler::handle() {
     for(Handleable *h : _handleables) {
-        h->handle();
+		if (h->isActive())
+        	h->handle();
     }
 }
 

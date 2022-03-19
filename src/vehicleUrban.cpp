@@ -27,6 +27,7 @@ CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
 CanSensorTinyBms tinyBms(canInterface, 25);
 CanSensorOrionBms orionBms(canInterface);
 CanSensorSteering steering(canInterface);
+
 #if RUN_ORION_BMS
 CanSensorBms* bms = &orionBms;
 #else
@@ -107,24 +108,15 @@ void socCallbackBms(float soc, float voltage) {
 
 // Set Bms Remotely
 int remoteSetBms(String command){
-	DEBUG_SERIAL("#### REMOTE - Attempting to set BMS to " + command + "BMS");
+	DEBUG_SERIAL("#### REMOTE - Attempting to set BMS to " + command + "BMS module");
 
-	bool orionIsRunning = Handler::instance().contains(&orionBms);
-	bool tinyIsRunning = Handler::instance().contains(&tinyBms);
-
-	if (command.equalsIgnoreCase("tiny") && !tinyIsRunning) {
-		Handler::instance().add(&tinyBms);
-
-		if (orionIsRunning)
-			Handler::instance().remove(&orionBms);
-
+	if (command.equalsIgnoreCase("tiny")) {
+		tinyBms.setIsActive(true);
+		orionBms.setIsActive(false);
 		bms = &tinyBms;
-	} else if (command.equalsIgnoreCase("orion") && !orionIsRunning) {
-		Handler::instance().add(&orionBms);
-		
-		if (tinyIsRunning) 
-			Handler::instance().remove(&tinyBms);
-		
+	} else if (command.equalsIgnoreCase("orion")) {
+		tinyBms.setIsActive(false);
+		orionBms.setIsActive(true);
 		bms = &orionBms;
 	} else {
 		return -1;
@@ -139,11 +131,12 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 	bms->setVoltageCallback(socCallbackBms);
 
 	if (RUN_ORION_BMS) {
+		tinyBms.setIsActive(false);
 		bms = &orionBms;
 	} else {
+		orionBms.setIsActive(false);
 		bms = &tinyBms;
 	}
-	Handler::instance().add(bms);
 
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
