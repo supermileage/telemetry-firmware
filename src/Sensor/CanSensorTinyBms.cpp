@@ -36,7 +36,6 @@
 #define FAULT_OVER_TEMP                     0x04
 #define FAULT_OVER_CURRENT_DISCHARGE        0x05
 #define FAULT_OVER_CURRENT_CHARGE           0x06
-#define FAULT_OVER_CURRENT_REGEN            0x07
 #define FAULT_LOW_TEMP                      0x0A
 #define FAULT_CHARGER_SWITCH                0x0B
 #define FAULT_LOAD_SWITCH                   0x0C
@@ -290,11 +289,9 @@ uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
         case FAULT_OVER_TEMP:
             return BmsFault::TEMP_HIGH;                   
         case FAULT_OVER_CURRENT_DISCHARGE: 
-            return BmsFault::CURRENT_DISCHARGE_HIGH;
-        case FAULT_OVER_CURRENT_CHARGE:
-            return BmsFault::CURRENT_CHARGE_HIGH;
-        case FAULT_OVER_CURRENT_REGEN:  
-            return BmsFault::CURRENT_REGEN_HIGH;          
+            return BmsFault::CURRENT_DISCHARGE_HIGH;       
+        case FAULT_OVER_CURRENT_CHARGE:    
+            return BmsFault::CURRENT_CHARGE_HIGH;             
         case FAULT_LOW_TEMP:       
             return BmsFault::TEMP_LOW;               
         case FAULT_CHARGER_SWITCH:      
