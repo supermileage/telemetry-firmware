@@ -37,7 +37,9 @@ void CanSensorOrionBms::update(CanMessage message) {
 	switch (message.id) {
 		case CAN_ORIONBMS_STATUS:
 			_bmsStatus = message.data[0] & 0x1 ? DischargeEnabled : Unknown;
-			_bmsStatus = message.data[0] & 0x2 ? ChargeEnabled : Unknown;
+			if (_bmsStatus == Unknown)
+				_bmsStatus = message.data[0] & 0x2 ? ChargeEnabled : Unknown;
+				
 			_fault = _parseFault(message);
 			_validationMap[CAN_ORIONBMS_STATUS] = time;
 			break;
