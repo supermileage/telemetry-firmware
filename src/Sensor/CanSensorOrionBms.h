@@ -91,6 +91,11 @@ class CanSensorOrionBms : public CanSensorBms {
         void restart() override;
 
 	private:
+		int _batteryTempMax = 0;
+        int _batteryTempMin = 0;
+		int _batteryTempAvg = 0;
+		float _cellVoltageAvg = 0.0f;
+
 		/**
          * @brief Called by delegate in CanInterface when a message with one of Orion's ids is receieved
          * 

@@ -2,8 +2,8 @@
 
 #define UPDATE_INTERVAL 1000
 
-BmsManager::BmsManager(CanSensorBms** bms, CanSensorBms* orion, CanSensorBms* tiny, BmsOptions option) : _bms(bms), _orion(orion), _tiny(tiny), _currentBms(option) {
-	*_bms = option == Orion ? _orion : _tiny;
+BmsManager::BmsManager(CanSensorBms** bmsPtr, CanSensorBms* orion, CanSensorBms* tiny, BmsOption option) : _mainBmsPtr(bmsPtr), _orion(orion), _tiny(tiny), _currentOption(option) {
+	setBms(option);
 }
 
 BmsManager::~BmsManager() { }
@@ -12,33 +12,33 @@ void BmsManager::begin() { }
 
 void BmsManager::handle() {
 	if (millis() > _lastTime + UPDATE_INTERVAL) {
-		BmsOptions currentOption = None;
+		BmsOption newOption = None;
 
 		if (_orion->getLastUpdateTime() > _tiny->getLastUpdateTime()) {
-			currentOption = Orion;
+			newOption = Orion;
 		} else if (_orion->getLastUpdateTime() < _tiny->getLastUpdateTime()) {
-			currentOption = Tiny;
+			newOption = Tiny;
 		}
 		
-		if (currentOption != None && _currentBms != currentOption) {
-			setBms(currentOption);
+		if (newOption != None && _currentOption != newOption) {
+			setBms(newOption);
 		}
 
 		_lastTime = millis();
 	}
 }
 
-void BmsManager::setBms(BmsOptions option) {
+void BmsManager::setBms(BmsOption option) {
 	bool isOrion = option == Orion;
 	_orion->setIsAsleep(!isOrion);
 	_tiny->setIsAsleep(isOrion);
-	*_bms = isOrion ? _orion : _tiny;
-	_currentBms = option;
+	*_mainBmsPtr = isOrion ? _orion : _tiny;
+	_currentOption = option;
 }
 
 String BmsManager::getCurrentBmsName() {
-	if ((*_bms) != NULL) {
-		return ((*_bms)->getHumanName());
+	if ((*_mainBmsPtr) != NULL) {
+		return ((*_mainBmsPtr)->getHumanName());
 	} else {
 		return "None";
 	}

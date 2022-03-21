@@ -118,12 +118,8 @@ class CanSensorBms : public CanListener {
         float _batteryCurrent = 0.0f;
         float _cellVoltageMax = 0.0f;
         float _cellVoltageMin = 0.0f;
-		float _cellVoltageAvg = 0.0f;
         float _soc = 0.0f;
         int _tempBms = 0;
-		int _batteryTempMax = 0;
-        int _batteryTempMin = 0;
-		int _batteryTempAvg = 0;
         int _fault = NONE;
         BmsStatus _bmsStatus = Unknown;
 

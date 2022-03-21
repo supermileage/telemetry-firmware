@@ -8,14 +8,14 @@
  */
 class BmsManager : public Handleable {
 	public:
-		enum BmsOptions { Orion, Tiny, None };
+		enum BmsOption { Orion, Tiny, None };
 		
         /**
          * Constructor
          * 
-         * Consumes pointer to main bms pointer, and pointer references to each of two bms types in project
+         * Consumes pointer reference to main bms pointer, and addresses of each of two bms instances in project
          * */
-        BmsManager(CanSensorBms** bms, CanSensorBms* orion, CanSensorBms* tiny, BmsOptions option);
+        BmsManager(CanSensorBms** bmsPtr, CanSensorBms* orion, CanSensorBms* tiny, BmsOption option);
 
         ~BmsManager();
 
@@ -34,18 +34,18 @@ class BmsManager : public Handleable {
 		 * 
 		 * @param option enum for type to set bms to
 		 */
-		void setBms(BmsOptions option);
+		void setBms(BmsOption option);
 
 		/**
-		 * @brief Returns name of active bms object or None if bms is null
+		 * @brief Returns name of active bms object or None if bms isn't assigned
 		 */
 		String getCurrentBmsName();
 
 	private:
-		CanSensorBms** _bms;
+		CanSensorBms** _mainBmsPtr;
 		CanSensorBms* _orion;
 		CanSensorBms* _tiny;
-		BmsOptions _currentBms = None;
+		BmsOption _currentOption = None;
 		uint64_t _lastTime = 0;
 };
 

@@ -2,8 +2,6 @@
 
 #ifdef URBAN
 
-#define RUN_ORION_BMS 1
-
 #include <map>
 #include "CanInterface.h"
 #include "CanListener.h"
@@ -21,19 +19,14 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-
 CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
 CanSensorSteering steering(canInterface);
 
-// Bms Sensors
+// Bms
 CanSensorTinyBms tinyBms(canInterface, 25);
 CanSensorOrionBms orionBms(canInterface);
 CanSensorBms* bms;
-#if RUN_ORION_BMS
-BmsManager bmsManager(&bms, &orionBms, &tinyBms, BmsManager::BmsOptions::Orion);
-#else
-BmsManager bmsManager(&bms, &orionBms, &tinyBms, BmsManager::BmsOptions::Tiny);
-#endif
+BmsManager bmsManager(&bms, &orionBms, &tinyBms, BmsManager::BmsOption::Orion); // starting bms is arbitrary--will change after one or other starts receiving Can messages
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -100,9 +93,9 @@ int remoteSetBms(String command){
 	DEBUG_SERIAL("#### REMOTE - Attempting to set BMS to " + command + "BMS module");
 
 	if (command.equalsIgnoreCase("tiny")) {
-		bmsManager.setBms(BmsManager::BmsOptions::Tiny);
+		bmsManager.setBms(BmsManager::BmsOption::Tiny);
 	} else if (command.equalsIgnoreCase("orion")) {
-		bmsManager.setBms(BmsManager::BmsOptions::Orion);
+		bmsManager.setBms(BmsManager::BmsOption::Orion);
 	} else {
 		return -1;
 	}
@@ -113,6 +106,7 @@ int remoteSetBms(String command){
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
     gps.setSpeedCallback(speedCallbackGps);
+	
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
@@ -142,6 +136,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("DMS: " + BOOL_TO_STRING(steering.getDms()) + " - ");
     DEBUG_SERIAL_LN("Brake: " + BOOL_TO_STRING(steering.getBrake()));
     // BMS
+	DEBUG_SERIAL("Current Bms: " + bms->getHumanName() + " - ");
     DEBUG_SERIAL("Battery Voltage: " + String(bms->getBatteryVolt()) + "v - ");
     DEBUG_SERIAL("Battery Current: " + String(bms->getBatteryCurrent()) + "A - ");
     DEBUG_SERIAL("Max Cell Voltage: " + String(bms->getMaxVolt()) + "v - ");

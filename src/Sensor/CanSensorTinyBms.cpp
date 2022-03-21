@@ -205,8 +205,8 @@ String CanSensorTinyBms::getMinVolt(bool& valid) {
 }
 
 String CanSensorTinyBms::getAvgVolt(bool& valid) {
-	valid = _validate(PARAM_ID_MIN_CELL_VOLTAGE);
-	return FLOAT_TO_STRING(_cellVoltageAvg, 3);
+	valid = _validate(PARAM_ID_MIN_CELL_VOLTAGE) && _validate(PARAM_ID_MAX_CELL_VOLTAGE);
+	return FLOAT_TO_STRING((_cellVoltageMin + _cellVoltageMax) / 2.0f, 3);
 }
 
 String CanSensorTinyBms::getSoc(bool& valid) {
