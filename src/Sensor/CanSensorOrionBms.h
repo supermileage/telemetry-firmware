@@ -16,12 +16,6 @@ class CanSensorOrionBms : public CanSensorBms {
         void begin() override;
 
 		/**
-		 * @brief Does nothing
-		 * 
-		 */
-        void handle() override;
-
-		/**
 		 * @brief Get the Human Name of CanOrionBms
 		 */
         String getHumanName() override;

@@ -23,8 +23,6 @@ void CanSensorOrionBms::begin() {
 	_canInterface.addMessageListen(CAN_ORIONBMS_TEMP, orionDelegate);
 }
 
-void CanSensorOrionBms::handle() { }
-
 String CanSensorOrionBms::getHumanName() {
 	return "CanSensorOrionBms";
 }
@@ -32,7 +30,7 @@ String CanSensorOrionBms::getHumanName() {
 void CanSensorOrionBms::restart() { }
 
 void CanSensorOrionBms::update(CanMessage message) {
-	uint64_t time = millis();
+	_lastUpdateTime = millis();
 
 	switch (message.id) {
 		case CAN_ORIONBMS_STATUS:
@@ -41,30 +39,30 @@ void CanSensorOrionBms::update(CanMessage message) {
 				_bmsStatus = message.data[0] & 0x2 ? ChargeEnabled : Unknown;
 				
 			_fault = _parseFault(message);
-			_validationMap[CAN_ORIONBMS_STATUS] = time;
+			_validationMap[CAN_ORIONBMS_STATUS] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_PACK:
 			_batteryVoltage = (float)_parseInt16(message.data) / 10.0f;
 			_batteryCurrent = (float)_parseInt16(message.data + 2) / 10.0f;
 			_soc = (float)message.data[4] / 2.0f;
-			_voltageCallback(_soc, _batteryVoltage);
-			_validationMap[CAN_ORIONBMS_PACK] = time;
+			_validationMap[CAN_ORIONBMS_PACK] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_CELL:
 			// TODO: Add unify this with TinyBms
 			_cellVoltageMin = (float)_parseInt16(message.data) / 1000.0f;
 			_cellVoltageMax = (float)_parseInt16(message.data + 2) / 1000.0f;
 			_cellVoltageAvg = (float)_parseInt16(message.data + 4) / 1000.0f;
-			_validationMap[CAN_ORIONBMS_CELL] = time;
+			_validationMap[CAN_ORIONBMS_CELL] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_TEMP:
 			_batteryTempMax = (int)message.data[0];
 			_batteryTempMin = (int)message.data[1];
 			_batteryTempAvg = (int)message.data[2];
 			_tempBms = (int)message.data[3];
-			_validationMap[CAN_ORIONBMS_TEMP] = time;
+			_validationMap[CAN_ORIONBMS_TEMP] = _lastUpdateTime;
 			break;
 		default:
+			// do nothing
 			break;
 	}
 }

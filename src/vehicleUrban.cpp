@@ -11,7 +11,7 @@
 #include "CanSensorSteering.h"
 #include "CanSensorTinyBms.h"
 #include "CanSensorOrionBms.h"
-
+#include "BmsManager.h"
 
 CanInterface canInterface(&SPI1, D5, D6);
 
@@ -23,15 +23,16 @@ SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
 CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
-
-CanSensorTinyBms tinyBms(canInterface, 25);
-CanSensorOrionBms orionBms(canInterface);
 CanSensorSteering steering(canInterface);
 
+// Bms Sensors
+CanSensorTinyBms tinyBms(canInterface, 25);
+CanSensorOrionBms orionBms(canInterface);
+CanSensorBms* bms;
 #if RUN_ORION_BMS
-CanSensorBms* bms = &orionBms;
+BmsManager bmsManager(&bms, &orionBms, &tinyBms, BmsManager::BmsOptions::Orion);
 #else
-CanSensorBms* bms = &tinyBms;
+BmsManager bmsManager(&bms, &orionBms, &tinyBms, BmsManager::BmsOptions::Tiny);
 #endif
 
 // Command definitions
@@ -94,30 +95,14 @@ void speedCallbackGps(float speed) {
     }
 }
 
-/**
- * @brief callback fn passed to bms which receieves current voltage, which is sent as can message to steering 
- * 
- * @param voltage current bms voltage
- */
-void socCallbackBms(float soc, float voltage) {
-	CanMessage message = { CAN_TELEMETRY_BMS_DATA, 0x8, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };
-	memcpy((void*)message.data, (void*)&voltage, 4);
-	memcpy((void*)(message.data + 4), (void*)&voltage, 4);
-	canInterface.sendMessage(message);
-}
-
 // Set Bms Remotely
 int remoteSetBms(String command){
 	DEBUG_SERIAL("#### REMOTE - Attempting to set BMS to " + command + "BMS module");
 
 	if (command.equalsIgnoreCase("tiny")) {
-		tinyBms.setIsActive(true);
-		orionBms.setIsActive(false);
-		bms = &tinyBms;
+		bmsManager.setBms(BmsManager::BmsOptions::Tiny);
 	} else if (command.equalsIgnoreCase("orion")) {
-		tinyBms.setIsActive(false);
-		orionBms.setIsActive(true);
-		bms = &orionBms;
+		bmsManager.setBms(BmsManager::BmsOptions::Orion);
 	} else {
 		return -1;
 	}
@@ -128,16 +113,6 @@ int remoteSetBms(String command){
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     // added here because because this function is called on startup
     gps.setSpeedCallback(speedCallbackGps);
-	bms->setVoltageCallback(socCallbackBms);
-
-	if (RUN_ORION_BMS) {
-		tinyBms.setIsActive(false);
-		bms = &orionBms;
-	} else {
-		orionBms.setIsActive(false);
-		bms = &tinyBms;
-	}
-
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }

@@ -98,6 +98,8 @@ void CanSensorTinyBms::handle() {
 
         _lastValidTime = millis();
     }
+
+	CanSensorBms::handle();
 }
 
 String CanSensorTinyBms::getHumanName() {
@@ -105,13 +107,13 @@ String CanSensorTinyBms::getHumanName() {
 }
 
 void CanSensorTinyBms::update(CanMessage message) {
-
+	_lastUpdateTime = millis();
+	
     if(message.data[RSP_STATUS_BYTE] != TRUE) {
         DEBUG_SERIAL_LN("Poor BMS Data Received");
     }
     else {
         uint8_t id = message.data[RSP_PARAM_ID_BYTE];
-        uint64_t time = millis();
         switch (id) {
             case PARAM_ID_BATTERY_VOLTAGE:
                 _batteryVoltage = parseFloat(message.data);
@@ -151,20 +153,19 @@ void CanSensorTinyBms::update(CanMessage message) {
             }
             case PARAM_ID_SOC:
                 _soc = (float)parseInt32(message.data) / 1000000.0;
-				_voltageCallback(_soc, _batteryVoltage);
                 break;
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
                     _tempBms = parseInt16(message.data + 1) / 10;
-                    _validationMap[TEMP_ID_INTERNAL] = time;
+                    _validationMap[TEMP_ID_INTERNAL] = _lastUpdateTime;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_1) {
                     _batteryTemp1 = parseInt16(message.data + 1) / 10;
-                    _validationMap[TEMP_ID_BATTERY_1] = time;
+                    _validationMap[TEMP_ID_BATTERY_1] = _lastUpdateTime;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_2) {
                     _batteryTemp2 = parseInt16(message.data + 1) / 10;
-                    _validationMap[TEMP_ID_BATTERY_2] = time;
+                    _validationMap[TEMP_ID_BATTERY_2] = _lastUpdateTime;
                 }
                 break;
             case PARAM_ID_EVENTS:
@@ -178,7 +179,7 @@ void CanSensorTinyBms::update(CanMessage message) {
 
 		// update validation map--exclude temp because it needs special handling for 3 cases
 		if (id != PARAM_ID_TEMP && _validationMap.find(id) != _validationMap.end()) {
-			_validationMap[id] = time;
+			_validationMap[id] = _lastUpdateTime;
 		}
     }
 }

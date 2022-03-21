@@ -5,6 +5,8 @@
 #include "CanInterface.h"
 #include "BmsFault.h"
 
+#define SOC_UPDATE_INTERVAL 497 // slighty off to avoid overlapping with other can write intervals
+
 using namespace BmsFault;
 
 /**
@@ -13,14 +15,29 @@ using namespace BmsFault;
  */
 class CanSensorBms : public CanListener {
 	public:
-        enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, ChargeEnabled, DischargeEnabled, Unknown };
-
 		// Constructors
 		CanSensorBms(CanInterface& caninterface);
 
 		CanSensorBms(CanInterface& caninterface, uint16_t id);
 
 		~CanSensorBms();
+
+		/**
+		 * @brief Checks if any messages have been receieved within TIME_BEFORE_SLEEP
+		 * sets _isAsleep to true if no messages have been received within time frame
+		 * 
+		 */
+        void handle() override;
+
+		/**
+		 * @brief returns time (in ms) at which this bms was last updated
+		 */
+		uint64_t getLastUpdateTime();
+
+		/**
+		 * @brief if true, this bms will stop sending out can messages which compete with other bms instances
+		 */
+		void setIsAsleep(bool value);
 		
 		/**
          * @brief Get the battery voltage
@@ -86,12 +103,6 @@ class CanSensorBms : public CanListener {
          * @brief Get the universal BMS fault code (if any)
          */
         virtual int getFault(bool& valid = Sensor::dummy) = 0;
-		
-		/**
-		 * @brief Sets a Can Callback message to be updated with voltage data
-		 * 
-		 */
-		void setVoltageCallback(void (*callback)(float,float));
 
         /**
          * @brief Send a restart message to the BMS
@@ -99,8 +110,10 @@ class CanSensorBms : public CanListener {
         virtual void restart() = 0;
 
 	protected:
+        enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, ChargeEnabled, DischargeEnabled, Unknown };
 		const char* BMS_STATUS_STRINGS[9] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Charge Enabled", "Discharge Enabled", "Unknown" };
 
+		// Data
 		float _batteryVoltage = 0.0f;
         float _batteryCurrent = 0.0f;
         float _cellVoltageMax = 0.0f;
@@ -114,7 +127,10 @@ class CanSensorBms : public CanListener {
         int _fault = NONE;
         BmsStatus _bmsStatus = Unknown;
 
-		void (*_voltageCallback)(float,float) = NULL;
+		// Mangagement
+		uint64_t _lastUpdateTime = 0;
+		uint64_t _lastSocUpdate = 0;
+		bool _isAsleep = false;
 		std::map<uint16_t, uint64_t> _validationMap;
 
 		/**
@@ -124,6 +140,11 @@ class CanSensorBms : public CanListener {
 		 * @returns true if property is valid
 		 */
         bool _validate(uint16_t id);
+
+		/**
+		 * @brief sends soc update out over can network on SOC_UPDATE_INTERVAL
+		 */
+		void _sendSocUpdate();
 };
 
 #endif
