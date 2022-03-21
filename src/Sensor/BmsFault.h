@@ -46,6 +46,8 @@ namespace BmsFault {
                 return "Charge Switch";
             case SWITCH_DISCHARGE:
                 return "Discharge Switch";
+            case OPEN_WIRING:
+                return "Open Wiring";
             case CURRENT_SENSOR_DISCONNECT:
                 return "Current Sensor Disconnected";
             case HARDWARE:
@@ -58,8 +60,6 @@ namespace BmsFault {
                 return "Cell Bank";
             case BALANCING:
                 return "Balancing";
-            case OPEN_WIRING:
-                return "Open Wiring";
             case THERMISTOR_PACK:
                 return "Battery Pack Thermistor";
             case THERMISTOR_INTERNAL:
