@@ -16,16 +16,28 @@
 class CanListener : public Sensor {
 
     public:
+		/**
+         * Constructor
+		 * 
+         * @param canInterface can interface object
+		 * 
+         **/
+        CanListener(CanInterface &canInterface);
+
         /**
          * Constructor
          * 
          * @param canInterface can interface object
          * @param id the can id that this class will listen for
+		 * 
+		 * @note only use this constructor if you are listening for a single id
          **/
-        CanListener(CanInterface &canInterface, uint16_t id) : _canInterface(canInterface), _id(id) { }
+        CanListener(CanInterface &canInterface, uint16_t id);
 
         /**
-		 * @brief Called on setup: adds id and delegate to can interface
+		 * @brief Default implementation: adds single id and delegate to can interface
+		 * 
+		 * @note Override this if you want to add more than one CAN id to listen for
 		 */
         virtual void begin() override;
 
@@ -60,7 +72,7 @@ class CanListener : public Sensor {
 
     private:
         /**
-         * @brief Specifies CanMessage updating behavior
+         * @brief Specifies CanMessage updating behavior -- invoked by delegate in CanInterface
          * 
          * @param message CanMessage received from CanInterface
          */

@@ -31,16 +31,6 @@
 #define RSP_PARAM_ID_BYTE   		0x1
 #define RSP_DATA_BYTE       		0x2
 
-const uint8_t PARAM_IDS[] =  {
-	PARAM_ID_BATTERY_VOLTAGE,
-	PARAM_ID_BATTERY_CURRENT,
-	PARAM_ID_MAX_CELL_VOLTAGE,
-	PARAM_ID_MIN_CELL_VOLTAGE,
-	PARAM_ID_STATUS,
-	PARAM_ID_SOC,
-	PARAM_ID_TEMP
-};
-
 #define FAULT_UNDER_VOLTAGE                 0x02
 #define FAULT_OVER_VOLTAGE                  0x03
 #define FAULT_OVER_TEMP                     0x04
@@ -52,6 +42,16 @@ const uint8_t PARAM_IDS[] =  {
 #define FAULT_SINGLE_PORT_SWITCH            0x0D
 #define FAULT_CURRENT_SENSOR_DISCONNECTED   0x0E
 #define FAULT_CURRENT_SENSOR_CONNECTED      0x0F
+
+const uint8_t PARAM_IDS[] =  {
+	PARAM_ID_BATTERY_VOLTAGE,
+	PARAM_ID_BATTERY_CURRENT,
+	PARAM_ID_MAX_CELL_VOLTAGE,
+	PARAM_ID_MIN_CELL_VOLTAGE,
+	PARAM_ID_STATUS,
+	PARAM_ID_SOC,
+	PARAM_ID_TEMP
+};
 
 const uint8_t VALIDATION_IDS[] {
     PARAM_ID_BATTERY_VOLTAGE,
@@ -67,14 +67,11 @@ const uint8_t VALIDATION_IDS[] {
     PARAM_ID_EVENTS
 };
 
-const char* BMS_STATUSES[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
-
 CanSensorTinyBms::CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
-    : CanListener(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
-
-        for (auto id : VALIDATION_IDS)  {
-            _validationMap[id] = 0;
-        }
+    : CanSensorBms(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
+		for (uint16_t id : VALIDATION_IDS)  {
+        	_validationMap[id] = 0;
+    	}
     }
 
 void CanSensorTinyBms::handle() {
@@ -101,6 +98,8 @@ void CanSensorTinyBms::handle() {
 
         _lastValidTime = millis();
     }
+
+	CanSensorBms::handle();
 }
 
 String CanSensorTinyBms::getHumanName() {
@@ -108,13 +107,13 @@ String CanSensorTinyBms::getHumanName() {
 }
 
 void CanSensorTinyBms::update(CanMessage message) {
-
+	_lastUpdateTime = millis();
+	
     if(message.data[RSP_STATUS_BYTE] != TRUE) {
         DEBUG_SERIAL_LN("Poor BMS Data Received");
     }
     else {
         uint8_t id = message.data[RSP_PARAM_ID_BYTE];
-        uint64_t time = millis();
         switch (id) {
             case PARAM_ID_BATTERY_VOLTAGE:
                 _batteryVoltage = parseFloat(message.data);
@@ -154,20 +153,19 @@ void CanSensorTinyBms::update(CanMessage message) {
             }
             case PARAM_ID_SOC:
                 _soc = (float)parseInt32(message.data) / 1000000.0;
-				_voltageCallback(_soc, _batteryVoltage);
                 break;
             case PARAM_ID_TEMP:
                 if(message.data[5] == TEMP_ID_INTERNAL) {
                     _tempBms = parseInt16(message.data + 1) / 10;
-                    _validationMap[TEMP_ID_INTERNAL] = time;
+                    _validationMap[TEMP_ID_INTERNAL] = _lastUpdateTime;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_1) {
                     _batteryTemp1 = parseInt16(message.data + 1) / 10;
-                    _validationMap[TEMP_ID_BATTERY_1] = time;
+                    _validationMap[TEMP_ID_BATTERY_1] = _lastUpdateTime;
                 }
                 else if(message.data[5] == TEMP_ID_BATTERY_2) {
                     _batteryTemp2 = parseInt16(message.data + 1) / 10;
-                    _validationMap[TEMP_ID_BATTERY_2] = time;
+                    _validationMap[TEMP_ID_BATTERY_2] = _lastUpdateTime;
                 }
                 break;
             case PARAM_ID_EVENTS:
@@ -181,7 +179,7 @@ void CanSensorTinyBms::update(CanMessage message) {
 
 		// update validation map--exclude temp because it needs special handling for 3 cases
 		if (id != PARAM_ID_TEMP && _validationMap.find(id) != _validationMap.end()) {
-			_validationMap[id] = time;
+			_validationMap[id] = _lastUpdateTime;
 		}
     }
 }
@@ -198,17 +196,42 @@ String CanSensorTinyBms::getBatteryCurrent(bool& valid) {
 
 String CanSensorTinyBms::getMaxVolt(bool& valid) {
     valid  = _validate(PARAM_ID_MAX_CELL_VOLTAGE);
-    return FLOAT_TO_STRING(_cellVoltageMax, 2);
+    return FLOAT_TO_STRING(_cellVoltageMax, 3);
 }
 
 String CanSensorTinyBms::getMinVolt(bool& valid) {
     valid  = _validate(PARAM_ID_MIN_CELL_VOLTAGE);
-    return FLOAT_TO_STRING(_cellVoltageMin, 2);
+    return FLOAT_TO_STRING(_cellVoltageMin, 3);
+}
+
+String CanSensorTinyBms::getAvgVolt(bool& valid) {
+	valid = _validate(PARAM_ID_MIN_CELL_VOLTAGE) && _validate(PARAM_ID_MAX_CELL_VOLTAGE);
+	return FLOAT_TO_STRING((_cellVoltageMin + _cellVoltageMax) / 2.0f, 3);
 }
 
 String CanSensorTinyBms::getSoc(bool& valid) {
     valid  = _validate(PARAM_ID_SOC);
     return FLOAT_TO_STRING(_soc, 1); 
+}
+
+int CanSensorTinyBms::getTempBms(bool& valid) {
+    valid  = _validate(TEMP_ID_INTERNAL);
+    return _tempBms;
+}
+
+int CanSensorTinyBms::getMinBatteryTemp(bool& valid) {
+    valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
+    return min(_batteryTemp1, _batteryTemp2);
+}
+
+int CanSensorTinyBms::getMaxBatteryTemp(bool& valid) {
+    valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
+    return max(_batteryTemp1, _batteryTemp2);
+}
+
+int CanSensorTinyBms::getAvgBatteryTemp(bool& valid) {
+	valid  = _validate(TEMP_ID_BATTERY_1) && _validate(TEMP_ID_BATTERY_2);
+    return (_batteryTemp1 + _batteryTemp2) / 2;
 }
 
 int CanSensorTinyBms::getStatusBms(bool& valid) {
@@ -218,22 +241,7 @@ int CanSensorTinyBms::getStatusBms(bool& valid) {
 
 String CanSensorTinyBms::getStatusBmsString(bool& valid) {
     valid  = _validate(PARAM_ID_STATUS);
-    return String(BMS_STATUSES[_bmsStatus]);
-}
-
-int CanSensorTinyBms::getTempBms(bool& valid) {
-    valid  = _validate(TEMP_ID_INTERNAL);
-    return _tempBms;
-}
-
-int CanSensorTinyBms::getBatteryTemp1(bool& valid) {
-    valid  = _validate(TEMP_ID_BATTERY_1);
-    return _batteryTemp1;
-}
-
-int CanSensorTinyBms::getBatteryTemp2(bool& valid) {
-    valid  = _validate(TEMP_ID_BATTERY_2);
-    return _batteryTemp2;
+    return String(BMS_STATUS_STRINGS[_bmsStatus]);
 }
 
 int CanSensorTinyBms::getFault(bool& valid) {
@@ -244,7 +252,6 @@ int CanSensorTinyBms::getFault(bool& valid) {
     }
 
     return BmsFault::NONE;
-    
 }
 
 void CanSensorTinyBms::restart() {
@@ -254,10 +261,6 @@ void CanSensorTinyBms::restart() {
     msg.data[0] = PARAM_ID_RESET;
     msg.data[1] = RESET_ID_BMS;
     _canInterface.sendMessage(msg);
-}
-
-void CanSensorTinyBms::setVoltageCallback(void (*callback)(float,float)) {
-	_voltageCallback = callback;
 }
 
 float CanSensorTinyBms::parseFloat(uint8_t* dataPtr) {
@@ -276,10 +279,6 @@ uint32_t CanSensorTinyBms::parseInt32(uint8_t* dataPtr) {
             | ((uint32_t)dataPtr[RSP_DATA_BYTE + 2] << 16)
             | ((uint32_t)dataPtr[RSP_DATA_BYTE + 1] << 8)
             | dataPtr[RSP_DATA_BYTE];
-}
-
-bool CanSensorTinyBms::_validate(uint8_t id) {
-    return (millis() - _validationMap[id]) < STALE_INTERVAL;
 }
 
 uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {

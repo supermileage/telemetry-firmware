@@ -33,6 +33,13 @@ class Handleable {
          * Run Handleable object every loop
          * */
         virtual void handle() = 0;
+
+		bool isActive();
+
+		void setIsActive(bool active);
+
+	private:
+		bool _isActive = true;
         
 };
 
