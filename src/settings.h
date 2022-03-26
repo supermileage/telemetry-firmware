@@ -13,7 +13,7 @@
 #endif
 
 // Logging enabled at boot-up, control logging with button or Particle Function
-#define LOGGING_EN_AT_BOOT      0
+#define LOGGING_EN_AT_BOOT      1
 // Publish to Cloud
 #define PUBLISH_EN              1
 // Output Serial messages (disable for production)
@@ -23,7 +23,7 @@
 // LED Flash interval in ms
 #define LED_FLASH_INT           500
 // Time zone in UTC offset (must manually adjust for DST)
-#define TIME_ZONE               -8
+#define TIME_ZONE               -7
 
 /**
  *  MACROS
