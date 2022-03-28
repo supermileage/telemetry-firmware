@@ -106,6 +106,11 @@ String CanSensorTinyBms::getHumanName() {
     return "CanSensorTinyBms";
 }
 
+String CanSensorTinyBms::getBatteryVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_BATTERY_VOLTAGE);
+    return FLOAT_TO_STRING(_batteryVoltage, 1);
+}
+
 void CanSensorTinyBms::update(CanMessage message) {
 	_lastUpdateTime = millis();
 	
@@ -182,11 +187,6 @@ void CanSensorTinyBms::update(CanMessage message) {
 			_validationMap[id] = _lastUpdateTime;
 		}
     }
-}
-
-String CanSensorTinyBms::getBatteryVolt(bool& valid) {
-    valid  = _validate(PARAM_ID_BATTERY_VOLTAGE);
-    return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
 String CanSensorTinyBms::getBatteryCurrent(bool& valid) {
