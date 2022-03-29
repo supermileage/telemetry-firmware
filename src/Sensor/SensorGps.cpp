@@ -193,7 +193,7 @@ String SensorGps::getIncline(bool &valid) {
 
 int SensorGps::getSatellitesInView(bool &valid) {
     valid = true;
-    return _gps->getSIV();  
+    return _gps->getSIV();
 }
 
 void SensorGps::setSpeedCallback(void (*speed)(float)){

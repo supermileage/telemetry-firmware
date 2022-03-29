@@ -38,6 +38,14 @@ class BmsManager : public Handleable {
 
 		/**
 		 * @brief Returns name of active bms object or None if bms isn't assigned
+		 * 
+		 * @note unlike getCurrentBmsName, this method will return None if we neither bms has been updated
+		 * within a certain time frame
+		 */		
+		int getCurrentBms(bool& valid);
+
+		/**
+		 * @brief Returns name of active bms object or None if bms isn't assigned
 		 */
 		String getCurrentBmsName();
 
