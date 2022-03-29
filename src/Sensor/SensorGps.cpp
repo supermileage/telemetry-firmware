@@ -188,7 +188,7 @@ String SensorGps::getIncline(bool &valid) {
     double radians = atan(_verticalDistance / _horizontalDistance);
     _verticalDistance = 0;
 	_horizontalDistance = 0;
-    return FLOAT_TO_STRING((float)radians, 7);
+    return FLOAT_TO_STRING((float)degrees(radians), 7);
 }
 
 int SensorGps::getSatellitesInView(bool &valid) {

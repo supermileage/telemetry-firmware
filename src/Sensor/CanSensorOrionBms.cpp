@@ -75,8 +75,8 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_validationMap[CAN_ORIONBMS_CELL] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_TEMP:
-			_batteryTempMax = (int)message.data[0];
-			_batteryTempMin = (int)message.data[1];
+			_batteryTempMin = (int)message.data[0];
+			_batteryTempMax = (int)message.data[1];
 			_batteryTempAvg = (int)message.data[2];
 			_tempBms = (int)message.data[3];
 			_validationMap[CAN_ORIONBMS_TEMP] = _lastUpdateTime;

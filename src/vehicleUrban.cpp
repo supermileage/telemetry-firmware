@@ -36,7 +36,6 @@ LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &Sen
 LoggingCommand<SensorVoltage, String> voltage(&inVoltage, "vin", &SensorVoltage::getVoltage, 10);
 LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 5);
 
-LoggingCommand<SensorGps, String> gpsIncline(&gps, "incl", &SensorGps::getIncline, 5);
 LoggingCommand<SensorGps, String> gpsLong(&gps, "lon", &SensorGps::getLongitude, 1);
 LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
 LoggingCommand<SensorGps, int> gpsHeading(&gps, "hea", &SensorGps::getHeading, 1);
@@ -44,6 +43,7 @@ LoggingCommand<SensorGps, String> gpsAltitude(&gps, "alt", &SensorGps::getAltitu
 LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1);
 LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1);
 LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1);
+LoggingCommand<SensorGps, String> gpsIncline(&gps, "incl", &SensorGps::getIncline, 1);
 LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10);
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
@@ -127,6 +127,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Altitude: " + gps.getAltitude() + "m - ");
     DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
     DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Vertical Acceleration: " + gps.getIncline() + "° - ");
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + "m - ");
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");
     DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));
