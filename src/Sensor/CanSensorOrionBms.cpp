@@ -32,6 +32,21 @@ String CanSensorOrionBms::getBatteryVolt(bool& valid) {
     return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
+String CanSensorOrionBms::getBatteryCurrent(bool& valid) {
+    valid  = _validate(CAN_ORIONBMS_PACK);
+    return FLOAT_TO_STRING(_batteryCurrent, 1);
+}
+
+String CanSensorOrionBms::getMinVolt(bool& valid) {
+    valid  = _validate(CAN_ORIONBMS_CELL);
+    return FLOAT_TO_STRING(_cellVoltageMin, 3);
+}
+
+String CanSensorOrionBms::getMaxVolt(bool& valid) {
+    valid  = _validate(CAN_ORIONBMS_CELL);
+    return FLOAT_TO_STRING(_cellVoltageMax, 3);
+}
+
 void CanSensorOrionBms::restart() { }
 
 void CanSensorOrionBms::update(CanMessage message) {
@@ -70,21 +85,6 @@ void CanSensorOrionBms::update(CanMessage message) {
 			// do nothing
 			break;
 	}
-}
-
-String CanSensorOrionBms::getBatteryCurrent(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_PACK);
-    return FLOAT_TO_STRING(_batteryCurrent, 1);
-}
-
-String CanSensorOrionBms::getMaxVolt(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_CELL);
-    return FLOAT_TO_STRING(_cellVoltageMax, 3);
-}
-
-String CanSensorOrionBms::getMinVolt(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_CELL);
-    return FLOAT_TO_STRING(_cellVoltageMin, 3);
 }
 
 String CanSensorOrionBms::getAvgVolt(bool& valid) {

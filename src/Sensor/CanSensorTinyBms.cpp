@@ -111,6 +111,21 @@ String CanSensorTinyBms::getBatteryVolt(bool& valid) {
     return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
+String CanSensorTinyBms::getBatteryCurrent(bool& valid) {
+    valid  = _validate(PARAM_ID_BATTERY_CURRENT);
+    return FLOAT_TO_STRING(_batteryCurrent, 1);
+}
+
+String CanSensorTinyBms::getMinVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_MIN_CELL_VOLTAGE);
+    return FLOAT_TO_STRING(_cellVoltageMin, 3);
+}
+
+String CanSensorTinyBms::getMaxVolt(bool& valid) {
+    valid  = _validate(PARAM_ID_MAX_CELL_VOLTAGE);
+    return FLOAT_TO_STRING(_cellVoltageMax, 3);
+}
+
 void CanSensorTinyBms::update(CanMessage message) {
 	_lastUpdateTime = millis();
 	
@@ -187,21 +202,6 @@ void CanSensorTinyBms::update(CanMessage message) {
 			_validationMap[id] = _lastUpdateTime;
 		}
     }
-}
-
-String CanSensorTinyBms::getBatteryCurrent(bool& valid) {
-    valid  = _validate(PARAM_ID_BATTERY_CURRENT);
-    return FLOAT_TO_STRING(_batteryCurrent, 1);
-}
-
-String CanSensorTinyBms::getMaxVolt(bool& valid) {
-    valid  = _validate(PARAM_ID_MAX_CELL_VOLTAGE);
-    return FLOAT_TO_STRING(_cellVoltageMax, 3);
-}
-
-String CanSensorTinyBms::getMinVolt(bool& valid) {
-    valid  = _validate(PARAM_ID_MIN_CELL_VOLTAGE);
-    return FLOAT_TO_STRING(_cellVoltageMin, 3);
 }
 
 String CanSensorTinyBms::getAvgVolt(bool& valid) {

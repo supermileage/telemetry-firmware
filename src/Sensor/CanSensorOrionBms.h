@@ -31,14 +31,14 @@ class CanSensorOrionBms : public CanSensorBms {
         String getBatteryCurrent(bool& valid = Sensor::dummy) override;
 
         /**
-         * @brief Get the cell maximum voltage
-         */
-        String getMaxVolt(bool& valid = Sensor::dummy) override;
-
-        /**
          * @brief Get the cell minimum voltage
          */
         String getMinVolt(bool& valid = Sensor::dummy) override;
+
+		/**
+         * @brief Get the cell maximum voltage
+         */
+        String getMaxVolt(bool& valid = Sensor::dummy) override;
 		
 		/**
          * @brief Get the cells' average voltage

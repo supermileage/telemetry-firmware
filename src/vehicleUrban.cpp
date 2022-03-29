@@ -36,6 +36,7 @@ LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &Sen
 LoggingCommand<SensorVoltage, String> voltage(&inVoltage, "vin", &SensorVoltage::getVoltage, 10);
 LoggingCommand<SensorThermo, int> thermoInt(&thermo1, "tmpint", &SensorThermo::getInternalTemp, 5);
 
+LoggingCommand<SensorGps, String> gpsIncline(&gps, "incl", &SensorGps::getIncline, 5);
 LoggingCommand<SensorGps, String> gpsLong(&gps, "lon", &SensorGps::getLongitude, 1);
 LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1);
 LoggingCommand<SensorGps, int> gpsHeading(&gps, "hea", &SensorGps::getHeading, 1);
@@ -55,14 +56,14 @@ LoggingCommand<CanSensorSteering, int> steeringDms(&steering, "dms", &CanSensorS
 LoggingCommand<CanSensorSteering, int> steeringBrake(&steering, "br", &CanSensorSteering::getBrake, 1);
 
 LoggingCommand<CanSensorBms, String> bmsSoc(bms, "soc", &CanSensorBms::getSoc, 10);
-// LoggingCommand<CanSensorBms, String> bmsVoltage(bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
-// LoggingCommand<CanSensorBms, String> bmsCurrent(bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
-// LoggingCommand<CanSensorBms, String> bmsCellMax(bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
-// LoggingCommand<CanSensorBms, String> bmsCellMin(bms, "cminv", &CanSensorBms::getMinVolt, 5);
-// LoggingCommand<CanSensorBms, int> bmsStatus(bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
-// LoggingCommand<CanSensorBms, int> bmsTempInternal(bms, "tmpbms", &CanSensorBms::getTempBms, 5);
-// LoggingCommand<CanSensorBms, int> bmsTempBatt1(bms, "tmpbt1", &CanSensorBms::getMaxBatteryTemp, 5);
-// LoggingCommand<CanSensorBms, int> bmsTempBatt2(bms, "tmpbt2", &CanSensorBms::getMinBatteryTemp, 5);
+LoggingCommand<CanSensorBms, String> bmsVoltage(bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
+LoggingCommand<CanSensorBms, String> bmsCurrent(bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
+LoggingCommand<CanSensorBms, String> bmsCellMax(bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
+LoggingCommand<CanSensorBms, String> bmsCellMin(bms, "cminv", &CanSensorBms::getMinVolt, 5);
+LoggingCommand<CanSensorBms, int> bmsStatus(bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
+LoggingCommand<CanSensorBms, int> bmsTempInternal(bms, "tmpbms", &CanSensorBms::getTempBms, 5);
+LoggingCommand<CanSensorBms, int> bmsTempBatt1(bms, "tmpbt1", &CanSensorBms::getMaxBatteryTemp, 5);
+LoggingCommand<CanSensorBms, int> bmsTempBatt2(bms, "tmpbt2", &CanSensorBms::getMinBatteryTemp, 5);
 LoggingCommand<CanSensorBms, int> bmsFault(bms, "bmsf", &CanSensorBms::getFault, 5);
 
 LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);

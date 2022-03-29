@@ -248,7 +248,9 @@ void setup() {
 void loop() {
 
     // Run all handleables
-    Handler::instance().handle();
+	if (millis() > 5000) {
+    	Handler::instance().handle();
+	}
 
     handleUI();
 
