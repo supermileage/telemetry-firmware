@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "SensorGps.h"
 #include "settings.h"
 #include "gpsGreenlist.h"
@@ -47,15 +49,17 @@ void SensorGps::handle() {
 
         // Calculate XY Acceleration
         float horizontalSpeed = _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
-        if(_speedCallback) {
+        if (_speedCallback) {
             _speedCallback(horizontalSpeed); 
         }       
         _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
         _lastHorizontalSpeed = horizontalSpeed;
+        _horizontalDistance = horizontalSpeed / MICROSECONDS_IN_SECOND * elapsedMicroseconds;
 
         // Calculate Z Speed
         float altitude = _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
         _verticalSpeed = ((altitude - _lastAltitude) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
+        _verticalDistance = _verticalSpeed / MICROSECONDS_IN_SECOND * elapsedMicroseconds;
         _lastAltitude = altitude;
 
         // Calculate Z Acceleration
@@ -177,6 +181,14 @@ String SensorGps::getVerticalAccuracy(bool &valid) {
         return "1000.00";
     }
     return FLOAT_TO_STRING(value, 2);  
+}
+
+String SensorGps::getIncline(bool &valid) {
+    valid = true;
+    double radians = atan(_verticalDistance / _horizontalDistance);
+    _verticalDistance = 0;
+	_horizontalDistance = 0;
+    return FLOAT_TO_STRING((float)radians, 7);
 }
 
 int SensorGps::getSatellitesInView(bool &valid) {

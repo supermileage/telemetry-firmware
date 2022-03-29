@@ -86,6 +86,8 @@ class SensorGps : public Sensor {
          **/
         String getVerticalAccuracy(bool &valid = Sensor::dummy);
 
+        String getIncline(bool &valid = Sensor::dummy);
+
         /**
          * @return Number of Satellites currently seen by GPS
          **/
@@ -118,6 +120,8 @@ class SensorGps : public Sensor {
         float _verticalSpeed = 0.0;
         float _lastVerticalSpeed = 0.0;
         float _verticalAcceleration = 0.0;
+        float _horizontalDistance = 0.0;
+        float _verticalDistance = 0.0;
         void (*_speedCallback)(float) = NULL;
         bool _override = false;
 
