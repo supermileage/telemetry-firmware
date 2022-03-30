@@ -284,11 +284,11 @@ uint32_t CanSensorTinyBms::parseInt32(uint8_t* dataPtr) {
 uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
     switch(fault) {
         case FAULT_UNDER_VOLTAGE:
-            return BmsFault::VOLTAGE_LOW;           
+            return BmsFault::VOLTAGE_LOW;
         case FAULT_OVER_VOLTAGE:
-            return BmsFault::VOLTAGE_HIGH;         
+            return BmsFault::VOLTAGE_HIGH;
         case FAULT_OVER_TEMP:
-            return BmsFault::TEMP_HIGH;                   
+            return BmsFault::TEMP_HIGH;
         case FAULT_OVER_CURRENT_DISCHARGE: 
             return BmsFault::CURRENT_DISCHARGE_HIGH;       
         case FAULT_OVER_CURRENT_CHARGE:    

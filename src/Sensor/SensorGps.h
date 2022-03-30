@@ -127,7 +127,7 @@ class SensorGps : public Sensor {
         float _horizontalDistance = 0.0;
         float _verticalDistance = 0.0;
         void (*_speedCallback)(float) = NULL;
-        bool _override = true;
+        bool _override = false;
 
 };
 
