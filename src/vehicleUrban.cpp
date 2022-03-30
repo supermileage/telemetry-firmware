@@ -59,10 +59,12 @@ LoggingCommand<CanSensorBms, String> bmsVoltage(bms, "bmsv", &CanSensorBms::getB
 LoggingCommand<CanSensorBms, String> bmsCurrent(bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
 LoggingCommand<CanSensorBms, String> bmsCellMax(bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
 LoggingCommand<CanSensorBms, String> bmsCellMin(bms, "cminv", &CanSensorBms::getMinVolt, 5);
+LoggingCommand<CanSensorBms, String> bmsCellAvg(bms, "cavgv", &CanSensorBms::getAvgVolt, 5);
 LoggingCommand<CanSensorBms, int> bmsStatus(bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
 LoggingCommand<CanSensorBms, int> bmsTempInternal(bms, "tmpbms", &CanSensorBms::getTempBms, 5);
 LoggingCommand<CanSensorBms, int> bmsTempBatt1(bms, "tmpbt1", &CanSensorBms::getMaxBatteryTemp, 5);
 LoggingCommand<CanSensorBms, int> bmsTempBatt2(bms, "tmpbt2", &CanSensorBms::getMinBatteryTemp, 5);
+LoggingCommand<CanSensorBms, int> bmsCellTempAvg(bms, "tmpavg", &CanSensorBms::getAvgBatteryTemp, 5);
 LoggingCommand<CanSensorBms, int> bmsFault(bms, "bmsf", &CanSensorBms::getFault, 5);
 LoggingCommand<CanSensorBms, String> bmsSoc(bms, "soc", &CanSensorBms::getSoc, 10);
 LoggingCommand<BmsManager, int> bmsType(&bmsManager, "bmst", &BmsManager::getCurrentBms, 10);
