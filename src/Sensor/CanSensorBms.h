@@ -5,8 +5,7 @@
 #include "CanInterface.h"
 #include "BmsFault.h"
 
-// #define SOC_UPDATE_INTERVAL 497 // slighty off to avoid overlapping with other can write intervals
-#define SOC_UPDATE_INTERVAL 1001 // slighty off to avoid overlapping with other can write intervals
+#define SOC_UPDATE_INTERVAL 497 // slighty off to avoid overlapping with other can write intervals
 
 using namespace BmsFault;
 
