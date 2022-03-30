@@ -44,22 +44,22 @@ void SensorGps::handle() {
 
     // Check to see if there has been an update (gps data is updated UPDATE_FREQ times per second, so this returns true at that rate)
     if(thisUpdateMicros != _lastUpdateMicros){
-
+		
         uint64_t elapsedMicroseconds = thisUpdateMicros - _lastUpdateMicros;
 
         // Calculate XY Acceleration
         float horizontalSpeed = _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
         if (_speedCallback) {
             _speedCallback(horizontalSpeed); 
-        }       
+        }
         _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
         _lastHorizontalSpeed = horizontalSpeed;
-        _horizontalDistance = horizontalSpeed / MICROSECONDS_IN_SECOND * elapsedMicroseconds;
+        _horizontalDistance = horizontalSpeed * elapsedMicroseconds / MICROSECONDS_IN_SECOND;
 
         // Calculate Z Speed
         float altitude = _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
         _verticalSpeed = ((altitude - _lastAltitude) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
-        _verticalDistance = _verticalSpeed / MICROSECONDS_IN_SECOND * elapsedMicroseconds;
+        _verticalDistance = altitude - _lastAltitude;
         _lastAltitude = altitude;
 
         // Calculate Z Acceleration
@@ -185,10 +185,10 @@ String SensorGps::getVerticalAccuracy(bool &valid) {
 
 String SensorGps::getIncline(bool &valid) {
     valid = true;
-    double radians = atan(_verticalDistance / _horizontalDistance);
+    double inclineInRadians = atan(_verticalDistance / _horizontalDistance);
     _verticalDistance = 0;
 	_horizontalDistance = 0;
-    return FLOAT_TO_STRING((float)radians, 7);
+    return FLOAT_TO_STRING(degrees(inclineInRadians), 7);
 }
 
 int SensorGps::getSatellitesInView(bool &valid) {
