@@ -11,6 +11,7 @@
 #include "CanSensorOrionBms.h"
 #include "BmsManager.h"
 
+// starting bms is arbitrary--will change after one or other starts receiving Can messages
 #define DEFAULT_BMS BmsManager::BmsOption::Orion
 
 CanInterface canInterface(&SPI1, D5, D6);
@@ -28,7 +29,7 @@ CanSensorSteering steering(canInterface);
 CanSensorTinyBms tinyBms(canInterface, 25);
 CanSensorOrionBms orionBms(canInterface);
 CanSensorBms* bms = DEFAULT_BMS == BmsManager::BmsOption::Orion ? (CanSensorBms*)(&orionBms) : (CanSensorBms*)(&tinyBms);
-BmsManager bmsManager(&bms, &orionBms, &tinyBms, DEFAULT_BMS); // starting bms is arbitrary--will change after one or other starts receiving Can messages
+BmsManager bmsManager(&bms, &orionBms, &tinyBms, DEFAULT_BMS);
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -55,19 +56,19 @@ LoggingCommand<CanSensorSteering, int> steeringIgnition(&steering, "ign", &CanSe
 LoggingCommand<CanSensorSteering, int> steeringDms(&steering, "dms", &CanSensorSteering::getDms, 1);
 LoggingCommand<CanSensorSteering, int> steeringBrake(&steering, "br", &CanSensorSteering::getBrake, 1);
 
-LoggingCommand<CanSensorBms, String> bmsVoltage(bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
-LoggingCommand<CanSensorBms, String> bmsCurrent(bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
-LoggingCommand<CanSensorBms, String> bmsCellMax(bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
-LoggingCommand<CanSensorBms, String> bmsCellMin(bms, "cminv", &CanSensorBms::getMinVolt, 5);
-LoggingCommand<CanSensorBms, String> bmsCellAvg(bms, "cavgv", &CanSensorBms::getAvgVolt, 5);
-LoggingCommand<CanSensorBms, int> bmsStatus(bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
-LoggingCommand<CanSensorBms, int> bmsTempInternal(bms, "tmpbms", &CanSensorBms::getTempBms, 5);
-LoggingCommand<CanSensorBms, int> bmsTempBatt1(bms, "tmpbt1", &CanSensorBms::getMaxBatteryTemp, 5);
-LoggingCommand<CanSensorBms, int> bmsTempBatt2(bms, "tmpbt2", &CanSensorBms::getMinBatteryTemp, 5);
-LoggingCommand<CanSensorBms, int> bmsCellTempAvg(bms, "tmpavg", &CanSensorBms::getAvgBatteryTemp, 5);
-LoggingCommand<CanSensorBms, int> bmsFault(bms, "bmsf", &CanSensorBms::getFault, 5);
-LoggingCommand<CanSensorBms, String> bmsSoc(bms, "soc", &CanSensorBms::getSoc, 10);
-LoggingCommand<BmsManager, int> bmsType(&bmsManager, "bmst", &BmsManager::getCurrentBms, 10);
+// LoggingCommand<CanSensorBms, String> bmsVoltage(bms, "bmsv", &CanSensorBms::getBatteryVolt, 1);
+// LoggingCommand<CanSensorBms, String> bmsCurrent(bms, "bmsa", &CanSensorBms::getBatteryCurrent, 1);
+// LoggingCommand<CanSensorBms, String> bmsCellMax(bms, "cmaxv", &CanSensorBms::getMaxVolt, 5);
+// LoggingCommand<CanSensorBms, String> bmsCellMin(bms, "cminv", &CanSensorBms::getMinVolt, 5);
+// LoggingCommand<CanSensorBms, String> bmsCellAvg(bms, "cavgv", &CanSensorBms::getAvgVolt, 5);
+// LoggingCommand<CanSensorBms, int> bmsStatus(bms, "bmsstat", &CanSensorBms::getStatusBms, 5);
+// LoggingCommand<CanSensorBms, int> bmsTempInternal(bms, "tmpbms", &CanSensorBms::getTempBms, 5);
+// LoggingCommand<CanSensorBms, int> bmsTempBatt1(bms, "tmpbt1", &CanSensorBms::getMaxBatteryTemp, 5);
+// LoggingCommand<CanSensorBms, int> bmsTempBatt2(bms, "tmpbt2", &CanSensorBms::getMinBatteryTemp, 5);
+// LoggingCommand<CanSensorBms, int> bmsCellTempAvg(bms, "tmpavg", &CanSensorBms::getAvgBatteryTemp, 5);
+// LoggingCommand<CanSensorBms, int> bmsFault(bms, "bmsf", &CanSensorBms::getFault, 5);
+// LoggingCommand<CanSensorBms, String> bmsSoc(bms, "soc", &CanSensorBms::getSoc, 10);
+// LoggingCommand<BmsManager, int> bmsType(&bmsManager, "bmst", &BmsManager::getCurrentBms, 10);
 
 LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
 LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);
