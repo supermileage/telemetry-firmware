@@ -133,52 +133,6 @@ void CanSensorOrionBms::update(CanMessage message) {
 	}
 }
 
-String CanSensorOrionBms::getAvgVolt(bool& valid) {
-	valid  = _validate(CAN_ORIONBMS_CELL);
-    return FLOAT_TO_STRING(_cellVoltageAvg, 3);
-}
-
-String CanSensorOrionBms::getSoc(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_PACK);
-    return FLOAT_TO_STRING(_soc, 1); 
-}
-
-int CanSensorOrionBms::getTempBms(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_TEMP);
-    return _tempBms;
-}
-
-int CanSensorOrionBms::getMaxBatteryTemp(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_TEMP);
-    return _batteryTempMax;
-}
-
-int CanSensorOrionBms::getMinBatteryTemp(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_TEMP);
-    return _batteryTempMin;
-}
-
-int CanSensorOrionBms::getAvgBatteryTemp(bool& valid) {
-	valid = _validate(CAN_ORIONBMS_TEMP);
-	return _batteryTempAvg;
-}
-
-
-int CanSensorOrionBms::getFault(bool& valid) {
-	valid = _validate(CAN_ORIONBMS_STATUS);
-	return _fault;
-}
-
-int CanSensorOrionBms::getStatusBms(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_STATUS);
-    return _bmsStatus;
-}
-
-String CanSensorOrionBms::getStatusBmsString(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_STATUS);
-    return String(BMS_STATUS_STRINGS[_bmsStatus]);
-}
-
 int16_t CanSensorOrionBms::_parseInt16(uint8_t* buf) {
 	return (float)( *buf << 8 | *(buf + 1) );
 }
