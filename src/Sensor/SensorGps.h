@@ -86,6 +86,10 @@ class SensorGps : public Sensor {
          **/
         String getVerticalAccuracy(bool &valid = Sensor::dummy);
 
+		/**
+		 * @brief Incline -- arctan(vertical distance / horizontal distance)
+		 * 
+		 */
         String getIncline(bool &valid = Sensor::dummy);
 
         /**
