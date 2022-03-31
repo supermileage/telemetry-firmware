@@ -50,14 +50,14 @@ class CanSensorBms : public CanListener {
         virtual String getBatteryCurrent(bool& valid = Sensor::dummy) = 0;
 
         /**
-         * @brief Get the cell maximum voltage
-         */
-        virtual String getMaxVolt(bool& valid = Sensor::dummy) = 0;
-
-        /**
          * @brief Get the cell minimum voltage
          */
         virtual String getMinVolt(bool& valid = Sensor::dummy) = 0;
+
+		/**
+         * @brief Get the cell maximum voltage
+         */
+        virtual String getMaxVolt(bool& valid = Sensor::dummy) = 0;
 
 		/**
          * @brief Get the cells' average voltage

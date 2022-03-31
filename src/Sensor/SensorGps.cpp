@@ -188,12 +188,12 @@ String SensorGps::getIncline(bool &valid) {
     double inclineInRadians = atan(_verticalDistance / _horizontalDistance);
     _verticalDistance = 0;
 	_horizontalDistance = 0;
-    return FLOAT_TO_STRING(degrees(inclineInRadians), 7);
+    return FLOAT_TO_STRING(degrees(inclineInRadians), 2);
 }
 
 int SensorGps::getSatellitesInView(bool &valid) {
     valid = true;
-    return _gps->getSIV();  
+    return _gps->getSIV();
 }
 
 void SensorGps::setSpeedCallback(void (*speed)(float)){
