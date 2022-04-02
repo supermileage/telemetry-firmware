@@ -16,3 +16,15 @@
 [submodule "lib/can-common"]
 	path = lib/can-common
 	url = https://github.com/supermileage/can-common.git
+[submodule "lib/PublishQueuePosixRK"]
+	path = lib/PublishQueuePosixRK
+	url = https://github.com/rickkas7/PublishQueuePosixRK.git
+[submodule "lib/SequentialFileRK"]
+	path = lib/SequentialFileRK
+	url = https://github.com/rickkas7/SequentialFileRK.git
+[submodule "lib/BackgroundPublishRK"]
+	path = lib/BackgroundPublishRK
+	url = https://github.com/rickkas7/BackgroundPublishRK.git
+[submodule "lib/ArduinoJson"]
+	path = lib/ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git
