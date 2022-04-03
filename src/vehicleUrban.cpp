@@ -70,10 +70,10 @@ LoggingCommand<CanSensorBms, int> bmsFault(bms, "bmsf", &CanSensorBms::getFault,
 LoggingCommand<CanSensorBms, String> bmsSoc(bms, "soc", &CanSensorBms::getSoc, 10);
 LoggingCommand<BmsManager, int> bmsType(&bmsManager, "bmst", &BmsManager::getCurrentBms, 10);
 
-LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 5);
+LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 1);
 LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);
 LoggingCommand<CanSensorAccessories, int> urbanHorn(&canSensorAccessories, "horn", &CanSensorAccessories::getStatusHorn, 1);
-LoggingCommand<CanSensorAccessories, int> urbanHazards(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHazards, 1);
+LoggingCommand<CanSensorAccessories, int> urbanHazards(&canSensorAccessories, "lhz", &CanSensorAccessories::getStatusHazards, 1);
 LoggingCommand<CanSensorAccessories, int> urbanRightSig(&canSensorAccessories, "ltr", &CanSensorAccessories::getStatusRightSignal, 1);
 LoggingCommand<CanSensorAccessories, int> urbanLeftSig(&canSensorAccessories, "ltl", &CanSensorAccessories::getStatusLeftSignal, 1);
 LoggingCommand<CanSensorAccessories, int> urbanWipers(&canSensorAccessories, "wipe", &CanSensorAccessories::getStatusWipers, 5);
