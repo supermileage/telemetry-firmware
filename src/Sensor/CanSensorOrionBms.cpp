@@ -7,11 +7,7 @@ const uint16_t VALIDATION_IDS[] {
 	CAN_ORIONBMS_TEMP,
 };
 
-CanSensorOrionBms::CanSensorOrionBms(CanInterface& canInterface) : CanSensorBms(canInterface) {
-	for (uint16_t id : VALIDATION_IDS) {
-		_validationMap[id] = 0;
-	}
-}
+CanSensorOrionBms::CanSensorOrionBms(CanInterface& canInterface) : CanSensorBms(canInterface) { }
 
 CanSensorOrionBms::~CanSensorOrionBms() { }
 
@@ -21,6 +17,10 @@ void CanSensorOrionBms::begin() {
 	_canInterface.addMessageListen(CAN_ORIONBMS_PACK, orionDelegate);
 	_canInterface.addMessageListen(CAN_ORIONBMS_CELL, orionDelegate);
 	_canInterface.addMessageListen(CAN_ORIONBMS_TEMP, orionDelegate);
+
+	for (uint16_t id : VALIDATION_IDS) {
+		_validationMap[id] = 0;
+	}
 }
 
 String CanSensorOrionBms::getHumanName() {

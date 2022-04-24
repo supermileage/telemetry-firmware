@@ -68,11 +68,7 @@ const uint8_t VALIDATION_IDS[] {
 };
 
 CanSensorTinyBms::CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
-    : CanSensorBms(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) {
-		for (uint16_t id : VALIDATION_IDS)  {
-        	_validationMap[id] = 0;
-    	}
-    }
+    : CanSensorBms(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) { }
 
 void CanSensorTinyBms::handle() {
     if(millis() - _lastValidTime >= _requestIntervalMs) {
@@ -100,6 +96,14 @@ void CanSensorTinyBms::handle() {
     }
 
 	CanSensorBms::handle();
+}
+
+void CanSensorTinyBms::begin() {
+	CanListener::begin();
+
+	for (uint16_t id : VALIDATION_IDS)  {
+		_validationMap[id] = 0;
+	}
 }
 
 String CanSensorTinyBms::getHumanName() {

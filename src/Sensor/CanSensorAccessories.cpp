@@ -19,8 +19,11 @@ const uint8_t STATUS_IDS[] {
 };
 
 CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id)
-	: CanListener(canInterface, id) {
-	
+	: CanListener(canInterface, id) { }
+
+void CanSensorAccessories::begin() {
+	CanListener::begin();
+
 	for (uint8_t id : STATUS_IDS)
 		_statuses[id] = CanSensorAccessories::StatusProperty { 0, Unknown };
 }

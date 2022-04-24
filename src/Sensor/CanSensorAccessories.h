@@ -38,6 +38,11 @@ class CanSensorAccessories : public CanListener {
 		void handle() override { }
 
 		/**
+		 * @brief Calls CanListener::begin and initializes status map
+		 */
+		void begin() override;
+
+		/**
 		 * @brief Get the string name of this object
 		 */
 		String getHumanName();
