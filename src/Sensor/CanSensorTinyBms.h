@@ -18,6 +18,21 @@ class CanSensorTinyBms : public CanSensorBms {
         CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs);
 
 		/**
+         * @brief Repeatedly requests and stores bms data on interval
+         */
+        void handle() override;
+
+		/**
+		 * @brief Calls CanListener::begin and initializes validation map
+		 */
+		void begin() override;
+
+		/**
+         * @brief Get the string name of this object
+         */
+        String getHumanName() override;
+
+		/**
          * @brief Get the battery voltage
          */
         String getBatteryVolt(bool& valid = Sensor::dummy) override;
@@ -76,16 +91,6 @@ class CanSensorTinyBms : public CanSensorBms {
          * @brief Get current Bms status as string
          */
         String getStatusBmsString(bool& valid = Sensor::dummy) override;
-
-        /**
-         * @brief Repeatedly requests and stores bms data on interval
-         */
-        void handle() override;
-        
-        /**
-         * @brief Get the string name of this object
-         */
-        String getHumanName() override;
 
         /**
          * @brief Get the universal BMS fault code (if any)

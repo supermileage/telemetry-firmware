@@ -6,7 +6,7 @@
 #include "Handler.h"
 #include "Handleable.h"
 
-SYSTEM_MODE(AUTOMATIC);
+SYSTEM_MODE(SEMI_AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 // Forward declarations for callback functions
@@ -238,8 +238,7 @@ void setup() {
     // Begin all handleables
     Handler::instance().begin();
 
-    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
-
+	Particle.connect();
 }
 
 /**
