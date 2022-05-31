@@ -1,5 +1,5 @@
-#ifndef CAN_WRAPPER_H_
-#define CAN_WRAPPER_H_
+#ifndef CAN_BUS_MCP_2515_H_
+#define CAN_BUS_MCP_2515_H_
 
 #include "CanBus.h"
 #include "can_common.h"
@@ -7,16 +7,16 @@
 /**
  * @brief Pure virtual class which functions as wrapper for MCP2515 Can
  */
-class Mcp2515CanWrapper : public CanBus {
+class CanBusMcp2515 : public CanBus {
 	public:
-		Mcp2515CanWrapper(SPIClass* spi, uint8_t csPin, uint8_t intPin) {
+		CanBusMcp2515(SPIClass* spi, uint8_t csPin, uint8_t intPin) {
 			pinMode(intPin, INPUT);
     		_intPin = intPin;
     		_mcpCan = new mcp2515_can(csPin);
     		_mcpCan->setSPI(spi);
 		}
 
-		~Mcp2515CanWrapper() override { }
+		~CanBusMcp2515() override { }
 
 		bool readInterruptPin() override {
 			return digitalRead(_intPin);
