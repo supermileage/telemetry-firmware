@@ -1,4 +1,5 @@
 #include "vehicle.h"
+#include "SensorFc.h"
 #include <vector>
 
 #ifdef FC
@@ -9,6 +10,7 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
+SensorFc fc(&Serial1);
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
@@ -22,6 +24,7 @@ LoggingCommand<SensorGps, String> gpsAltitude(&gps, "alt", &SensorGps::getAltitu
 LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1);
 LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1);
 LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1);
+LoggingCommand<SensorGps, String> gpsIncline(&gps, "incl", &SensorGps::getIncline, 1);
 LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10);
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
@@ -70,6 +73,10 @@ uint32_t CurrentVehicle::getUnixTime() {
 
 void CurrentVehicle::toggleGpsOverride() {
     gps.toggleOverride();
+}
+
+void CurrentVehicle::restartTinyBms() {
+
 }
  
 #endif

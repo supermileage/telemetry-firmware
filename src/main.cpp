@@ -6,7 +6,7 @@
 #include "Handler.h"
 #include "Handleable.h"
 
-SYSTEM_MODE(AUTOMATIC);
+SYSTEM_MODE(SEMI_AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 // Forward declarations for callback functions
@@ -200,6 +200,15 @@ int remoteDisableLogging(String command){
 
 }
 
+// Restart BMS Remotely
+int remoteRestartTinyBms(String command) {
+
+    DEBUG_SERIAL_LN("#### REMOTE - Sent TinyBMS Restart Command\n");
+    CurrentVehicle::restartTinyBms();
+    return 1;
+
+}
+
 #pragma endregion
 
 /**
@@ -220,6 +229,7 @@ void setup() {
     Particle.function("remoteReset", remoteReset);
     Particle.function("enableLogging", remoteEnableLogging);
     Particle.function("disableLogging", remoteDisableLogging);
+    Particle.function("restartTinyBms", remoteRestartTinyBms);
 
     Time.zone(TIME_ZONE);
 
@@ -228,8 +238,7 @@ void setup() {
     // Begin all handleables
     Handler::instance().begin();
 
-    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
-
+	Particle.connect();
 }
 
 /**

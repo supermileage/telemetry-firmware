@@ -30,13 +30,17 @@ class CanSensorAccessories : public CanListener {
 		 * @param ids the individual ids of the Can accessories whose status we want (0xFF == unused)
 		 * @note size of ids array can be increased if we need to listen for more Can status messages
 		 */
-		typedef std::array<uint8_t, 7> StatusIds;
-		CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids);
+		CanSensorAccessories(CanInterface &canInterface, uint16_t id);
 
 		/**
 		 * @brief Nothing to handle here
 		 */
 		void handle() override { }
+
+		/**
+		 * @brief Calls CanListener::begin and initializes status map
+		 */
+		void begin() override;
 
 		/**
 		 * @brief Get the string name of this object
