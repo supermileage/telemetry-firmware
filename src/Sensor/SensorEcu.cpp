@@ -136,6 +136,11 @@ String SensorEcu::getUbAdc(bool &valid) {
     return FLOAT_TO_STRING(this->_ubAdc, 1);
 }
 
+int SensorEcu::getOn(bool &valid) {
+    valid = true;
+    return _valid;
+}
+
 float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset) {
     return (float)((int)high * 256 + (int)low) * factor + offset;
 }

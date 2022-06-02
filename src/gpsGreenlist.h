@@ -23,6 +23,7 @@ struct positionBox {
 
 const positionBox GREEN_LIST[] = {  {/*N*/49.286, /*S*/49.239, /*W*/-123.281, /*E*/-123.222},   // UBC
                                     {/*N*/49.132, /*S*/49.120, /*W*/-122.339, /*E*/-122.307},   // Mission Race Ways
-                                    {/*N*/39.809, /*S*/39.783, /*W*/-86.247, /*E*/-86.219}};    // Indianapolis Motor Speedway
+                                    {/*N*/39.809, /*S*/39.783, /*W*/-86.247, /*E*/-86.219},     // Indianapolis Motor Speedway
+                                    {/*N*/47.500, /*S*/41.600, /*W*/-90.700, /*E*/-82.3}};    // Michigan
 
 #endif
