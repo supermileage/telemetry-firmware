@@ -30,7 +30,7 @@ LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getH
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
 LoggingCommand<SensorThermo, int> thermoHead(&thermo1, "tmphead", &SensorThermo::getProbeTemp, 5);
-LoggingCommand<SensorThermo, int> thermoCrank(&thermo1, "tmpcnk", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorThermo, int> thermoCrank(&thermo2, "tmpcnk", &SensorThermo::getProbeTemp, 5);
 
 LoggingCommand<SensorEcu, int> ecuOn(&ecu, "eon", &SensorEcu::getOn, 1);
 LoggingCommand<SensorEcu, int> ecuRpm(&ecu, "rpm", &SensorEcu::getRPM, 1);
