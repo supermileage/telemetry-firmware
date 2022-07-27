@@ -8,7 +8,7 @@
 #define MESSAGE_AVAIL 5
 
 /**
- * @brief Pure virtual class which functions as wrapper for MCP2515 Can
+ * @brief Mock class for predefining CAN bus behavior
  */
 class CanBusMock : public CanBus {
 	public:
