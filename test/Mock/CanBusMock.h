@@ -5,14 +5,12 @@
 
 #include "CanBus.h"
 
-#define MESSAGE_AVAIL 5
-
 /**
  * @brief Mock class for predefining CAN bus behavior
  */
 class CanBusMock : public CanBus {
 	public:
-		CanBusMock() : CanBus(MESSAGE_AVAIL) { }
+		CanBusMock(byte messageAvail) : CanBus(messageAvail) { }
 
 		~CanBusMock() { }
 

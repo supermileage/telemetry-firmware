@@ -8,3 +8,4 @@ access-link.txt
 *.pdf
 .DS_STORE
 output/
+test/test

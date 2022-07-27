@@ -3,7 +3,7 @@
 #ifdef URBAN
 
 #include <map>
-#include "Mcp2515CanWrapper.h"
+#include "CanBusMcp2515.h"
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
