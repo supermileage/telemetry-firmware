@@ -22,7 +22,7 @@ class Handleable {
          * 
          * Removes this object from the handler's list of handleables
          * */
-        ~Handleable();
+        virtual ~Handleable();
 
         /**
          * Begin Handleable Object

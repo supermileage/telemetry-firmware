@@ -1,3 +1,4 @@
+#include "settings.h"
 #include "CanSensorOrionBms.h"
 
 const uint16_t VALIDATION_IDS[] {

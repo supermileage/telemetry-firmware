@@ -1,6 +1,7 @@
 #ifndef CAN_BUS_MCP_2515_H_
 #define CAN_BUS_MCP_2515_H_
 
+#include "mcp2515_can.h"
 #include "CanBus.h"
 #include "can_common.h"
 
@@ -9,7 +10,7 @@
  */
 class CanBusMcp2515 : public CanBus {
 	public:
-		CanBusMcp2515(SPIClass* spi, uint8_t csPin, uint8_t intPin) {
+		CanBusMcp2515(SPIClass* spi, uint8_t csPin, uint8_t intPin) : CanBus(CAN_MSGAVAIL) {
 			pinMode(intPin, INPUT);
     		_intPin = intPin;
     		_mcpCan = new mcp2515_can(csPin);

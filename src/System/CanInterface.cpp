@@ -1,4 +1,5 @@
 #include "CanInterface.h"
+
 #define CAN_FRAME 0
 
 // #define DEBUG_CAN
@@ -19,7 +20,7 @@ void CanInterface::begin() {
 
 void CanInterface::handle() {
     if(!_CAN->readInterruptPin()){
-        while(_CAN->checkReceive() == CAN_MSGAVAIL){
+        while(_CAN->checkReceive() == _CAN->messageAvail()){ // TODO: rewrite CanBus messageAvail message to return bool
             CanMessage message = CAN_MESSAGE_NULL;
             _CAN->readMsgBuffer(&message.dataLength, message.data);
             message.id = _CAN->getCanId();
