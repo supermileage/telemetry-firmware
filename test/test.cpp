@@ -7,11 +7,11 @@
 
 int main(int argc, char** argv) {
 
-	CanBusMock mock;
+	CanBusMock mock(1);
 	CanInterface interface(&mock);
 
 	interface.begin();
 	interface.handle();
 
 	std::cout << "Hello tests!" << std::endl;
-}
+} 
