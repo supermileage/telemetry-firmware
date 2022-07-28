@@ -31,3 +31,6 @@
 [submodule "test/External/UnitTestLib"]
 	path = test/External/UnitTestLib
 	url = https://github.com/rickkas7/UnitTestLib
+[submodule "test/external/Catch2"]
+	path = test/external/Catch2
+	url = https://github.com/catchorg/Catch2.git

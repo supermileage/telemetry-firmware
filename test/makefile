@@ -5,7 +5,7 @@ VERSION = -std=c++11
 LIBS = -lc++ -stdlib=libc++
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
 PARTICLE_DEP = external/UnitTestLib/libwiringgcc.a
-INCLUDE_DIRS = external/UnitTestLib external/Catch2 tests/Mocks ./
+INCLUDE_DIRS = external/UnitTestLib external/Catch2/single_include/catch2 tests/Mocks ./
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall
 LFLAGS = -g $(VERSION) $(LIBS) $(PARTICLE_DEP)
 INCLUDE_PREFIX = -I
@@ -48,7 +48,6 @@ clean :
 	@rm -r obj
 	@rm -r bin
 	@rm -r dep
-
 
 # rules for generating object and dependency files
 $(BUILD_DIR)%.o: $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
