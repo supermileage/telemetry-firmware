@@ -35,12 +35,14 @@ OBJ_SRC := $(patsubst $(SRC_DIR)%,$(BUILD_DIR)%,$(CPPSRC:.cpp=.o))
 OBJ = $(patsubst $(LIB_DIR)%,$(BUILD_DIR)%,$(OBJ_SRC))
 DEPENDENCIES := $(patsubst $(BUILD_DIR)%.o,$(DEP_DIR)%.d,$(OBJ))
 
-test : $(TEST_OBJ) $(BIN_DIR)
+test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
 	@echo ' *** Linking $@ *** '
 	@g++ $(LFLAGS) $(TEST_OBJ) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
 
 libwiringgcc :
-	cd external/UnitTestLib && make libwiringgcc.a
+	@echo ' *** building $@ *** '
+	@cd external/UnitTestLib
+	@make libwiringgcc.a
 
 .PHONY: clean
 
