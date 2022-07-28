@@ -78,6 +78,11 @@ class SensorEcu : public Sensor {
         * */
         String getUbAdc(bool &valid = Sensor::dummy);
 
+        /**
+        * @return Whether or not the ECU is corrently on and connected to Telemetry
+        * */
+        int getOn(bool &valid = Sensor::dummy);
+
     private:
         USARTSerial * _serial;
 

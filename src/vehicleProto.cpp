@@ -30,8 +30,9 @@ LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getH
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
 LoggingCommand<SensorThermo, int> thermoHead(&thermo1, "tmphead", &SensorThermo::getProbeTemp, 5);
-LoggingCommand<SensorThermo, int> thermoCrank(&thermo1, "tmpcnk", &SensorThermo::getProbeTemp, 5);
+LoggingCommand<SensorThermo, int> thermoCrank(&thermo2, "tmpcnk", &SensorThermo::getProbeTemp, 5);
 
+LoggingCommand<SensorEcu, int> ecuOn(&ecu, "eon", &SensorEcu::getOn, 1);
 LoggingCommand<SensorEcu, int> ecuRpm(&ecu, "rpm", &SensorEcu::getRPM, 1);
 LoggingCommand<SensorEcu, String> ecuMap(&ecu, "map", &SensorEcu::getMap, 1);
 LoggingCommand<SensorEcu, int> ecuTps(&ecu, "tps", &SensorEcu::getTPS, 1);
@@ -69,6 +70,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Engine Head Temp: " + String(thermo1.getProbeTemp()) + "°C");
     DEBUG_SERIAL_LN("Engine Crankcase Temp: " + String(thermo2.getProbeTemp()) + "°C");
     // Engine Computer
+    DEBUG_SERIAL("ECU On: " + BOOL_TO_STRING(ecu.getOn()) + " - ");
     DEBUG_SERIAL("ECU RPM: " + String(ecu.getRPM()) + " - ");
     DEBUG_SERIAL("ECU MAP: " + ecu.getMap() + "kPa - ");
     DEBUG_SERIAL("ECU TPS: " + String(ecu.getTPS()) + "% - ");
