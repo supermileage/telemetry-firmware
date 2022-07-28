@@ -18,7 +18,7 @@ class CanBusMock : public CanBus {
 			return _readInterruptPin();
 		}
 
-		byte checkReceive() override { 
+		byte checkReceive() override {
 			return _checkReceive();
 		}
 
