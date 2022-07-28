@@ -28,7 +28,7 @@
 [submodule "lib/ArduinoJson"]
 	path = lib/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
-[submodule "test/External/UnitTestLib"]
+[submodule "test/external/UnitTestLib"]
 	path = test/External/UnitTestLib
 	url = https://github.com/rickkas7/UnitTestLib
 [submodule "test/external/Catch2"]
