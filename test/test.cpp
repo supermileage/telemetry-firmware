@@ -1,17 +1,14 @@
-#include "Particle.h"
-#include "CanInterface.h"
-#include "CanBusMock.h"
+#define CATCH_CONFIG_RUNNER
+#include "catch.hpp"
 
-#include <iostream>
 #include <stdint.h>
 
-int main(int argc, char** argv) {
+int main (int argc, char* argv[]) {
+	Catch::Session session;
 
-	CanBusMock mock(1);
-	CanInterface interface(&mock);
+	auto exitCode = session.applyCommandLine(argc, argv);
+	if (exitCode != 0)
+		return exitCode;
 
-	interface.begin();
-	interface.handle();
-
-	std::cout << "Hello tests!" << std::endl;
-} 
+	return session.run();
+}

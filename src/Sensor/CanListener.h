@@ -41,10 +41,6 @@ class CanListener : public Sensor {
 		 */
         virtual void begin() override;
 
-        virtual void handle() = 0;
-
-        virtual String getHumanName() = 0;
-
     protected:
         CanInterface &_canInterface;
         uint16_t _id;

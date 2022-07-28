@@ -80,7 +80,7 @@ class CanSensorTinyBms : public CanSensorBms {
 		/**
 		 * @brief Get the average battery temperation of all packs
 		 */
-		int getAvgBatteryTemp(bool& valid = Sensor::dummy);
+		int getAvgBatteryTemp(bool& valid = Sensor::dummy) override;
 
 		/**
          * @brief Get the current Bms status

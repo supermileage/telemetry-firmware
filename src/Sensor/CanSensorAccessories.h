@@ -45,7 +45,7 @@ class CanSensorAccessories : public CanListener {
 		/**
 		 * @brief Get the string name of this object
 		 */
-		String getHumanName();
+		String getHumanName() override;
 		
 		/**
 		 * @brief Get the status of headlights
