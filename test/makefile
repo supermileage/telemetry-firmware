@@ -41,8 +41,7 @@ test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
 
 libwiringgcc :
 	@echo ' *** building $@ *** '
-	@cd external/UnitTestLib
-	@make libwiringgcc.a
+	cd external/UnitTestLib && make libwiringgcc.a
 
 .PHONY: clean
 

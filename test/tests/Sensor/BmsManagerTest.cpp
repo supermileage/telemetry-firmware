@@ -1,3 +1,4 @@
+#include <iostream>
 #include "settings.h"
 
 #include "CanInterface.h"
@@ -7,12 +8,17 @@
 #include "BmsManager.h"
 
 TEST_CASE( "BmsManager constructor test", "[BmsManager]" ) {
-	CanBusMock mock(1);
+	CanBusMock mock(0);
 	CanInterface interface(&mock);
 	CanSensorOrionBms orion(interface);
 	CanSensorTinyBms tiny(interface, 500);
 	CanSensorBms* bms;
-	BmsManager(&bms, &tiny, &orion, BmsManager::Orion);
+	BmsManager manager(&bms, &tiny, &orion, BmsManager::Orion);
 
-	REQUIRE( mock.messageAvail() == 2 );
+	REQUIRE( orion.getLastUpdateTime() == 0 );
+	REQUIRE( tiny.getLastUpdateTime() == 0 );
+
+	uint64_t time = millis();
+
+	std::cout << "time  = " << time << std::endl;
 }
