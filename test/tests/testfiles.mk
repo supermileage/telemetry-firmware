@@ -7,22 +7,27 @@ DEP_DIR = $(TEST_DIR)dep/
 BIN_DIR = $(TEST_DIR)bin/
 
 # SENSOR TEST FILES
-SENSOR := System/Handleable.o System/Handler.o Sensor/Sensor.o
-CAN := System/CanInterface.o Sensor/CanListener.o
-BMS := Sensor/CanSensorBms.o
+SENSOR := System/Handleable.cpp System/Handler.cpp Sensor/Sensor.cpp
+CAN := System/CanInterface.cpp Sensor/CanListener.cpp
+BMS := Sensor/CanSensorBms.cpp
 # Orion Bms Test Files
-ORION_TEST := Sensor/CanSensorOrionBms.o tests/Sensor/CanSensorOrionBmsTest.o
+ORION := Sensor/CanSensorOrionBms.cpp
 # Tiny Bms Test Files
-TINY_TEST := Sensor/CanSensorTinyBms.o tests/Sensor/CanSensorTinyBmsTest.o
+TINY := Sensor/CanSensorTinyBms.cpp
 # Steering Test Files
-STEERING_TEST := Sensor/CanSensorSteering.o tests/Sensor/CanSensorSteeringTest.o
+STEERING := Sensor/CanSensorSteering.cpp
 # Accessories Test Files
-ACCESSORIES_TEST := Sensor/CanSensorAccessories.o tests/Sensor/CanSensorAccessoriesTest.o
+ACCESSORIES := Sensor/CanSensorAccessories.cpp
 # Bms Manager Test Files
-BMS_MANAGER_TEST := Sensor/BmsManager.o tests/Sensor/BmsManagerTest.o
+BMS_MANAGER := Sensor/BmsManager.cpp
+
 # All Test Object Files
-SENSOR_TEST := $(SENSOR) $(CAN) $(BMS) $(TINY_TEST) $(ORION_TEST) $(STEERING_TEST) $(ACCESSORIES_TEST) $(BMS_MANAGER_TEST)
+TEST_DIRS := $(dir $(wildcard $(TEST_DIR)tests/*/))
+TEST_SRC := $(patsubst $(TEST_DIR)%,%,$(foreach %,$(TEST_DIRS),$(wildcard $(%)*.cpp)))
+SENSOR_SRC := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER)
 
 # ALL TEST FILES
-TEST := $(SENSOR_TEST) test.o
-TEST_OBJ := $(foreach %,$(TEST),$(BUILD_DIR)$(%))
+TEST := $(SENSOR_SRC)  $(TEST_SRC) test.cpp
+TEST_OBJ := $(patsubst %.cpp,%.o,$(foreach %,$(TEST),$(BUILD_DIR)$(%)))
+
+$(info TEST_OBJ is $(TEST_OBJ))

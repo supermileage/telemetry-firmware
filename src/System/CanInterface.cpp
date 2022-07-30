@@ -49,7 +49,8 @@ void CanInterface::handle() {
 }
 
 void CanInterface::addMessageListen(uint16_t id, Command* canListenerDelegate) {
-    _delegates[id] = canListenerDelegate;
+	if (_delegates.find(id) == _delegates.end())
+		_delegates[id] = canListenerDelegate;
 }
 
 void CanInterface::sendMessage(CanMessage message) {

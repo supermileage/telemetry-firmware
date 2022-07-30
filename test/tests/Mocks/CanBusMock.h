@@ -10,51 +10,19 @@
  */
 class CanBusMock : public CanBus {
 	public:
-		CanBusMock(byte messageAvail) : CanBus(messageAvail) { }
-
-		~CanBusMock() { }
-
-		bool readInterruptPin() override { 
-			return _readInterruptPin();
-		}
-
-		byte checkReceive() override {
-			return _checkReceive();
-		}
-
-		byte readMsgBuffer(byte* len, byte* buf) override { 
-			return _readMsgBuffer(len, buf);
-		}
-
-		unsigned long getCanId() override { 
-			return _getCanId();
-		}
-
-		void begin() override { }
-
-		void sendMsgBuffer(unsigned long id, byte ext, byte len, const byte *buf) override {
-			_sendMsgBuffer(id, ext, len, buf);
-		}
-
-		void setReadInterruptPin(std::function<bool(void)> func) {
-			_readInterruptPin = func;
-		}
-
-		void setCheckReceive(std::function<byte(void)> func) {
-			_checkReceive = func;
-		}
-
-		void setGetCanId(std::function<uint64_t(void)> func) {
-			_getCanId = func;
-		}
-
-		void setReadMsgBuffer(std::function<byte(byte*,byte*)> func) {
-			_readMsgBuffer = func;
-		}
-
-		void setSendMsgBuffer(std::function<void(uint64_t,byte,byte,const byte*)> func) {
-			_sendMsgBuffer = func;
-		}
+		CanBusMock(byte messageAvail);
+		~CanBusMock();
+		bool readInterruptPin() override;
+		byte checkReceive() override ;
+		byte readMsgBuffer(byte* len, byte* buf) override;
+		unsigned long getCanId() override;
+		void begin() override;
+		void sendMsgBuffer(unsigned long id, byte ext, byte len, const byte *buf) override;
+		void setReadInterruptPin(std::function<bool(void)> func);
+		void setCheckReceive(std::function<byte(void)> func);
+		void setGetCanId(std::function<uint64_t(void)> func);
+		void setReadMsgBuffer(std::function<byte(byte*,byte*)> func);
+		void setSendMsgBuffer(std::function<void(uint64_t,byte,byte,const byte*)> func);
 	
 	private:
 		std::function<bool(void)> _readInterruptPin;
@@ -62,6 +30,7 @@ class CanBusMock : public CanBus {
 		std::function<uint64_t(void)> _getCanId;
 		std::function<byte(byte*,byte*)> _readMsgBuffer;
 		std::function<void(uint64_t,byte,byte,const byte*)> _sendMsgBuffer;
+		bool _checkReceiveCalled = false;
 
 };
 

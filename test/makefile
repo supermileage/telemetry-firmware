@@ -7,7 +7,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
 PARTICLE_DEP = external/UnitTestLib/libwiringgcc.a
 INCLUDE_DIRS = external/UnitTestLib external/Catch2/single_include/catch2 tests/Mocks ./
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall
-LFLAGS = -g $(VERSION) $(LIBS) $(PARTICLE_DEP)
+LFLAGS = $(VERSION) $(LIBS) $(PARTICLE_DEP)
 INCLUDE_PREFIX = -I
 
 # Get all directories from lib and add lib files (may not be necessary)
