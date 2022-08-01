@@ -10,7 +10,7 @@
 #endif
 
 #ifndef FALSE
-#define FALSE true
+#define FALSE false
 #endif
 
 #define DEBUG_SERIAL_LN(x) 0
