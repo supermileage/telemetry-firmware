@@ -29,5 +29,3 @@ SENSOR_SRC := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES
 # ALL TEST FILES
 TEST := $(SENSOR_SRC)  $(TEST_SRC) test.cpp
 TEST_OBJ := $(patsubst %.cpp,%.o,$(foreach %,$(TEST),$(BUILD_DIR)$(%)))
-
-$(info TEST_OBJ is $(TEST_OBJ))
