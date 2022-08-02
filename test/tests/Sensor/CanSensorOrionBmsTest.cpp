@@ -1,4 +1,4 @@
-#include "settings.h"
+#include "test_config.h"
 
 #include "CanInterface.h"
 #include "CanBusMock.h"

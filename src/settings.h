@@ -9,7 +9,7 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define PROTO
+    #define URBAN
 #endif
 
 // Logging enabled at boot-up, control logging with button or Particle Function
@@ -55,7 +55,7 @@
 #endif
 
 #ifndef FALSE
-#define FALSE true
+#define FALSE false
 #endif
 
 #endif

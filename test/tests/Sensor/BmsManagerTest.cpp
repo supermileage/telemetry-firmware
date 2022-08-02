@@ -1,4 +1,4 @@
-#include "settings.h"
+#include "test_config.h"
 
 #include "CanInterface.h"
 #include "CanBusMock.h"
@@ -22,7 +22,7 @@ TEST_CASE( "BmsManager::getCurrentBms test", "[BmsManager]" ) {
 
 	SECTION( "BmsManager returns correct bms type before deselect timeout" ) {
 		setMillis(0);
-		REQUIRE( orion.getLastUpdateTime() == 0 );
+		CHECK( orion.getLastUpdateTime() == 0 );
 		REQUIRE( tiny.getLastUpdateTime() == 0 );
 		REQUIRE ( manager.getCurrentBms(valid) == BmsManager::Orion );
 

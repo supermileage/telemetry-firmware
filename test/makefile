@@ -4,23 +4,18 @@ CC = g++
 VERSION = -std=c++11
 LIBS = -lc++ -stdlib=libc++
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
-PARTICLE_DEP = external/UnitTestLib/libwiringgcc.a
-INCLUDE_DIRS = external/UnitTestLib external/Catch2/single_include/catch2 tests/Mocks ./
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall
-LFLAGS = $(VERSION) $(LIBS) $(PARTICLE_DEP)
+LFLAGS = $(VERSION) $(LIBS) $(PARTICLE_TEST)
 INCLUDE_PREFIX = -I
-
-# Get all directories from lib and add lib files (may not be necessary)
-INCLUDE_DIRS_LIB += $(wildcard $(LIB_DIR)**/src/) $(wildcard $(LIB_DIR)*/)
-CPPSRC += $(foreach %,$(INCLUDE_DIRS_LIB),$(wildcard $(%)*.cpp))
-INCLUDE_DIRS += $(INCLUDE_DIRS_LIB)
+PARTICLE_TEST = external/UnitTestLib/libwiringgcc.a
+INCLUDE_DIRS = external/UnitTestLib external/Catch2/single_include/catch2 tests/Mocks ./ ../lib/can-common/src
 
 # Get all directories in src and add to includes
 SRC_DIRS = $(sort $(dir $(wildcard $(SRC_DIR)*/)))
 ifeq ($(filter $(SRC_DIR),$(SRC_DIRS)),)
-	INCLUDE_DIRS += $(SRC_DIRS)
+	INCLUDE_DIRS += $(SRC_DIRS) $(SRC_DIR)
 else
-	INCLUDE_DIRS += $(filter-out $(SRC_DIR),$(SRC_DIRS))
+	INCLUDE_DIRS += $(SRC_DIRS)
 endif
 
 # add src files (excluding main.cpp)
