@@ -1,9 +1,5 @@
 #include "CanInterface.h"
-
-// #define DEBUG_CAN
-#ifdef DEBUG_CAN
 #include "settings.h"
-#endif
 
 #define CAN_FRAME 0
 
@@ -23,9 +19,9 @@ void CanInterface::begin() {
 
 void CanInterface::handle() {
     if(!_CAN->readInterruptPin()){
-        while(_CAN->checkReceive() == _CAN->messageAvail()){ // TODO: rewrite CanBus messageAvail message to return bool
+        while(_CAN->checkReceive() == _CAN->messageAvail()) {
             CanMessage message = CAN_MESSAGE_NULL;
-            _CAN->readMsgBuffer(&message.dataLength, message.data);
+            _CAN->readMsgBuf(&message.dataLength, message.data);
             message.id = _CAN->getCanId();
 
             #ifdef DEBUG_CAN 
@@ -54,5 +50,5 @@ void CanInterface::addMessageListen(uint16_t id, Command* canListenerDelegate) {
 }
 
 void CanInterface::sendMessage(CanMessage message) {
-        _CAN->sendMsgBuffer(message.id, CAN_FRAME, message.dataLength, message.data );   
+	_CAN->sendMsgBuf(message.id, CAN_FRAME, message.dataLength, message.data );   
 }

@@ -14,10 +14,10 @@ class CanBusMock : public CanBus {
 		~CanBusMock();
 		bool readInterruptPin() override;
 		byte checkReceive() override ;
-		byte readMsgBuffer(byte* len, byte* buf) override;
+		byte readMsgBuf(byte* len, byte* buf) override;
 		unsigned long getCanId() override;
 		void begin() override;
-		void sendMsgBuffer(unsigned long id, byte ext, byte len, const byte *buf) override;
+		void sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) override;
 		void setReadInterruptPin(std::function<bool(void)> func);
 		void setCheckReceive(std::function<byte(void)> func);
 		void setGetCanId(std::function<uint64_t(void)> func);
@@ -28,8 +28,8 @@ class CanBusMock : public CanBus {
 		std::function<bool(void)> _readInterruptPin;
 		std::function<byte(void)> _checkReceive;
 		std::function<uint64_t(void)> _getCanId;
-		std::function<byte(byte*,byte*)> _readMsgBuffer;
-		std::function<void(uint64_t,byte,byte,const byte*)> _sendMsgBuffer;
+		std::function<byte(byte*,byte*)> _readMsgBuf;
+		std::function<void(uint64_t,byte,byte,const byte*)> _sendMsgBuf;
 		bool _checkReceiveCalled = false;
 
 };

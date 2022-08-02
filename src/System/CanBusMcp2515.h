@@ -27,7 +27,7 @@ class CanBusMcp2515 : public CanBus {
 			return _mcpCan->checkReceive();
 		}
 
-		byte readMsgBuffer(byte* len, byte* buf) override {
+		byte readMsgBuf(byte* len, byte* buf) override {
 			return _mcpCan->readMsgBuf(len, buf);
 		}
 
@@ -39,7 +39,7 @@ class CanBusMcp2515 : public CanBus {
 			_mcpCan->begin(CAN_500KBPS,MCP_8MHz);
 		}
 
-		void sendMsgBuffer(unsigned long id, byte ext, byte len, const byte *buf) {
+		void sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
 			_mcpCan->sendMsgBuf(id, ext, len, buf);
 		}
 

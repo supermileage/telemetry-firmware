@@ -18,13 +18,13 @@ class CanBus {
 
 		virtual byte checkReceive() = 0;
 
-		virtual byte readMsgBuffer(byte* len, byte* buf) = 0;
+		virtual byte readMsgBuf(byte* len, byte* buf) = 0;
 
 		virtual unsigned long getCanId() = 0;
 
 		virtual void begin() = 0;
 
-		virtual void sendMsgBuffer(unsigned long id, byte ext, byte len, const byte *buf) = 0;
+		virtual void sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) = 0;
 
 		inline byte messageAvail() { return _messageAvail; }
 

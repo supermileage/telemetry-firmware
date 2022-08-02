@@ -5,8 +5,8 @@ CanBusMock::CanBusMock(byte messageAvail) : CanBus(messageAvail) {
 	_readInterruptPin = []() { return true; };
 	_checkReceive = []() { return 0; };
 	_getCanId = []() { return 0; };
-	_readMsgBuffer = [](byte* len, byte* buf) { *len = 1; buf[0] = 0; return 0; };
-	_sendMsgBuffer = [](unsigned long id, byte ext, byte len, const byte *buf) { };
+	_readMsgBuf = [](byte* len, byte* buf) { *len = 1; buf[0] = 0; return 0; };
+	_sendMsgBuf = [](unsigned long id, byte ext, byte len, const byte *buf) { };
 }
 
 CanBusMock::~CanBusMock() { }
@@ -24,8 +24,8 @@ byte CanBusMock::checkReceive() {
 	}
 }
 
-byte CanBusMock::readMsgBuffer(byte* len, byte* buf) { 
-	return _readMsgBuffer(len, buf);
+byte CanBusMock::readMsgBuf(byte* len, byte* buf) { 
+	return _readMsgBuf(len, buf);
 }
 
 unsigned long CanBusMock::getCanId() { 
@@ -34,8 +34,8 @@ unsigned long CanBusMock::getCanId() {
 
 void CanBusMock::begin() { }
 
-void CanBusMock::sendMsgBuffer(unsigned long id, byte ext, byte len, const byte *buf) {
-	_sendMsgBuffer(id, ext, len, buf);
+void CanBusMock::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
+	_sendMsgBuf(id, ext, len, buf);
 }
 
 void CanBusMock::setReadInterruptPin(std::function<bool(void)> func) {
@@ -52,10 +52,10 @@ void CanBusMock::setGetCanId(std::function<uint64_t(void)> func) {
 }
 
 void CanBusMock::setReadMsgBuffer(std::function<byte(byte*,byte*)> func) {
-	_readMsgBuffer = func;
+	_readMsgBuf = func;
 }
 
 void CanBusMock::setSendMsgBuffer(std::function<void(uint64_t,byte,byte,const byte*)> func) {
-	_sendMsgBuffer = func;
+	_sendMsgBuf = func;
 }
 
