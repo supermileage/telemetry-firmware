@@ -27,5 +27,8 @@ TEST_SRC := $(patsubst $(TEST_DIR)%,%,$(foreach %,$(TEST_DIRS),$(wildcard $(%)*.
 SENSOR_SRC := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER)
 
 # ALL TEST FILES
-TEST := $(SENSOR_SRC)  $(TEST_SRC) test.cpp
+TEST := $(SENSOR_SRC) $(TEST_SRC) test.cpp
 TEST_OBJ := $(patsubst %.cpp,%.o,$(foreach %,$(TEST),$(BUILD_DIR)$(%)))
+
+# ALL TEST INCLUDE DIRS
+TEST_DIRS += $(TEST_DIR)
