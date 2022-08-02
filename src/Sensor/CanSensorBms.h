@@ -127,7 +127,7 @@ class CanSensorBms : public CanListener {
 		uint64_t _lastUpdateTime = 0;
 		uint64_t _lastSocUpdate = 0;
 		bool _isAsleep = false;
-		std::map<uint16_t, uint64_t> _validationMap;
+		std::unordered_map<uint16_t, uint64_t> _validationMap;
 
 		/**
 		 * @brief Validate current value based on value id

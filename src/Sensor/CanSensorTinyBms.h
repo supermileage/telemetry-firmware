@@ -1,7 +1,7 @@
 #ifndef _CAN_SENSOR_TINY_BMS_H_
 #define _CAN_SENSOR_TINY_BMS_H_
 
-#include <map>
+#include <unordered_map>
 #include "CanSensorBms.h"
 #include "BmsFault.h"
 

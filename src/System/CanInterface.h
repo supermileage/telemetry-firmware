@@ -1,7 +1,7 @@
 #ifndef _CAN_INTERFACE_H_
 #define _CAN_INTERFACE_H_
 
-#include <map>
+#include <unordered_map>
 
 #include "can.h"
 #include "Sensor.h"
@@ -51,7 +51,7 @@ class CanInterface : public Handleable {
 
     private:
         CanBus* _CAN;
-        std::map<uint16_t, Command*> _delegates;
+        std::unordered_map<uint16_t, Command*> _delegates;
 
 };
 
