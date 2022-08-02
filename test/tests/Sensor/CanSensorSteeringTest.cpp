@@ -9,5 +9,5 @@ TEST_CASE( "CanSensorSteering constructor test", "[CanSensorSteering]" ) {
 	CanInterface interface(&mock);
 	CanSensorSteering steering(interface);
 
-	REQUIRE( mock.messageAvail() == 5 );
+	REQUIRE( mock.messageAvail() == 1 );
 }

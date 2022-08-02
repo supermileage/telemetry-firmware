@@ -9,5 +9,5 @@ TEST_CASE( "CanSensorTinyBms constructor test", "[CanSensorTinyBms]" ) {
 	CanInterface interface(&mock);
 	CanSensorTinyBms bms(interface, 500);
 
-	REQUIRE( mock.messageAvail() == 6 );
+	REQUIRE( mock.messageAvail() == 1 );
 }

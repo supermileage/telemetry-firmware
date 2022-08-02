@@ -9,5 +9,5 @@ TEST_CASE( "CanSensorAccessories constructor test", "[CanSensorAccessories]" ) {
 	CanInterface interface(&mock);
 	CanSensorAccessories accessories(interface, 0);
 
-	REQUIRE( mock.messageAvail() == 3 );
+	REQUIRE( mock.messageAvail() == 1 );
 }
