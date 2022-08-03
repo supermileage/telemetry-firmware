@@ -25,6 +25,10 @@ void CanSensorBms::setIsAsleep(bool value) {
 	_isAsleep = value;
 }
 
+bool CanSensorBms::getIsAsleep() {
+	return _isAsleep;
+}
+
 bool CanSensorBms::_validate(uint16_t id) {
     return (millis() - _validationMap[id]) < STALE_INTERVAL;
 }

@@ -1,6 +1,7 @@
 #include "CanInterface.h"
 #include "settings.h"
 
+#define DEBUG_CAN
 #define CAN_FRAME 0
 
 CanInterface::CanInterface(CanBus* can) {
@@ -31,7 +32,7 @@ void CanInterface::handle() {
                 for (int i = 0; i < message.dataLength; i++) { // print the data
                     DEBUG_SERIAL_F("0x%X\t", message.data[i]);
                 }
-                DEBUG_SERIAL_LN();
+                DEBUG_SERIAL_LN("");
             #endif
 
             // check if we're listening for id, continue if we're not
