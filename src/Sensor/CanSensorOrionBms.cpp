@@ -14,7 +14,7 @@ CanSensorOrionBms::~CanSensorOrionBms() { }
 
 void CanSensorOrionBms::begin() {
 	for (uint16_t id : VALIDATION_IDS) {
-		_canInterface.addMessageListen(CAN_ORIONBMS_TEMP, new CanListener::CanListenerDelegate(this));
+		_canInterface.addMessageListen(id, new CanListener::CanListenerDelegate(this));
 		_validationMap[id] = 0;
 	}
 }

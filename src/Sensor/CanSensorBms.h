@@ -35,9 +35,14 @@ class CanSensorBms : public CanListener {
 		uint64_t getLastUpdateTime();
 
 		/**
-		 * @brief if true, this bms will stop sending out can messages which compete with other bms instances
+		 * @brief if true, this bms will stop sending out can messages
 		 */
 		void setIsAsleep(bool value);
+
+		/**
+		 * @brief returns whether or not this sensor is sending out can update messages
+		 */
+		bool getIsAsleep();
 		
 		/**
          * @brief Get the battery voltage

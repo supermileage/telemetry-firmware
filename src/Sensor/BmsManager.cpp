@@ -33,21 +33,37 @@ void BmsManager::handle() {
 }
 
 void BmsManager::setBms(BmsOption option) {
-	bool isOrion = option == Orion;
-	_orion->setIsAsleep(!isOrion);
-	_tiny->setIsAsleep(isOrion);
-	*_mainBmsPtr = isOrion ? _orion : _tiny;
+	switch (option) {
+		case BmsManager::Orion:
+			_tiny->setIsAsleep(true);
+			_orion->setIsAsleep(false);
+			*_mainBmsPtr = _orion;
+			break;
+		case BmsManager::Tiny:
+			_orion->setIsAsleep(true);
+			_tiny->setIsAsleep(false);
+			*_mainBmsPtr = _tiny;
+			break;
+		default:
+			_tiny->setIsAsleep(true);
+			_orion->setIsAsleep(true);
+			// _mainBmsPtr should not be set to null (see vehicleUrban.cpp)
+			break;
+	}
+
 	_currentOption = option;
 }
 
 int BmsManager::getCurrentBms(bool& valid) {
 	valid = true;
 
-	if ((_currentOption == Orion && _orion->getLastUpdateTime() + MILLISECONDS_BEFORE_DESELECT > millis()) ||
-		(_currentOption == Tiny && _tiny->getLastUpdateTime() + MILLISECONDS_BEFORE_DESELECT > millis())) {
-		return _currentOption;
-	} else {
-		return None;
+	switch (_currentOption) {
+		case BmsManager::Orion:
+			return (_orion->getLastUpdateTime() + MILLISECONDS_BEFORE_DESELECT > millis()) ? _currentOption : BmsManager::None;
+		case BmsManager::Tiny:
+			return (_tiny->getLastUpdateTime() + MILLISECONDS_BEFORE_DESELECT > millis()) ? _currentOption : BmsManager::None;
+		default:
+			return _currentOption;
 	}
 }
 

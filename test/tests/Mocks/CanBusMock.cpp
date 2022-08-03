@@ -20,6 +20,7 @@ byte CanBusMock::checkReceive() {
 		_checkReceiveCalled = true;
 		return _checkReceive();
 	} else {
+		_checkReceiveCalled = false;
 		return ~_checkReceive();
 	}
 }
