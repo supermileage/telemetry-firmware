@@ -1,3 +1,4 @@
+#include "settings.h"
 #include "CanSensorOrionBms.h"
 
 const uint16_t VALIDATION_IDS[] {
@@ -12,13 +13,8 @@ CanSensorOrionBms::CanSensorOrionBms(CanInterface& canInterface) : CanSensorBms(
 CanSensorOrionBms::~CanSensorOrionBms() { }
 
 void CanSensorOrionBms::begin() {
-	CanListenerDelegate* orionDelegate = new CanListener::CanListenerDelegate(this);
-	_canInterface.addMessageListen(CAN_ORIONBMS_STATUS, orionDelegate);
-	_canInterface.addMessageListen(CAN_ORIONBMS_PACK, orionDelegate);
-	_canInterface.addMessageListen(CAN_ORIONBMS_CELL, orionDelegate);
-	_canInterface.addMessageListen(CAN_ORIONBMS_TEMP, orionDelegate);
-
 	for (uint16_t id : VALIDATION_IDS) {
+		_canInterface.addMessageListen(CAN_ORIONBMS_TEMP, new CanListener::CanListenerDelegate(this));
 		_validationMap[id] = 0;
 	}
 }

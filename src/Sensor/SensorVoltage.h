@@ -28,7 +28,6 @@ class SensorVoltage : public Sensor
         **/
 
         String getVoltage(bool &valid = Sensor::dummy);
-
 };
 
 #endif

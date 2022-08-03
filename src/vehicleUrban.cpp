@@ -2,7 +2,7 @@
 
 #ifdef URBAN
 
-#include <map>
+#include "CanBusMcp2515.h"
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
@@ -14,7 +14,8 @@
 // starting bms is arbitrary--will change after one or other starts receiving Can messages
 #define DEFAULT_BMS BmsManager::BmsOption::Orion
 
-CanInterface canInterface(&SPI1, D5, D6);
+CanBusMcp2515 canBus(&SPI1, D5, D6);
+CanInterface canInterface((CanBus*)&canBus);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());

@@ -1,13 +1,10 @@
 #include "CanInterface.h"
+#include "settings.h"
+
 #define CAN_FRAME 0
 
-// #define DEBUG_CAN
-
-CanInterface::CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin) {
-    pinMode(intPin, INPUT);
-    _intPin = intPin;
-    _CAN = new mcp2515_can(csPin);
-    _CAN->setSPI(spi);
+CanInterface::CanInterface(CanBus* can) {
+    _CAN = can;
 }
 
 CanInterface::~CanInterface() {
@@ -17,12 +14,12 @@ CanInterface::~CanInterface() {
 }
 
 void CanInterface::begin() {
-    _CAN->begin(CAN_500KBPS,MCP_8MHz);
+    _CAN->begin();
 }
 
 void CanInterface::handle() {
-    if(!digitalRead(_intPin)){
-        while(_CAN->checkReceive() == CAN_MSGAVAIL){
+    if(!_CAN->readInterruptPin()){
+        while(_CAN->checkReceive() == _CAN->messageAvail()) {
             CanMessage message = CAN_MESSAGE_NULL;
             _CAN->readMsgBuf(&message.dataLength, message.data);
             message.id = _CAN->getCanId();
@@ -48,9 +45,10 @@ void CanInterface::handle() {
 }
 
 void CanInterface::addMessageListen(uint16_t id, Command* canListenerDelegate) {
-    _delegates[id] = canListenerDelegate;
+	if (_delegates.find(id) == _delegates.end())
+		_delegates[id] = canListenerDelegate;
 }
 
 void CanInterface::sendMessage(CanMessage message) {
-    _CAN->sendMsgBuf(message.id, CAN_FRAME, message.dataLength, message.data );   
+	_CAN->sendMsgBuf(message.id, CAN_FRAME, message.dataLength, message.data );   
 }

@@ -1,7 +1,9 @@
 #ifndef _INTERVAL_COMMAND_H_
 #define _INTERVAL_COMMAND_H_
 
+#include <stdint.h>
 #include <vector>
+
 #include "Command.h"
 
 class IntervalCommand : public Command {

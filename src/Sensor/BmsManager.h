@@ -8,6 +8,8 @@
  */
 class BmsManager : public Handleable {
 	public:
+		static const uint32_t UpdateInterval;
+		static const uint32_t MillisecondsBeforeDeselect;
 		enum BmsOption { Orion, Tiny, None };
 		
         /**

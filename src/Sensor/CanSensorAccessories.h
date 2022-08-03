@@ -1,7 +1,7 @@
 #ifndef CAN_ACCESSORIES_LISTENER
 #define CAN_ACCESSORIES_LISTENER
 
-#include <map>
+#include <unordered_map>
 #include <array>
 
 #include "can.h"
@@ -45,7 +45,7 @@ class CanSensorAccessories : public CanListener {
 		/**
 		 * @brief Get the string name of this object
 		 */
-		String getHumanName();
+		String getHumanName() override;
 		
 		/**
 		 * @brief Get the status of headlights
@@ -88,7 +88,7 @@ class CanSensorAccessories : public CanListener {
             unsigned long lastUpdated;
             int value;
         };
-		std::map<uint8_t, StatusProperty> _statuses;
+		std::unordered_map<uint8_t, StatusProperty> _statuses;
 
 		/**
 		 * @brief adds data to appropriate byte of _data's data buffer

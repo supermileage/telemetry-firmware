@@ -3,6 +3,9 @@
 #define UPDATE_INTERVAL 1000
 #define MILLISECONDS_BEFORE_DESELECT 10000
 
+const uint32_t BmsManager::UpdateInterval = UPDATE_INTERVAL;
+const uint32_t BmsManager::MillisecondsBeforeDeselect = MILLISECONDS_BEFORE_DESELECT;
+
 BmsManager::BmsManager(CanSensorBms** bmsPtr, CanSensorBms* orion, CanSensorBms* tiny, BmsOption option) : _mainBmsPtr(bmsPtr), _orion(orion), _tiny(tiny), _currentOption(option) {
 	setBms(option);
 }

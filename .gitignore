@@ -8,3 +8,6 @@ access-link.txt
 *.pdf
 .DS_STORE
 output/
+test/obj
+test/dep
+test/bin

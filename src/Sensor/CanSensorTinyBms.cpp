@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "CanSensorTinyBms.h"
 #include "settings.h"
 
@@ -147,12 +148,12 @@ int CanSensorTinyBms::getTempBms(bool& valid) {
 
 int CanSensorTinyBms::getMinBatteryTemp(bool& valid) {
     valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
-    return min(_batteryTemp1, _batteryTemp2);
+    return std::min(_batteryTemp1, _batteryTemp2);
 }
 
 int CanSensorTinyBms::getMaxBatteryTemp(bool& valid) {
     valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
-    return max(_batteryTemp1, _batteryTemp2);
+    return std::max(_batteryTemp1, _batteryTemp2);
 }
 
 int CanSensorTinyBms::getAvgBatteryTemp(bool& valid) {
@@ -294,22 +295,22 @@ uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
         case FAULT_OVER_TEMP:
             return BmsFault::TEMP_HIGH;
         case FAULT_OVER_CURRENT_DISCHARGE: 
-            return BmsFault::CURRENT_DISCHARGE_HIGH;       
-        case FAULT_OVER_CURRENT_CHARGE:    
-            return BmsFault::CURRENT_CHARGE_HIGH;             
-        case FAULT_LOW_TEMP:       
-            return BmsFault::TEMP_LOW;               
-        case FAULT_CHARGER_SWITCH:      
-            return BmsFault::SWITCH_CHARGE;          
+            return BmsFault::CURRENT_DISCHARGE_HIGH;
+        case FAULT_OVER_CURRENT_CHARGE:
+            return BmsFault::CURRENT_CHARGE_HIGH;
+        case FAULT_LOW_TEMP:
+            return BmsFault::TEMP_LOW;
+        case FAULT_CHARGER_SWITCH:
+            return BmsFault::SWITCH_CHARGE;
         case FAULT_LOAD_SWITCH: 
-            return BmsFault::SWITCH_DISCHARGE;                  
-        case FAULT_SINGLE_PORT_SWITCH:        
-            return BmsFault::SWITCH_DISCHARGE;    
+            return BmsFault::SWITCH_DISCHARGE;
+        case FAULT_SINGLE_PORT_SWITCH:
+            return BmsFault::SWITCH_DISCHARGE;
         case FAULT_CURRENT_SENSOR_DISCONNECTED: 
             return BmsFault::CURRENT_SENSOR_DISCONNECT;  
         case FAULT_CURRENT_SENSOR_CONNECTED:     
             return BmsFault::CURRENT_SENSOR_CONNECT; 
         default: 
-            return BmsFault::NONE;               
+            return BmsFault::NONE;
     }
 }
