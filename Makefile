@@ -8,22 +8,6 @@ include test/test.mk
 $(info CPPSRC is $(CPPSRC))
 $(info TEST_SRC is $(TEST_SRC))
 
-# TEST pattern rules for generating object and dependency files
-$(BUILD_DIR)%.o: $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
-	$(call compile,$<,$(@D),$@)
-
-$(BUILD_DIR)%.o: $(LIB_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
-	$(call compile,$<,$(@D),$@)
-
-$(BUILD_DIR)%.o: $(TEST_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
-	$(call compile,$<,$(@D),$@)
-
-$(BIN_DIR):
-	@mkdir -p $(BIN_DIR)
-
-$(DEP_DIR)%.d:
-	@mkdir -p $(@D)
-
 .PHONY: urban proto pull-image clean clean-test
 
 urban: clean pull-image

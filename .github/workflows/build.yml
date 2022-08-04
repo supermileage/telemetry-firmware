@@ -65,11 +65,11 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
+      - name: Show Directory
+        run: pwd
+
       - name: Build Tests
         run: make test
-
-      - name: Show Directory Again
-        run: pwd
 
       - name: Run Tests
         run: .test/bin/test
