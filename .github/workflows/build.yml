@@ -65,8 +65,13 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Show Directory
-        run: pwd
+      - name: Install Make
+        run: |
+          sudo apt install make -y
+
+      - name: Install GCC
+        run: |
+          sudo apt install gcc -y
 
       - name: Build Tests
         run: make test

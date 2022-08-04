@@ -4,7 +4,7 @@ CC = g++
 VERSION = -std=c++11
 LIBS = -lc++ -stdlib=libc++
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
-CFLAGS = $(VERSION) $(DEPFLAGS) -Wall
+CFLAGS = $(VERSION) $(DEPFLAGS) -Wall -Wno-psabi
 LFLAGS = $(VERSION) $(LIBS) $(PARTICLE_TEST)
 INCLUDE_PREFIX = -I
 PARTICLE_TEST = test/external/UnitTestLib/libwiringgcc.a
