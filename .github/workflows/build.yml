@@ -55,3 +55,18 @@ jobs:
         with:
           name: fc-${{ github.sha }}
           path: output
+
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 5
+
+      - name: Build Tests
+        run: make test
+
+      - name: Run Tests
+        run: ./test/bin/test
