@@ -1,4 +1,4 @@
-include tests/testfiles.mk
+include test/tests/testfiles.mk
 
 CC = g++
 VERSION = -std=c++11
@@ -7,8 +7,8 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall
 LFLAGS = $(VERSION) $(LIBS) $(PARTICLE_TEST)
 INCLUDE_PREFIX = -I
-PARTICLE_TEST = external/UnitTestLib/libwiringgcc.a
-INCLUDE_DIRS = external/UnitTestLib external/Catch2/single_include/catch2 ../lib/can-common/src $(TEST_DIRS)
+PARTICLE_TEST = test/external/UnitTestLib/libwiringgcc.a
+INCLUDE_DIRS = test/external/UnitTestLib test/external/Catch2/single_include/catch2 ./lib/can-common/src $(TEST_DIRS)
 
 # Get all directories in src and add to includes
 SRC_DIRS = $(sort $(dir $(wildcard $(SRC_DIR)*/)))
@@ -29,21 +29,6 @@ INCLUDE_FLAGS := $(foreach %,$(INCLUDE_DIRS),$(INCLUDE_PREFIX)$(wildcard $(%)))
 OBJ_SRC := $(patsubst $(SRC_DIR)%,$(BUILD_DIR)%,$(CPPSRC:.cpp=.o))
 OBJ = $(patsubst $(LIB_DIR)%,$(BUILD_DIR)%,$(OBJ_SRC))
 DEPENDENCIES := $(patsubst $(BUILD_DIR)%.o,$(DEP_DIR)%.d,$(OBJ))
-
-test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
-	@echo ' *** Linking $@ *** '
-	@g++ $(LFLAGS) $(TEST_OBJ) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
-
-libwiringgcc :
-	@echo ' *** building $@ *** '
-	cd external/UnitTestLib && make libwiringgcc.a
-
-.PHONY: clean
-
-clean : 
-	@rm -r obj
-	@rm -r bin
-	@rm -r dep
 
 # rules for generating object and dependency files
 $(BUILD_DIR)%.o: $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)

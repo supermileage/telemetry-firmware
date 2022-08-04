@@ -3,9 +3,9 @@ IMAGE := ghcr.io/supermileage/particle-v3.0.0:latest
 OUTPUT_DIR := output
 
 include src/build.mk
-include test/tests.mk
+include test/test.mk
 
-.PHONY: urban proto pull-image clean
+.PHONY: urban proto pull-image clean clean-test
 
 urban: clean pull-image
 	$(call print, COMPILING URBAN FIRMWARE)
@@ -28,12 +28,24 @@ fc: clean pull-image
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 
+test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
+	@echo ' *** Building $@ *** '
+	@g++ $(LFLAGS) $(TEST_OBJ) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
+
 pull-image:
 	docker pull $(IMAGE)
+
+libwiringgcc :
+	@echo ' *** building $@ *** '
+	@cd test/external/UnitTestLib && make libwiringgcc.a
 
 clean:
 	rm -rf $(OUTPUT_DIR)
 
+clean-test :
+	@rm -r test/obj
+	@rm -r test/bin
+	@rm -r test/dep
 
 define print
 	@echo ''
