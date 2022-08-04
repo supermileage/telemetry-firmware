@@ -5,9 +5,6 @@ OUTPUT_DIR := output
 include src/build.mk
 include test/test.mk
 
-$(info CPPSRC is $(CPPSRC))
-$(info TEST_SRC is $(TEST_SRC))
-
 .PHONY: urban proto pull-image clean clean-test
 
 urban: clean pull-image
@@ -42,10 +39,10 @@ libwiringgcc :
 	@echo ' *** building $@ *** '
 	@cd test/external/UnitTestLib && make libwiringgcc.a
 
-clean:
+clean: clean-test
 	rm -rf $(OUTPUT_DIR)
 
-clean-test :
+clean-test:
 	@rm -r test/obj
 	@rm -r test/bin
 	@rm -r test/dep

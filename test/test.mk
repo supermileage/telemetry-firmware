@@ -18,15 +18,11 @@ else
 	INCLUDE_DIRS += $(SRC_DIRS)
 endif
 
-# add src files (excluding main.cpp)
-SRC_SUB_DIRS = $(filter-out $(SRC_DIR),$(SRC_DIRS))
-CPPSRC += $(foreach %,$(SRC_SUB_DIRS),$(wildcard $(%)*.cpp))
-
 # Create flags to include all directories (so we don't have to use paths in #include)
 INCLUDE_FLAGS := $(foreach %,$(INCLUDE_DIRS),$(INCLUDE_PREFIX)$(wildcard $(%)))
 
 # generate object / dependency file paths for source and library files
-OBJ_SRC := $(patsubst $(SRC_DIR)%,$(BUILD_DIR)%,$(CPPSRC:.cpp=.o))
+OBJ_SRC := $(patsubst $(SRC_DIR)%,$(BUILD_DIR)%,$(CPPSRC_TEST:.cpp=.o))
 OBJ = $(patsubst $(LIB_DIR)%,$(BUILD_DIR)%,$(OBJ_SRC))
 DEPENDENCIES := $(patsubst $(BUILD_DIR)%.o,$(DEP_DIR)%.d,$(OBJ))
 
