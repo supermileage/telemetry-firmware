@@ -66,7 +66,7 @@ jobs:
           fetch-depth: 5
 
       - name: Build Tests
-        run: make test
+        run: cd test && make test
 
       - name: Run Tests
         run: ./test/bin/test
