@@ -5,6 +5,9 @@ OUTPUT_DIR := output
 include src/build.mk
 include test/test.mk
 
+$(info CPPSRC is $(CPPSRC))
+$(info TEST_SRC is $(TEST_SRC))
+
 .PHONY: urban proto pull-image clean clean-test
 
 urban: clean pull-image
