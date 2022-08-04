@@ -65,8 +65,5 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Build Tests
-        run: cd test && make test
-
-      - name: Run Tests
-        run: ./test/bin/test
+      - name: Build and Run Tests
+        run: cd test && make test && ./bin/test
