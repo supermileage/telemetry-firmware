@@ -21,10 +21,8 @@ endif
 # Create flags to include all directories (so we don't have to use paths in #include)
 INCLUDE_FLAGS := $(foreach %,$(INCLUDE_DIRS),$(INCLUDE_PREFIX)$(wildcard $(%)))
 
-# generate object / dependency file paths for source and library files
-OBJ_SRC := $(patsubst $(SRC_DIR)%,$(BUILD_DIR)%,$(CPPSRC_TEST:.cpp=.o))
-OBJ = $(patsubst $(LIB_DIR)%,$(BUILD_DIR)%,$(OBJ_SRC))
-DEPENDENCIES := $(patsubst $(BUILD_DIR)%.o,$(DEP_DIR)%.d,$(OBJ))
+# generate dependency file paths for test object files
+DEPENDENCIES := $(patsubst $(BUILD_DIR)%.o,$(DEP_DIR)%.d,$(TEST_OBJ))
 
 # rules for generating object and dependency files
 $(BUILD_DIR)%.o: $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)

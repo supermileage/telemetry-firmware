@@ -22,13 +22,13 @@ BMS_MANAGER := Sensor/BmsManager.cpp
 
 # All files to compile for tests
 TEST_DIRS := $(dir $(wildcard $(TEST_DIR)tests/*/))
-CPPTEST := $(patsubst $(TEST_DIR)%,%,$(foreach %,$(TEST_DIRS),$(wildcard $(%)*.cpp)))
-CPPSRC_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER)
-CPPSRC_TEST := $(foreach %,$(CPPSRC_TEMP),$(SRC_DIR)$(%))
+TEST_CPP_TEMP := $(patsubst $(TEST_DIR)%,%,$(foreach %,$(TEST_DIRS),$(wildcard $(%)*.cpp)))
+SRC_CPP_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER)
 
 # ALL TEST FILES
-TEST := $(CPPSRC_TEMP) $(CPPTEST) test.cpp
-TEST_OBJ := $(patsubst %.cpp,%.o,$(foreach %,$(TEST),$(BUILD_DIR)$(%)))
+CPP_TO_OBJ := $(SRC_CPP_TEMP) $(TEST_CPP_TEMP) test.cpp
+TEST_OBJ := $(patsubst %.cpp,%.o,$(foreach %,$(CPP_TO_OBJ),$(BUILD_DIR)$(%)))
+TEST_CPP := $(foreach %,$(SRC_CPP_TEMP),$(SRC_DIR)$(%)) $(foreach %,$(TEST_CPP_TEMP),$(TEST_DIR)$(%))  $(TEST_DIR)test.cpp
 
 # ALL TEST INCLUDE DIRS
 TEST_DIRS += $(TEST_DIR)

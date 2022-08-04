@@ -5,6 +5,9 @@ OUTPUT_DIR := output
 include src/build.mk
 include test/test.mk
 
+$(info TEST_CPP is $(TEST_CPP))
+$(info TEST_OBJ is $(TEST_OBJ))
+
 .PHONY: urban proto pull-image clean clean-test
 
 urban: clean pull-image
