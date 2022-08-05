@@ -36,7 +36,7 @@ fc: clean pull-image
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 
-test/obj/System/Handleable.o : src/System/Handleable.cpp
+$(OBJ_DIR)System/Handleable.o : $(SRC_DIR)System/Handleable.cpp
 	$(call compile,$<,$(@D),$@)
 
 test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
