@@ -37,7 +37,10 @@ $(OBJ_DIR)%.o: $(TEST_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
 $(BIN_DIR):
 	@mkdir -p $(BIN_DIR)
 
-$(DEP_DIR)%:
+$(DEP_DIR):
+	@mkdir -p $(DEP_DIR)
+
+$(DEP_DIR)%.d:
 	@mkdir -p $(@D)
 
 define compile
