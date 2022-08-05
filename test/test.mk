@@ -45,5 +45,3 @@ define compile
 	@mkdir -p $(2)
 	@$(CC) $(CFLAGS) -c -o $(3) $(1) $(INCLUDE_FLAGS)
 endef
-
--include $(DEPENDENCIES)
