@@ -5,6 +5,10 @@ OUTPUT_DIR := output
 include src/build.mk
 include test/test.mk
 
+CPPSRC += $(TEST_CPP)
+
+$(info TEST_CPP is $(TEST_CPP))
+$(info TEST_OBJ is $(TEST_OBJ))
 $(info SRC_DIR is $(SRC_DIR))
 $(info TEST_DIR is $(TEST_DIR))
 $(info OBJ_DIR is $(OBJ_DIR))
