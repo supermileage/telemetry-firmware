@@ -3,15 +3,14 @@
 This project includes a unit test suite, built with [catch2](https://github.com/catchorg/Catch2/tree/v2.x)
 
 ## Building the tests
-navigate to test folder and run:
+
+from root project folder:
 
 ``` $ make test ```
 
 ## Running the tests
 
-from test folder:
-
-``` $ ./bin/test <test-tag> ```
+``` $ ./test/bin/test <test-tag> ```
 
 **```<test-tag>``` is an optional parameter for running a subset of the tests--more on this below
 
