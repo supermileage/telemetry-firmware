@@ -64,6 +64,12 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
+      - name: Make Version
+        run: make --version
+
+      - name: GCC Version
+        run: gcc --version
+
       - name: Build Tests
         run: make test
 
