@@ -2,59 +2,59 @@ name: Build Firmware
 on: [push, pull_request]
 
 jobs:
-  build-urban:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          fetch-depth: 5
+#   build-urban:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v2
+#         with:
+#           submodules: recursive
+#           fetch-depth: 5
 
-      - name: Build
-        run: make urban
+#       - name: Build
+#         run: make urban
 
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: urban-${{ github.sha }}
-          path: output
+#       - name: Upload
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: urban-${{ github.sha }}
+#           path: output
 
-  build-proto:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          fetch-depth: 5
+#   build-proto:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v2
+#         with:
+#           submodules: recursive
+#           fetch-depth: 5
 
-      - name: Build
-        run: make proto
+#       - name: Build
+#         run: make proto
 
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: proto-${{ github.sha }}
-          path: output
+#       - name: Upload
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: proto-${{ github.sha }}
+#           path: output
 
-  build-fc:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          fetch-depth: 5
+#   build-fc:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v2
+#         with:
+#           submodules: recursive
+#           fetch-depth: 5
 
-      - name: Build
-        run: make fc
+#       - name: Build
+#         run: make fc
 
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: fc-${{ github.sha }}
-          path: output
+#       - name: Upload
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: fc-${{ github.sha }}
+#           path: output
 
   run-all-tests:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure GCC
-        run: ./configure
+        run: sudo ./configure
 
       - name: Build Tests
         run: make test
