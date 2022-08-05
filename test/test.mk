@@ -1,7 +1,7 @@
 include test/tests/testfiles.mk
 
 CC = g++
-VERSION = -std=c++11
+VERSION = -std=c++17
 LIBS = -lc++ -stdlib=libc++
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall -Wno-psabi

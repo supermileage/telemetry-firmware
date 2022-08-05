@@ -32,6 +32,10 @@ test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
 	@echo ' *** Building $@ *** '
 	@g++ $(LFLAGS) $(TEST_OBJ) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
 
+run-tests:
+	@chmod +x ./test/bin/test
+	./test/bin/test
+
 pull-image:
 	docker pull $(IMAGE)
 

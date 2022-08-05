@@ -56,17 +56,16 @@ jobs:
           name: fc-${{ github.sha }}
           path: output
 
-  run-tests:
+  run-all-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          fetch-depth: 5
+      - uses: actions/checkout@v2
+
+      - name: Configure GCC
+        run: ./scripts/configure
 
       - name: Build Tests
         run: make test
 
       - name: Run Tests
-        run: .test/bin/test
+        run: make run-tests
