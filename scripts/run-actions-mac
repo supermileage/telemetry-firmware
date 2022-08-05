@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# check OS
+if [[ $OSTYPE != 'darwin'* ]] ; then
+  echo 'This script is only meant to be run on macOS'
+  exit 0
+fi
+
+# verify docker is installed
+if ! command -v docker &> /dev/null ; then
+    echo "Error: docker could not be found.  Please install in order to run actions locally:"
+	echo "https://docs.docker.com/desktop/install/mac-install/"
+    exit 0
+fi
+
+# verify act is installed
+if ! command -v act &> /dev/null ; then
+	read -p "Warning: act could not be found. Would you like to install act? y/n " answer
+	if [ $answer == 'y' ] ; then
+		if command -v brew &> /dev/null ; then
+			brew install act
+		else
+			read -p "Installing act requires homebrew package manager.  Would you like to install homebrew? y/n " answer
+			if [ $answer == 'y' ] ; then
+				/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+			else
+				echo 'quitting'
+				exit 0
+			fi
+		fi # install brew
+	else
+		echo 'quitting'
+		exit 0
+	fi # install act
+fi
+
+cd .. && act -l
+read -p 'Which job would you like to run? (leave blank to run all jobs) ' action
+
+if [ -z "$action" ]
+then
+	echo 'Running all actions'
+else
+	echo 'Running' $action
+fi
+
+# open Docker if is not running
+if (! docker stats --no-stream ); then
+	# mac terminal command to start docker
+	open /Applications/Docker.app
+# wait until Docker daemon is running and has completed initialisation
+while (! docker stats --no-stream ); do
+	# Docker takes a few seconds to initialize
+	echo "Waiting for Docker to launch..."
+	sleep 1
+done
+fi
+
+if [ -z "$action" ]
+then
+	act
+else
+	act -j $action
+fi
