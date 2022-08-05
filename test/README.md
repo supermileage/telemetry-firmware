@@ -20,7 +20,7 @@ from root project folder:
 
 Before writing any tests, it may be important to consider how testable your code is.  External libraries can make it challenging to write good tests because we can't necessarily control the behavior of the libraries we use.  On top of this, much of the code in this project is dependent on libraries which are not intended to be compiled and run on your computer!
 
-With that said, there are workarounds for these problems which allow us to test our own code independently of the core systems it depends on.  Just know that if you are writing new tests, you may need to 'trick' the compiler in some way, either by providing your own implementations of external symbols or by using dependency injection.  This project employs both methods.
+With that said, there are workarounds for these problems which allow us to test our own code independently of the core systems it depends on.  Just know that if you are writing new tests, you may need to 'trick' the compiler in some way, either by providing your own implementations of external headers/symbols or by using dependency injection.  This project employs both methods.
 
 (see **On Dependencies** below)
 
