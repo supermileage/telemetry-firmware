@@ -37,11 +37,12 @@ $(OBJ_DIR)%.o: $(TEST_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
 $(BIN_DIR):
 	@mkdir -p $(BIN_DIR)
 
-$(DEP_DIR)%.d:
+$(DEP_DIR)%:
 	@mkdir -p $(@D)
 
 define compile
 	@echo ' *** Compiling $(1) *** '
+	@echo ' *** DEP_DIR is $(DEP_DIR)$* *** '
 	@mkdir -p $(2)
 	@$(CC) $(CFLAGS) -c -o $(3) $(1) $(INCLUDE_FLAGS)
 endef

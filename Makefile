@@ -36,12 +36,6 @@ fc: clean pull-image
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 
-$(DEP_DIR)%.d:
-	@mkdir -p $(@D)
-
-$(OBJ_DIR)%.o : $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
-	$(call compile,$<,$(@D),$@)
-
 test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
 	@echo ' *** Building $@ *** '
 	@g++ $(LFLAGS) $(TEST_OBJ) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
