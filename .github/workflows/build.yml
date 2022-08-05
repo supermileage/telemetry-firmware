@@ -1,4 +1,4 @@
-name: Build Firmware
+name: Verify Firmware
 on: [push, pull_request]
 
 jobs:
@@ -56,7 +56,7 @@ jobs:
           name: fc-${{ github.sha }}
           path: output
 
-  run-all-tests:
+  run-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -64,14 +64,8 @@ jobs:
           submodules: recursive
           fetch-depth: 5
 
-      - name: Make Version
-        run: make --version
-
-      - name: GCC Version
-        run: gcc --version
-
-      - name: Update Make
-        run: sudo apt-get upgrade make -y
+      - name: Verify Dependencies
+        run: ./scripts/gh-configure-test
 
       - name: Build Tests
         run: make test
