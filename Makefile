@@ -42,29 +42,13 @@ libwiringgcc :
 	@echo ' *** building $@ *** '
 	@cd test/external/UnitTestLib && make libwiringgcc.a
 
-clean: clean-test
+clean:
 	rm -rf $(OUTPUT_DIR)
 
 clean-test:
-	@rm -r test/obj
-	@rm -r test/bin
-	@rm -r test/dep
-
-# rules for generating object and dependency files
-$(BUILD_DIR)%.o: $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
-	$(call compile,$<,$(@D),$@)
-
-$(BUILD_DIR)%.o: $(LIB_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
-	$(call compile,$<,$(@D),$@)
-
-$(BUILD_DIR)%.o: $(TEST_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
-	$(call compile,$<,$(@D),$@)
-
-$(BIN_DIR):
-	@mkdir -p $(BIN_DIR)
-
-$(DEP_DIR)%.d:
-	@mkdir -p $(@D)
+	@rm -rf test/obj
+	@rm -rf test/bin
+	@rm -rf test/dep
 
 define print
 	@echo ''

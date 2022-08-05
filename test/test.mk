@@ -24,6 +24,22 @@ INCLUDE_FLAGS := $(foreach %,$(INCLUDE_DIRS),$(INCLUDE_PREFIX)$(wildcard $(%)))
 # generate dependency file paths for test object files
 DEPENDENCIES := $(patsubst $(BUILD_DIR)%.o,$(DEP_DIR)%.d,$(TEST_OBJ))
 
+# rules for generating object and dependency files
+$(BUILD_DIR)%.o: $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
+	$(call compile,$<,$(@D),$@)
+
+$(BUILD_DIR)%.o: $(LIB_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
+	$(call compile,$<,$(@D),$@)
+
+$(BUILD_DIR)%.o: $(TEST_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
+	$(call compile,$<,$(@D),$@)
+
+$(BIN_DIR):
+	@mkdir -p $(BIN_DIR)
+
+$(DEP_DIR)%.d:
+	@mkdir -p $(@D)
+
 define compile
 	@echo ' *** Compiling $(1) *** '
 	@mkdir -p $(2)
