@@ -60,9 +60,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Configure GCC
-        run: sudo ./configure
+        with:
+          submodules: recursive
+          fetch-depth: 5
 
       - name: Build Tests
         run: make test

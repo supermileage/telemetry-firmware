@@ -1,7 +1,7 @@
 SRC_DIR = src/
 LIB_DIR = lib/
 TEST_DIR = test/
-BUILD_DIR = $(TEST_DIR)obj/
+OBJ_DIR = $(TEST_DIR)obj/
 DEP_DIR = $(TEST_DIR)dep/
 BIN_DIR = $(TEST_DIR)bin/
 
@@ -27,7 +27,7 @@ SRC_CPP_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORI
 
 # ALL TEST FILES
 CPP_TO_OBJ := $(SRC_CPP_TEMP) $(TEST_CPP_TEMP) test.cpp
-TEST_OBJ := $(patsubst %.cpp,%.o,$(foreach %,$(CPP_TO_OBJ),$(BUILD_DIR)$(%)))
+TEST_OBJ := $(patsubst %.cpp,%.o,$(foreach %,$(CPP_TO_OBJ),$(OBJ_DIR)$(%)))
 TEST_CPP := $(foreach %,$(SRC_CPP_TEMP),$(SRC_DIR)$(%)) $(foreach %,$(TEST_CPP_TEMP),$(TEST_DIR)$(%))  $(TEST_DIR)test.cpp
 
 # ALL TEST INCLUDE DIRS
