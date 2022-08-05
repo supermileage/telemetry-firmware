@@ -1,7 +1,6 @@
-ABS_PATH := $(subst test/tests/,,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-SRC_DIR = $(ABS_PATH)src/
-LIB_DIR = $(ABS_PATH)lib/
-TEST_DIR = $(ABS_PATH)test/
+SRC_DIR = src/
+LIB_DIR = lib/
+TEST_DIR = test/
 BUILD_DIR = $(TEST_DIR)obj/
 DEP_DIR = $(TEST_DIR)dep/
 BIN_DIR = $(TEST_DIR)bin/
