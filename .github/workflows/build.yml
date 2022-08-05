@@ -70,6 +70,9 @@ jobs:
       - name: GCC Version
         run: gcc --version
 
+      - name: Update Make
+        run: sudo apt-get upgrade make -y
+
       - name: Build Tests
         run: make test
 
