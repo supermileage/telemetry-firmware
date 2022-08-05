@@ -25,7 +25,7 @@ INCLUDE_FLAGS := $(foreach %,$(INCLUDE_DIRS),$(INCLUDE_PREFIX)$(wildcard $(%)))
 DEPENDENCIES := $(patsubst $(OBJ_DIR)%.o,$(DEP_DIR)%.d,$(TEST_OBJ))
 
 # rules for generating object and dependency files
-$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
+$(OBJ_DIR)%.o : $(SRC_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
 	$(call compile,$<,$(@D),$@)
 
 $(OBJ_DIR)%.o: $(LIB_DIR)%.cpp $(DEP_DIR)%.d | $(DEP_DIR)
