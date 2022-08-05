@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure GCC
-        run: ./scripts/configure
+        run: sudo scripts/configure
 
       - name: Build Tests
         run: make test
