@@ -5,14 +5,6 @@ OUTPUT_DIR := output
 include src/build.mk
 include test/test.mk
 
-$(info TEST_CPP is $(TEST_CPP))
-$(info TEST_OBJ is $(TEST_OBJ))
-$(info SRC_DIR is $(SRC_DIR))
-$(info TEST_DIR is $(TEST_DIR))
-$(info OBJ_DIR is $(OBJ_DIR))
-$(info BIN_DIR is $(BIN_DIR))
-$(info DEP_DIR is $(DEP_DIR))
-
 .PHONY: urban proto pull-image clean clean-test
 
 urban: clean pull-image
@@ -38,7 +30,7 @@ fc: clean pull-image
 
 test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
 	@echo ' *** Building $@ *** '
-	@g++ $(LFLAGS) $(TEST_OBJ) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
+	@g++ $(LFLAGS) $(TEST_OBJ) $(PARTICLE_LIB) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
 
 run-tests:
 	@chmod +x ./test/bin/test

@@ -1,13 +1,19 @@
 include test/tests/testfiles.mk
 
+# add clang c++ library flags if compiling on macOS
+ifeq ($(shell uname -s),Darwin)
+	LIBS := -lc++ -stdlib=libc++
+else
+	LIBS :=
+endif
+
 CC = g++
-VERSION = -std=c++17
-LIBS = -lc++ -stdlib=libc++
+VERSION = -std=c++11
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall -Wno-psabi
-LFLAGS = $(VERSION) $(LIBS) $(PARTICLE_TEST)
+LFLAGS = $(VERSION) $(LIBS)
 INCLUDE_PREFIX = -I
-PARTICLE_TEST = test/external/UnitTestLib/libwiringgcc.a
+PARTICLE_LIB = test/external/UnitTestLib/libwiringgcc.a
 INCLUDE_DIRS = test/external/UnitTestLib test/external/Catch2/single_include/catch2 lib/can-common/src $(TEST_DIRS)
 
 # Get all directories in src and add to includes
