@@ -50,7 +50,7 @@ String CanSensorOrionBms::getAvgVolt(bool& valid) {
 
 String CanSensorOrionBms::getSoc(bool& valid) {
     valid  = _validate(CAN_ORIONBMS_PACK);
-    return FLOAT_TO_STRING(_soc, 1); 
+    return FLOAT_TO_STRING(_soc, 1);
 }
 
 int CanSensorOrionBms::getTempBms(bool& valid) {
@@ -110,7 +110,6 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_validationMap[CAN_ORIONBMS_PACK] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_CELL:
-			// TODO: Add unify this with TinyBms
 			_cellVoltageMin = (float)_parseInt16(message.data) / 1000.0f;
 			_cellVoltageMax = (float)_parseInt16(message.data + 2) / 1000.0f;
 			_cellVoltageAvg = (float)_parseInt16(message.data + 4) / 1000.0f;

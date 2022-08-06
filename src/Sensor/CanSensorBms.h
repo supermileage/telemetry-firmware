@@ -15,6 +15,8 @@ using namespace BmsFault;
  */
 class CanSensorBms : public CanListener {
 	public:
+        enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, ChargeEnabled, DischargeEnabled, Unknown };
+
 		// Constructors
 		CanSensorBms(CanInterface& caninterface);
 
@@ -115,7 +117,6 @@ class CanSensorBms : public CanListener {
         virtual void restart() = 0;
 
 	protected:
-        enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, ChargeEnabled, DischargeEnabled, Unknown };
 		const char* BMS_STATUS_STRINGS[9] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Charge Enabled", "Discharge Enabled", "Unknown" };
 
 		// Data

@@ -17,7 +17,7 @@
 // Publish to Cloud
 #define PUBLISH_EN              1
 // Output Serial messages (disable for production)
-#define DEBUG_SERIAL_EN         1
+#define DEBUG_SERIAL_EN         0
 // Sensor Debug Interval in s, 0 for off
 #define DEBUG_SENSOR_INT        5
 // LED Flash interval in ms
@@ -35,7 +35,7 @@
 #else
     #define DEBUG_SERIAL_LN(x) 0
     #define DEBUG_SERIAL(x) 0
-    #define DEBUG_SERIAL_F(X) 0
+    #define DEBUG_SERIAL_F(x, ...) 0
 #endif
 
 #ifdef  PROTO

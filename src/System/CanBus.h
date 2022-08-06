@@ -10,7 +10,7 @@ typedef uint8_t byte;
  */
 class CanBus {
 	public:
-		CanBus(byte messageAvail) : _messageAvail(messageAvail) { }
+		CanBus(byte msgAvail) : _messageAvail(msgAvail) { }
 
 		virtual ~CanBus() { }
 
