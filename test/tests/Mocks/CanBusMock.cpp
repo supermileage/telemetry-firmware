@@ -60,3 +60,17 @@ void CanBusMock::setSendMsgBuffer(std::function<void(uint64_t,byte,byte,const by
 	_sendMsgBuf = func;
 }
 
+void CanBusMock::setCanMessage(CanMessage msg) {
+	setReadInterruptPin([]() { return false; });
+	setCheckReceive([this]() { return messageAvail(); });
+	setGetCanId([msg]() { return msg.id; });
+	setReadMsgBuffer([msg](byte* len, byte* buf) -> byte {
+		*len = msg.dataLength;
+
+		for (uint8_t i = 0; i < msg.dataLength; i++)
+			buf[i] = msg.data[i];
+
+		return *len;
+	});
+}
+
