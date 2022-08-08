@@ -153,7 +153,7 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 	} // SECTION
 }
 
-TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK") {
+TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBms][Sensor][CanSensor]") {
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
@@ -161,20 +161,100 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK") {
 
 	Handler::instance().begin();
 
+	SECTION("Test CanSensorOrionBms::update battery voltage") {
+		// set up pack message with battery voltage value
+		CanMessage msg = CAN_MESSAGE_NULL;
+		msg.id = CAN_ORIONBMS_PACK;
+		msg.dataLength = 5;
+		packBatteryData(32, 0, 0, msg.data);
+		canBusMock.setCanMessage(msg);
 
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool batteryVoltageIsValid = false;
+		REQUIRE ( orion.getBatteryVolt(batteryVoltageIsValid) == "32.0" );
+		REQUIRE ( batteryVoltageIsValid );
+		REQUIRE ( orion.getBatteryCurrent() == "0.0" );
+		REQUIRE ( orion.getSoc() == "0.0" );
+	}
+
+	SECTION("Test CanSensorOrionBms::update battery current") {
+		// set up pack message with battery voltage value
+		CanMessage msg = CAN_MESSAGE_NULL;
+		msg.id = CAN_ORIONBMS_PACK;
+		msg.dataLength = 5;
+		packBatteryData(0, 32, 0, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool batteryCurrentIsValid = false;
+		REQUIRE ( orion.getBatteryCurrent(batteryCurrentIsValid) == "32.0" );
+		REQUIRE ( batteryCurrentIsValid );
+		REQUIRE ( orion.getBatteryVolt() == "0.0" );
+		REQUIRE ( orion.getSoc() == "0.0" );
+	}
+
+	SECTION("Test CanSensorOrionBms::update soc") {
+		// set up pack message with battery voltage value
+		CanMessage msg = CAN_MESSAGE_NULL;
+		msg.id = CAN_ORIONBMS_PACK;
+		msg.dataLength = 5;
+		packBatteryData(0, 0, 64, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// asserts
+		bool socIsValid = false;
+		REQUIRE ( orion.getSoc(socIsValid) == "64.0" );
+		REQUIRE ( socIsValid );
+		REQUIRE ( orion.getBatteryVolt() == "0.0" );
+		REQUIRE ( orion.getBatteryCurrent() == "0.0" );
+	}
+
+	SECTION("Test CanSensorOrionBms::update pack data -- different values in possible ranges") {
+		CanMessage msg = CAN_MESSAGE_NULL;
+		msg.id = CAN_ORIONBMS_PACK;
+		msg.dataLength = 5;
+
+		for (int i = 0; i < 10; i++) {
+			// set up values with random decimal value
+			float voltage = (float)(i * 10 - 50) + (float)rand() / RAND_MAX;
+			float current = (float)(i * 8 - 40) + (float)rand() / RAND_MAX;
+			float soc = i * 10 + (float)rand() / RAND_MAX;
+			packBatteryData(voltage, current, soc, msg.data);
+			canBusMock.setCanMessage(msg);
+
+			// act
+			Handler::instance().handle();
+
+			// assert
+			REQUIRE ( orion.getBatteryVolt().toFloat() == Approx(voltage).margin(0.1) );
+			REQUIRE ( orion.getBatteryCurrent().toFloat() == Approx(current).margin(0.1) );
+			REQUIRE ( orion.getSoc().toFloat() == Approx(soc).margin(0.5) );
+		}
+	}
 }
 
 /* Helper Function Definitions */
 void packBatteryData(float voltage, float current, float soc, uint8_t* buf) {
-	packInt16((int16_t)voltage * 10, buf);
-	packInt16((int16_t)voltage * 10, buf + 2);
-	buf[4] = (uint8_t)soc * 2;
+	packInt16((int16_t)(voltage * 10.0f), buf);
+	packInt16((int16_t)(current * 10.0f), buf + 2);
+	buf[4] = (uint8_t)(soc * 2.0f);
+
+	std::cout << "packed voltage value = " << (int16_t)(voltage * 10.0f) << std::endl;
 }
 
 void packCellData(float cellVoltageLow, float cellVoltageHigh, float cellVoltageAvg, uint8_t* buf) {
-	packInt16((int16_t)cellVoltageLow * 1000, buf);
-	packInt16((int16_t)cellVoltageHigh * 1000, buf + 2);
-	packInt16((int16_t)cellVoltageAvg * 1000, buf + 4);
+	packInt16((int16_t)(cellVoltageLow * 1000), buf);
+	packInt16((int16_t)(cellVoltageHigh * 1000), buf + 2);
+	packInt16((int16_t)(cellVoltageAvg * 1000), buf + 4);
 }
 
 void packTempData(int8_t packTempLow, int8_t packTempHigh, int8_t packTempAvg, int8_t bmsTemp, uint8_t* buf) {

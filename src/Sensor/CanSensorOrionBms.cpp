@@ -24,8 +24,8 @@ String CanSensorOrionBms::getHumanName() {
 }
 
 String CanSensorOrionBms::getBatteryVolt(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_PACK);
-    return FLOAT_TO_STRING(_batteryVoltage, 1);
+	valid  = _validate(CAN_ORIONBMS_PACK);
+	return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
 String CanSensorOrionBms::getBatteryCurrent(bool& valid) {

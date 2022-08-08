@@ -46,7 +46,7 @@
     #define VEHICLE_NAME "FC"
 #endif
 
-#define FLOAT_TO_STRING(x,y) String(x).substring(0,String(x).indexOf('.') + y + 1)
+#define FLOAT_TO_STRING(x,y) String(x,y)
 #define BOOL_TO_STRING(x) String((x < 2) ? ((x == 1) ? "ON" : "OFF") : "N/A")
 
 #endif
