@@ -178,6 +178,12 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		REQUIRE ( batteryVoltageIsValid );
 		REQUIRE ( orion.getBatteryCurrent() == "0.0" );
 		REQUIRE ( orion.getSoc() == "0.0" );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getBatteryCurrent(batteryVoltageIsValid);
+		REQUIRE ( !batteryVoltageIsValid );
 	}
 
 	SECTION("Test CanSensorOrionBms::update battery current") {
@@ -197,6 +203,12 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		REQUIRE ( batteryCurrentIsValid );
 		REQUIRE ( orion.getBatteryVolt() == "0.0" );
 		REQUIRE ( orion.getSoc() == "0.0" );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getBatteryCurrent(batteryCurrentIsValid);
+		REQUIRE ( !batteryCurrentIsValid );
 	}
 
 	SECTION("Test CanSensorOrionBms::update soc") {
@@ -216,6 +228,12 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		REQUIRE ( socIsValid );
 		REQUIRE ( orion.getBatteryVolt() == "0.0" );
 		REQUIRE ( orion.getBatteryCurrent() == "0.0" );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getSoc(socIsValid);
+		REQUIRE ( !socIsValid );
 	}
 
 	SECTION("Test CanSensorOrionBms::update pack data -- different values in possible ranges") {
@@ -224,7 +242,10 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		msg.dataLength = 5;
 
 		for (int i = 0; i < 10; i++) {
-			// set up values with random decimal value
+			// set up pack values with random decimal offset value:
+			// voltage ranges from -50 to 50V
+			// current ranges from -30 to 30A
+			// soc ranges from 0 to 100%
 			float voltage = (float)(i * 10 - 50) + (float)rand() / RAND_MAX;
 			float current = (float)(i * 8 - 40) + (float)rand() / RAND_MAX;
 			float soc = i * 10 + (float)rand() / RAND_MAX;
@@ -247,8 +268,6 @@ void packBatteryData(float voltage, float current, float soc, uint8_t* buf) {
 	packInt16((int16_t)(voltage * 10.0f), buf);
 	packInt16((int16_t)(current * 10.0f), buf + 2);
 	buf[4] = (uint8_t)(soc * 2.0f);
-
-	std::cout << "packed voltage value = " << (int16_t)(voltage * 10.0f) << std::endl;
 }
 
 void packCellData(float cellVoltageLow, float cellVoltageHigh, float cellVoltageAvg, uint8_t* buf) {
