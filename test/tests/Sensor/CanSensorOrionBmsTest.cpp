@@ -361,6 +361,146 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 	}
 }
 
+TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBms][Sensor][CanSensor]") {
+	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanInterface interface(&canBusMock);
+	CanSensorOrionBms orion(interface);
+	setMillis(0);
+
+	CanMessage msg = CAN_MESSAGE_NULL;
+	msg.id = CAN_ORIONBMS_TEMP;
+	msg.dataLength = 4;
+
+	Handler::instance().begin();
+
+	SECTION("Test CanSensorOrionBms::update cell temp min") {
+		// set up pack message with battery voltage value
+		packTempData(20, 0, 0, 0, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool minTempIsValid = false;
+		REQUIRE ( orion.getMinBatteryTemp(minTempIsValid) == 20 );
+		REQUIRE ( minTempIsValid );
+		REQUIRE ( orion.getMaxBatteryTemp() == 0 );
+		REQUIRE ( orion.getAvgBatteryTemp() == 0 );
+		REQUIRE ( orion.getTempBms() == 0 );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getBatteryCurrent(minTempIsValid);
+		REQUIRE ( !minTempIsValid );
+	}
+
+	SECTION("Test CanSensorOrionBms::update cell temp max") {
+		// set up pack message with battery voltage value
+		packTempData(0, 20, 0, 0, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool maxTempIsValid = false;
+		REQUIRE ( orion.getMaxBatteryTemp(maxTempIsValid) == 20 );
+		REQUIRE ( maxTempIsValid );
+		REQUIRE ( orion.getMinBatteryTemp() == 0 );
+		REQUIRE ( orion.getAvgBatteryTemp() == 0 );
+		REQUIRE ( orion.getTempBms() == 0 );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getBatteryCurrent(maxTempIsValid);
+		REQUIRE ( !maxTempIsValid );
+	}
+
+	SECTION("Test CanSensorOrionBms::update cell temp avg") {
+		// set up pack message with battery voltage value
+		packTempData(0, 0, 20, 0, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool avgTempIsValid = false;
+		REQUIRE ( orion.getAvgBatteryTemp(avgTempIsValid) == 20 );
+		REQUIRE ( avgTempIsValid );
+		REQUIRE ( orion.getMinBatteryTemp() == 0 );
+		REQUIRE ( orion.getMaxBatteryTemp() == 0 );
+		REQUIRE ( orion.getTempBms() == 0 );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getBatteryCurrent(avgTempIsValid);
+		REQUIRE ( !avgTempIsValid );
+	}
+
+	SECTION("Test CanSensorOrionBms::update bms temp") {
+		// set up pack message with battery voltage value
+		packTempData(0, 0, 0, 20, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool bmsTempIsValid = false;
+		REQUIRE ( orion.getTempBms(bmsTempIsValid) == 20 );
+		REQUIRE ( bmsTempIsValid );
+		REQUIRE ( orion.getMinBatteryTemp() == 0 );
+		REQUIRE ( orion.getMaxBatteryTemp() == 0 );
+		REQUIRE ( orion.getAvgBatteryTemp() == 0 );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getTempBms(bmsTempIsValid);
+		REQUIRE ( !bmsTempIsValid );
+	}
+
+	SECTION("Test CanSensorOrionBms::update temp data -- test all different values") {
+		// set up pack message with battery voltage value
+		packTempData(-1, -2, 3, 4, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		REQUIRE ( orion.getMinBatteryTemp() == -1 );
+		REQUIRE ( orion.getMaxBatteryTemp() == -2 );
+		REQUIRE ( orion.getAvgBatteryTemp() == 3 );
+		REQUIRE ( orion.getTempBms() == 4 );
+	}
+
+	SECTION("Test CanSensorOrionBms::update temp data -- test full int8_t range for all values") {
+		// test different values
+		for (int i = -128; i < 128; i+=64) {
+			srand(i);
+			if (i == 128) i = 127;
+			
+			packTempData(i, i, i, i, msg.data);
+			canBusMock.setCanMessage(msg);
+
+			// act`
+			Handler::instance().handle();
+
+			// assert
+			REQUIRE ( orion.getMinBatteryTemp() == i );
+			REQUIRE ( orion.getMaxBatteryTemp() == i );
+			REQUIRE ( orion.getAvgBatteryTemp() == i );
+			REQUIRE ( orion.getTempBms() == i );
+		}
+	}
+}
+
 /* Helper Function Definitions */
 void packBatteryData(float voltage, float current, float soc, uint8_t* buf) {
 	packInt16((int16_t)(voltage * 10.0f), buf);
@@ -378,7 +518,7 @@ void packTempData(int8_t packTempLow, int8_t packTempHigh, int8_t packTempAvg, i
 	buf[0] = packTempLow;
 	buf[1] = packTempHigh;
 	buf[2] = packTempAvg;
-	buf[4] = bmsTemp;
+	buf[3] = bmsTemp;
 }
 
 void packInt16(int16_t val, uint8_t* buf) {
