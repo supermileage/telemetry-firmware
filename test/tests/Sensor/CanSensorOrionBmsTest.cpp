@@ -159,13 +159,14 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 	CanSensorOrionBms orion(interface);
 	setMillis(0);
 
+	CanMessage msg = CAN_MESSAGE_NULL;
+	msg.id = CAN_ORIONBMS_PACK;
+	msg.dataLength = 5;
+
 	Handler::instance().begin();
 
 	SECTION("Test CanSensorOrionBms::update battery voltage") {
 		// set up pack message with battery voltage value
-		CanMessage msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_PACK;
-		msg.dataLength = 5;
 		packBatteryData(32, 0, 0, msg.data);
 		canBusMock.setCanMessage(msg);
 
@@ -188,9 +189,6 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 
 	SECTION("Test CanSensorOrionBms::update battery current") {
 		// set up pack message with battery voltage value
-		CanMessage msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_PACK;
-		msg.dataLength = 5;
 		packBatteryData(0, 32, 0, msg.data);
 		canBusMock.setCanMessage(msg);
 
@@ -213,9 +211,6 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 
 	SECTION("Test CanSensorOrionBms::update soc") {
 		// set up pack message with battery voltage value
-		CanMessage msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_PACK;
-		msg.dataLength = 5;
 		packBatteryData(0, 0, 64, msg.data);
 		canBusMock.setCanMessage(msg);
 
@@ -237,14 +232,13 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 	}
 
 	SECTION("Test CanSensorOrionBms::update pack data -- different values in possible ranges") {
-		CanMessage msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_PACK;
-		msg.dataLength = 5;
-
+		// test different values
 		for (int i = 0; i < 10; i++) {
+			srand(i);
+
 			// set up pack values with random decimal offset value:
 			// voltage ranges from -50 to 50V
-			// current ranges from -30 to 30A
+			// current ranges from -40 to 40A
 			// soc ranges from 0 to 100%
 			float voltage = (float)(i * 10 - 50) + (float)rand() / RAND_MAX;
 			float current = (float)(i * 8 - 40) + (float)rand() / RAND_MAX;
@@ -259,6 +253,110 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 			REQUIRE ( orion.getBatteryVolt().toFloat() == Approx(voltage).margin(0.1) );
 			REQUIRE ( orion.getBatteryCurrent().toFloat() == Approx(current).margin(0.1) );
 			REQUIRE ( orion.getSoc().toFloat() == Approx(soc).margin(0.5) );
+		}
+	}
+}
+
+TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBms][Sensor][CanSensor]") {
+	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanInterface interface(&canBusMock);
+	CanSensorOrionBms orion(interface);
+	setMillis(0);
+
+	CanMessage msg = CAN_MESSAGE_NULL;
+	msg.id = CAN_ORIONBMS_CELL;
+	msg.dataLength = 6;
+
+	Handler::instance().begin();
+
+	SECTION("Test CanSensorOrionBms::update cell voltage min") {
+		// set up pack message with battery voltage value
+		packCellData(5.0, 0, 0, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool minVoltIsValid = false;
+		REQUIRE ( orion.getMinVolt(minVoltIsValid) == "5.0" );
+		REQUIRE ( minVoltIsValid );
+		REQUIRE ( orion.getMaxVolt() == "0.0" );
+		REQUIRE ( orion.getAvgVolt() == "0.0" );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getBatteryCurrent(minVoltIsValid);
+		REQUIRE ( !minVoltIsValid );
+	}
+
+	SECTION("Test CanSensorOrionBms::update cell voltage max") {
+		// set up pack message with battery voltage value
+		packCellData(0, 11, 0, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// assert
+		bool maxVoltIsValid = false;
+		REQUIRE ( orion.getMaxVolt(maxVoltIsValid) == "11.0" );
+		REQUIRE ( maxVoltIsValid );
+		REQUIRE ( orion.getMinVolt() == "0.0" );
+		REQUIRE ( orion.getAvgVolt() == "0.0" );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getBatteryCurrent(maxVoltIsValid);
+		REQUIRE ( !maxVoltIsValid );
+	}
+
+	SECTION("Test CanSensorOrionBms::update cell voltage avg") {
+		// set up pack message with battery voltage value
+		packCellData(0, 0, 10, msg.data);
+		canBusMock.setCanMessage(msg);
+
+		// act
+		Handler::instance().handle();
+
+		// asserts
+		bool avgVoltIsValid = false;
+		REQUIRE ( orion.getAvgVolt(avgVoltIsValid) == "10.0" );
+		REQUIRE ( avgVoltIsValid );
+		REQUIRE ( orion.getMinVolt() == "0.0" );
+		REQUIRE ( orion.getMaxVolt() == "0.0" );
+
+		// test validation
+		setMillis( STALE_INTERVAL );
+		
+		orion.getSoc(avgVoltIsValid);
+		REQUIRE ( !avgVoltIsValid );
+	}
+
+	SECTION("Test CanSensorOrionBms::update cell data -- different values in possible ranges") {
+		// test different values
+		for (int i = 0; i < 10; i++) {
+			srand(i);
+
+			// set up cell values with random decimal offset value:
+			// min pack voltage ranges from -5 to 5V
+			// max pack voltage ranges from 5 to 15V
+			// avg pack is median between min and max + random decimal
+			float minPack = (float)(i - 5) + (float)rand() / RAND_MAX;
+			float maxPack = (float)(i + 5) + (float)rand() / RAND_MAX;
+			float avgPack = minPack + maxPack / 2 + (float)rand() / RAND_MAX;
+			packCellData(minPack, maxPack, avgPack, msg.data);
+			canBusMock.setCanMessage(msg);
+
+			// act
+			Handler::instance().handle();
+
+			// assert
+			REQUIRE ( orion.getMinVolt().toFloat() == Approx(minPack).margin(0.001) );
+			REQUIRE ( orion.getMaxVolt().toFloat() == Approx(maxPack).margin(0.001) );
+			REQUIRE ( orion.getAvgVolt().toFloat() == Approx(avgPack).margin(0.001) );
 		}
 	}
 }
