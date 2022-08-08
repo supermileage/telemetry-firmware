@@ -1,4 +1,3 @@
-#include <algorithm>
 #include "CanSensorTinyBms.h"
 #include "settings.h"
 
@@ -148,12 +147,12 @@ int CanSensorTinyBms::getTempBms(bool& valid) {
 
 int CanSensorTinyBms::getMinBatteryTemp(bool& valid) {
     valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
-    return std::min(_batteryTemp1, _batteryTemp2);
+    return min(_batteryTemp1, _batteryTemp2);
 }
 
 int CanSensorTinyBms::getMaxBatteryTemp(bool& valid) {
     valid  = _validate(TEMP_ID_BATTERY_1)  && _validate(TEMP_ID_BATTERY_2);
-    return std::max(_batteryTemp1, _batteryTemp2);
+    return max(_batteryTemp1, _batteryTemp2);
 }
 
 int CanSensorTinyBms::getAvgBatteryTemp(bool& valid) {

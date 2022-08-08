@@ -1,6 +1,8 @@
 #ifndef CAN_NAMESPACE_H_
 #define CAN_NAMESPACE_H_
 
+#include <stdint.h>
+
 namespace can {
 
 	// This struct contains all the components of a CAN message. dataLength must be <= 8, 
