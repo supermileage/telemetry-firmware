@@ -33,9 +33,9 @@
     #define DEBUG_SERIAL(x) Serial.print(x)
     #define DEBUG_SERIAL_F(x, ...) Serial.printf(x, __VA_ARGS__)
 #else
-    #define DEBUG_SERIAL_LN(x) 0
-    #define DEBUG_SERIAL(x) 0
-    #define DEBUG_SERIAL_F(x, ...) 0
+    #define DEBUG_SERIAL_LN(x) { }
+    #define DEBUG_SERIAL(x) { }
+    #define DEBUG_SERIAL_F(x, ...) { }
 #endif
 
 #ifdef  PROTO

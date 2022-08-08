@@ -1,7 +1,7 @@
 #include "CanInterface.h"
 #include "settings.h"
 
-#define DEBUG_CAN
+// #define DEBUG_CAN
 #define CAN_FRAME 0
 
 CanInterface::CanInterface(CanBus* can) {
