@@ -3,15 +3,14 @@
 This project includes a unit test suite, built with [catch2](https://github.com/catchorg/Catch2/tree/v2.x)
 
 ## Building the tests
-navigate to test folder and run:
+
+from root project folder:
 
 ``` $ make test ```
 
 ## Running the tests
 
-from test folder:
-
-``` $ ./bin/test <test-tag> ```
+``` $ ./test/bin/test <test-tag> ```
 
 **```<test-tag>``` is an optional parameter for running a subset of the tests--more on this below
 
@@ -19,9 +18,9 @@ from test folder:
 
 ### Unit tests for firmware
 
-Before writing any tests, it may be important to consider how testable your code is.  Much of the code in this project is dependent on libraries which we don't necessarily have control over, and given that this is a firmware project, our code isn't actually intended to be compiled and run on your computer!
+Before writing any tests, it may be important to consider how testable your code is.  External libraries can make it challenging to write good tests because we can't necessarily control their behavior.  On top of this, much of the code in this project is dependent on libraries which are not intended to be compiled and run on your computer!
 
-With that said, there are workarounds for these problems which allow us to test our own code independently of the core systems it depends on.  Just know that if you are writing new tests, you may need to 'trick' the compiler in some way, either by providing your own implementations of system methods or by using dependency injection.  This project employs both methods.
+With that said, there are workarounds for these problems which allow us to test our own code independently of the core systems it depends on.  Just know that if you are writing new tests, you may need to 'trick' the compiler in some way, either by providing your own implementations of external headers/symbols or by using dependency injection.  This project employs both methods.
 
 (see **On Dependencies** below)
 
