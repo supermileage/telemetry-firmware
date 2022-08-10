@@ -146,12 +146,12 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Brake: " + BOOL_TO_STRING(steering.getBrake()));
     // BMS
 	DEBUG_SERIAL("Current Bms: " + bms->getHumanName() + " - ");
-    DEBUG_SERIAL("Battery Voltage: " + String(bms->getBatteryVolt()) + "v - ");
-    DEBUG_SERIAL("Battery Current: " + String(bms->getBatteryCurrent()) + "A - ");
-    DEBUG_SERIAL("Max Cell Voltage: " + String(bms->getMaxVolt()) + "v - ");
-    DEBUG_SERIAL("Min Cell Voltage: " + String(bms->getMinVolt()) + "v - ");
-    DEBUG_SERIAL("Avg Cell Voltage: " + String(bms->getAvgVolt()) + "v - ");
-    DEBUG_SERIAL("State of Charge: " + String(bms->getSoc()) + "% - ");
+    DEBUG_SERIAL("Battery Voltage: " + bms->getBatteryVolt() + "v - ");
+    DEBUG_SERIAL("Battery Current: " + bms->getBatteryCurrent() + "A - ");
+    DEBUG_SERIAL("Max Cell Voltage: " + bms->getMaxVolt() + "v - ");
+    DEBUG_SERIAL("Min Cell Voltage: " + bms->getMinVolt() + "v - ");
+    DEBUG_SERIAL("Avg Cell Voltage: " + bms->getAvgVolt() + "v - ");
+    DEBUG_SERIAL("State of Charge: " + bms->getSoc() + "% - ");
     DEBUG_SERIAL("BMS Status: " + bms->getStatusBmsString() + " - ");
     DEBUG_SERIAL("BMS Fault: " + BmsFault::toString(bms->getFault()) + " - ");
     DEBUG_SERIAL("BMS Temperature: " + String(bms->getTempBms()) + "°C - ");

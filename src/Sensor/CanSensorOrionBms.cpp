@@ -24,8 +24,8 @@ String CanSensorOrionBms::getHumanName() {
 }
 
 String CanSensorOrionBms::getBatteryVolt(bool& valid) {
-    valid  = _validate(CAN_ORIONBMS_PACK);
-    return FLOAT_TO_STRING(_batteryVoltage, 1);
+	valid  = _validate(CAN_ORIONBMS_PACK);
+	return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
 String CanSensorOrionBms::getBatteryCurrent(bool& valid) {
@@ -50,7 +50,7 @@ String CanSensorOrionBms::getAvgVolt(bool& valid) {
 
 String CanSensorOrionBms::getSoc(bool& valid) {
     valid  = _validate(CAN_ORIONBMS_PACK);
-    return FLOAT_TO_STRING(_soc, 1); 
+    return FLOAT_TO_STRING(_soc, 1);
 }
 
 int CanSensorOrionBms::getTempBms(bool& valid) {
@@ -110,7 +110,6 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_validationMap[CAN_ORIONBMS_PACK] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_CELL:
-			// TODO: Add unify this with TinyBms
 			_cellVoltageMin = (float)_parseInt16(message.data) / 1000.0f;
 			_cellVoltageMax = (float)_parseInt16(message.data + 2) / 1000.0f;
 			_cellVoltageAvg = (float)_parseInt16(message.data + 4) / 1000.0f;
@@ -130,7 +129,7 @@ void CanSensorOrionBms::update(CanMessage message) {
 }
 
 int16_t CanSensorOrionBms::_parseInt16(uint8_t* buf) {
-	return (float)( *buf << 8 | *(buf + 1) );
+	return (int16_t)( *buf << 8 | *(buf + 1) );
 }
 
 // Faults are prioritized from left to right, most significant bit to least significant

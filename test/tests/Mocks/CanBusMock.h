@@ -3,7 +3,10 @@
 
 #include <functional>
 
+#include "can.h"
 #include "CanBus.h"
+
+using namespace can;
 
 /**
  * @brief Mock class for predefining CAN bus behavior
@@ -23,6 +26,7 @@ class CanBusMock : public CanBus {
 		void setGetCanId(std::function<uint64_t(void)> func);
 		void setReadMsgBuffer(std::function<byte(byte*,byte*)> func);
 		void setSendMsgBuffer(std::function<void(uint64_t,byte,byte,const byte*)> func);
+		void setCanMessage(CanMessage msg);
 	
 	private:
 		std::function<bool(void)> _readInterruptPin;
