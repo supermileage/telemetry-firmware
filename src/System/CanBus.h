@@ -1,9 +1,7 @@
 #ifndef CAN_BUS_H_
 #define CAN_BUS_H_
 
-#ifndef byte
-typedef uint8_t byte;
-#endif
+#include "settings.h"
 
 /**
  * @brief Pure virtual class which functions as wrapper for MCP2515 Can
