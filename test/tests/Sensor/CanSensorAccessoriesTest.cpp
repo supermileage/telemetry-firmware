@@ -60,7 +60,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		// test validation
 		setMillis( STALE_INTERVAL );
 		accessories.getStatusHeadlights(statusIsValid);
-		REQUIRE( !statusIsValid );
+		REQUIRE_FALSE( statusIsValid );
 	}
 
 	SECTION("Test update brakelights status") {
@@ -76,7 +76,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		// test validation
 		setMillis( STALE_INTERVAL );
 		accessories.getStatusBrakelights(statusIsValid);
-		REQUIRE( !statusIsValid );
+		REQUIRE_FALSE( statusIsValid );
 	}
 
 	SECTION("Test update horn status") {
@@ -92,7 +92,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		// test validation
 		setMillis( STALE_INTERVAL );
 		accessories.getStatusHorn(statusIsValid);
-		REQUIRE( !statusIsValid );
+		REQUIRE_FALSE( statusIsValid );
 	}
 
 	SECTION("Test update hazards status") {
@@ -108,7 +108,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		// test validation
 		setMillis( STALE_INTERVAL );
 		accessories.getStatusHazards(statusIsValid);
-		REQUIRE( !statusIsValid );
+		REQUIRE_FALSE( statusIsValid );
 	}
 
 	SECTION("Test update right signal status") {
@@ -124,7 +124,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		// test validation
 		setMillis( STALE_INTERVAL );
 		accessories.getStatusRightSignal(statusIsValid);
-		REQUIRE( !statusIsValid );
+		REQUIRE_FALSE( statusIsValid );
 	}
 
 	SECTION("Test update left signal status") {
@@ -140,7 +140,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		// test validation
 		setMillis( STALE_INTERVAL );
 		accessories.getStatusLeftSignal(statusIsValid);
-		REQUIRE( !statusIsValid );
+		REQUIRE_FALSE( statusIsValid );
 	}
 
 	SECTION("Test update wipers status") {
@@ -156,11 +156,11 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		// test validation
 		setMillis( STALE_INTERVAL );
 		accessories.getStatusWipers(statusIsValid);
-		REQUIRE( !statusIsValid );
+		REQUIRE_FALSE( statusIsValid );
 	}
 }
 
-TEST_CASE("CanSensorAccessories::update -- full buffer test", "[CanSensorAccessories][Sensor]") {
+TEST_CASE("CanSensorAccessories::update -- full buffer test -- on then off", "[CanSensorAccessories][Sensor]") {
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
@@ -172,7 +172,7 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test", "[CanSensorAccesso
 
 	Handler::instance().begin();
 
-	// setup
+	// set all statuses to 'on'
 	for (uint8_t i = 0; i < NUM_IDS; i++)
 		msg.data[i] = (orderedStatusIds[i] << 1) | 0x1;
 	canBusMock.setCanMessage(msg);
@@ -185,6 +185,20 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test", "[CanSensorAccesso
 		bool statusIsValid = false;
 		REQUIRE( (accessories.*orderedGetters[i])(statusIsValid) );
 		REQUIRE( statusIsValid );
+	}
 
+	// set all statuses to 'off'
+	for (uint8_t i = 0; i < NUM_IDS; i++)
+		msg.data[i] = (orderedStatusIds[i] << 1) | 0x0;
+	canBusMock.setCanMessage(msg);
+
+	// act
+	Handler::instance().handle();
+
+	// assert
+	for  (uint8_t i = 0; i < NUM_IDS; i++) {
+		bool statusIsValid = false;
+		REQUIRE_FALSE( (accessories.*orderedGetters[i])(statusIsValid) );
+		REQUIRE( statusIsValid );
 	}
 }
