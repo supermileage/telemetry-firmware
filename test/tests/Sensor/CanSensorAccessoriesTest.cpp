@@ -1,6 +1,4 @@
 #include "test_config.h"
-
-#include <iostream>
 #include <array>
 
 #include "CanInterface.h"
@@ -172,8 +170,6 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test", "[CanSensorAccesso
 	msg.id = CAN_ACC_STATUS;
 	msg.dataLength = NUM_IDS;
 
-	std::cout << "msg.dataLength = " << (int)msg.dataLength << std::endl;
-
 	Handler::instance().begin();
 
 	// setup
@@ -186,8 +182,6 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test", "[CanSensorAccesso
 
 	// assert
 	for  (uint8_t i = 0; i < NUM_IDS; i++) {
-		std::cout << "running test " << (int)i << std::endl;
-
 		bool statusIsValid = false;
 		REQUIRE( (accessories.*orderedGetters[i])(statusIsValid) );
 		REQUIRE( statusIsValid );
