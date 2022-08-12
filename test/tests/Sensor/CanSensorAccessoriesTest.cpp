@@ -62,7 +62,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		Handler::instance().handle();
 
 		bool statusIsValid = false;
-		REQUIRE( accessories.getStatusHeadlights(statusIsValid) );
+		REQUIRE( accessories.getStatusHeadlights(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 
 		testValidation(accessories, CanSensorAccessories::StatusIdHeadlights);
@@ -75,7 +75,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		Handler::instance().handle();
 
 		bool statusIsValid = false;
-		REQUIRE( accessories.getStatusBrakelights(statusIsValid) );
+		REQUIRE( accessories.getStatusBrakelights(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 
 		testValidation(accessories, CanSensorAccessories::StatusIdBrakelights);
@@ -88,7 +88,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		Handler::instance().handle();
 
 		bool statusIsValid = false;
-		REQUIRE( accessories.getStatusHorn(statusIsValid) );
+		REQUIRE( accessories.getStatusHorn(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 
 		testValidation(accessories, CanSensorAccessories::StatusIdHorn);
@@ -101,7 +101,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		Handler::instance().handle();
 
 		bool statusIsValid = false;
-		REQUIRE( accessories.getStatusHazards(statusIsValid) );
+		REQUIRE( accessories.getStatusHazards(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 
 		testValidation(accessories, CanSensorAccessories::StatusIdHazards);
@@ -114,7 +114,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		Handler::instance().handle();
 
 		bool statusIsValid = false;
-		REQUIRE( accessories.getStatusRightSignal(statusIsValid) );
+		REQUIRE( accessories.getStatusRightSignal(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 
 		testValidation(accessories, CanSensorAccessories::StatusIdRightSignal);
@@ -140,7 +140,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		Handler::instance().handle();
 
 		bool statusIsValid = false;
-		REQUIRE( accessories.getStatusWipers(statusIsValid) );
+		REQUIRE( accessories.getStatusWipers(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 
 		testValidation(accessories, CanSensorAccessories::StatusIdWipers);
@@ -174,7 +174,7 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test -- on then off", "[C
 	// assert
 	for  (const auto& pair : statusIdToGetter) {
 		bool statusIsValid = false;
-		REQUIRE( (accessories.*pair.second)(statusIsValid) );
+		REQUIRE( (accessories.*pair.second)(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 	}
 
@@ -190,7 +190,7 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test -- on then off", "[C
 	// assert
 	for  (const auto pair : statusIdToGetter) {
 		bool statusIsValid = false;
-		REQUIRE_FALSE( (accessories.*pair.second)(statusIsValid) );
+		REQUIRE( (accessories.*pair.second)(statusIsValid) == CanSensorAccessories::Off );
 		REQUIRE( statusIsValid );
 	}
 }
