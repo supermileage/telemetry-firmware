@@ -12,6 +12,18 @@ void packCellData(float cellVoltageLow, float cellVoltageHigh, float cellVoltage
 void packTempData(int8_t packTempLow, int8_t packTempHigh, int8_t packTempAvg, int8_t bmsTemp, uint8_t* buf);
 void packInt16(int16_t val, uint8_t* buf);
 
+template <typename T>
+void testValidation(CanSensorOrionBms& orion, T (CanSensorOrionBms::*getter)(bool&)) {
+	bool statusIsValid = false;
+	setMillis(DEFAULT_STALE_TIME_MILLIS - 1);
+	(orion.*getter)(statusIsValid);
+	REQUIRE ( statusIsValid );
+
+	setMillis(DEFAULT_STALE_TIME_MILLIS);
+	(orion.*getter)(statusIsValid);
+	REQUIRE_FALSE ( statusIsValid );
+}
+
 // orion faults ordered byte 1 - 3, from least to most significant bit
 // ie. data[1], data[2], data[3], each byte right to left
 const int orderedFaults[] = {
@@ -33,16 +45,18 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
-	setMillis(0);
+
+	setMillis(DEFAULT_START_TIME_MILLIS);
+
+	CanMessage msg = CAN_MESSAGE_NULL;
+	msg.id = CAN_ORIONBMS_STATUS;
+	msg.dataLength = 4;
 
 	Handler::instance().begin();
 
 	SECTION( "Test CanSensorOrionBms::update charge status" ) {
 		// Discharge
 		// set up discharge enabled msg
-		CanMessage msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_STATUS;
-		msg.dataLength = 4;
 		msg.data[0] = 0x1;
 		canBusMock.setCanMessage(msg);
 
@@ -51,38 +65,26 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 
 		// assert
 		bool statusValid = false;
-
 		REQUIRE( orion.getStatusBms(statusValid) == CanSensorBms::DischargeEnabled );
 		REQUIRE( statusValid );
 
 		// Charge
 		// set up charge enabled msg
-		msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_STATUS;
-		msg.dataLength = 4;
 		msg.data[0] = 0x2;
 		canBusMock.setCanMessage(msg);
 
 		// act
 		Handler::instance().handle();
 
+		statusValid = false;
 		REQUIRE( orion.getStatusBms(statusValid) == CanSensorBms::ChargeEnabled );
 		REQUIRE( statusValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		REQUIRE( orion.getStatusBms(statusValid) == CanSensorBms::ChargeEnabled );
-		REQUIRE( !statusValid );
+		testValidation(orion, &CanSensorOrionBms::getStatusBms);
 	}
 
 	SECTION( "Test CanSensorOrionBms::update fault -- _parseFault() returns correct fault for each flag" ) {
-		CanMessage msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_STATUS;
-		msg.dataLength = 4;
-		msg.data[0] = 0x0;
-		canBusMock.setCanMessage(msg);
-
+		// set up multiple fault messages
 		int faultIndex = 0;
 		
 		for (int i = 1; i < 4; i++) {
@@ -108,21 +110,11 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 			}
 		}
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		bool faultIsValid = true;
-		orion.getFault(faultIsValid);
-		REQUIRE ( !faultIsValid );
+		testValidation(orion, &CanSensorOrionBms::getFault);
 	} // SECTION
 
 	SECTION( "Test CanSensorOrionBms::update fault -- mixed flags: highest priority (lowest value) is always returned" ) {
-		CanMessage msg = CAN_MESSAGE_NULL;
-		msg.id = CAN_ORIONBMS_STATUS;
-		msg.dataLength = 4;
-		msg.data[0] = 0x0;
-		canBusMock.setCanMessage(msg);
-
+		// set up multiple fault messages
 		int faultIndex = 0;
 
 		for (int i = 1; i < 4; i++) {
@@ -150,6 +142,8 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 				REQUIRE ( faultIsValid );
 			}
 		}
+
+		testValidation(orion, &CanSensorOrionBms::getFault);
 	} // SECTION
 }
 
@@ -157,7 +151,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
-	setMillis(0);
+	setMillis(DEFAULT_START_TIME_MILLIS);
 
 	CanMessage msg = CAN_MESSAGE_NULL;
 	msg.id = CAN_ORIONBMS_PACK;
@@ -180,11 +174,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		REQUIRE ( orion.getBatteryCurrent() == "0.0" );
 		REQUIRE ( orion.getSoc() == "0.0" );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getBatteryCurrent(batteryVoltageIsValid);
-		REQUIRE ( !batteryVoltageIsValid );
+		testValidation(orion, &CanSensorOrionBms::getBatteryVolt);
 	}
 
 	SECTION("Test CanSensorOrionBms::update battery current") {
@@ -202,11 +192,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		REQUIRE ( orion.getBatteryVolt() == "0.0" );
 		REQUIRE ( orion.getSoc() == "0.0" );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getBatteryCurrent(batteryCurrentIsValid);
-		REQUIRE ( !batteryCurrentIsValid );
+		testValidation(orion, &CanSensorOrionBms::getBatteryCurrent);
 	}
 
 	SECTION("Test CanSensorOrionBms::update soc") {
@@ -224,11 +210,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		REQUIRE ( orion.getBatteryVolt() == "0.0" );
 		REQUIRE ( orion.getBatteryCurrent() == "0.0" );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getSoc(socIsValid);
-		REQUIRE ( !socIsValid );
+		testValidation(orion, &CanSensorOrionBms::getBatteryCurrent);
 	}
 
 	SECTION("Test CanSensorOrionBms::update pack data -- different values in possible ranges") {
@@ -261,7 +243,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
-	setMillis(0);
+	setMillis(DEFAULT_START_TIME_MILLIS);
 
 	CanMessage msg = CAN_MESSAGE_NULL;
 	msg.id = CAN_ORIONBMS_CELL;
@@ -284,11 +266,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 		REQUIRE ( orion.getMaxVolt() == "0.0" );
 		REQUIRE ( orion.getAvgVolt() == "0.0" );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getBatteryCurrent(minVoltIsValid);
-		REQUIRE ( !minVoltIsValid );
+		testValidation(orion, &CanSensorOrionBms::getMinVolt);
 	}
 
 	SECTION("Test CanSensorOrionBms::update cell voltage max") {
@@ -306,11 +284,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 		REQUIRE ( orion.getMinVolt() == "0.0" );
 		REQUIRE ( orion.getAvgVolt() == "0.0" );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getBatteryCurrent(maxVoltIsValid);
-		REQUIRE ( !maxVoltIsValid );
+		testValidation(orion, &CanSensorOrionBms::getMaxVolt);
 	}
 
 	SECTION("Test CanSensorOrionBms::update cell voltage avg") {
@@ -328,11 +302,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 		REQUIRE ( orion.getMinVolt() == "0.0" );
 		REQUIRE ( orion.getMaxVolt() == "0.0" );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getSoc(avgVoltIsValid);
-		REQUIRE ( !avgVoltIsValid );
+		testValidation(orion, &CanSensorOrionBms::getAvgVolt);
 	}
 
 	SECTION("Test CanSensorOrionBms::update cell data -- different values in possible ranges") {
@@ -365,7 +335,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
-	setMillis(0);
+	setMillis(DEFAULT_START_TIME_MILLIS);
 
 	CanMessage msg = CAN_MESSAGE_NULL;
 	msg.id = CAN_ORIONBMS_TEMP;
@@ -389,11 +359,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		REQUIRE ( orion.getAvgBatteryTemp() == 0 );
 		REQUIRE ( orion.getTempBms() == 0 );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getBatteryCurrent(minTempIsValid);
-		REQUIRE ( !minTempIsValid );
+		testValidation(orion, &CanSensorOrionBms::getMinBatteryTemp);
 	}
 
 	SECTION("Test CanSensorOrionBms::update cell temp max") {
@@ -412,11 +378,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		REQUIRE ( orion.getAvgBatteryTemp() == 0 );
 		REQUIRE ( orion.getTempBms() == 0 );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getBatteryCurrent(maxTempIsValid);
-		REQUIRE ( !maxTempIsValid );
+		testValidation(orion, &CanSensorOrionBms::getMaxBatteryTemp);
 	}
 
 	SECTION("Test CanSensorOrionBms::update cell temp avg") {
@@ -435,11 +397,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		REQUIRE ( orion.getMaxBatteryTemp() == 0 );
 		REQUIRE ( orion.getTempBms() == 0 );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getBatteryCurrent(avgTempIsValid);
-		REQUIRE ( !avgTempIsValid );
+		testValidation(orion, &CanSensorOrionBms::getAvgBatteryTemp);
 	}
 
 	SECTION("Test CanSensorOrionBms::update bms temp") {
@@ -458,11 +416,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		REQUIRE ( orion.getMaxBatteryTemp() == 0 );
 		REQUIRE ( orion.getAvgBatteryTemp() == 0 );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		
-		orion.getTempBms(bmsTempIsValid);
-		REQUIRE ( !bmsTempIsValid );
+		testValidation(orion, &CanSensorOrionBms::getTempBms);
 	}
 
 	SECTION("Test CanSensorOrionBms::update temp data -- test all different values") {

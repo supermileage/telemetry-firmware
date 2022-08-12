@@ -6,7 +6,7 @@
 /**
  * @brief Class whose sole purpose is to automatically switch between tiny and orion bms systems when they are swapped out
  */
-class BmsManager : public Handleable {
+class BmsManager : public Sensor {
 	public:
 		static const uint32_t UpdateInterval;
 		static const uint32_t MillisecondsBeforeDeselect;
@@ -32,6 +32,11 @@ class BmsManager : public Handleable {
         void handle() override;
 
 		/**
+		 * @brief Get the string name of this object
+		 */
+		String getHumanName() override;
+
+		/**
 		 * @brief Sets the current active bms
 		 * 
 		 * @param option enum for type to set bms to
@@ -44,7 +49,7 @@ class BmsManager : public Handleable {
 		 * @note unlike getCurrentBmsName, this method will return None if we neither bms has been updated
 		 * within a certain time frame
 		 */		
-		int getCurrentBms(bool& valid);
+		int getCurrentBms(bool& valid = Sensor::dummy);
 
 		/**
 		 * @brief Returns name of active bms object or None if bms isn't assigned

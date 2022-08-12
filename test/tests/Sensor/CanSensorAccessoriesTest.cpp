@@ -1,5 +1,5 @@
 #include "test_config.h"
-#include <array>
+#include <unordered_map>
 
 #include "CanInterface.h"
 #include "CanBusMock.h"
@@ -7,27 +7,21 @@
 
 #define NUM_IDS 7
 
-const uint8_t orderedStatusIds[] {
-    CanSensorAccessories::StatusIdHeadlights,
-    CanSensorAccessories::StatusIdBrakelights,
-    CanSensorAccessories::StatusIdHorn,
-    CanSensorAccessories::StatusIdHazards,
-    CanSensorAccessories::StatusIdRightSignal,
-    CanSensorAccessories::StatusIdLeftSignal,
-	CanSensorAccessories::StatusIdWipers
+/* Helper Functions */
+void testValidation(CanSensorAccessories& accessories, const uint8_t statusId);
+
+// status ids mapped to their getters 
+std::unordered_map<uint8_t, int (CanSensorAccessories::*)(bool&)> statusIdToGetter = {
+	{ CanSensorAccessories::StatusIdHeadlights, &CanSensorAccessories::getStatusHeadlights },
+	{ CanSensorAccessories::StatusIdBrakelights, &CanSensorAccessories::getStatusBrakelights },
+	{ CanSensorAccessories::StatusIdHorn, &CanSensorAccessories::getStatusHorn },
+	{ CanSensorAccessories::StatusIdHazards, &CanSensorAccessories::getStatusHazards },
+	{ CanSensorAccessories::StatusIdRightSignal, &CanSensorAccessories::getStatusRightSignal },
+	{ CanSensorAccessories::StatusIdLeftSignal, &CanSensorAccessories::getStatusLeftSignal },
+	{ CanSensorAccessories::StatusIdWipers, &CanSensorAccessories::getStatusWipers }
 };
 
-// array of all status getters (in same orders as orderedStatusIds)
-std::array<int (CanSensorAccessories::*)(bool&), NUM_IDS> orderedGetters {
-    &CanSensorAccessories::getStatusHeadlights,
-    &CanSensorAccessories::getStatusBrakelights,
-    &CanSensorAccessories::getStatusHorn,
-    &CanSensorAccessories::getStatusHazards,
-    &CanSensorAccessories::getStatusRightSignal,
-    &CanSensorAccessories::getStatusLeftSignal,
-	&CanSensorAccessories::getStatusWipers
-};
-
+/* Tests */
 TEST_CASE( "CanSensorAccessories::getHumanName test", "[CanSensorAccessories][Sensor]" ) {
 	CanInterface interface(nullptr);
 	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
@@ -35,11 +29,25 @@ TEST_CASE( "CanSensorAccessories::getHumanName test", "[CanSensorAccessories][Se
 	REQUIRE (accessories.getHumanName() == "CanSensorAccessories" );
 }
 
+TEST_CASE( "CanSensorAccessories getters test -- all status properties unknown on startup", "[CanSensorAccessories][Sensor]" ) {
+	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanInterface interface(&canBusMock);
+	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
+
+	Handler::instance().begin();
+
+	for (const auto& pair : statusIdToGetter) {
+		bool statusIsValid = false;
+		REQUIRE ( (accessories.*pair.second)(statusIsValid) == CanSensorAccessories::Unknown );
+		REQUIRE_FALSE ( statusIsValid );
+	}
+}
+
 TEST_CASE( "CanSensorAccessories::update -- test update individual properties", "[CanSensorAccessories][Sensor]" ) {
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
-	setMillis(0);
+	setMillis(DEFAULT_START_TIME_MILLIS);
 
 	CanMessage msg = CAN_MESSAGE_NULL;
 	msg.id = CAN_ACC_STATUS;
@@ -57,10 +65,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		REQUIRE( accessories.getStatusHeadlights(statusIsValid) );
 		REQUIRE( statusIsValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		accessories.getStatusHeadlights(statusIsValid);
-		REQUIRE_FALSE( statusIsValid );
+		testValidation(accessories, CanSensorAccessories::StatusIdHeadlights);
 	}
 
 	SECTION("Test update brakelights status") {
@@ -73,10 +78,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		REQUIRE( accessories.getStatusBrakelights(statusIsValid) );
 		REQUIRE( statusIsValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		accessories.getStatusBrakelights(statusIsValid);
-		REQUIRE_FALSE( statusIsValid );
+		testValidation(accessories, CanSensorAccessories::StatusIdBrakelights);
 	}
 
 	SECTION("Test update horn status") {
@@ -89,10 +91,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		REQUIRE( accessories.getStatusHorn(statusIsValid) );
 		REQUIRE( statusIsValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		accessories.getStatusHorn(statusIsValid);
-		REQUIRE_FALSE( statusIsValid );
+		testValidation(accessories, CanSensorAccessories::StatusIdHorn);
 	}
 
 	SECTION("Test update hazards status") {
@@ -105,10 +104,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		REQUIRE( accessories.getStatusHazards(statusIsValid) );
 		REQUIRE( statusIsValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		accessories.getStatusHazards(statusIsValid);
-		REQUIRE_FALSE( statusIsValid );
+		testValidation(accessories, CanSensorAccessories::StatusIdHazards);
 	}
 
 	SECTION("Test update right signal status") {
@@ -121,10 +117,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		REQUIRE( accessories.getStatusRightSignal(statusIsValid) );
 		REQUIRE( statusIsValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		accessories.getStatusRightSignal(statusIsValid);
-		REQUIRE_FALSE( statusIsValid );
+		testValidation(accessories, CanSensorAccessories::StatusIdRightSignal);
 	}
 
 	SECTION("Test update left signal status") {
@@ -134,13 +127,10 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		Handler::instance().handle();
 
 		bool statusIsValid = false;
-		REQUIRE( accessories.getStatusLeftSignal(statusIsValid) );
+		REQUIRE( accessories.getStatusLeftSignal(statusIsValid) == CanSensorAccessories::On );
 		REQUIRE( statusIsValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		accessories.getStatusLeftSignal(statusIsValid);
-		REQUIRE_FALSE( statusIsValid );
+		testValidation(accessories, CanSensorAccessories::StatusIdLeftSignal);
 	}
 
 	SECTION("Test update wipers status") {
@@ -153,10 +143,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 		REQUIRE( accessories.getStatusWipers(statusIsValid) );
 		REQUIRE( statusIsValid );
 
-		// test validation
-		setMillis( STALE_INTERVAL );
-		accessories.getStatusWipers(statusIsValid);
-		REQUIRE_FALSE( statusIsValid );
+		testValidation(accessories, CanSensorAccessories::StatusIdWipers);
 	}
 }
 
@@ -164,7 +151,7 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test -- on then off", "[C
 	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
-	setMillis(0);
+	setMillis(DEFAULT_START_TIME_MILLIS);
 
 	CanMessage msg = CAN_MESSAGE_NULL;
 	msg.id = CAN_ACC_STATUS;
@@ -172,33 +159,50 @@ TEST_CASE("CanSensorAccessories::update -- full buffer test -- on then off", "[C
 
 	Handler::instance().begin();
 
+	// this test will have to be restructure if we have more statuses than can fit in a single CanMessage data buffer
+	REQUIRE ( statusIdToGetter.size() <= 8 );
+
 	// set all statuses to 'on'
-	for (uint8_t i = 0; i < NUM_IDS; i++)
-		msg.data[i] = (orderedStatusIds[i] << 1) | 0x1;
+	int i = 0;
+	for (const auto& pair : statusIdToGetter)
+		msg.data[i++] = (pair.first << 1) | 0x1;
 	canBusMock.setCanMessage(msg);
 
 	// act
 	Handler::instance().handle();
 
 	// assert
-	for  (uint8_t i = 0; i < NUM_IDS; i++) {
+	for  (const auto& pair : statusIdToGetter) {
 		bool statusIsValid = false;
-		REQUIRE( (accessories.*orderedGetters[i])(statusIsValid) );
+		REQUIRE( (accessories.*pair.second)(statusIsValid) );
 		REQUIRE( statusIsValid );
 	}
 
 	// set all statuses to 'off'
-	for (uint8_t i = 0; i < NUM_IDS; i++)
-		msg.data[i] = (orderedStatusIds[i] << 1) | 0x0;
+	i = 0;
+	for (const auto& pair : statusIdToGetter)
+		msg.data[i++] = (pair.first << 1) | 0x0;
 	canBusMock.setCanMessage(msg);
 
 	// act
 	Handler::instance().handle();
 
 	// assert
-	for  (uint8_t i = 0; i < NUM_IDS; i++) {
+	for  (const auto pair : statusIdToGetter) {
 		bool statusIsValid = false;
-		REQUIRE_FALSE( (accessories.*orderedGetters[i])(statusIsValid) );
+		REQUIRE_FALSE( (accessories.*pair.second)(statusIsValid) );
 		REQUIRE( statusIsValid );
 	}
+}
+
+// Checks validation edge cases
+void testValidation(CanSensorAccessories& accessories, const uint8_t statusId) {
+	bool statusIsValid = false;
+	setMillis(DEFAULT_STALE_TIME_MILLIS - 1);
+	(accessories.*statusIdToGetter[statusId])(statusIsValid);
+	REQUIRE ( statusIsValid );
+
+	setMillis(DEFAULT_STALE_TIME_MILLIS);
+	(accessories.*statusIdToGetter[statusId])(statusIsValid);
+	REQUIRE_FALSE ( statusIsValid );
 }
