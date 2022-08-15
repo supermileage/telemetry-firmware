@@ -32,6 +32,10 @@ void BmsManager::handle() {
 	}
 }
 
+String BmsManager::getHumanName() {
+	return "BmsManager";
+}
+
 void BmsManager::setBms(BmsOption option) {
 	switch (option) {
 		case BmsManager::Orion:

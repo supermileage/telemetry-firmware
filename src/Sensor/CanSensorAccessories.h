@@ -17,6 +17,14 @@ using namespace can;
  */
 class CanSensorAccessories : public CanListener {
 	public:
+		static const uint8_t StatusIdHeadlights;
+		static const uint8_t StatusIdBrakelights;
+		static const uint8_t StatusIdHorn;
+		static const uint8_t StatusIdHazards;
+		static const uint8_t StatusIdRightSignal;
+		static const uint8_t StatusIdLeftSignal;
+		static const uint8_t StatusIdWipers;
+
 		/**
 		 * @brief return values for getStatus methods
 		 */

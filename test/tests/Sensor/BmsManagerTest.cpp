@@ -15,18 +15,17 @@ TEST_CASE( "BmsManager::setCurrentBms", "[BmsManager]" ) {
 	CanSensorTinyBms tiny(interface, 500);
 	CanSensorBms* bms;
 	BmsManager manager(&bms, &orion, &tiny, BmsManager::Tiny);
-	bool valid;
 
 	setMillis(0);
 
 	REQUIRE(bms == &tiny);
-	REQUIRE(manager.getCurrentBms(valid) == BmsManager::Tiny);
+	REQUIRE(manager.getCurrentBms() == BmsManager::Tiny);
 	REQUIRE(manager.getCurrentBmsName().equals(tiny.getHumanName()));
 
 	manager.setBms(BmsManager::Orion);
 
 	REQUIRE(bms == &orion);
-	REQUIRE(manager.getCurrentBms(valid) == BmsManager::Orion);
+	REQUIRE(manager.getCurrentBms() == BmsManager::Orion);
 	REQUIRE(manager.getCurrentBmsName().equals(orion.getHumanName()));
 }
 
@@ -37,7 +36,6 @@ TEST_CASE( "BmsManager::getCurrentBms", "[BmsManager]" ) {
 	CanSensorTinyBms tiny(interface, 500);
 	CanSensorBms* bms;
 	BmsManager manager(&bms, &orion, &tiny, BmsManager::Orion);
-	bool valid;
 
 	// begin all handleable objects
 	Handler::instance().begin();
@@ -46,15 +44,15 @@ TEST_CASE( "BmsManager::getCurrentBms", "[BmsManager]" ) {
 		setMillis(0);
 		CHECK( orion.getLastUpdateTime() == 0 );
 		REQUIRE( tiny.getLastUpdateTime() == 0 );
-		REQUIRE ( manager.getCurrentBms(valid) == BmsManager::Orion );
+		REQUIRE ( manager.getCurrentBms() == BmsManager::Orion );
 
 		setMillis( BmsManager::MillisecondsBeforeDeselect - 1 );
-		REQUIRE ( manager.getCurrentBms(valid) == BmsManager::Orion );
+		REQUIRE ( manager.getCurrentBms() == BmsManager::Orion );
 	}
 
 	SECTION( "BmsManager returns None after deselect timeout" ) {
 		setMillis( BmsManager::MillisecondsBeforeDeselect );
-		REQUIRE (manager.getCurrentBms(valid) == BmsManager::None );
+		REQUIRE (manager.getCurrentBms() == BmsManager::None );
 	}
 }
 
@@ -65,58 +63,52 @@ TEST_CASE( "BmsManager::handle", "[BmsManager][Handle]" ) {
 	CanSensorTinyBms tiny(interface, 500);
 	CanSensorBms* bms;
 	BmsManager manager(&bms, &orion, &tiny, BmsManager::Orion);
-	bool valid;
+
+	CanMessage msg = CAN_MESSAGE_NULL;
+	msg.id = CAN_TINYBMS_RESPONSE;
+	msg.dataLength = 1;
 
 	// begin all handleable objects
 	Handler::instance().begin();
 
-	// set up canBusMock to return can message
-	canBusMock.setReadInterruptPin([]() { return false; });
-	canBusMock.setCheckReceive([]() { return FAKE_MESSAGE_AVAIL; });
-
-	SECTION( "1 off test case: BmsManager won't update current bms" ) {
-		setMillis( BmsManager::UpdateInterval );
-
+	SECTION( "1-off test case: BmsManager won't update current bms" ) {
 		// set up canBusMock to update TinyBms
-		canBusMock.setGetCanId([]() { return CAN_TINYBMS_RESPONSE; });
+		canBusMock.setCanMessage(msg);
+		setMillis( BmsManager::UpdateInterval );
 
 		// handle all handleables so they update
 		Handler::instance().handle();
 		
 		REQUIRE( tiny.getLastUpdateTime() == BmsManager::UpdateInterval );
 		REQUIRE( orion.getLastUpdateTime() == 0 );
-		REQUIRE( manager.getCurrentBms(valid) == BmsManager::Orion );
+		REQUIRE( manager.getCurrentBms() == BmsManager::Orion );
 	}
 
 	SECTION( "BmsManager changes selection to TinyBms if it has been updated more recently" ) {
-		setMillis( BmsManager::UpdateInterval + 1 );
-
 		// set up canBusMock to update TinyBms
-		canBusMock.setGetCanId([]() { return CAN_TINYBMS_RESPONSE; });
+		canBusMock.setCanMessage(msg);
+		setMillis( BmsManager::UpdateInterval + 1 );
 
 		// handle all handleables so they update
 		Handler::instance().handle();
 		
 		REQUIRE( tiny.getLastUpdateTime() == BmsManager::UpdateInterval + 1 );
 		REQUIRE( orion.getLastUpdateTime() == 0 );
-		REQUIRE( manager.getCurrentBms(valid) == BmsManager::Tiny );
+		REQUIRE( manager.getCurrentBms() == BmsManager::Tiny );
 	}
 
 	SECTION( "BmsManager changes selection to OrionBms if it has been updated more recently" ) {
-		setMillis( BmsManager::UpdateInterval + 1 );
-
 		// set up canBusMock to update TinyBms
-		canBusMock.setGetCanId([]() { return CAN_ORIONBMS_CELL; });
-		canBusMock.setReadMsgBuffer([](byte* len, byte* buf) -> byte {
-			*len = 8;
-			return 0;
-		});
+		msg.id = CAN_ORIONBMS_CELL;
+		msg.dataLength = 8;
+		canBusMock.setCanMessage(msg);
+		setMillis( BmsManager::UpdateInterval + 1 );
 
 		// handle all handleables so they update
 		Handler::instance().handle();
 		
 		REQUIRE( tiny.getLastUpdateTime() == 0 );
 		REQUIRE( orion.getLastUpdateTime() == BmsManager::UpdateInterval + 1 );
-		REQUIRE( manager.getCurrentBms(valid) == BmsManager::Orion );
+		REQUIRE( manager.getCurrentBms() == BmsManager::Orion );
 	}
 }
