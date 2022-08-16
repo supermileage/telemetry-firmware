@@ -3,16 +3,18 @@
 #ifdef PROTO
 
 #include "SensorEcu.h"
+#include "TelemetrySerialUSART.h"
 
-// sensor definitions
+// sensors
+TelemetrySerialUSART usartSerial(&Serial1);
+SensorEcu ecu(&usartSerial);
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
-SensorEcu ecu(&Serial1);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 
-// command definitions
+// commands
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
 LoggingCommand<SensorVoltage, String> voltage(&inVoltage, "vin", &SensorVoltage::getVoltage, 10);

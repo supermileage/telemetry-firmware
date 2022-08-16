@@ -2,14 +2,22 @@
 #define _SENSOR_ECU_H_
 
 #include "Sensor.h"
+#include  "TelemetrySerial.h"
 
 class SensorEcu : public Sensor {
     public:
+		static const uint8_t PacketSize;
+		static const uint8_t Header1;
+		static const uint8_t Header2;
+		static const uint8_t Header3;
+		static const uint8_t DataFieldLength;
+		static const uint8_t ServiceId;
+		
         /**
          * Constructor 
          * @param *serial bus receiving ECU data
          **/
-        SensorEcu(USARTSerial *serial);
+        SensorEcu(TelemetrySerial *serial);
 
         /**
          * Begins ECU receive
@@ -84,7 +92,7 @@ class SensorEcu : public Sensor {
         int getOn(bool &valid = Sensor::dummy);
 
     private:
-        USARTSerial * _serial;
+        TelemetrySerial* _serial;
 
         uint32_t _lastUpdate = 0;
         bool _valid = false;
