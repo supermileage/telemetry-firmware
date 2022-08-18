@@ -2,6 +2,7 @@
 #define CAN_BUS_MCP_2515_H_
 
 #include "CanController.h"
+#include "mcp2515_can.h"
 
 /**
  * @brief Concrete mcp2515_can wrapper class
