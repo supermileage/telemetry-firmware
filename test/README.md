@@ -58,6 +58,6 @@ Catch2 provides a variety of test functions and assertion macros for writing dif
 
 **UnitTestLib**: Particle Device OS is a huge library which is intended to be compiled and run on Particle hardware.  For simplicity's sake, our tests aren't compiled with Device OS source code.  We instead use our own UnitTestLib submodule, which includes implementations of some basic Device OS classes and functions.  Feel free to add anything you need to this repo.
 
-**Dependency injection**: this essentially just refers to wrapping external dependencies in an abstract class (see ```src/System/CanBus``` and its derived classes as an example).  This is great for testing because it allows us to create Mock implementations of these external dependencies which we can explicitly use for testing (see ```test/tests/Mocks```).
+**Dependency injection**: this essentially just refers to wrapping external dependencies in an abstract class (see ```src/System/CanController``` and its derived classes as an example).  This is great for testing because it allows us to create Mock implementations of these external dependencies which we can explicitly use for testing (see ```test/tests/Mocks```).
 
 **some unit test suites provide APIs for creating mocks without having to hard-code them.  Catch2 does not, so we need to create our own hard-coded mock classes

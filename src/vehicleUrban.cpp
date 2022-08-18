@@ -15,7 +15,7 @@
 #define DEFAULT_BMS BmsManager::BmsOption::Orion
 
 Mcp2515CanWrapper canBus(&SPI1, D5, D6);
-CanInterface canInterface((CanBus*)&canBus);
+CanInterface canInterface((CanController*)&canBus);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());

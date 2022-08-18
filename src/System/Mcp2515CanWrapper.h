@@ -1,12 +1,12 @@
 #ifndef CAN_BUS_MCP_2515_H_
 #define CAN_BUS_MCP_2515_H_
 
-#include "CanBus.h"
+#include "CanController.h"
 
 /**
  * @brief Concrete mcp2515_can wrapper class
  */
-class Mcp2515CanWrapper : public CanBus {
+class Mcp2515CanWrapper : public CanController {
 	public:
 		Mcp2515CanWrapper(SPIClass* spi, uint8_t csPin, uint8_t intPin);
 		~Mcp2515CanWrapper() override;

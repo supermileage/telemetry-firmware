@@ -4,7 +4,7 @@
 // #define DEBUG_CAN
 #define CAN_FRAME 0
 
-CanInterface::CanInterface(CanBus* can) {
+CanInterface::CanInterface(CanController* can) {
     _CAN = can;
 }
 

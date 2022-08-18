@@ -5,7 +5,7 @@
 
 #include "can.h"
 #include "Sensor.h"
-#include "CanBus.h"
+#include "CanController.h"
 #include "Command.h"
 
 using namespace can;
@@ -18,7 +18,7 @@ class CanInterface : public Handleable {
          * @param csPin chip select pin to use for this CAN module
          * @param intPin interrupt pin to use for this CAN module
          **/
-        CanInterface(CanBus* can);
+        CanInterface(CanController* can);
 
         // look into virtual desctructors in c++
         ~CanInterface();
@@ -50,7 +50,7 @@ class CanInterface : public Handleable {
         void sendMessage(CanMessage message);
 
     private:
-        CanBus* _CAN;
+        CanController* _CAN;
         std::unordered_map<uint16_t, Command*> _delegates;
 
 };

@@ -4,12 +4,12 @@
 #include "settings.h"
 
 /**
- * @brief Abstract class which functions as wrapper for different can communication libraries
+ * @brief Abstract class which functions as wrapper for can controller objects
  */
-class CanBus {
+class CanController {
 	public:
-		CanBus(byte msgAvail) : _messageAvail(msgAvail) { }
-		virtual ~CanBus() { }
+		CanController(byte msgAvail) : _messageAvail(msgAvail) { }
+		virtual ~CanController() { }
 		virtual void begin() = 0;
 		virtual bool readInterruptPin() = 0;
 		virtual byte checkReceive() = 0;
