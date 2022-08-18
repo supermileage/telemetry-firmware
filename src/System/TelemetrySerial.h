@@ -1,6 +1,9 @@
 #ifndef _TELEMETRY_SERIAL_H_
 #define _TELEMETRY_SERIAL_H_
 
+/**
+ * @brief Abstract wrapper class for Serial objects
+ */
 class TelemetrySerial {
 	public:
 		virtual ~TelemetrySerial() { }

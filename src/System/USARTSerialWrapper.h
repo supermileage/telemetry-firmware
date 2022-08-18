@@ -4,17 +4,20 @@
 #include "Particle.h"
 #include "TelemetrySerial.h"
 
-class TelemetrySerialUSART : public TelemetrySerial {
+/**
+ * @brief Concrete wrapper class for USARTSerial object
+ */
+class USARTSerialWrapper : public TelemetrySerial {
 	public:
-		TelemetrySerialUSART(USARTSerial *serial);
-		~TelemetrySerialUSART();
+		USARTSerialWrapper(USARTSerial *serial);
+		~USARTSerialWrapper();
 		void begin(unsigned long baud, uint32_t flags) override;
 		int available() override;
 		int read() override;
 		size_t readBytes(char* buffer, size_t length) override;
 
 	private:
-		USARTSerial* _serial;
+		USARTSerial* _usartSerial;
 };
 
 #endif

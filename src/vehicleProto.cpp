@@ -3,10 +3,10 @@
 #ifdef PROTO
 
 #include "SensorEcu.h"
-#include "TelemetrySerialUSART.h"
+#include "USARTSerialWrapper.h"
 
 // sensors
-TelemetrySerialUSART usartSerial(&Serial1);
+USARTSerialWrapper usartSerial(&Serial1);
 SensorEcu ecu(&usartSerial);
 SensorGps gps(new SFE_UBLOX_GNSS());
 SensorThermo thermo1(&SPI, A5);

@@ -2,7 +2,7 @@
 
 #ifdef URBAN
 
-#include "CanBusMcp2515.h"
+#include "Mcp2515CanWrapper.h"
 #include "CanInterface.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
@@ -14,7 +14,7 @@
 // starting bms is arbitrary--will change after one or other starts receiving Can messages
 #define DEFAULT_BMS BmsManager::BmsOption::Orion
 
-CanBusMcp2515 canBus(&SPI1, D5, D6);
+Mcp2515CanWrapper canBus(&SPI1, D5, D6);
 CanInterface canInterface((CanBus*)&canBus);
 
 // Sensor definitions
