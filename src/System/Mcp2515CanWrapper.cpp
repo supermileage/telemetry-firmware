@@ -1,6 +1,4 @@
 #include "Mcp2515CanWrapper.h"
-
-#include "mcp2515_can.h"
 #include "can_common.h"
 
 Mcp2515CanWrapper::Mcp2515CanWrapper(SPIClass* spi, uint8_t csPin, uint8_t intPin) : CanController(CAN_MSGAVAIL), _intPin(intPin) {

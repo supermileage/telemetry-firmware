@@ -1,4 +1,5 @@
 #include "TelemetrySerialMock.h"
+#include <string.h>
 
 TelemetrySerialMock::~TelemetrySerialMock() { }
 

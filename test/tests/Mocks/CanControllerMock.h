@@ -9,7 +9,7 @@
 using namespace can;
 
 /**
- * @brief Mock class for predefining CAN bus behavior
+ * @brief Mock class for predefining CAN controller behavior
  */
 class CanControllerMock : public CanController {
 	public:

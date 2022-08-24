@@ -3,6 +3,7 @@
 
 #include "mcp2515_can.h"
 #include "CanController.h"
+#include "mcp2515_can.h"
 
 /**
  * @brief Concrete mcp2515_can wrapper class
