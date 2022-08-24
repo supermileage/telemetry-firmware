@@ -4,7 +4,7 @@
 #include "settings.h"
 
 /**
- * @brief Abstract class which functions as wrapper for can controller objects
+ * @brief Abstract class which functions as wrapper for can controller library
  */
 class CanController {
 	public:

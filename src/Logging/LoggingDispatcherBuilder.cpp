@@ -20,7 +20,7 @@ LoggingDispatcher* LoggingDispatcherBuilder::build() {
 
     // iterate over intervalMap, get all commands which share same interval and add them to a new commandGroup,
     // then pass commandGroups to LoggingDispatcher constructor
-    for (std::pair<uint16_t, uint16_t> const& pair : _intervalMap) {
+    for (auto const& pair : _intervalMap) {
         uint16_t interval = pair.first;
         uint16_t numCommandsOnInterval = pair.second;
         Command **commandsOnInterval = new Command*[numCommandsOnInterval];
