@@ -1,6 +1,7 @@
 #ifndef CAN_BUS_MCP_2515_H_
 #define CAN_BUS_MCP_2515_H_
 
+#include "mcp2515_can.h"
 #include "CanController.h"
 
 /**

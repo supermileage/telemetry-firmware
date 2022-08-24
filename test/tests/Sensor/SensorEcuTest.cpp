@@ -8,9 +8,3 @@ TEST_CASE( "SensorEcu::getHumanName test", "[SensorEcu]" ) {
 	
 	REQUIRE( ecu.getHumanName() == "ECU" );
 }
-
-TEST_CASE( "SensorEcu::getHumanName test", "[SensorEcu]" ) {
-	SensorEcu ecu(nullptr);
-	
-	REQUIRE( ecu.getHumanName() == "ECU" );
-}

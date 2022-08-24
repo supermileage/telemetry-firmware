@@ -11,7 +11,7 @@ Mcp2515CanWrapper::Mcp2515CanWrapper(SPIClass* spi, uint8_t csPin, uint8_t intPi
 Mcp2515CanWrapper::~Mcp2515CanWrapper() { }
 
 void Mcp2515CanWrapper::begin() {
-	pinMode(intPin, INPUT);
+	pinMode(_intPin, INPUT);
 	_mcpCan->begin(CAN_500KBPS,MCP_8MHz);
 }
 
