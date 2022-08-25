@@ -315,11 +315,8 @@ void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool
 	float val = min;
 
 	for (int32_t i = 0; i < 10; i++) {
-		if (packOverflow(i, factor)) {
-			std::cout << "Pack overflow!" << std::endl;
+		if (packOverflow(i, factor))
 			break;
-		}
-
 
 		val = val + (float)rand() / RAND_MAX;
 
