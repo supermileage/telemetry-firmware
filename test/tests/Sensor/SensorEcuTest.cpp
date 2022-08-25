@@ -1,7 +1,6 @@
 #include "test_config.h"
 
 #include <array>
-#include <iostream>
 
 #include "SensorEcu.h"
 #include "TelemetrySerialMock.h"
@@ -111,7 +110,7 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 		// set up readBytes to copy from buf
 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
 
-		for (int i = 0; i < HeaderBytes.size(); i++) {
+		for (size_t i = 0; i < HeaderBytes.size(); i++) {
 			// set single header byte so it is the wrong value
 			buf[i] = ~HeaderBytes[i];
 
@@ -250,13 +249,13 @@ TEST_CASE( "SensorEcu::_interpretValue parses buffer correctly for all propertie
 }
 
 void packHeader(uint8_t* buf) {
-	for (int i = 0; i < HeaderBytes.size(); i++)
+	for (size_t i = 0; i < HeaderBytes.size(); i++)
 		buf[i] = HeaderBytes[i];
 }
 
 uint8_t getCheckSum(uint8_t* buf) {
 	uint8_t checkSum = 0;
-	for(int i = 0; i < SensorEcu::PacketSize - 1; i++)
+	for(int32_t i = 0; i < SensorEcu::PacketSize - 1; i++)
 		checkSum += buf[i];
 	
 	return checkSum;
@@ -274,7 +273,6 @@ void packValue(uint8_t* buf, float value, float factor, float offset) {
 	int32_t intValue = (value - offset) / factor;
 	*buf = (uint8_t)(intValue >> 8);
 	*(buf + 1) = (uint8_t)(intValue & 0xFF);
-	// std::cout << "Packing val: " << value << " -- as: " << (((int32_t)(intValue >> 8) << 8) + (int32_t)(intValue & 0xFF)) * factor + offset << std::endl;
 }
 
 // set and test 10 different float values over provided range for a SensorEcu property
