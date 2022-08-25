@@ -93,7 +93,8 @@
 		"numbers": "cpp",
 		"semaphore": "cpp",
 		"stop_token": "cpp",
-		"cinttypes": "cpp"
+		"cinttypes": "cpp",
+		"__bits": "cpp"
 	},
 	"C_Cpp.default.configurationProvider": "particle.particle-vscode-core",
 	"particle.disableDeviceOSOutdatedCheck": true,

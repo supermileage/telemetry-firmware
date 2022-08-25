@@ -142,8 +142,8 @@ int SensorEcu::getOn(bool &valid) {
 
 float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset, bool isInt) {
 	if (isInt)
-		return round((((uint32_t)high << 8) + (uint32_t)low) * factor + offset);
+		return round(((high << 8) | low) * factor + offset);
 	else
-		return (((uint32_t)high << 8) + (uint32_t)low) * factor + offset;
+		return ((high << 8) | low) * factor + offset;
 }
 

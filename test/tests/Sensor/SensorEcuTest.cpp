@@ -1,6 +1,7 @@
 #include "test_config.h"
 
 #include <array>
+#include <limits>
 
 #include "SensorEcu.h"
 #include "TelemetrySerialMock.h"
@@ -21,6 +22,7 @@ void packHeader(uint8_t* buf);
 uint8_t getCheckSum(uint8_t* buf);
 void setCheckSum(uint8_t* buf);
 void packValue(uint8_t* buf, float value, float factor, float offset);
+bool packOverflow(float val, float factor);
 void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision);
 void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset);
 
@@ -29,6 +31,7 @@ const std::array<uint8_t, 5> HeaderBytes = {
 	SensorEcu::Header1, SensorEcu::Header2, SensorEcu::Header3, SensorEcu::DataFieldLength, SensorEcu::ServiceId
 };
 
+/* Tests */
 TEST_CASE( "SensorEcu::getHumanName test", "[SensorEcu][Sensor]" ) {
 	SensorEcu ecu(nullptr);
 
@@ -54,6 +57,7 @@ TEST_CASE( "SensorEcu::begin -- calls _serial->begin", "[SensorEcu][Sensor]" ) {
 TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Sensor]" ) {
 	TelemetrySerialMock serialMock;
 	SensorEcu ecu(&serialMock);
+	uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 
 	SECTION( "_serial->available() check fails then passes" ) {
 		// set up failing check
@@ -104,7 +108,6 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 	}
 
 	SECTION( "Header check fails for any single incorrect byte" ) {
-		uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 		packHeader(buf);
 
 		// set up readBytes to copy from buf
@@ -136,12 +139,9 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 			// reset header value in buffer
 			buf[i] = HeaderBytes[i];
 		}
-
-		delete[] buf;
 	}
 
 	SECTION( "Header is valid but checksum fails" ) {
-		uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 		packHeader(buf);
 
 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
@@ -160,12 +160,9 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 		ecu.getRPM(valid);
 
 		REQUIRE( !valid );
-
-		delete[] buf;
 	}
 
 	SECTION( "Header is valid and checksum passes" ) {
-		uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 		packHeader(buf);
 
 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
@@ -183,20 +180,53 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 		bool valid = false;
 		ecu.getRPM(valid);
 		REQUIRE( valid );
-
-		delete[] buf;
 	}
+
+	delete[] buf;
 }
 
 TEST_CASE( "SensorEcu::handle -- validation test", "[SensorEcu][Sensor]" ) {
+	TelemetrySerialMock serialMock;
+	SensorEcu ecu(&serialMock);
+	uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 
+	// set header and checksum so SensorEcu::_valid will be set to true
+	packHeader(buf);
+	setCheckSum(buf);
+	serialMock.setReadMessage(buf, SensorEcu::PacketSize);
+	setMillis(DEFAULT_START_TIME_MILLIS);
+
+	ecu.handle();
+
+	// assert: SensorEcu::_valid should be true from valid update message
+	REQUIRE( ecu.getOn() );
+
+	// Edge Cases
+	// SensorEcu data is still valid
+	setMillis(DEFAULT_STALE_TIME_MILLIS - 1);
+	serialMock.setAvailable([]() { return 0; });
+
+	ecu.handle();
+
+	// assert: SensorEcu was't updated but time is still valid
+	REQUIRE( ecu.getOn() );
+
+	//SensorEcu data is no longer valid
+	setMillis(DEFAULT_STALE_TIME_MILLIS);
+
+	ecu.handle();
+
+	// assert: SensorEcu was't updated and time is now invalid
+	REQUIRE_FALSE( ecu.getOn() );
+
+	delete[] buf;
 }
 
 TEST_CASE( "SensorEcu::_interpretValue parses buffer correctly for all properties", "[SensorEcu][Sensor][PropertyGetter]" ) {
 	TelemetrySerialMock serialMock;
 	SensorEcu ecu(&serialMock);
-
 	uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
+
 	packHeader(buf);
 	setMillis(DEFAULT_START_TIME_MILLIS);
 
@@ -275,12 +305,22 @@ void packValue(uint8_t* buf, float value, float factor, float offset) {
 	*(buf + 1) = (uint8_t)(intValue & 0xFF);
 }
 
+bool packOverflow(float val, float factor) {
+	return (int32_t)(val / factor - 1) > std::numeric_limits<uint16_t>::max();
+}
+
 // set and test 10 different float values over provided range for a SensorEcu property
 void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision) {
 	float increment = (max - min) / 10;
 	float val = min;
 
 	for (int32_t i = 0; i < 10; i++) {
+		if (packOverflow(i, factor)) {
+			std::cout << "Pack overflow!" << std::endl;
+			break;
+		}
+
+
 		val = val + (float)rand() / RAND_MAX;
 
 		packValue(buf + index, val, factor, offset);
@@ -301,7 +341,10 @@ void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool
 void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset) {
 	int32_t increment = (max - min) / 10;
 
-	for (int32_t i = min; i < max; i+=increment) {
+	for (int32_t i = min; i <= max; i+=increment) {
+		if (packOverflow(i, factor))
+			break;
+
 		packValue(buf + index, (float)i, factor, offset);
 		setCheckSum(buf);
 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
