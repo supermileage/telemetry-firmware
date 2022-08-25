@@ -6,7 +6,7 @@
 
 class SensorEcu : public Sensor {
     public:
-		static const uint8_t PacketSize;
+		static const int PacketSize;
 		static const uint8_t Header1;
 		static const uint8_t Header2;
 		static const uint8_t Header3;
@@ -116,7 +116,7 @@ class SensorEcu : public Sensor {
          * @param offset 
          * @return Intepreted value
          * */
-        float _interpretValue(uint8_t high, uint8_t low, float factor, float offset);
+        float _interpretValue(uint8_t high, uint8_t low, float factor, float offset, bool isInt = false);
 };
 
 #endif

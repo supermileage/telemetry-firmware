@@ -1,9 +1,11 @@
 #include "SensorEcu.h"
 #include "settings.h"
 
+#include <cmath>
+
 #define ECU_BAUD                115200
 
-const uint8_t SensorEcu::PacketSize = 27;
+const int32_t SensorEcu::PacketSize = 27;
 const uint8_t SensorEcu::Header1 = 0x80;
 const uint8_t SensorEcu::Header2 = 0x8F;
 const uint8_t SensorEcu::Header3 = 0xEA;
@@ -28,7 +30,6 @@ void SensorEcu::flush() {
 }
 
 void SensorEcu::handle() {
-
     if(millis() < _lastUpdate + STALE_INTERVAL) {
         _valid = true;
     } else {
@@ -39,14 +40,9 @@ void SensorEcu::handle() {
         return;
     }
 
-    uint8_t buffer[27];
+    uint8_t buffer[27] = { };
 
     _serial->readBytes((char*)buffer, SensorEcu::PacketSize);
-
-    uint8_t checkSum = 0;
-    for(int i = 0; i < 26; i++) {
-        checkSum += buffer[i];
-    }
 
     // Check if the header is correct
     if (buffer[0] == SensorEcu::Header1 && 
@@ -55,6 +51,11 @@ void SensorEcu::handle() {
         buffer[3] == SensorEcu::DataFieldLength && 
         buffer[4] == SensorEcu::ServiceId) {
 
+			uint8_t checkSum = 0;
+			for(int i = 0; i < 26; i++) {
+				checkSum += buffer[i];
+			}
+
             // Check if the checksum is correct
             if(checkSum == buffer[26]){
 
@@ -62,13 +63,13 @@ void SensorEcu::handle() {
 				_valid = true;
 
                 // Data is valid, update all fields
-                _rpm = _interpretValue(buffer[6], buffer[7], 0.25, 0.0);
+                _rpm = _interpretValue(buffer[6], buffer[7], 0.25, 0.0, true);
                 _map = _interpretValue(buffer[8], buffer[9], 0.0039, 0.0);
-                _tps = _interpretValue(buffer[10], buffer[11], 0.0015, 0.0);
-                _ect = _interpretValue(buffer[12], buffer[13], 1, -40.0);
-                _iat = _interpretValue(buffer[14], buffer[15], 1, -40.0);
+                _tps = _interpretValue(buffer[10], buffer[11], 0.0015, 0.0, true);
+                _ect = _interpretValue(buffer[12], buffer[13], 1, -40.0, true);
+                _iat = _interpretValue(buffer[14], buffer[15], 1, -40.0, true);
                 _o2s = _interpretValue(buffer[16], buffer[17], 0.0048, 0.0);
-                _spark = _interpretValue(buffer[18], buffer[19], 0.5, 0.0);
+                _spark = _interpretValue(buffer[18], buffer[19], 0.5, 0.0, true);
                 _fuelPW1 = _interpretValue(buffer[20], buffer[21], 0.001, 0.0);
                 _fuelPW2 = _interpretValue(buffer[22], buffer[23], 0.001, 0.0);
                 _ubAdc = _interpretValue(buffer[24], buffer[25], 0.00625, 0.0);
@@ -139,7 +140,10 @@ int SensorEcu::getOn(bool &valid) {
     return _valid;
 }
 
-float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset) {
-    return (float)((int)high * 256 + (int)low) * factor + offset;
+float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset, bool isInt) {
+	if (isInt)
+		return round((((uint32_t)high << 8) + (uint32_t)low) * factor + offset);
+	else
+		return (((uint32_t)high << 8) + (uint32_t)low) * factor + offset;
 }
 
