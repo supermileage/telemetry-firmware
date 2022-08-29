@@ -1,5 +1,5 @@
-#ifndef CAN_BUS_MCP_2515_H_
-#define CAN_BUS_MCP_2515_H_
+#ifndef _MCP2515_CAN_WRAPPER_H_
+#define _MCP2515_CAN_WRAPPER_H_
 
 #include "mcp2515_can.h"
 #include "CanController.h"

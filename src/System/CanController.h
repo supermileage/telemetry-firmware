@@ -1,5 +1,5 @@
-#ifndef CAN_BUS_H_
-#define CAN_BUS_H_
+#ifndef _CAN_CONTROLLER_H_
+#define _CAN_CONTROLLER_H_
 
 #include "settings.h"
 

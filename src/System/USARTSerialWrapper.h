@@ -1,5 +1,5 @@
-#ifndef _TELEMETRY_SERIAL_USART_H_
-#define _TELEMETRY_SERIAL_USART_H_
+#ifndef _USART_SERIAL_WRAPPER_H_
+#define _USART_SERIAL_WRAPPER_H_
 
 #include "Particle.h"
 #include "TelemetrySerial.h"
