@@ -25,9 +25,8 @@ uint8_t getCheckSum(uint8_t* buf);
 void setCheckSum(uint8_t* buf);
 void packValue(uint8_t* buf, float value, float factor, float offset);
 bool packOverflow(float val, float factor, float offset);
-// void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision);
-// void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset);
 
+// set and test 10 different values over provided range for a SensorEcu property
 template <typename T>
 void testGetterWithinRange(SensorEcu& ecu, std::function<T(bool&)> getter, TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, T min, T max, float factor, float offset, float precision = 0.0f) {
 	T increment = (T)(max - min) / 10;
@@ -334,48 +333,3 @@ void packValue(uint8_t* buf, float value, float factor, float offset) {
 bool packOverflow(float val, float factor, float offset) {
 	return (int32_t)((val - offset) / factor) > std::numeric_limits<uint16_t>::max();
 }
-
-// set and test 10 different float values over provided range for a SensorEcu property
-// void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision) {
-// 	float increment = (max - min) / 10;
-// 	float val = min;
-
-// 	for (int32_t i = 0; i < 10; i++) {
-// 		if (packOverflow(i, factor, offset))
-// 			break;
-
-// 		val = val + (float)rand() / RAND_MAX;
-
-// 		packValue(buf + index, val, factor, offset);
-// 		setCheckSum(buf);
-// 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
-
-// 		ecu.handle();
-
-// 		bool isValid = false;
-// 		REQUIRE( (ecu.*getter)(isValid).toFloat() == Approx(val).margin(precision) );
-// 		REQUIRE( isValid );
-
-// 		val += increment;
-// 	}
-// }
-
-// // set and test 10 different int values over provided range for a SensorEcu property
-// void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset) {
-// 	int32_t increment = (max - min) / 10;
-
-// 	for (int32_t i = min; i <= max; i+=increment) {
-// 		if (packOverflow(i, factor, offset))
-// 			break;
-
-// 		packValue(buf + index, (float)i, factor, offset);
-// 		setCheckSum(buf);
-// 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
-
-// 		ecu.handle();
-
-// 		bool isValid = false;
-// 		REQUIRE( (ecu.*getter)(isValid) == i );
-// 		REQUIRE( isValid );
-// 	}
-// }
