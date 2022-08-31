@@ -250,27 +250,22 @@ TEST_CASE( "SensorEcu::_interpretValue parses buffer correctly for all propertie
 		testGetterWithinRangeInt(ecu, &SensorEcu::getIAT, serialMock, buf, OFFSET_IAT, -10, 100, 1, -40.0);
 	}
 
-	// float
 	SECTION( "SensorEcu::getO2S" ) {
 		testGetterWithinRangeFloat(ecu, &SensorEcu::getO2S, serialMock, buf, OFFSET_O2S, 0, 5, 0.0048, 0, 0.01);
 	}
 
-	// int
 	SECTION( "SensorEcu::getSpark" ) {
 		testGetterWithinRangeInt(ecu, &SensorEcu::getSpark, serialMock, buf, OFFSET_SPARK, 0, 360, 0.5, 0);
 	}
 
-	// float
 	SECTION( "SensorEcu::getFuelPW1" ) {
 		testGetterWithinRangeFloat(ecu, &SensorEcu::getFuelPW1, serialMock, buf, OFFSET_FUELPW1, 0, 60, 0.001, 0, 0.001);
 	}
 
-	// float
 	SECTION( "SensorEcu::getFuelPW2" ) {
 		testGetterWithinRangeFloat(ecu, &SensorEcu::getFuelPW2, serialMock, buf, OFFSET_FUELPW2, 0, 60, 0.001, 0, 0.001);
 	}
 
-	// float
 	SECTION( "SensorEcu::getUbAdc") {
 		testGetterWithinRangeFloat(ecu, &SensorEcu::getUbAdc, serialMock, buf, OFFSET_UBADC, 0, 14, 0.00625, 0, 0.1);
 	}
