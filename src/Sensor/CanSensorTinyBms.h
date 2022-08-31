@@ -5,6 +5,48 @@
 #include "CanSensorBms.h"
 #include "BmsFault.h"
 
+#define TINYBMS_NUM_PARAMS                          7
+#define TINYBMS_REQ_DATA_LENGTH     		        8
+
+#define TINYBMS_PARAM_ID_BATTERY_VOLTAGE            0x14
+#define TINYBMS_PARAM_ID_BATTERY_CURRENT            0x15
+#define TINYBMS_PARAM_ID_MAX_CELL_VOLTAGE           0x16
+#define TINYBMS_PARAM_ID_MIN_CELL_VOLTAGE           0x17
+#define TINYBMS_PARAM_ID_STATUS                     0x18
+#define TINYBMS_PARAM_ID_SOC                        0x1A
+#define TINYBMS_PARAM_ID_TEMP                       0x1B
+
+#define TINYBMS_PARAM_ID_EVENTS                     0x11
+#define TINYBMS_PARAM_ID_RESET                      0x02
+#define TINYBMS_RESET_ID_BMS                        0x05
+
+#define TINYBMS_STATUS_CHARGING                     0x91
+#define TINYBMS_STATUS_CHARGED                      0x92
+#define TINYBMS_STATUS_DISCHARGING                  0x93
+#define TINYBMS_STATUS_REGENERATION                 0x96
+#define TINYBMS_STATUS_IDLE                         0x97
+#define TINYBMS_STATUS_FAULT_ERROR                  0x9B
+
+#define TINYBMS_TEMP_ID_INTERNAL    		        0x00
+#define TINYBMS_TEMP_ID_BATTERY_1   		        0x01
+#define TINYBMS_TEMP_ID_BATTERY_2   		        0x02
+
+#define TINYBMS_RSP_STATUS_BYTE     		        0x0
+#define TINYBMS_RSP_PARAM_ID_BYTE   		        0x1
+#define TINYBMS_RSP_DATA_BYTE       		        0x2
+
+#define TINYBMS_FAULT_UNDER_VOLTAGE                 0x02
+#define TINYBMS_FAULT_OVER_VOLTAGE                  0x03
+#define TINYBMS_FAULT_OVER_TEMP                     0x04
+#define TINYBMS_FAULT_OVER_CURRENT_DISCHARGE        0x05
+#define TINYBMS_FAULT_OVER_CURRENT_CHARGE           0x06
+#define TINYBMS_FAULT_LOW_TEMP                      0x0A
+#define TINYBMS_FAULT_CHARGER_SWITCH                0x0B
+#define TINYBMS_FAULT_LOAD_SWITCH                   0x0C
+#define TINYBMS_FAULT_SINGLE_PORT_SWITCH            0x0D
+#define TINYBMS_FAULT_CURRENT_SENSOR_DISCONNECTED   0x0E
+#define TINYBMS_FAULT_CURRENT_SENSOR_CONNECTED      0x0F
+
 using namespace can;
 
 class CanSensorTinyBms : public CanSensorBms {
