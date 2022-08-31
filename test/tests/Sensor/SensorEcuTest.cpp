@@ -24,7 +24,6 @@ void packHeader(uint8_t* buf);
 uint8_t getCheckSum(uint8_t* buf);
 void setCheckSum(uint8_t* buf);
 void packValue(uint8_t* buf, float value, float factor, float offset);
-bool packOverflow(float val, float factor, float offset);
 
 // set and test 10 different values over provided range for a SensorEcu property
 template <typename T>
@@ -35,9 +34,6 @@ void testGetterWithinRange(SensorEcu& ecu, std::function<T(bool&)> getter, Telem
 	for (int32_t i = 0; i < 10; i++) {
 		if (typeid(T) == typeid(float))
 			val = val + (float)rand() / RAND_MAX;
-
-		if (packOverflow(val, factor, offset))
-			break;
 
 		packValue(buf + index, (float)val, factor, offset);
 		setCheckSum(buf);
@@ -328,8 +324,4 @@ void packValue(uint8_t* buf, float value, float factor, float offset) {
 	int32_t intValue = (value - offset) / factor;
 	*buf = (uint8_t)(intValue >> 8);
 	*(buf + 1) = (uint8_t)(intValue & 0xFF);
-}
-
-bool packOverflow(float val, float factor, float offset) {
-	return (int32_t)((val - offset) / factor) > std::numeric_limits<uint16_t>::max();
 }
