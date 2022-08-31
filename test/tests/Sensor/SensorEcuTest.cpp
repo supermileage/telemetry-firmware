@@ -2,6 +2,8 @@
 
 #include <array>
 #include <limits>
+#include <functional>
+#include <typeinfo>
 
 #include "SensorEcu.h"
 #include "TelemetrySerialMock.h"
@@ -22,9 +24,38 @@ void packHeader(uint8_t* buf);
 uint8_t getCheckSum(uint8_t* buf);
 void setCheckSum(uint8_t* buf);
 void packValue(uint8_t* buf, float value, float factor, float offset);
-bool packOverflow(float val, float factor);
-void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision);
-void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset);
+bool packOverflow(float val, float factor, float offset);
+// void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision);
+// void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset);
+
+template <typename T>
+void testGetterWithinRange(SensorEcu& ecu, std::function<T(bool&)> getter, TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, T min, T max, float factor, float offset, float precision = 0.0f) {
+	T increment = (T)(max - min) / 10;
+	T val = min;
+
+	for (int32_t i = 0; i < 10; i++) {
+		if (typeid(T) == typeid(float))
+			val = val + (float)rand() / RAND_MAX;
+
+		if (packOverflow(val, factor, offset))
+			break;
+
+		packValue(buf + index, (float)val, factor, offset);
+		setCheckSum(buf);
+		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
+
+		ecu.handle();
+
+		bool isValid = false;
+		if (typeid(T) == typeid(float))
+			REQUIRE( getter(isValid) == Approx(val).margin(precision) );
+		else
+			REQUIRE( getter(isValid) == val );
+		REQUIRE( isValid );
+
+		val += increment;
+	}
+}
 
 // ordered header bytes
 const std::array<uint8_t, 5> HeaderBytes = {
@@ -230,44 +261,44 @@ TEST_CASE( "SensorEcu::_interpretValue parses buffer correctly for all propertie
 	packHeader(buf);
 	setMillis(DEFAULT_START_TIME_MILLIS);
 
-	SECTION( "SensorEcu::getRpm" ) {
-		testGetterWithinRangeInt(ecu, &SensorEcu::getRPM, serialMock, buf, OFFSET_RPM, 0, 10000, 0.25, 0);
+	SECTION( "SensorEcu::getRPM" ) {
+		testGetterWithinRange<int>(ecu, [&ecu](bool& valid) { return ecu.getRPM(valid); }, serialMock, buf, OFFSET_RPM, 0, 10000, 0.25, 0);
 	}
 
 	SECTION( "SensorEcu::getMap" ) {
-		testGetterWithinRangeFloat(ecu, &SensorEcu::getMap, serialMock, buf, OFFSET_MAP, 0, 100, 0.0039, 0, 0.01);
+		testGetterWithinRange<float>(ecu, [&ecu](bool& valid) { return ecu.getMap(valid).toFloat(); }, serialMock, buf, OFFSET_MAP, 0, 100, 0.0039, 0, 0.01);
 	}
 
 	SECTION( "SensorEcu::getTPS" ) {
-		testGetterWithinRangeInt(ecu, &SensorEcu::getTPS, serialMock, buf, OFFSET_TPS, 0, 100, 0.0015, 0);
+		testGetterWithinRange<int>(ecu, [&ecu](bool& valid) { return ecu.getTPS(valid); }, serialMock, buf, OFFSET_TPS, 0, 100, 0.0015, 0);
 	}
 
 	SECTION( "SensorEcu::getECT" ) {
-		testGetterWithinRangeInt(ecu, &SensorEcu::getECT, serialMock, buf, OFFSET_ECT, -10, 100, 1, -40.0);
+		testGetterWithinRange<int>(ecu, [&ecu](bool& valid) { return ecu.getECT(valid); }, serialMock, buf, OFFSET_ECT, -10, 100, 1, -40.0);
 	}
 
 	SECTION( "SensorEcu::getIAT" ) {
-		testGetterWithinRangeInt(ecu, &SensorEcu::getIAT, serialMock, buf, OFFSET_IAT, -10, 100, 1, -40.0);
+		testGetterWithinRange<int>(ecu, [&ecu](bool& valid) { return ecu.getIAT(valid); }, serialMock, buf, OFFSET_IAT, -10, 100, 1, -40.0);
 	}
 
 	SECTION( "SensorEcu::getO2S" ) {
-		testGetterWithinRangeFloat(ecu, &SensorEcu::getO2S, serialMock, buf, OFFSET_O2S, 0, 5, 0.0048, 0, 0.01);
+		testGetterWithinRange<float>(ecu, [&ecu](bool& valid) { return ecu.getO2S(valid).toFloat(); }, serialMock, buf, OFFSET_O2S, 0, 5, 0.0048, 0, 0.01);
 	}
 
 	SECTION( "SensorEcu::getSpark" ) {
-		testGetterWithinRangeInt(ecu, &SensorEcu::getSpark, serialMock, buf, OFFSET_SPARK, 0, 360, 0.5, 0);
+		testGetterWithinRange<int>(ecu, [&ecu](bool& valid) { return ecu.getSpark(valid); }, serialMock, buf, OFFSET_SPARK, 0, 360, 0.5, 0);
 	}
 
 	SECTION( "SensorEcu::getFuelPW1" ) {
-		testGetterWithinRangeFloat(ecu, &SensorEcu::getFuelPW1, serialMock, buf, OFFSET_FUELPW1, 0, 60, 0.001, 0, 0.001);
+		testGetterWithinRange<float>(ecu, [&ecu](bool& valid) { return ecu.getFuelPW1(valid).toFloat(); }, serialMock, buf, OFFSET_FUELPW1, 0, 60, 0.001, 0, 0.001);
 	}
 
 	SECTION( "SensorEcu::getFuelPW2" ) {
-		testGetterWithinRangeFloat(ecu, &SensorEcu::getFuelPW2, serialMock, buf, OFFSET_FUELPW2, 0, 60, 0.001, 0, 0.001);
+		testGetterWithinRange<float>(ecu, [&ecu](bool& valid) { return ecu.getFuelPW2(valid).toFloat(); }, serialMock, buf, OFFSET_FUELPW2, 0, 60, 0.001, 0, 0.001);
 	}
 
 	SECTION( "SensorEcu::getUbAdc") {
-		testGetterWithinRangeFloat(ecu, &SensorEcu::getUbAdc, serialMock, buf, OFFSET_UBADC, 0, 14, 0.00625, 0, 0.1);
+		testGetterWithinRange<float>(ecu, [&ecu](bool& valid) { return ecu.getUbAdc(valid).toFloat(); }, serialMock, buf, OFFSET_UBADC, 0, 14, 0.00625, 0, 0.1);
 	}
 
 	delete[] buf;
@@ -300,51 +331,51 @@ void packValue(uint8_t* buf, float value, float factor, float offset) {
 	*(buf + 1) = (uint8_t)(intValue & 0xFF);
 }
 
-bool packOverflow(float val, float factor) {
-	return (int32_t)(val / factor - 1) > std::numeric_limits<uint16_t>::max();
+bool packOverflow(float val, float factor, float offset) {
+	return (int32_t)((val - offset) / factor) > std::numeric_limits<uint16_t>::max();
 }
 
 // set and test 10 different float values over provided range for a SensorEcu property
-void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision) {
-	float increment = (max - min) / 10;
-	float val = min;
+// void testGetterWithinRangeFloat(SensorEcu& ecu, String (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, float min, float max, float factor, float offset, float precision) {
+// 	float increment = (max - min) / 10;
+// 	float val = min;
 
-	for (int32_t i = 0; i < 10; i++) {
-		if (packOverflow(i, factor))
-			break;
+// 	for (int32_t i = 0; i < 10; i++) {
+// 		if (packOverflow(i, factor, offset))
+// 			break;
 
-		val = val + (float)rand() / RAND_MAX;
+// 		val = val + (float)rand() / RAND_MAX;
 
-		packValue(buf + index, val, factor, offset);
-		setCheckSum(buf);
-		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
+// 		packValue(buf + index, val, factor, offset);
+// 		setCheckSum(buf);
+// 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
 
-		ecu.handle();
+// 		ecu.handle();
 
-		bool isValid = false;
-		REQUIRE( (ecu.*getter)(isValid).toFloat() == Approx(val).margin(precision) );
-		REQUIRE( isValid );
+// 		bool isValid = false;
+// 		REQUIRE( (ecu.*getter)(isValid).toFloat() == Approx(val).margin(precision) );
+// 		REQUIRE( isValid );
 
-		val += increment;
-	}
-}
+// 		val += increment;
+// 	}
+// }
 
-// set and test 10 different int values over provided range for a SensorEcu property
-void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset) {
-	int32_t increment = (max - min) / 10;
+// // set and test 10 different int values over provided range for a SensorEcu property
+// void testGetterWithinRangeInt(SensorEcu& ecu, int (SensorEcu::*getter)(bool&), TelemetrySerialMock& serialMock, uint8_t* buf, int32_t index, int32_t min, int32_t max, float factor, float offset) {
+// 	int32_t increment = (max - min) / 10;
 
-	for (int32_t i = min; i <= max; i+=increment) {
-		if (packOverflow(i, factor))
-			break;
+// 	for (int32_t i = min; i <= max; i+=increment) {
+// 		if (packOverflow(i, factor, offset))
+// 			break;
 
-		packValue(buf + index, (float)i, factor, offset);
-		setCheckSum(buf);
-		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
+// 		packValue(buf + index, (float)i, factor, offset);
+// 		setCheckSum(buf);
+// 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
 
-		ecu.handle();
+// 		ecu.handle();
 
-		bool isValid = false;
-		REQUIRE( (ecu.*getter)(isValid) == i );
-		REQUIRE( isValid );
-	}
-}
+// 		bool isValid = false;
+// 		REQUIRE( (ecu.*getter)(isValid) == i );
+// 		REQUIRE( isValid );
+// 	}
+// }
