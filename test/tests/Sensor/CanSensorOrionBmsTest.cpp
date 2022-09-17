@@ -3,7 +3,7 @@
 #include "test_config.h"
 
 #include "CanInterface.h"
-#include "CanBusMock.h"
+#include "CanControllerMock.h"
 #include "CanSensorOrionBms.h"
 
 /* Helper Functions */
@@ -42,7 +42,7 @@ TEST_CASE( "CanSensorOrionBms::getHumanName", "[CanSensorOrionBms][Sensor]" ) {
 }
 
 TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms][Sensor][CanSensor]" ) {
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
 
@@ -148,7 +148,7 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 }
 
 TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBms][Sensor][CanSensor]") {
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
 	setMillis(DEFAULT_START_TIME_MILLIS);
@@ -240,7 +240,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 }
 
 TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBms][Sensor][CanSensor]") {
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
 	setMillis(DEFAULT_START_TIME_MILLIS);
@@ -332,7 +332,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 }
 
 TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBms][Sensor][CanSensor]") {
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
 	setMillis(DEFAULT_START_TIME_MILLIS);

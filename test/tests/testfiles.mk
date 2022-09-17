@@ -19,11 +19,13 @@ STEERING := Sensor/CanSensorSteering.cpp
 ACCESSORIES := Sensor/CanSensorAccessories.cpp
 # Bms Manager Test Files
 BMS_MANAGER := Sensor/BmsManager.cpp
+# Sensor ECU Test FIles
+ECU := Sensor/SensorEcu.cpp
 
 # All files to compile for tests
 TEST_DIRS := $(dir $(wildcard $(TEST_DIR)tests/*/))
 TEST_CPP_TEMP := $(patsubst $(TEST_DIR)%,%,$(foreach %,$(TEST_DIRS),$(wildcard $(%)*.cpp)))
-SRC_CPP_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER)
+SRC_CPP_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER) $(ECU)
 
 # ALL TEST FILES
 CPP_TO_OBJ := $(SRC_CPP_TEMP) $(TEST_CPP_TEMP) test.cpp

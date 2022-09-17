@@ -1,11 +1,11 @@
 #include "test_config.h"
 
 #include "CanInterface.h"
-#include "CanBusMock.h"
+#include "CanControllerMock.h"
 #include "CanSensorSteering.h"
 
 TEST_CASE( "CanSensorSteering constructor test", "[CanSensorSteering]" ) {
-	CanBusMock mock(1);
+	CanControllerMock mock(1);
 	CanInterface interface(&mock);
 	CanSensorSteering steering(interface);
 
