@@ -67,8 +67,5 @@ jobs:
       - name: Verify Dependencies
         run: ./scripts/gh-configure-test
 
-      - name: Build Tests
-        run: make test
-
-      - name: Run Tests
+      - name: Build and Run Tests
         run: make run-tests
