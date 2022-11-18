@@ -1,0 +1,33 @@
+#ifndef _SENSOR_FCP_CELL_STACK_H_
+#define _SENSOR_FCP_CELL_STACK_H_
+
+#include <stdint.h>
+#include <vector>
+
+#include "Particle.h"
+#include "Sensor.h"
+#include "TelemetrySerial.h"
+
+class SensorFcpCellStack: public Sensor {
+    public:
+        SensorFcpCellStack(TelemetrySerial* serial);
+        ~SensorFcpCellStack();
+        String getHumanName() override;
+        void begin() override;
+        void handle() override;
+        String getNextCellVoltage(bool& valid = Sensor::dummy);
+        float getCellVoltageByIndex(int index, bool& valid = Sensor::dummy);
+
+    private:
+        TelemetrySerial* _serial;
+        String _buffer = "";
+        std::vector<float> _cellVoltages;
+        uint64_t _lastUpdate = 0;
+        bool _valid = false;
+        int8_t _lastCellVoltageIndex = -1;
+
+        bool _containsEndCharacter(char* buf);
+        void _unpackCellVoltages();
+};
+
+#endif

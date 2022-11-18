@@ -2,6 +2,7 @@
 #define _SENSOR_FC_H_
 
 #include "Sensor.h"
+#include "TelemetrySerial.h"
 
 #define FC_BUFFER_SIZE 512
 

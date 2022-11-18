@@ -215,7 +215,6 @@ int remoteRestartTinyBms(String command) {
  * SETUP
  * */
 void setup() {
-
     if(DEBUG_SERIAL_EN){
         Serial.begin(115200);
     }
@@ -245,7 +244,6 @@ void setup() {
  * LOOP
  * */
 void loop() {
-
     // Run all handleables
     Handler::instance().handle();
 

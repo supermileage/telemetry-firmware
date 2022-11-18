@@ -13,7 +13,8 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall -Wno-psabi
 LFLAGS = $(VERSION) $(LIBS)
 INCLUDE_PREFIX = -I
-PARTICLE_LIB = test/external/UnitTestLib/libwiringgcc.a
+PARTICLE_LIB_DIR = test/external/UnitTestLib/
+PARTICLE_LIB = $(PARTICLE_LIB_DIR)libwiringgcc.a
 INCLUDE_DIRS = test/external/UnitTestLib test/external/Catch2/single_include/catch2 lib/can-common/src $(TEST_DIRS)
 
 # Get all directories in src and add to includes
@@ -53,4 +54,8 @@ define compile
 	@echo ' *** Compiling $(1) *** '
 	@mkdir -p $(2)
 	@$(CC) $(CFLAGS) -c -o $(3) $(1) $(INCLUDE_FLAGS)
+endef
+
+define clean-test-submodules
+	@rm $(PARTICLE_LIB_DIR)*.o $(PARTICLE_LIB_DIR)*.a
 endef
