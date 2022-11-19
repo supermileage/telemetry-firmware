@@ -19,7 +19,7 @@ void timeValidCallback();
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
-Button button(A2, true, false, buttonPushed, NULL, buttonHeld);
+Button button(A2, false, true, buttonPushed, NULL, buttonHeld);
 DataQueue dataQ(VEHICLE_NAME, publish);
 TimeLib timeLib(timeValidCallback);
 LoggingDispatcher *dispatcher;

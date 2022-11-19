@@ -22,6 +22,7 @@ class Mcp2515CanWrapper : public CanController {
 	private:
 		uint8_t _intPin;
 		mcp2515_can* _mcpCan;
+		uint8_t _canInit = 0;
 };
 
 #endif

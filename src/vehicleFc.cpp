@@ -47,7 +47,6 @@ LoggingCommand<SensorFcpCellStack, String> cellVoltage14(&cellStack, "cv14", &Se
 LoggingCommand<SensorFcpCellStack, String> cellVoltage15(&cellStack, "cv15", &SensorFcpCellStack::getNextCellVoltage, 1);
 LoggingCommand<SensorFcpCellStack, String> cellVoltage16(&cellStack, "cv16", &SensorFcpCellStack::getNextCellVoltage, 1);
 LoggingCommand<SensorFcpCellStack, String> cellVoltage17(&cellStack, "cv17", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage18(&cellStack, "cv18", &SensorFcpCellStack::getNextCellVoltage, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);
@@ -79,9 +78,16 @@ void CurrentVehicle::debugSensorData() {
     // Thermo
     DEBUG_SERIAL("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C - ");
     DEBUG_SERIAL_LN("Fuel Cell Temp: " + String(thermo2.getProbeTemp()) + "°C");
-
+	// Fuel Cell voltages
+	DEBUG_SERIAL_LN("Fuel Cell Voltages:");
+	for (int i = 0; i < cellStack.getNumFuelCells(); i++) {
+		if (i != 0 && i % (cellStack.getNumFuelCells() / 2) == 0) {
+			DEBUG_SERIAL("\n");
+		}
+		DEBUG_SERIAL("Cell " + String(i + 1) + ": " + FLOAT_TO_STRING(cellStack.getCellVoltageByIndex(i), 2) + "V\t");
+	}
+	DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN();
-
 }
 
 bool CurrentVehicle::getTimeValid() {

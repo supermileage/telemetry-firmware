@@ -10,7 +10,11 @@ Mcp2515CanWrapper::~Mcp2515CanWrapper() { }
 
 void Mcp2515CanWrapper::begin() {
 	pinMode(_intPin, INPUT);
-	_mcpCan->begin(CAN_500KBPS,MCP_8MHz);
+	if (_mcpCan->begin(CAN_500KBPS,MCP_8MHz) == CAN_FAILINIT) {
+		DEBUG_SERIAL_LN("CAN_BEGIN FAILED");
+	} else {
+		_canInit = 1;
+	}
 }
 
 bool Mcp2515CanWrapper::readInterruptPin() {
@@ -30,5 +34,9 @@ unsigned long Mcp2515CanWrapper::getCanId() {
 }
 
 void Mcp2515CanWrapper::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
+	if (_canInit == 0) {
+		// DEBUG_SERIAL_LN("GAD DAMN BOI!  CAN AINT INITIALIZED");
+	}
 	_mcpCan->sendMsgBuf(id, ext, len, buf);
+	// DEBUG_SERIAL_LN(String(_mcpCan->sendMsgBuf(id, ext, len, buf)));
 }
