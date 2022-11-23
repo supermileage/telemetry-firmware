@@ -15,7 +15,7 @@ LFLAGS = $(VERSION) $(LIBS)
 INCLUDE_PREFIX = -I
 PARTICLE_LIB_DIR = test/external/UnitTestLib/
 PARTICLE_LIB = $(PARTICLE_LIB_DIR)libwiringgcc.a
-INCLUDE_DIRS = test/external/UnitTestLib test/external/Catch2/single_include/catch2 lib/can-common/src $(TEST_DIRS)
+INCLUDE_DIRS = test/external/UnitTestLib test/external/Catch2/single_include/catch2 lib/can-common/src lib/fcp-common/src $(TEST_DIRS)
 
 # Get all directories in src and add to includes
 SRC_DIRS = $(sort $(dir $(wildcard $(SRC_DIR)*/)))

@@ -1,5 +1,5 @@
 #include "vehicle.h"
-#include "SensorFcpCellStack.h"
+#include "SensorFcpControl.h"
 #include "USARTSerialWrapper.h"
 #include <vector>
 
@@ -12,7 +12,7 @@ SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 USARTSerialWrapper serial(&Serial1);
-SensorFcpCellStack cellStack(&serial);
+SensorFcpControl cellStack(&serial);
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
@@ -30,23 +30,23 @@ LoggingCommand<SensorGps, String> gpsIncline(&gps, "incl", &SensorGps::getInclin
 LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10);
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
 
-LoggingCommand<SensorFcpCellStack, String> cellVoltage1(&cellStack, "cv1", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage2(&cellStack, "cv2", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage3(&cellStack, "cv3", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage4(&cellStack, "cv4", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage5(&cellStack, "cv5", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage6(&cellStack, "cv6", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage7(&cellStack, "cv7", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage8(&cellStack, "cv8", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage9(&cellStack, "cv9", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage10(&cellStack, "cv10", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage11(&cellStack, "cv11", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage12(&cellStack, "cv12", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage13(&cellStack, "cv13", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage14(&cellStack, "cv14", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage15(&cellStack, "cv15", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage16(&cellStack, "cv16", &SensorFcpCellStack::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpCellStack, String> cellVoltage17(&cellStack, "cv17", &SensorFcpCellStack::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage1(&cellStack, "cv1", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage2(&cellStack, "cv2", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage3(&cellStack, "cv3", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage4(&cellStack, "cv4", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage5(&cellStack, "cv5", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage6(&cellStack, "cv6", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage7(&cellStack, "cv7", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage8(&cellStack, "cv8", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage9(&cellStack, "cv9", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage10(&cellStack, "cv10", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage11(&cellStack, "cv11", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage12(&cellStack, "cv12", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage13(&cellStack, "cv13", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage14(&cellStack, "cv14", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage15(&cellStack, "cv15", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage16(&cellStack, "cv16", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage17(&cellStack, "cv17", &SensorFcpControl::getNextCellVoltage, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);

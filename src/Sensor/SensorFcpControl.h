@@ -8,10 +8,13 @@
 #include "Sensor.h"
 #include "TelemetrySerial.h"
 
-class SensorFcpCellStack: public Sensor {
+/* Sensor which reads and interprets serial data sent from FCP control board */
+class SensorFcpControl: public Sensor {
     public:
-        SensorFcpCellStack(TelemetrySerial* serial);
-        ~SensorFcpCellStack();
+        static const uint8_t PacketSize;
+
+        SensorFcpControl(TelemetrySerial* serial);
+        ~SensorFcpControl();
         String getHumanName() override;
         void begin() override;
         void handle() override;

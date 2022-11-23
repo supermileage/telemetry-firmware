@@ -20,7 +20,7 @@
 #define OFFSET_UBADC		0x18
 
 /* Helper Functions */
-void packHeader(uint8_t* buf);
+void packHeaderEcu(uint8_t* buf);
 uint8_t getCheckSum(uint8_t* buf);
 void setCheckSum(uint8_t* buf);
 void packValue(uint8_t* buf, float value, float factor, float offset);
@@ -134,7 +134,7 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 	}
 
 	SECTION( "Header check fails for any single incorrect byte" ) {
-		packHeader(buf);
+		packHeaderEcu(buf);
 
 		// set up readBytes to copy from buf
 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
@@ -168,7 +168,7 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 	}
 
 	SECTION( "Header is valid but checksum fails" ) {
-		packHeader(buf);
+		packHeaderEcu(buf);
 
 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
 
@@ -189,7 +189,7 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 	}
 
 	SECTION( "Header is valid and checksum passes" ) {
-		packHeader(buf);
+		packHeaderEcu(buf);
 
 		serialMock.setReadMessage(buf, SensorEcu::PacketSize);
 
@@ -217,7 +217,7 @@ TEST_CASE( "SensorEcu::handle -- validation test", "[SensorEcu][Sensor]" ) {
 	uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 
 	// set header and checksum so SensorEcu::_valid will be set to true
-	packHeader(buf);
+	packHeaderEcu(buf);
 	setCheckSum(buf);
 	serialMock.setReadMessage(buf, SensorEcu::PacketSize);
 	setMillis(DEFAULT_START_TIME_MILLIS);
@@ -253,7 +253,7 @@ TEST_CASE( "SensorEcu::_interpretValue parses buffer correctly for all propertie
 	SensorEcu ecu(&serialMock);
 	uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 
-	packHeader(buf);
+	packHeaderEcu(buf);
 	setMillis(DEFAULT_START_TIME_MILLIS);
 
 	SECTION( "SensorEcu::getRPM" ) {
@@ -299,7 +299,7 @@ TEST_CASE( "SensorEcu::_interpretValue parses buffer correctly for all propertie
 	delete[] buf;
 }
 
-void packHeader(uint8_t* buf) {
+void packHeaderEcu(uint8_t* buf) {
 	for (size_t i = 0; i < HeaderBytes.size(); i++)
 		buf[i] = HeaderBytes[i];
 }

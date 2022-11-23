@@ -12,6 +12,10 @@
     #define FC
 #endif
 
+// Important: Board version number
+// TODO: remove when we have fully transitioned to second board
+#define BOARD_V2
+
 // Logging enabled at boot-up, control logging with button or Particle Function
 #define LOGGING_EN_AT_BOOT      1
 // Publish to Cloud
