@@ -2,9 +2,9 @@
 #include "fcp-common.h"
 #include "settings.h"
 
-#define FC_PACKET_LENGTH FC_NUM_CELLS * 2 + FC_NUM_HEADERS
+#define FC_PACKET_LENGTH FC_NUM_HEADERS + FC_NUM_CELLS * 2
 
-const uint8_t SensorFcpControl::PacketSize = FC_PACKET_LENGTH;
+const int32_t SensorFcpControl::PacketSize = FC_PACKET_LENGTH;
 
 SensorFcpControl::SensorFcpControl(TelemetrySerial* serial) : _serial(serial) { }
 
@@ -54,7 +54,8 @@ String SensorFcpControl::getNextCellVoltage(bool& valid) {
     return FLOAT_TO_STRING(_cellVoltages[_lastCellVoltageIndex], 2);
 }
 
-float SensorFcpControl::getCellVoltageByIndex(int index) {
+float SensorFcpControl::getCellVoltageByIndex(int index, bool& valid) {
+	valid = _valid;
 	if (index < FC_NUM_CELLS)
     	return _cellVoltages[index];
 	else
@@ -71,6 +72,7 @@ void SensorFcpControl::_unpackCellVoltages(uint8_t* buf) {
 		DEBUG_SERIAL_LN("UNPACKED VALUE: " + FLOAT_TO_STRING(_cellVoltages[j-1], 1));
 		#endif
 	}
+	_valid = true;
     _lastUpdate = millis();
 }
 

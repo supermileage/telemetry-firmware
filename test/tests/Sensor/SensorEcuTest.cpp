@@ -85,6 +85,8 @@ TEST_CASE( "SensorEcu::handle -- buffer header / checksum test", "[SensorEcu][Se
 	SensorEcu ecu(&serialMock);
 	uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
 
+	ecu.begin();
+
 	SECTION( "_serial->available() check fails then passes" ) {
 		// set up failing check
 		bool availableCalled = false;
@@ -252,6 +254,8 @@ TEST_CASE( "SensorEcu::_interpretValue parses buffer correctly for all propertie
 	TelemetrySerialMock serialMock;
 	SensorEcu ecu(&serialMock);
 	uint8_t* buf = new uint8_t[SensorEcu::PacketSize]();
+
+	ecu.begin();
 
 	packHeaderEcu(buf);
 	setMillis(DEFAULT_START_TIME_MILLIS);

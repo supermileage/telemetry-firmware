@@ -1,12 +1,14 @@
 #include "TelemetrySerialMock.h"
 #include <string.h>
 
-TelemetrySerialMock::~TelemetrySerialMock() {
+TelemetrySerialMock::TelemetrySerialMock() {
 	_begin = [](unsigned long baud, uint32_t flags) { };
 	_available = []() { return 0; };
 	_read = []() { return 0; };
 	_readBytes = [](char* buf, size_t len) { return 0; };
 }
+
+TelemetrySerialMock::~TelemetrySerialMock() { }
 
 void TelemetrySerialMock::begin(unsigned long baud, uint32_t flags) {
 	_begin(baud, flags);

@@ -11,7 +11,7 @@
 /* Sensor which reads and interprets serial data sent from FCP control board */
 class SensorFcpControl: public Sensor {
     public:
-        static const uint8_t PacketSize;
+        static const int32_t PacketSize;
 
         SensorFcpControl(TelemetrySerial* serial);
         ~SensorFcpControl();
@@ -20,7 +20,7 @@ class SensorFcpControl: public Sensor {
         void handle() override;
 		int getNumFuelCells();
         String getNextCellVoltage(bool& valid = Sensor::dummy);
-        float getCellVoltageByIndex(int index);
+        float getCellVoltageByIndex(int index, bool& valid = Sensor::dummy);
 
     private:
         TelemetrySerial* _serial;

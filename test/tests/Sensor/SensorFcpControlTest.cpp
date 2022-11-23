@@ -2,8 +2,9 @@
 
 #include <functional>
 #include <array>
-#include "fcp-common.h"
+#include <string.h>
 
+#include "fcp-common.h"
 #include "SensorFcpControl.h"
 #include "TelemetrySerialMock.h"
 
@@ -38,23 +39,26 @@ TEST_CASE( "SensorFcpControl::begin -- calls _serial->begin", "[SensorFcpControl
 	REQUIRE( beginCalled );
 }
 
-TEST_CASE( "SensorFcpControl::handle -- message length tests", "[SensorFcpControl][Sensor]" ) {
+TEST_CASE( "SensorFcpControl::handle -- buffer header test", "[SensorFcpControl][Sensor]" ) {
 	TelemetrySerialMock serialMock;
 	SensorFcpControl fcp(&serialMock);
 	uint8_t* buf = new uint8_t[SensorFcpControl::PacketSize]();
 
-	bool readCalled = false;
+	fcp.begin();
 	
 	SECTION( "should fail -- fewer bytes available than message length" ) {
+		bool readCalled = false;
 
 		serialMock.setAvailable([]() {
 			return SensorFcpControl::PacketSize - 1;
 		});
-		serialMock.setReadBytes([readCalled](char* buf, int len) {
+		serialMock.setReadBytes([&readCalled](char* buf, int len) {
 			readCalled = true;
+			return len;
 		});
-		serialMock.setRead([readCalled]() {
+		serialMock.setRead([&readCalled]() {
 			readCalled = true;
+			return 0;
 		});
 
 		fcp.handle();
@@ -63,28 +67,13 @@ TEST_CASE( "SensorFcpControl::handle -- message length tests", "[SensorFcpContro
 	}
 
 	SECTION( "should pass -- message is correct length and has correct header" ) {
-		serialMock.setAvailable([]() {
-			return SensorFcpControl::PacketSize;
-		});
-		serialMock.setReadBytes([readCalled](char* buf, int len) {
-			packHeaderFc(buf);
-			readCalled = true;
-		});
-		serialMock.setRead([readCalled]() {
-			readCalled = false;
-		});
-
-		fcp.handle();
-
-		REQUIRE( readCalled );
-	}
-
-	SECTION( "should fail -- message contains invalid header" ) {
-		bool flushCalled = false;
+		bool readCalled = false;
 		bool availableCalled = false;
 
-		serialMock.setAvailable([availableCalled]() {
-			// prevents infinite loop in case SensorEcu::flush is called
+		packHeaderFc(buf);
+
+		serialMock.setAvailable([&availableCalled]() {
+			// prevents infinite loop in case SensorFcpControl::flush is called
 			if (availableCalled)
 				return 0;
 			else
@@ -92,20 +81,132 @@ TEST_CASE( "SensorFcpControl::handle -- message length tests", "[SensorFcpContro
 
 			return SensorFcpControl::PacketSize;
 		});
-
-		serialMock.setReadMessage([](char* buf, int len) {
-			packHeaderFc(buf);
-			buf[1] = ~FC_HEADER_1;
+		serialMock.setReadBytes([&buf, &readCalled](char* buffer, int len) {
+			memcpy((void*)buffer, (void*)buf, len);
+			readCalled = true;
+			return len;
 		});
-		serialMock.setRead([flushCalled]() {
+
+		fcp.handle();
+
+		REQUIRE( availableCalled );
+		REQUIRE( readCalled );
+	}
+
+	SECTION( "should fail -- message contains invalid header" ) {
+		bool flushCalled = false;
+		bool readCalled = false;
+		int timesAvailableCalled = 0;
+		
+		packHeaderFc(buf);
+		buf[1] = ~FC_HEADER_1;
+		
+		serialMock.setAvailable([&timesAvailableCalled]() {
+			timesAvailableCalled++;
+			if (timesAvailableCalled > 5) {
+				return 0;
+			}
+			return SensorFcpControl::PacketSize;
+		});
+		serialMock.setReadBytes([&buf, &readCalled](char* buffer, int len) {
+			memcpy((void*)buffer, (void*)buf, len);
+			readCalled = true;
+			return len;
+		});
+		serialMock.setRead([&flushCalled]() {
 			flushCalled = true;
+			return 0;
 		});
 
 		fcp.handle();
 
 		REQUIRE( readCalled );
+		REQUIRE( timesAvailableCalled != 0 );
+		REQUIRE( flushCalled );
 	}
 
+	delete[] buf;
+}
+
+TEST_CASE( "SensorFcpControl::handle -- validation test", "[SensorFcpControl][Sensor]" ) {
+	TelemetrySerialMock serialMock;
+	SensorFcpControl fcp(&serialMock);
+	uint8_t* buf = new uint8_t[SensorFcpControl::PacketSize]();
+	packHeaderFc(buf);
+
+	fcp.begin();
+	setMillis(DEFAULT_START_TIME_MILLIS);
+
+	SECTION("should pass -- calling getter within stale interval") {
+		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
+		
+		// receive message
+		fcp.handle();
+
+		setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL - 1);
+
+		// set data validity
+		fcp.handle();
+
+		bool isValid = false;
+		fcp.getCellVoltageByIndex(0, isValid);
+
+		REQUIRE( isValid );
+	}
+
+	SECTION("should fail -- calling getter after stale interval") {
+		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
+		
+		// receive message
+		fcp.handle();
+
+		setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL);
+
+		// set data validity
+		fcp.handle();
+
+		bool isValid = false;
+		fcp.getCellVoltageByIndex(0, isValid);
+
+		REQUIRE_FALSE( isValid );
+	}
+
+	delete[] buf;
+}
+
+TEST_CASE( "SensorFcpControl::handle -- message parsing test", "[SensorFcpControl][Sensor]" ) {
+	TelemetrySerialMock serialMock;
+	SensorFcpControl fcp(&serialMock);
+	uint8_t* buf = new uint8_t[SensorFcpControl::PacketSize]();
+	packHeaderFc(buf);
+
+	fcp.begin();
+	setMillis(DEFAULT_START_TIME_MILLIS);
+	
+	SECTION("should pass -- correctly parses a range of cell data") {
+		const float cellValues[] = { 0, 0.01, -0.01, 0.125, -0.125, 0.7, -0.7, 0.88, -0.88, 1, -1, 2.55, -2.55, 13.33, -13.33, 25.5, -25.5 };
+
+		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );
+
+		for (int i = 0; i < FC_NUM_CELLS; i++) {
+			int16_t toPack = (int16_t)(cellValues[i] * 1000);
+			buf[FC_NUM_HEADERS + i * 2] = toPack >> 8;
+			buf[FC_NUM_HEADERS + i * 2 + 1] = toPack & 0xFF;
+		}
+
+		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
+
+		fcp.handle();
+
+		for (int i = 0; i < FC_NUM_CELLS; i++) {
+			bool isValid = false;
+			float val = fcp.getCellVoltageByIndex(i, isValid);
+
+			REQUIRE( isValid );
+			REQUIRE( cellValues[i] == Approx(val).margin(0.01) );
+		}
+	}
+	delete[] buf;
 }
 
 void packHeaderFc(uint8_t* buf) {
