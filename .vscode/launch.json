@@ -1,6 +1,5 @@
 {
     // unit test launch configuration:
-    // if you want to run a subset of these unit tests, add test tags to args below
     "version": "0.2.0",
     "configurations": [
         {
