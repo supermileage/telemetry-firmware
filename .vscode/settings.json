@@ -98,5 +98,6 @@
 	},
 	"C_Cpp.default.configurationProvider": "particle.particle-vscode-core",
 	"particle.disableDeviceOSOutdatedCheck": true,
-	"C_Cpp.errorSquiggles": "Disabled"
+	"C_Cpp.errorSquiggles": "Disabled",
+	"testMate.cpp.test.executables": "${workspaceFolder}/test/bin/*"
 }
