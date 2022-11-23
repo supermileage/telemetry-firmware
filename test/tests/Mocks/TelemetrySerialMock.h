@@ -2,6 +2,8 @@
 #define _TELEMETRY_SERIAL_MOCK_H_
 
 #include <functional>
+#include <stdint.h>
+#include <stddef.h>
 
 #include "TelemetrySerial.h"
 
