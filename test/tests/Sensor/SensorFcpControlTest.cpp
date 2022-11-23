@@ -19,7 +19,6 @@ const std::array<uint8_t, 6> HeaderBytes = {
 /* Tests */
 TEST_CASE( "SensorFcpControl::getHumanName test", "[SensorFcpControl][Sensor]" ) {
 	SensorFcpControl fcp(nullptr);
-
 	REQUIRE( fcp.getHumanName() == "FCP Control" );
 }
 
@@ -31,6 +30,7 @@ TEST_CASE( "SensorFcpControl::begin -- calls _serial->begin", "[SensorFcpControl
 
 	serialMock.setBegin([&beginCalled](unsigned long baud, uint32_t flags) {
 		beginCalled = true;
+		REQUIRE( baud == FC_BAUD );
 		REQUIRE( flags == SERIAL_8N1 );
 	});
 
@@ -170,7 +170,6 @@ TEST_CASE( "SensorFcpControl::handle -- validation test", "[SensorFcpControl][Se
 
 		REQUIRE_FALSE( isValid );
 	}
-
 	delete[] buf;
 }
 
@@ -183,7 +182,7 @@ TEST_CASE( "SensorFcpControl::handle -- message parsing test", "[SensorFcpContro
 	fcp.begin();
 	setMillis(DEFAULT_START_TIME_MILLIS);
 	
-	SECTION("should pass -- correctly parses a range of cell data") {
+	SECTION("should pass -- correctly parses a range of cell values") {
 		const float cellValues[] = { 0, 0.01, -0.01, 0.125, -0.125, 0.7, -0.7, 0.88, -0.88, 1, -1, 2.55, -2.55, 13.33, -13.33, 25.5, -25.5 };
 
 		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );

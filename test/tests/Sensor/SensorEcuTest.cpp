@@ -72,6 +72,7 @@ TEST_CASE( "SensorEcu::begin -- calls _serial->begin", "[SensorEcu][Sensor]" ) {
 
 	serialMock.setBegin([&beginCalled](unsigned long baud, uint32_t flags) {
 		beginCalled = true;
+		REQUIRE( baud == SensorEcu::Baud );
 		REQUIRE( flags == SERIAL_8N1 );
 	});
 
