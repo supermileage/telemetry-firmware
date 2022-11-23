@@ -10,7 +10,7 @@ endif
 CC = g++
 VERSION = -std=c++11
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
-CFLAGS = $(VERSION) $(DEPFLAGS) -Wall -Wno-psabi
+CFLAGS = $(VERSION) $(DEPFLAGS) -Wall -Wno-psabi -g
 LFLAGS = $(VERSION) $(LIBS)
 INCLUDE_PREFIX = -I
 PARTICLE_LIB_DIR = test/external/UnitTestLib/
