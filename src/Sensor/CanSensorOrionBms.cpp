@@ -99,7 +99,7 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_bmsStatus = message.data[0] & 0x1 ? DischargeEnabled : Unknown;
 			if (_bmsStatus == Unknown)
 				_bmsStatus = message.data[0] & 0x2 ? ChargeEnabled : Unknown;
-				
+			
 			_fault = _parseFault(message);
 			_validationMap[CAN_ORIONBMS_STATUS] = _lastUpdateTime;
 			break;

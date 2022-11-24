@@ -1,0 +1,8 @@
+{
+	"recommendations": [
+		"ms-vscode.cpptools-extension-pack",
+		"vadimcn.vscode-lldb",
+		"matepek.vscode-catch2-test-adapter",
+		"particle.particle-vscode-pack"
+	]
+}

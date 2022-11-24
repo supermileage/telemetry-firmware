@@ -2,17 +2,23 @@
 
 This project includes a unit test suite, built with [catch2](https://github.com/catchorg/Catch2/tree/v2.x)
 
-## Building the tests
-
-from root project folder:
-
-``` $ make test ```
-
 ## Running the tests
 
-``` $ ./test/bin/test <test-tag> ```
+First make sure you have the C++ TestMate VSCode extension installed.  This extension generates a test display panel not unlike those of Visual Studio and IntelliJ.  You can run the whole test suite by opening up the panel and clicking the run icon.  This will both compile and run the tests, so no need to run make manually.
 
-**```<test-tag>``` is an optional parameter for running a subset of the tests--more on this below
+![](https://github.com/matepek/vscode-catch2-test-adapter/blob/master/resources/ScreenShot_2021-11-20.png)
+
+**Note**: if testmate is not in the extension toolbar then you can display it by right-clicking the toolbar menu and adding it to the list extensions.
+
+If you are a more hands on kind of person then from the root project folder you can run:
+
+``` $ make test ``` to compile the tests
+
+``` $ make run-test ``` to compile and run all the tests
+
+``` $ ./test/bin/test <test-tag> ``` to run the test suite
+
+**Note**: ```<test-tag>``` is an optional parameter for running a subset of the tests--more on this below
 
 ## Writing tests
 
@@ -47,7 +53,7 @@ In the example above, the TEST_CASE macro is used.  This registers the test unde
 
 The first argument is a description of the test which will be displayed if the test fails.  The second provides a set of tags which you can use to group tests together.  For example, if you have many test cases in different files tagged with [ConstructorTests], you can run them all with:
 ```
-./bin/test [ConstructorTests]
+./test/bin/test [ConstructorTests]
 ```
 
 #### More on Catch2
