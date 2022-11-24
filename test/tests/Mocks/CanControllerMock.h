@@ -4,17 +4,17 @@
 #include <functional>
 
 #include "can.h"
-#include "CanBus.h"
+#include "CanController.h"
 
 using namespace can;
 
 /**
- * @brief Mock class for predefining CAN bus behavior
+ * @brief Mock class for predefining CAN controller behavior
  */
-class CanBusMock : public CanBus {
+class CanControllerMock : public CanController {
 	public:
-		CanBusMock(byte messageAvail);
-		~CanBusMock();
+		CanControllerMock(byte messageAvail);
+		~CanControllerMock();
 		bool readInterruptPin() override;
 		byte checkReceive() override ;
 		byte readMsgBuf(byte* len, byte* buf) override;

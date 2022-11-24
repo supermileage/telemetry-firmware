@@ -1,6 +1,6 @@
-#include "CanBusMock.h"
+#include "CanControllerMock.h"
 
-CanBusMock::CanBusMock(byte msgAvail) : CanBus(msgAvail) {
+CanControllerMock::CanControllerMock(byte msgAvail) : CanController(msgAvail) {
 	// set up default functions
 	_readInterruptPin = []() { return true; };
 	_checkReceive = [this]() { return ~messageAvail(); };
@@ -9,13 +9,13 @@ CanBusMock::CanBusMock(byte msgAvail) : CanBus(msgAvail) {
 	_sendMsgBuf = [](unsigned long id, byte ext, byte len, const byte *buf) { };
 }
 
-CanBusMock::~CanBusMock() { }
+CanControllerMock::~CanControllerMock() { }
 
-bool CanBusMock::readInterruptPin() { 
+bool CanControllerMock::readInterruptPin() { 
 	return _readInterruptPin();
 }
 
-byte CanBusMock::checkReceive() {
+byte CanControllerMock::checkReceive() {
 	if (!_checkReceiveCalled) {
 		_checkReceiveCalled = true;
 		return _checkReceive();
@@ -25,42 +25,42 @@ byte CanBusMock::checkReceive() {
 	}
 }
 
-byte CanBusMock::readMsgBuf(byte* len, byte* buf) { 
+byte CanControllerMock::readMsgBuf(byte* len, byte* buf) { 
 	return _readMsgBuf(len, buf);
 }
 
-unsigned long CanBusMock::getCanId() { 
+unsigned long CanControllerMock::getCanId() { 
 	return _getCanId();
 }
 
-void CanBusMock::begin() { }
+void CanControllerMock::begin() { }
 
-void CanBusMock::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
+void CanControllerMock::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
 	_sendMsgBuf(id, ext, len, buf);
 }
 
-void CanBusMock::setReadInterruptPin(std::function<bool(void)> func) {
+void CanControllerMock::setReadInterruptPin(std::function<bool(void)> func) {
 	_readInterruptPin = func;
 }
 
-void CanBusMock::setCheckReceive(std::function<byte(void)> func) {
+void CanControllerMock::setCheckReceive(std::function<byte(void)> func) {
 	_checkReceive = func;
 	_checkReceiveCalled = false;
 }
 
-void CanBusMock::setGetCanId(std::function<uint64_t(void)> func) {
+void CanControllerMock::setGetCanId(std::function<uint64_t(void)> func) {
 	_getCanId = func;
 }
 
-void CanBusMock::setReadMsgBuffer(std::function<byte(byte*,byte*)> func) {
+void CanControllerMock::setReadMsgBuffer(std::function<byte(byte*,byte*)> func) {
 	_readMsgBuf = func;
 }
 
-void CanBusMock::setSendMsgBuffer(std::function<void(uint64_t,byte,byte,const byte*)> func) {
+void CanControllerMock::setSendMsgBuffer(std::function<void(uint64_t,byte,byte,const byte*)> func) {
 	_sendMsgBuf = func;
 }
 
-void CanBusMock::setCanMessage(CanMessage msg) {
+void CanControllerMock::setCanMessage(CanMessage msg) {
 	setReadInterruptPin([]() { return false; });
 	setCheckReceive([this]() { return messageAvail(); });
 	setGetCanId([msg]() { return msg.id; });

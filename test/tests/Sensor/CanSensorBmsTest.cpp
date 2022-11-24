@@ -1,12 +1,12 @@
 #include "test_config.h"
 #include "Particle.h"
 
-#include "CanBusMock.h"
+#include "CanControllerMock.h"
 #include "CanSensorOrionBms.h"
 
 
 TEST_CASE("Test CanSensorBms::handle", "[CanSensorBms][handle]"){
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms bms(interface);
 	bool socMessageSent = false;

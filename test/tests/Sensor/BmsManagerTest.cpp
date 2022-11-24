@@ -1,7 +1,7 @@
 #include "test_config.h"
 
 #include "CanInterface.h"
-#include "CanBusMock.h"
+#include "CanControllerMock.h"
 #include "CanSensorTinyBms.h"
 #include "CanSensorOrionBms.h"
 #include "BmsManager.h"
@@ -9,7 +9,7 @@
 #define FAKE_MESSAGE_AVAIL 5
 
 TEST_CASE( "BmsManager::setCurrentBms", "[BmsManager]" ) {
-	CanBusMock canBusMock(FAKE_MESSAGE_AVAIL);
+	CanControllerMock canBusMock(FAKE_MESSAGE_AVAIL);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
 	CanSensorTinyBms tiny(interface, 500);
@@ -30,7 +30,7 @@ TEST_CASE( "BmsManager::setCurrentBms", "[BmsManager]" ) {
 }
 
 TEST_CASE( "BmsManager::getCurrentBms", "[BmsManager]" ) {
-	CanBusMock canBusMock(FAKE_MESSAGE_AVAIL);
+	CanControllerMock canBusMock(FAKE_MESSAGE_AVAIL);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
 	CanSensorTinyBms tiny(interface, 500);
@@ -57,7 +57,7 @@ TEST_CASE( "BmsManager::getCurrentBms", "[BmsManager]" ) {
 }
 
 TEST_CASE( "BmsManager::handle", "[BmsManager][Handle]" ) {
-	CanBusMock canBusMock(FAKE_MESSAGE_AVAIL);
+	CanControllerMock canBusMock(FAKE_MESSAGE_AVAIL);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
 	CanSensorTinyBms tiny(interface, 500);

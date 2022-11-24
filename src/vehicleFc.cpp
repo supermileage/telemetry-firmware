@@ -1,5 +1,6 @@
 #include "vehicle.h"
-#include "SensorFc.h"
+#include "SensorFcpControl.h"
+#include "USARTSerialWrapper.h"
 #include <vector>
 
 #ifdef FC
@@ -10,7 +11,8 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-SensorFc fc(&Serial1);
+USARTSerialWrapper serial(&Serial1);
+SensorFcpControl cellStack(&serial);
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
@@ -27,6 +29,24 @@ LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVer
 LoggingCommand<SensorGps, String> gpsIncline(&gps, "incl", &SensorGps::getIncline, 1);
 LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10);
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
+
+LoggingCommand<SensorFcpControl, String> cellVoltage1(&cellStack, "cv1", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage2(&cellStack, "cv2", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage3(&cellStack, "cv3", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage4(&cellStack, "cv4", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage5(&cellStack, "cv5", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage6(&cellStack, "cv6", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage7(&cellStack, "cv7", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage8(&cellStack, "cv8", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage9(&cellStack, "cv9", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage10(&cellStack, "cv10", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage11(&cellStack, "cv11", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage12(&cellStack, "cv12", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage13(&cellStack, "cv13", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage14(&cellStack, "cv14", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage15(&cellStack, "cv15", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage16(&cellStack, "cv16", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage17(&cellStack, "cv17", &SensorFcpControl::getNextCellVoltage, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);
@@ -58,9 +78,16 @@ void CurrentVehicle::debugSensorData() {
     // Thermo
     DEBUG_SERIAL("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C - ");
     DEBUG_SERIAL_LN("Fuel Cell Temp: " + String(thermo2.getProbeTemp()) + "°C");
-
+	// Fuel Cell voltages
+	DEBUG_SERIAL_LN("Fuel Cell Voltages:");
+	for (int i = 0; i < cellStack.getNumFuelCells(); i++) {
+		if (i != 0 && i % (cellStack.getNumFuelCells() / 2) == 0) {
+			DEBUG_SERIAL("\n");
+		}
+		DEBUG_SERIAL("Cell " + String(i + 1) + ": " + FLOAT_TO_STRING(cellStack.getCellVoltageByIndex(i), 2) + "V\t");
+	}
+	DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN();
-
 }
 
 bool CurrentVehicle::getTimeValid() {

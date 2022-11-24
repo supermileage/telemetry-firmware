@@ -2,7 +2,7 @@
 #include <unordered_map>
 
 #include "CanInterface.h"
-#include "CanBusMock.h"
+#include "CanControllerMock.h"
 #include "CanSensorAccessories.h"
 
 #define NUM_IDS 7
@@ -30,7 +30,7 @@ TEST_CASE( "CanSensorAccessories::getHumanName test", "[CanSensorAccessories][Se
 }
 
 TEST_CASE( "CanSensorAccessories getters test -- all status properties unknown on startup", "[CanSensorAccessories][Sensor]" ) {
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
 
@@ -44,7 +44,7 @@ TEST_CASE( "CanSensorAccessories getters test -- all status properties unknown o
 }
 
 TEST_CASE( "CanSensorAccessories::update -- test update individual properties", "[CanSensorAccessories][Sensor]" ) {
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
 	setMillis(DEFAULT_START_TIME_MILLIS);
@@ -148,7 +148,7 @@ TEST_CASE( "CanSensorAccessories::update -- test update individual properties", 
 }
 
 TEST_CASE("CanSensorAccessories::update -- full buffer test -- on then off", "[CanSensorAccessories][Sensor]") {
-	CanBusMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
+	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorAccessories accessories(interface, CAN_ACC_STATUS);
 	setMillis(DEFAULT_START_TIME_MILLIS);

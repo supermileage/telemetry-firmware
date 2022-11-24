@@ -16,10 +16,14 @@ void publish(String payload, DataQueue::PublishData status);
 void timeValidCallback();
 
 // Construct all Handleables
+#ifdef BOARD_V2
+Button button(A2, false, true, buttonPushed, NULL, buttonHeld);
+#else
+Button button(A2, true, false, buttonPushed, NULL, buttonHeld);
+#endif
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
-Button button(A2, true, false, buttonPushed, NULL, buttonHeld);
 DataQueue dataQ(VEHICLE_NAME, publish);
 TimeLib timeLib(timeValidCallback);
 LoggingDispatcher *dispatcher;
@@ -215,10 +219,9 @@ int remoteRestartTinyBms(String command) {
  * SETUP
  * */
 void setup() {
-
-    if(DEBUG_SERIAL_EN){
-        Serial.begin(115200);
-    }
+    #if DEBUG_SERIAL_EN
+    Serial.begin(115200);
+    #endif
 
     // Start i2c with clock speed of 400 KHz
     // This requires the pull-up resistors to be removed on i2c bus
@@ -245,7 +248,6 @@ void setup() {
  * LOOP
  * */
 void loop() {
-
     // Run all handleables
     Handler::instance().handle();
 

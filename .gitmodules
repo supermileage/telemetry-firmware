@@ -35,3 +35,6 @@
 	path = test/external/Catch2
 	url = https://github.com/catchorg/Catch2.git
 	branch = v2.x
+[submodule "lib/fcp-common"]
+	path = lib/fcp-common
+	url = git@github.com:supermileage/fcp-common.git

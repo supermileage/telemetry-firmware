@@ -28,11 +28,11 @@ fc: clean pull-image
 	$(call print, TAKING OWNERSHIP OF FILES - YOU MAY NEED YOUR PASSWORD)
 	sudo chown -R $(shell id -u):$(shell id -g) $(OUTPUT_DIR)
 
-test : $(TEST_OBJ) $(BIN_DIR) libwiringgcc
+test: $(TEST_OBJ) $(BIN_DIR) libwiringgcc
 	@echo ' *** Building $@ *** '
 	@g++ $(LFLAGS) $(TEST_OBJ) $(PARTICLE_LIB) $(INCLUDE_FLAGS) -o $(BIN_DIR)$@
 
-run-tests:
+run-tests: test
 	@chmod +x ./test/bin/test
 	./test/bin/test
 
@@ -47,6 +47,7 @@ clean:
 	rm -rf $(OUTPUT_DIR)
 
 clean-test:
+	@$(call clean-test-submodules)
 	@rm -rf test/obj
 	@rm -rf test/bin
 	@rm -rf test/dep
