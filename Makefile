@@ -47,6 +47,7 @@ clean:
 	rm -rf $(OUTPUT_DIR)
 
 clean-test:
+	@$(call clean-test-submodules)
 	@rm -rf test/obj
 	@rm -rf test/bin
 	@rm -rf test/dep

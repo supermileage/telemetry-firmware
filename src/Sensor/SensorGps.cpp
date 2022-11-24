@@ -33,7 +33,6 @@ void SensorGps::begin() {
     _gps->setAutoPVT(true);
     // Set the update frequency.  The Sparkfun GNSS library will automatically limit checks to UPDATE_FREQ times per second
     _gps->setNavigationFrequency(UPDATE_FREQ);
-
 }
 
 void SensorGps::handle() {

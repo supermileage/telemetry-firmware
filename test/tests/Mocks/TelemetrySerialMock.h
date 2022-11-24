@@ -2,11 +2,14 @@
 #define _TELEMETRY_SERIAL_MOCK_H_
 
 #include <functional>
+#include <stdint.h>
+#include <stddef.h>
 
 #include "TelemetrySerial.h"
 
 class TelemetrySerialMock : public TelemetrySerial {
 	public:
+		TelemetrySerialMock();
 		~TelemetrySerialMock();
 		void begin(unsigned long baud, uint32_t flags) override;
 		int available() override;

@@ -1,7 +1,6 @@
-.vscode/
+.vscode/*
 !.vscode/*.json
 **c_cpp_properties.json
-**launch.json
 demo/
 *.code-workspace
 target/

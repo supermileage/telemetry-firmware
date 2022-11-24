@@ -9,8 +9,12 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define URBAN
+    #define FC
 #endif
+
+// Important: Board version number
+// TODO: remove when we have fully transitioned to second board
+#define BOARD_V2
 
 // Logging enabled at boot-up, control logging with button or Particle Function
 #define LOGGING_EN_AT_BOOT      1
