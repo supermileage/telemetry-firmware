@@ -25,12 +25,13 @@ const uint8_t VALIDATION_IDS[] {
     TINYBMS_PARAM_ID_EVENTS
 };
 
+const uint8_t* CanSensorTinyBms::ParamIds = PARAM_IDS;
+
 CanSensorTinyBms::CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
     : CanSensorBms(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) { }
 
 void CanSensorTinyBms::handle() {
     if(millis() - _lastValidTime >= _requestIntervalMs) {
-
         CanMessage msg = CAN_MESSAGE_NULL;
         msg.id = CAN_TINYBMS_REQUEST;
         msg.dataLength = TINYBMS_REQ_DATA_LENGTH;
@@ -41,15 +42,10 @@ void CanSensorTinyBms::handle() {
         }
 
         msg.data[0] = PARAM_IDS[_currentParam];
-            
+		
         _canInterface.sendMessage(msg);
 
-        if(_currentParam == TINYBMS_NUM_PARAMS - 1) {
-            _currentParam = 0;
-        } else {
-            _currentParam++;
-        }
-
+		(++_currentParam) %= TINYBMS_NUM_PARAMS;
         _lastValidTime = millis();
     }
 
@@ -196,15 +192,15 @@ void CanSensorTinyBms::update(CanMessage message) {
                 _soc = (float)parseInt32(message.data) / 1000000.0;
                 break;
             case TINYBMS_PARAM_ID_TEMP:
-                if(message.data[5] == TINYBMS_TEMP_ID_INTERNAL) {
+                if(message.data[TINYBMS_TEMP_ID_BYTE] == TINYBMS_TEMP_ID_INTERNAL) {
                     _tempBms = parseInt16(message.data + 1) / 10;
                     _validationMap[TINYBMS_TEMP_ID_INTERNAL] = _lastUpdateTime;
                 }
-                else if(message.data[5] == TINYBMS_TEMP_ID_BATTERY_1) {
+                else if(message.data[TINYBMS_TEMP_ID_BYTE] == TINYBMS_TEMP_ID_BATTERY_1) {
                     _batteryTemp1 = parseInt16(message.data + 1) / 10;
                     _validationMap[TINYBMS_TEMP_ID_BATTERY_1] = _lastUpdateTime;
                 }
-                else if(message.data[5] == TINYBMS_TEMP_ID_BATTERY_2) {
+                else if(message.data[TINYBMS_TEMP_ID_BYTE] == TINYBMS_TEMP_ID_BATTERY_2) {
                     _batteryTemp2 = parseInt16(message.data + 1) / 10;
                     _validationMap[TINYBMS_TEMP_ID_BATTERY_2] = _lastUpdateTime;
                 }
@@ -231,13 +227,13 @@ float CanSensorTinyBms::parseFloat(uint8_t* dataPtr) {
     return output;
 }
 
-uint16_t CanSensorTinyBms::parseInt16(uint8_t* dataPtr) {
-    return ((uint16_t)dataPtr[TINYBMS_RSP_DATA_BYTE + 1] << 8)
+int16_t CanSensorTinyBms::parseInt16(uint8_t* dataPtr) {
+    return (int16_t)((uint16_t)dataPtr[TINYBMS_RSP_DATA_BYTE + 1] << 8)
             | dataPtr[TINYBMS_RSP_DATA_BYTE];
 }
 
-uint32_t CanSensorTinyBms::parseInt32(uint8_t* dataPtr) {
-    return ((uint32_t)dataPtr[TINYBMS_RSP_DATA_BYTE + 3] << 24) 
+int32_t CanSensorTinyBms::parseInt32(uint8_t* dataPtr) {
+    return (int32_t)((uint32_t)dataPtr[TINYBMS_RSP_DATA_BYTE + 3] << 24) 
             | ((uint32_t)dataPtr[TINYBMS_RSP_DATA_BYTE + 2] << 16)
             | ((uint32_t)dataPtr[TINYBMS_RSP_DATA_BYTE + 1] << 8)
             | dataPtr[TINYBMS_RSP_DATA_BYTE];

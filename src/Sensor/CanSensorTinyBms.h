@@ -34,6 +34,7 @@
 #define TINYBMS_RSP_STATUS_BYTE     		        0x0
 #define TINYBMS_RSP_PARAM_ID_BYTE   		        0x1
 #define TINYBMS_RSP_DATA_BYTE       		        0x2
+#define TINYBMS_TEMP_ID_BYTE						0x5
 
 #define TINYBMS_FAULT_UNDER_VOLTAGE                 0x02
 #define TINYBMS_FAULT_OVER_VOLTAGE                  0x03
@@ -47,10 +48,14 @@
 #define TINYBMS_FAULT_CURRENT_SENSOR_DISCONNECTED   0x0E
 #define TINYBMS_FAULT_CURRENT_SENSOR_CONNECTED      0x0F
 
+#define TINYBMS_TEMP_SCALING_FACTOR					10
+
 using namespace can;
 
 class CanSensorTinyBms : public CanSensorBms {
-    public:    
+    public:
+		static const uint8_t* ParamIds;
+
         /**
          * @brief Constructor for CanSensorTinyBms
          * 
@@ -142,7 +147,7 @@ class CanSensorTinyBms : public CanSensorBms {
         /**
          * @brief Send a restart message to the BMS
          */
-        void restart() override;
+        void restart() override; 
 
     private:
 		// Control
@@ -164,14 +169,14 @@ class CanSensorTinyBms : public CanSensorBms {
          * 
          * @param dataPtr Base address of data
          */
-        uint16_t parseInt16(uint8_t* dataPtr);
+        int16_t parseInt16(uint8_t* dataPtr);
 
         /**
          * @brief Parse number in TinyBMS 32-bit int format
          * 
          * @param dataPtr Base address of data
          */
-        uint32_t parseInt32(uint8_t* dataPtr);
+        int32_t parseInt32(uint8_t* dataPtr);
 
         /**
          * @brief Determines type of bms data and stores respectively
