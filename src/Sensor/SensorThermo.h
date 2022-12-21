@@ -37,11 +37,14 @@ class SensorThermo : public Sensor {
          **/
         int getInternalTemp(bool &valid = Sensor::dummy);
 
+        String getInitStatus();
+
     private:
         Adafruit_MAX31855* _probe;
         SPIClass *_spi;
         uint8_t _csPin;
         uint32_t _lastDebug = 0;
+        bool _initialized = false;
 };
 
 #endif
