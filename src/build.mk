@@ -13,7 +13,7 @@ INCLUDE_DIRS += $(INCLUDE_DIRS_LIB)
 # Add all src files in root of each library folder in /lib/
 CPPSRC += $(patsubst $(APPDIR)/%,%,$(foreach %,$(INCLUDE_DIRS_LIB),$(wildcard $(%)/*.cpp)))
 # Include all directories in /src/
-INCLUDE_DIRS_SRC += $(sort $(dir $(wildcard $(APPDIR)/src/*/)))
+INCLUDE_DIRS_SRC += $(sort $(dir $(wildcard $(APPDIR)/src/*/*/)))
 INCLUDE_DIRS += $(INCLUDE_DIRS_SRC)
 
 # Define constants to remove compilation warnings from these external libs:
