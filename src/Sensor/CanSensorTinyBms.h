@@ -49,12 +49,15 @@
 #define TINYBMS_FAULT_CURRENT_SENSOR_CONNECTED      0x0F
 
 #define TINYBMS_TEMP_SCALING_FACTOR					10
+#define TINYBMS_CELL_VOLTAGE_SCALING_FACTOR			1000
+#define TINYBMS_SOC_SCALING_FACTOR                  1000000
 
 using namespace can;
 
 class CanSensorTinyBms : public CanSensorBms {
     public:
 		static const uint8_t* ParamIds;
+        static const std::unordered_map<uint8_t, BmsFault::Code> FaultCodeMap;
 
         /**
          * @brief Constructor for CanSensorTinyBms
@@ -190,7 +193,7 @@ class CanSensorTinyBms : public CanSensorBms {
          * 
          * @param fault TinyBMS fault code
          */
-        uint8_t _getFaultCode(uint8_t fault);
+        int _getFaultCode(uint8_t fault);
 };
 
 #endif

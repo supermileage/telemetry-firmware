@@ -27,6 +27,22 @@ const uint8_t VALIDATION_IDS[] {
 
 const uint8_t* CanSensorTinyBms::ParamIds = PARAM_IDS;
 
+
+const std::unordered_map<uint8_t, BmsFault::Code> CanSensorTinyBms::FaultCodeMap = {
+    { TINYBMS_FAULT_UNDER_VOLTAGE, BmsFault::VOLTAGE_LOW },
+    { TINYBMS_FAULT_OVER_VOLTAGE, BmsFault::VOLTAGE_HIGH },
+    { TINYBMS_FAULT_OVER_TEMP, BmsFault::TEMP_HIGH },
+    { TINYBMS_FAULT_OVER_CURRENT_DISCHARGE, BmsFault::CURRENT_DISCHARGE_HIGH },
+    { TINYBMS_FAULT_OVER_CURRENT_CHARGE, BmsFault::CURRENT_CHARGE_HIGH },
+    { TINYBMS_FAULT_LOW_TEMP, BmsFault::TEMP_LOW },
+    { TINYBMS_FAULT_CHARGER_SWITCH, BmsFault::SWITCH_CHARGE },
+    { TINYBMS_FAULT_LOAD_SWITCH, BmsFault::SWITCH_DISCHARGE },
+    { TINYBMS_FAULT_SINGLE_PORT_SWITCH, BmsFault::SWITCH_DISCHARGE },
+    { TINYBMS_FAULT_CURRENT_SENSOR_DISCONNECTED, BmsFault::CURRENT_SENSOR_DISCONNECT },
+    { TINYBMS_FAULT_CURRENT_SENSOR_CONNECTED, BmsFault::CURRENT_SENSOR_CONNECT }
+};
+
+
 CanSensorTinyBms::CanSensorTinyBms(CanInterface &canInterface, uint16_t requestIntervalMs) 
     : CanSensorBms(canInterface, CAN_TINYBMS_RESPONSE), _requestIntervalMs(requestIntervalMs) { }
 
@@ -160,10 +176,10 @@ void CanSensorTinyBms::update(CanMessage message) {
                 _batteryCurrent = -parseFloat(message.data);
                 break;
             case TINYBMS_PARAM_ID_MAX_CELL_VOLTAGE:
-                _cellVoltageMax = (float)parseInt16(message.data) / 1000.0; 
+                _cellVoltageMax = (float)parseInt16(message.data) / TINYBMS_CELL_VOLTAGE_SCALING_FACTOR; 
                 break;
             case TINYBMS_PARAM_ID_MIN_CELL_VOLTAGE:
-                _cellVoltageMin = (float)parseInt16(message.data) / 1000.0; 
+                _cellVoltageMin = (float)parseInt16(message.data) / TINYBMS_CELL_VOLTAGE_SCALING_FACTOR; 
                 break;
             case TINYBMS_PARAM_ID_STATUS: {
                 unsigned statusCode = parseInt16(message.data);
@@ -193,15 +209,15 @@ void CanSensorTinyBms::update(CanMessage message) {
                 break;
             case TINYBMS_PARAM_ID_TEMP:
                 if(message.data[TINYBMS_TEMP_ID_BYTE] == TINYBMS_TEMP_ID_INTERNAL) {
-                    _tempBms = parseInt16(message.data + 1) / 10;
+                    _tempBms = parseInt16(message.data + 1) / TINYBMS_TEMP_SCALING_FACTOR;
                     _validationMap[TINYBMS_TEMP_ID_INTERNAL] = _lastUpdateTime;
                 }
                 else if(message.data[TINYBMS_TEMP_ID_BYTE] == TINYBMS_TEMP_ID_BATTERY_1) {
-                    _batteryTemp1 = parseInt16(message.data + 1) / 10;
+                    _batteryTemp1 = parseInt16(message.data + 1) / TINYBMS_TEMP_SCALING_FACTOR;
                     _validationMap[TINYBMS_TEMP_ID_BATTERY_1] = _lastUpdateTime;
                 }
                 else if(message.data[TINYBMS_TEMP_ID_BYTE] == TINYBMS_TEMP_ID_BATTERY_2) {
-                    _batteryTemp2 = parseInt16(message.data + 1) / 10;
+                    _batteryTemp2 = parseInt16(message.data + 1) / TINYBMS_TEMP_SCALING_FACTOR;
                     _validationMap[TINYBMS_TEMP_ID_BATTERY_2] = _lastUpdateTime;
                 }
                 break;
@@ -239,31 +255,9 @@ int32_t CanSensorTinyBms::parseInt32(uint8_t* dataPtr) {
             | dataPtr[TINYBMS_RSP_DATA_BYTE];
 }
 
-uint8_t CanSensorTinyBms::_getFaultCode(uint8_t fault) {
-    switch(fault) {
-        case TINYBMS_FAULT_UNDER_VOLTAGE:
-            return BmsFault::VOLTAGE_LOW;
-        case TINYBMS_FAULT_OVER_VOLTAGE:
-            return BmsFault::VOLTAGE_HIGH;
-        case TINYBMS_FAULT_OVER_TEMP:
-            return BmsFault::TEMP_HIGH;
-        case TINYBMS_FAULT_OVER_CURRENT_DISCHARGE: 
-            return BmsFault::CURRENT_DISCHARGE_HIGH;
-        case TINYBMS_FAULT_OVER_CURRENT_CHARGE:
-            return BmsFault::CURRENT_CHARGE_HIGH;
-        case TINYBMS_FAULT_LOW_TEMP:
-            return BmsFault::TEMP_LOW;
-        case TINYBMS_FAULT_CHARGER_SWITCH:
-            return BmsFault::SWITCH_CHARGE;
-        case TINYBMS_FAULT_LOAD_SWITCH: 
-            return BmsFault::SWITCH_DISCHARGE;
-        case TINYBMS_FAULT_SINGLE_PORT_SWITCH:
-            return BmsFault::SWITCH_DISCHARGE;
-        case TINYBMS_FAULT_CURRENT_SENSOR_DISCONNECTED: 
-            return BmsFault::CURRENT_SENSOR_DISCONNECT;  
-        case TINYBMS_FAULT_CURRENT_SENSOR_CONNECTED:     
-            return BmsFault::CURRENT_SENSOR_CONNECT; 
-        default: 
-            return BmsFault::NONE;
+int CanSensorTinyBms::_getFaultCode(uint8_t fault) {
+    if (FaultCodeMap.find(fault) != FaultCodeMap.end()) {
+        return FaultCodeMap.at(fault);
     }
+    return BmsFault::NONE;
 }
