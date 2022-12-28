@@ -7,6 +7,10 @@
 
 #define GRAVITY 9.81
 
+/*
+ * Defines a vehicle accelerometer sensor positioned such that z-axis
+ * is forward/backward and y-axis is up/down
+ */
 class SensorAccelerometer : public Sensor {
     public:
         SensorAccelerometer(AccelerometerController *controller);
@@ -21,11 +25,7 @@ class SensorAccelerometer : public Sensor {
 
         Vec3 getGyro();
         Vec3 getAccel();
-        float getTemp();
         float getAccelMagnitude();
-        float getMetersPerSecond();
-        float getGravityZ();
-
         String getInitStatus();
 
     private:
@@ -36,7 +36,6 @@ class SensorAccelerometer : public Sensor {
         int32_t _pitch = 0;
         float _horizontalAcceleration = 0;
         float _verticalAcceleration = 0;
-        float _metersPerSecond = 0;
         float _gravityY = 0;
         float _gravityZ = 0;
         bool _initialized = false;

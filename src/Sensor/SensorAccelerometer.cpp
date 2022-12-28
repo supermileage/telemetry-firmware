@@ -112,20 +112,8 @@ float SensorAccelerometer::getPitch(bool& valid) {
     return (float)_pitch / MEGA;
 }
 
-float SensorAccelerometer::getTemp() {
-    return _controller->getTemp();
-}
-
-float SensorAccelerometer::getGravityZ() {
-    return _gravityZ;
-}
-
 float SensorAccelerometer::getAccelMagnitude() {
     return sqrt(pow(getAccel().x, 2) + pow(getAccel().y, 2) + pow(getAccel().z, 2));
-}
-
-float SensorAccelerometer::getMetersPerSecond() {
-    return _metersPerSecond;
 }
 
 String SensorAccelerometer::getInitStatus() {
@@ -152,7 +140,7 @@ void SensorAccelerometer::_setPitch(Vec3 accel) {
 
 bool SensorAccelerometer::_tryRecalibrateGyroscope() {
     Vec3 accel = _controller->getAccel();
-    
+
     if (fabs((accel.z * accel.z + accel.y * accel.y) - (GRAVITY * GRAVITY)) <= GYRO_RECALIBRATION_MARGIN) {
         _setPitch(accel);
         return true;
