@@ -32,7 +32,7 @@ void SensorAccelerometer::handle() {
     bool success = false;
 
     #ifdef DEBUG_ACCELEROMETER_OUTPUT_ACCEL
-    if (_lastReadMillis + 15 < millis()) {
+    if (_lastReadMillis + READ_INTERVAL < millis()) {
         _lastReadMillis = millis();
         float lastX = _controller.getAccel().x;
         float lastY = _controller.getAccel().y;
@@ -49,7 +49,7 @@ void SensorAccelerometer::handle() {
         }
     }
     #elif defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO)
-    if (_lastReadMillis + 15 < millis()) {
+    if (_lastReadMillis + READ_INTERVAL < millis()) {
         _lastReadMillis = millis();
         float lastX = _controller.getGyro().x;
         float lastY = _controller.getGyro().y;
@@ -67,7 +67,7 @@ void SensorAccelerometer::handle() {
     #endif
 
     #if !defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO) and !defined(DEBUG_ACCELEROMETER_OUTPUT_ACCEL)
-    if (_lastReadMillis + 15 < millis()) {
+    if (_lastReadMillis + READ_INTERVAL < millis()) {
         _lastReadMillis = millis();
         success = _controller->tryGetReading();
     }
