@@ -152,7 +152,7 @@ void SensorAccelerometer::_setPitch(Vec3 accel) {
 
 bool SensorAccelerometer::_tryRecalibrateGyroscope() {
     Vec3 accel = _controller->getAccel();
-    float difference = (accel.z * accel.z + accel.y * accel.y) - (GRAVITY * GRAVITY);
+    
     if (fabs((accel.z * accel.z + accel.y * accel.y) - (GRAVITY * GRAVITY)) <= GYRO_RECALIBRATION_MARGIN) {
         _setPitch(accel);
         return true;
