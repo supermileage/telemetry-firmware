@@ -16,12 +16,12 @@ class LoggingDispatcherBuilder {
     public:
         /**
          * Constructs new LoggingDispatcherBuilder with number of commands and data queue
-         *
+         * 
          * @param numCommands The number of sensor functions you will add to the builder
          * Note: this must be accurate and has potential to cause a segfault if the value is too low
          * @param dataQ the Data Queue from main
          * @param publishName the name under which any data from interval commands will be published
-         **/
+         * */
         LoggingDispatcherBuilder(DataQueue *dataQ, String publishName, const std::vector<IntervalCommand*>& commands);
         
         /**
