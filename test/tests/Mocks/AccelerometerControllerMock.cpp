@@ -1,5 +1,13 @@
 #include "AccelerometerControllerMock.h"
 
+AccelerometerControllerMock::AccelerometerControllerMock() {
+    _init = []() { return true; };
+    _tryGetReading = []() { return true; };
+    _getAccel = []() { return Vec3 { 0, 0, 0 }; };
+    _getGyro = []() { return Vec3 { 0, 0, 0 }; };
+    _getTemp = []() { return 0; };
+}
+
 bool AccelerometerControllerMock::init() {
     return _init();
 }
@@ -41,7 +49,9 @@ void AccelerometerControllerMock::setGetTemp(std::function<float(void)> func) {
 }
 
 void AccelerometerControllerMock::setReturnValues(Vec3 accel, Vec3 gyro, bool success) {
-    _getAccel = [&accel]() { return accel; };
-    _getGyro = [&gyro]() { return gyro; };
-    _tryGetReading = [&success]() { return success; };
+    _getAccel = [accel]() { return accel; };
+    _getGyro = [gyro]() { return gyro; };
+    _tryGetReading = [success]() {
+        return success;
+    };
 }

@@ -3,19 +3,9 @@
 
 // #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
 
-#define GRAVITY     9.81
-#define X_G_HIGH    9.9f
-#define X_G_LOW     -9.72f
-#define Y_G_HIGH    9.91f
-#define Y_G_LOW     -9.71f
-#define Z_G_HIGH    10.15f
-#define Z_G_LOW     -9.47f
-
-#define MEGA        1000000
-
-#define OFFSET_X    (X_G_HIGH - GRAVITY)
-#define OFFSET_Y    (Y_G_HIGH - GRAVITY)
-#define OFFSET_Z    (Z_G_HIGH - GRAVITY)
+#define GYRO_RECALIBRATION_MARGIN   0.01    // if accelerometer |<y,z>| == 9.81, recalibrate gyroscope
+#define READ_INTERVAL               10      // keep in mind that default data rate for LSM6DOX is 104Hz
+#define MEGA                        1000000
 
 SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller) : _controller(controller) { }
 
@@ -31,11 +21,9 @@ void SensorAccelerometer::begin() {
     // get initial reading of pitch and ambient gravitational force on z-axis
     if (_initialized) {
         if (_controller->tryGetReading()) {
-            Vec3 accel = _controller->getAccel();
-            _pitch = acos((-accel.y) / (sqrt(pow(accel.y, 2) + pow(accel.z, 2)))) *
-            (accel.z <= 0 ? -1 : 1);
-            _gravityZ = sin(_pitch);
-            _lastTimeMicros = micros();
+            _setPitch(_controller->getAccel());
+            _setGravityY();
+            _setGravityZ();
         }
     }
 }
@@ -44,44 +32,43 @@ void SensorAccelerometer::handle() {
     bool success = false;
 
     #ifdef DEBUG_ACCELEROMETER_OUTPUT_ACCEL
-    if (_lastOutputMillis + 15 < millis()) {
-        _lastOutputMillis = millis();
-        float lastX = _accel.acceleration.x;
-        float lastY = _accel.acceleration.y;
-        float lastZ = _accel.acceleration.z;
-        _lsm6->getEvent(&_accel, &_gyro, &_temp);
-        _lastOutputMillis = millis();
+    if (_lastReadMillis + 15 < millis()) {
+        _lastReadMillis = millis();
+        float lastX = _controller.getAccel().x;
+        float lastY = _controller.getAccel().y;
+        float lastZ = _controller.getAccel().z;
+        success = _controller->tryGetReading();
+        _lastReadMillis = millis();
 
-        if (fabs(lastX - _accel.acceleration.x) > 0.1 ||
-            fabs(lastY - _accel.acceleration.y) > 0.1 ||
-            fabs(lastZ - _accel.acceleration.z) > 0.1) {
-                DEBUG_SERIAL_LN("< " + String(_accel.acceleration.x - OFFSET_X) + ", " +
-                    String(_accel.acceleration.y - OFFSET_Y) + ", " +
-                    String(_accel.acceleration.z - OFFSET_Z) + " >");
+        if (fabs(lastX - _controller.getAccel().x) > 0.1 ||
+            fabs(lastY - _controller.getAccel().y) > 0.1 ||
+            fabs(lastZ - _controller.getAccel().z) > 0.1) {
+                DEBUG_SERIAL_LN("< " + String(_controller.getAccel().x - OFFSET_X) + ", " +
+                    String(_controller.getAccel().y - OFFSET_Y) + ", " +
+                    String(_controller.getAccel().z - OFFSET_Z) + " >");
         }
     }
-
     #elif defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO)
-    if (_lastOutputMillis + 15 < millis()) {
-        _lastOutputMillis = millis();
-        float lastX = _gyro.gyro.x;
-        float lastY = _gyro.gyro.y;
-        float lastZ = _gyro.gyro.z;
-        _lsm6->getEvent(&_accel, &_gyro, &_temp);
+    if (_lastReadMillis + 15 < millis()) {
+        _lastReadMillis = millis();
+        float lastX = _controller.getGyro().x;
+        float lastY = _controller.getGyro().y;
+        float lastZ = _controller.getGyro().z;
+        success = _controller->tryGetReading();
 
-        if (fabs(lastX - _gyro.gyro.x) > 0.1 ||
-            fabs(lastY - _gyro.gyro.y) > 0.1 ||
-            fabs(lastZ - _gyro.gyro.z) > 0.1) {
-                DEBUG_SERIAL_LN("< " + String(_gyro.gyro.x) + ", " +
-                    String(_gyro.gyro.y) + ", " +
-                    String(_gyro.gyro.z) + " >");
+        if (fabs(lastX - _controller.getGyro().x) > 0.1 ||
+            fabs(lastY - _controller.getGyro().y) > 0.1 ||
+            fabs(lastZ - _controller.getGyro().z) > 0.1) {
+                DEBUG_SERIAL_LN("< " + String(_controller.getGyro().x) + ", " +
+                    String(_controller.getGyro().y) + ", " +
+                    String(_controller.getGyro().z) + " >");
         }
     }
     #endif
 
     #if !defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO) and !defined(DEBUG_ACCELEROMETER_OUTPUT_ACCEL)
-    if (_lastOutputMillis + 15 < millis()) {
-        _lastOutputMillis = millis();
+    if (_lastReadMillis + 15 < millis()) {
+        _lastReadMillis = millis();
         success = _controller->tryGetReading();
     }
     #endif
@@ -90,11 +77,15 @@ void SensorAccelerometer::handle() {
     // use this to update ambient gravitational force on z-axis
     if (success) {
         uint64_t currentTime = micros();
-        uint64_t deltaT = currentTime - _lastTimeMicros;
-        _lastTimeMicros = currentTime;
-
-        float pitchVelocity = _controller->getGyro().x;
-        _pitch = (pitchVelocity * deltaT) + _pitch;
+        
+        if (!_tryRecalibrateGyroscope()) {
+            uint64_t deltaT = currentTime - _lastPitchUpdateMicros;
+            _lastPitchUpdateMicros = currentTime;
+            _pitch = (_controller->getGyro().x * deltaT) + _pitch;
+        }
+        
+        _setGravityY();
+        _setGravityZ();
     }
 }
 
@@ -106,12 +97,23 @@ Vec3 SensorAccelerometer::getAccel() {
     return _controller->getAccel();
 }
 
-float SensorAccelerometer::getTemp() {
-    return _controller->getTemp();
+float SensorAccelerometer::getHorizontalAcceleration(bool& valid) {
+    valid = _initialized;
+    return _controller->getAccel().z - _gravityZ;
 }
 
-float SensorAccelerometer::getPitch() {
+float SensorAccelerometer::getVerticalAcceleration(bool& valid) {
+    valid = _initialized;
+    return _controller->getAccel().y - _gravityY;
+}
+
+float SensorAccelerometer::getPitch(bool& valid) {
+    valid = _initialized;
     return (float)_pitch / MEGA;
+}
+
+float SensorAccelerometer::getTemp() {
+    return _controller->getTemp();
 }
 
 float SensorAccelerometer::getGravityZ() {
@@ -128,8 +130,33 @@ float SensorAccelerometer::getMetersPerSecond() {
 
 String SensorAccelerometer::getInitStatus() {
     if (_initialized) {
-        return "Success -- Offset: " +  String(OFFSET_X) + " " + String(OFFSET_Y) + " " +  String(OFFSET_Z);
+        return "Success";
     } else {
         return "Failure";
+    }
+}
+
+void SensorAccelerometer::_setGravityY() {
+    _gravityY = -(GRAVITY * cos((float)_pitch / MEGA));
+}
+
+void SensorAccelerometer::_setGravityZ() {
+    _gravityZ = GRAVITY * sin((float)_pitch / MEGA);
+}
+
+void SensorAccelerometer::_setPitch(Vec3 accel) {
+    _pitch = acos((-accel.y) / (sqrt(pow(accel.y, 2) + pow(accel.z, 2)))) *
+        (accel.z <= 0 ? -1 : 1) * MEGA;
+    _lastPitchUpdateMicros = micros();
+}
+
+bool SensorAccelerometer::_tryRecalibrateGyroscope() {
+    Vec3 accel = _controller->getAccel();
+    float difference = (accel.z * accel.z + accel.y * accel.y) - (GRAVITY * GRAVITY);
+    if (fabs((accel.z * accel.z + accel.y * accel.y) - (GRAVITY * GRAVITY)) <= GYRO_RECALIBRATION_MARGIN) {
+        _setPitch(accel);
+        return true;
+    } else {
+        return false;
     }
 }

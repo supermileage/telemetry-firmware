@@ -6,6 +6,7 @@
 
 class AccelerometerControllerMock : public AccelerometerController {
     public:
+        AccelerometerControllerMock();
         bool init() override;
         bool tryGetReading() override;
         Vec3 getAccel() override;
