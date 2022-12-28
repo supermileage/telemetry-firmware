@@ -133,7 +133,7 @@ void SensorAccelerometer::_setGravityZ() {
 }
 
 void SensorAccelerometer::_setPitch(Vec3 accel) {
-    // <0,1> • <y,z> = |<y,z>| cos(t)  ->  t = z / |<y,z>|
+    // <0,1> • <y,z> = |<y,z>| cos(t)  ->  t = arccos(z / |<y,z>|)
     _pitch = acos((-accel.y) / (sqrt(pow(accel.y, 2) + pow(accel.z, 2)))) *
         (accel.z <= 0 ? -1 : 1) * MEGA;
     _lastPitchUpdateMicros = micros();
