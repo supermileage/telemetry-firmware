@@ -34,8 +34,6 @@ class SensorAccelerometer : public Sensor {
         uint64_t _lastPitchUpdateMicros = 0;
 
         int32_t _pitch = 0;
-        float _horizontalAcceleration = 0;
-        float _verticalAcceleration = 0;
         float _gravityY = 0;
         float _gravityZ = 0;
         bool _initialized = false;

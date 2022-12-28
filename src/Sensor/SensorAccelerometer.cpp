@@ -1,5 +1,5 @@
-#include "SensorAccelerometer.h"
 #include <math.h>
+#include "SensorAccelerometer.h"
 
 // #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
 // #define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
