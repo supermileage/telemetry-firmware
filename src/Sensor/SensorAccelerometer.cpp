@@ -2,6 +2,7 @@
 #include <math.h>
 
 // #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
+// #define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
 
 #define GYRO_RECALIBRATION_MARGIN   0.01    // if accelerometer |<y,z>| == 9.81, recalibrate gyroscope
 #define READ_INTERVAL               10      // keep in mind that default data rate for LSM6DOX is 104Hz
@@ -18,7 +19,8 @@ String SensorAccelerometer::getHumanName() {
 void SensorAccelerometer::begin() {
     _initialized = _controller->init();
 
-    // get initial reading of pitch and ambient gravitational force on z-axis
+    // get initial reading of pitch and gravitational acceleration on z and y axes.
+    // assumes that the vehicle is not moving when this method is called
     if (_initialized) {
         if (_controller->tryGetReading()) {
             _setPitch(_controller->getAccel());
@@ -73,17 +75,15 @@ void SensorAccelerometer::handle() {
     }
     #endif
 
-    // check change in rotation from gyroscope and update pitch
-    // use this to update ambient gravitational force on z-axis
     if (success) {
-        uint64_t currentTime = micros();
-        
         if (!_tryRecalibrateGyroscope()) {
+            uint64_t currentTime = micros();
             uint64_t deltaT = currentTime - _lastPitchUpdateMicros;
             _lastPitchUpdateMicros = currentTime;
             _pitch = (_controller->getGyro().x * deltaT) + _pitch;
         }
         
+        // update gravitational acceleration on y, z based on new pitch
         _setGravityY();
         _setGravityZ();
     }
@@ -133,6 +133,7 @@ void SensorAccelerometer::_setGravityZ() {
 }
 
 void SensorAccelerometer::_setPitch(Vec3 accel) {
+    // <0,1> • <y,z> = |<y,z>| cos(t)  ->  t = z / |<y,z>|
     _pitch = acos((-accel.y) / (sqrt(pow(accel.y, 2) + pow(accel.z, 2)))) *
         (accel.z <= 0 ? -1 : 1) * MEGA;
     _lastPitchUpdateMicros = micros();
@@ -144,7 +145,7 @@ bool SensorAccelerometer::_tryRecalibrateGyroscope() {
     if (fabs((accel.z * accel.z + accel.y * accel.y) - (GRAVITY * GRAVITY)) <= GYRO_RECALIBRATION_MARGIN) {
         _setPitch(accel);
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 }
