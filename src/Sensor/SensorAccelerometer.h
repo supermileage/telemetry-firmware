@@ -18,10 +18,9 @@ class SensorAccelerometer : public Sensor {
         String getHumanName() override;
         void begin() override;
         void handle() override;
-
-        float getHorizontalAcceleration(bool& valid = Sensor::dummy);
-        float getVerticalAcceleration(bool& valid = Sensor::dummy);
-        float getPitch(bool& valid = Sensor::dummy);
+        String getHorizontalAcceleration(bool& valid = Sensor::dummy);
+        String getVerticalAcceleration(bool& valid = Sensor::dummy);
+        String getIncline(bool& valid = Sensor::dummy);
 
         Vec3 getGyro();
         Vec3 getAccel();

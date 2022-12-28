@@ -5,9 +5,9 @@
 #include "Adafruit_LSM6DSOX.h"
 #include "AccelerometerController.h"
 
-class Lsm6dsoxAccelerometerWrapper : public AccelerometerController {
+class Lsm6dsoAccelerometerWrapper : public AccelerometerController {
     public:
-        Lsm6dsoxAccelerometerWrapper(Adafruit_LSM6DS *lsm6, SPIClass *spi, int csPin);
+        Lsm6dsoAccelerometerWrapper(SPIClass *spi, int csPin);
         bool init() override;
         bool tryGetReading() override;
         Vec3 getAccel() override;

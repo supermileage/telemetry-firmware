@@ -4,6 +4,7 @@
 
 #include "Mcp2515CanWrapper.h"
 #include "CanInterface.h"
+#include "Lsm6dsoAccelerometerWrapper.h"
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
 #include "CanSensorSteering.h"
@@ -16,9 +17,11 @@
 
 Mcp2515CanWrapper canBus(&SPI1, D5, D6);
 CanInterface canInterface((CanController*)&canBus);
+Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
+SensorAccelerometer accel(&lsm6);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
@@ -43,11 +46,12 @@ LoggingCommand<SensorGps, String> gpsLat(&gps, "lat", &SensorGps::getLatitude, 1
 LoggingCommand<SensorGps, int> gpsHeading(&gps, "hea", &SensorGps::getHeading, 1);
 LoggingCommand<SensorGps, String> gpsAltitude(&gps, "alt", &SensorGps::getAltitude, 1);
 LoggingCommand<SensorGps, String> gpsHorSpeed(&gps, "hvel", &SensorGps::getHorizontalSpeed, 1);
-LoggingCommand<SensorGps, String> gpsHorAccel(&gps, "hacce", &SensorGps::getHorizontalAcceleration, 1);
-LoggingCommand<SensorGps, String> gpsVertAccel(&gps, "vacce", &SensorGps::getVerticalAcceleration, 1);
-LoggingCommand<SensorGps, String> gpsIncline(&gps, "incl", &SensorGps::getIncline, 1);
 LoggingCommand<SensorGps, String> gpsHorAccuracy(&gps, "haccu", &SensorGps::getHorizontalAccuracy, 10);
 LoggingCommand<SensorGps, String> gpsVerAccuracy(&gps, "vaccu", &SensorGps::getVerticalAccuracy, 10);
+
+LoggingCommand<SensorAccelerometer, String> accelerometerHorAccel(&accel, "hacce", &SensorAccelerometer::getHorizontalAcceleration, 1);
+LoggingCommand<SensorAccelerometer, String> accelerometerVertAccel(&accel, "vacce", &SensorAccelerometer::getVerticalAcceleration, 1);
+LoggingCommand<SensorAccelerometer, String> accelerometerIncline(&accel, "incl", &SensorAccelerometer::getIncline, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoMotorController(&thermo2, "tmpmc", &SensorThermo::getProbeTemp, 5);
@@ -130,9 +134,9 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Latitude: " + gps.getLatitude() + "° - ");
     DEBUG_SERIAL("Heading: " + String(gps.getHeading()) + "° - ");
     DEBUG_SERIAL("Altitude: " + gps.getAltitude() + "m - ");
-    DEBUG_SERIAL("Horizontal Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
-    DEBUG_SERIAL("Vertical Acceleration: " + gps.getHorizontalAcceleration() + "m/s^2 - ");
-    DEBUG_SERIAL("Vertical Acceleration: " + gps.getIncline() + "° - ");
+    DEBUG_SERIAL("Horizontal Acceleration: " + accel.getHorizontalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Vertical Acceleration: " +accel.getVerticalAcceleration() + "m/s^2 - ");
+    DEBUG_SERIAL("Incline: " + accel.getIncline() + "rad - ");
     DEBUG_SERIAL("Horizontal Accuracy: " + gps.getHorizontalAccuracy() + "m - ");
     DEBUG_SERIAL("Vertical Accuracy: " + gps.getVerticalAccuracy() + "m - ");
     DEBUG_SERIAL_LN("Satellites in View: " + String(gps.getSatellitesInView()));

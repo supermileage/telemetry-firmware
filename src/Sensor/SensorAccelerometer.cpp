@@ -97,19 +97,19 @@ Vec3 SensorAccelerometer::getAccel() {
     return _controller->getAccel();
 }
 
-float SensorAccelerometer::getHorizontalAcceleration(bool& valid) {
+String SensorAccelerometer::getHorizontalAcceleration(bool& valid) {
     valid = _initialized;
-    return _controller->getAccel().z - _gravityZ;
+    return FLOAT_TO_STRING(_controller->getAccel().z - _gravityZ, 2);
 }
 
-float SensorAccelerometer::getVerticalAcceleration(bool& valid) {
+String SensorAccelerometer::getVerticalAcceleration(bool& valid) {
     valid = _initialized;
-    return _controller->getAccel().y - _gravityY;
+    return FLOAT_TO_STRING(_controller->getAccel().y - _gravityY, 2);
 }
 
-float SensorAccelerometer::getPitch(bool& valid) {
+String SensorAccelerometer::getIncline(bool& valid) {
     valid = _initialized;
-    return (float)_pitch / MEGA;
+    return FLOAT_TO_STRING((float)_pitch / MEGA, 2);
 }
 
 float SensorAccelerometer::getAccelMagnitude() {
