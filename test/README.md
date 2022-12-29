@@ -6,7 +6,7 @@ This project includes a unit test suite, built with [catch2](https://github.com/
 
 First make sure you have the C++ TestMate VSCode extension installed.  This extension generates a test display panel not unlike those of Visual Studio and IntelliJ.  You can run the whole test suite by opening up the panel and clicking the run icon.  This will both compile and run the tests, so no need to run make manually.
 
-![](https://github.com/matepek/vscode-catch2-test-adapter/blob/master/resources/ScreenShot_2021-11-20.png)
+![](https://github.com/supermileage/telemetry-firmware/blob/master/media/TestMate.png)
 
 **Note**: if testmate is not in the extension toolbar then you can display it by right-clicking the toolbar menu and adding it to the list extensions.
 

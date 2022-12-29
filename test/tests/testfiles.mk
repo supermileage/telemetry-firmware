@@ -24,10 +24,13 @@ ECU := Sensor/SensorEcu.cpp
 # Sensor ECU Test FIles
 FCP := Sensor/SensorFcpControl.cpp
 
+# Sensor ECU Test FIles
+ACCELEROMETER := Sensor/SensorAccelerometer.cpp
+
 # All files to compile for tests
 TEST_DIRS := $(dir $(wildcard $(TEST_DIR)tests/*/))
 TEST_CPP_TEMP := $(patsubst $(TEST_DIR)%,%,$(foreach %,$(TEST_DIRS),$(wildcard $(%)*.cpp)))
-SRC_CPP_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER) $(ECU) $(FCP)
+SRC_CPP_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER) $(ECU) $(FCP) $(ACCELEROMETER)
 
 # ALL TEST FILES
 CPP_TO_OBJ := $(SRC_CPP_TEMP) $(TEST_CPP_TEMP) test.cpp

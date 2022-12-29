@@ -48,6 +48,8 @@
     #define VEHICLE_NAME "URBAN"
 #elif   defined(FC)
     #define VEHICLE_NAME "FC"
+#elif   defined(SANDBOX)
+    #define VEHICLE_NAME "SANDBOX"
 #endif
 
 #define FLOAT_TO_STRING(x,y) String(x,y)
