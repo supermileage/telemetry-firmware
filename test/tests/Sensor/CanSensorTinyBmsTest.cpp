@@ -128,6 +128,17 @@ TEST_CASE( "CanSensorTinyBms::update", "[CanSensorTinyBms][Sensor][CanSensor]" )
 
 	Handler::instance().begin();
 
+	SECTION("update sets _lastUpdateTime") {
+		uint64_t arbitraryUpdateTime = 150;
+
+		setMillis(arbitraryUpdateTime);
+		packCanMessageTiny(msg, TRUE, 0x0, 8);
+		canBusMock.setCanMessage(msg);
+
+		Handler::instance().handle();
+
+		REQUIRE( tiny.getLastUpdateTime() == arbitraryUpdateTime );
+	}
 
 	SECTION( "update can tinybms battery voltage" ) {
 		srand(chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count());
