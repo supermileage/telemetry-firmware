@@ -9,7 +9,7 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define FC
+    #define URBAN
 #endif
 
 // Important: Board version number
@@ -48,6 +48,8 @@
     #define VEHICLE_NAME "URBAN"
 #elif   defined(FC)
     #define VEHICLE_NAME "FC"
+#elif   defined(SANDBOX)
+    #define VEHICLE_NAME "SANDBOX"
 #endif
 
 #define FLOAT_TO_STRING(x,y) String(x,y)

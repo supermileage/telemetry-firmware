@@ -18,7 +18,7 @@ String SensorThermo::getHumanName() {
 
 void SensorThermo::begin() {
     _spi->begin();
-    _probe->begin();
+    _initialized = _probe->begin();
 }
 
 void SensorThermo::handle() {
@@ -46,6 +46,14 @@ void SensorThermo::handle() {
         
         }
     #endif
+}
+
+String SensorThermo::getInitStatus() {
+    if (_initialized) {
+        return "Success";
+    } else {
+        return "Failure";
+    }
 }
 
 int SensorThermo::getProbeTemp(bool &valid) {
