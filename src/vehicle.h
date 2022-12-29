@@ -9,6 +9,7 @@
 
 #include "Sensor.h"
 #include "SensorGps.h"
+#include "SensorAccelerometer.h"
 #include "SensorThermo.h"
 #include "SensorSigStrength.h"
 #include "SensorVoltage.h"
