@@ -159,8 +159,8 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("BMS Status: " + bms->getStatusBmsString() + " - ");
     DEBUG_SERIAL("BMS Fault: " + BmsFault::toString(bms->getFault()) + " - ");
     DEBUG_SERIAL("BMS Temperature: " + String(bms->getTempBms()) + "°C - ");
-    DEBUG_SERIAL("Min Battery Temperature: " + String(bms->getMaxBatteryTemp()) + "°C - ");
-    DEBUG_SERIAL_LN("Max Battery Temperature: " + String(bms->getMinBatteryTemp()) + "°C");
+    DEBUG_SERIAL("Min Battery Temperature: " + String(bms->getMinBatteryTemp()) + "°C - ");
+    DEBUG_SERIAL_LN("Max Battery Temperature: " + String(bms->getMaxBatteryTemp()) + "°C");
     DEBUG_SERIAL_LN("Avg Battery Temperature: " + String(bms->getAvgBatteryTemp()) + "°C");
 
     // CAN Accessories
