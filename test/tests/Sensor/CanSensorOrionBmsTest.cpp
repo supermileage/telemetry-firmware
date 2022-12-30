@@ -54,6 +54,17 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 
 	Handler::instance().begin();
 
+	SECTION("update sets _lastUpdateTime") {
+		uint64_t arbitraryUpdateTime = 150;
+
+		setMillis(arbitraryUpdateTime);
+		canBusMock.setCanMessage(msg);
+
+		Handler::instance().handle();
+
+		REQUIRE( orion.getLastUpdateTime() == arbitraryUpdateTime );
+	}
+
 	SECTION( "Test CanSensorOrionBms::update charge status" ) {
 		// Discharge
 		// set up discharge enabled msg
