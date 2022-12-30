@@ -3,11 +3,14 @@
 
 #include "CanListener.h"
 
+#define STEERING_READY_BIT_IGNITION 0x00
+#define STEERING_READY_BIT_DMS      0x01
+#define STEERING_READY_BIT_BRAKE    0x02
+
 using namespace can;
 
 class CanSensorSteering : public CanListener {
-    public:
-    
+    public:    
         /**
          * @brief Constructor for CanSensorSteering
          * 
@@ -61,14 +64,10 @@ class CanSensorSteering : public CanListener {
         uint32_t _lastUpdateThrottle = 0;
         uint32_t _lastUpdateReady = 0;
 
-        bool _validThrottle = false;
-        bool _validReady = false;
-
         uint8_t _throttle;
-        int _ignition = 2;
-        int _dms = 2;
-        int _brake = 2;
-
+        int _ignition = Sensor::Status::Unknown;
+        int _dms = Sensor::Status::Unknown;
+        int _brake = Sensor::Status::Unknown;
 };
 
 #endif

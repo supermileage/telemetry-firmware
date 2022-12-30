@@ -3,6 +3,7 @@
 
 #include "catch.hpp"
 #include "settings.h"
+#include "Sensor.h"
 
 // Can
 #define CAN_MESSAGE_AVAIL_TEST 5

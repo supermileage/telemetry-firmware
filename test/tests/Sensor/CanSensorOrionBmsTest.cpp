@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "test_config.h"
+#include "TestHelpers.h"
 
 #include "CanInterface.h"
 #include "CanControllerMock.h"
@@ -11,18 +12,6 @@ void packBatteryData(float voltage, float current, float soc, uint8_t* buf);
 void packCellData(float cellVoltageLow, float cellVoltageHigh, float cellVoltageAvg, uint8_t* buf);
 void packTempData(int8_t packTempLow, int8_t packTempHigh, int8_t packTempAvg, int8_t bmsTemp, uint8_t* buf);
 void packInt16(int16_t val, uint8_t* buf);
-
-template <typename T>
-void testValidation(CanSensorOrionBms& orion, T (CanSensorOrionBms::*getter)(bool&)) {
-	bool statusIsValid = false;
-	setMillis(DEFAULT_STALE_TIME_MILLIS - 1);
-	(orion.*getter)(statusIsValid);
-	REQUIRE ( statusIsValid );
-
-	setMillis(DEFAULT_STALE_TIME_MILLIS);
-	(orion.*getter)(statusIsValid);
-	REQUIRE_FALSE ( statusIsValid );
-}
 
 // orion faults ordered byte 1 - 3, from least to most significant bit
 // ie. data[1], data[2], data[3], each byte right to left
@@ -65,7 +54,7 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 		REQUIRE( orion.getLastUpdateTime() == arbitraryUpdateTime );
 	}
 
-	SECTION( "Test CanSensorOrionBms::update charge status" ) {
+	SECTION( "CanSensorOrionBms::update charge status" ) {
 		// Discharge
 		// set up discharge enabled msg
 		msg.data[0] = 0x1;
@@ -94,7 +83,7 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 		testValidation(orion, &CanSensorOrionBms::getStatusBms);
 	}
 
-	SECTION( "Test CanSensorOrionBms::update fault -- _parseFault() returns correct fault for each flag" ) {
+	SECTION( "CanSensorOrionBms::update fault -- _parseFault() returns correct fault for each flag" ) {
 		// set up multiple fault messages
 		int faultIndex = 0;
 		
@@ -124,7 +113,7 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 		testValidation(orion, &CanSensorOrionBms::getFault);
 	} // SECTION
 
-	SECTION( "Test CanSensorOrionBms::update fault -- mixed flags: highest priority (lowest value) is always returned" ) {
+	SECTION( "CanSensorOrionBms::update fault -- mixed flags: highest priority (lowest value) is always returned" ) {
 		// set up multiple fault messages
 		int faultIndex = 0;
 
@@ -158,7 +147,7 @@ TEST_CASE( "CanSensorOrionBms::update CAN_ORIONBMS_STATUS", "[CanSensorOrionBms]
 	} // SECTION
 }
 
-TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBms][Sensor][CanSensor]") {
+TEST_CASE("CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBms][Sensor][CanSensor]") {
 	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
@@ -170,7 +159,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 
 	Handler::instance().begin();
 
-	SECTION("Test CanSensorOrionBms::update battery voltage") {
+	SECTION("CanSensorOrionBms::update battery voltage") {
 		// set up pack message with battery voltage value
 		packBatteryData(32, 0, 0, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -188,7 +177,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getBatteryVolt);
 	}
 
-	SECTION("Test CanSensorOrionBms::update battery current") {
+	SECTION("CanSensorOrionBms::update battery current") {
 		// set up pack message with battery voltage value
 		packBatteryData(0, 32, 0, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -206,7 +195,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getBatteryCurrent);
 	}
 
-	SECTION("Test CanSensorOrionBms::update soc") {
+	SECTION("CanSensorOrionBms::update soc") {
 		// set up pack message with battery voltage value
 		packBatteryData(0, 0, 64, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -224,7 +213,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getBatteryCurrent);
 	}
 
-	SECTION("Test CanSensorOrionBms::update pack data -- different values in possible ranges") {
+	SECTION("CanSensorOrionBms::update pack data -- different values in possible ranges") {
 		// test different values
 		for (int i = 0; i < 10; i++) {
 			srand(i);
@@ -250,7 +239,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_PACK", "[CanSensorOrionBm
 	}
 }
 
-TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBms][Sensor][CanSensor]") {
+TEST_CASE("CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBms][Sensor][CanSensor]") {
 	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
@@ -262,7 +251,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 
 	Handler::instance().begin();
 
-	SECTION("Test CanSensorOrionBms::update cell voltage min") {
+	SECTION("CanSensorOrionBmsupdate cell voltage min") {
 		// set up pack message with battery voltage value
 		packCellData(5.0, 0, 0, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -280,7 +269,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getMinVolt);
 	}
 
-	SECTION("Test CanSensorOrionBms::update cell voltage max") {
+	SECTION("CanSensorOrionBms::update cell voltage max") {
 		// set up pack message with battery voltage value
 		packCellData(0, 11, 0, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -298,7 +287,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getMaxVolt);
 	}
 
-	SECTION("Test CanSensorOrionBms::update cell voltage avg") {
+	SECTION("CanSensorOrionBms::update cell voltage avg") {
 		// set up pack message with battery voltage value
 		packCellData(0, 0, 10, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -316,7 +305,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getAvgVolt);
 	}
 
-	SECTION("Test CanSensorOrionBms::update cell data -- different values in possible ranges") {
+	SECTION("CanSensorOrionBms::update cell data -- different values in possible ranges") {
 		// test different values
 		for (int i = 0; i < 10; i++) {
 			srand(i);
@@ -342,7 +331,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_CELL", "[CanSensorOrionBm
 	}
 }
 
-TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBms][Sensor][CanSensor]") {
+TEST_CASE("CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBms][Sensor][CanSensor]") {
 	CanControllerMock canBusMock(CAN_MESSAGE_AVAIL_TEST);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
@@ -354,7 +343,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 
 	Handler::instance().begin();
 
-	SECTION("Test CanSensorOrionBms::update cell temp min") {
+	SECTION("CanSensorOrionBms::update cell temp min") {
 		// set up pack message with battery voltage value
 		packTempData(20, 0, 0, 0, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -373,7 +362,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getMinBatteryTemp);
 	}
 
-	SECTION("Test CanSensorOrionBms::update cell temp max") {
+	SECTION("CanSensorOrionBms::update cell temp max") {
 		// set up pack message with battery voltage value
 		packTempData(0, 20, 0, 0, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -392,7 +381,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getMaxBatteryTemp);
 	}
 
-	SECTION("Test CanSensorOrionBms::update cell temp avg") {
+	SECTION("CanSensorOrionBms::update cell temp avg") {
 		// set up pack message with battery voltage value
 		packTempData(0, 0, 20, 0, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -411,7 +400,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getAvgBatteryTemp);
 	}
 
-	SECTION("Test CanSensorOrionBms::update bms temp") {
+	SECTION("CanSensorOrionBms::update bms temp") {
 		// set up pack message with battery voltage value
 		packTempData(0, 0, 0, 20, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -430,7 +419,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		testValidation(orion, &CanSensorOrionBms::getTempBms);
 	}
 
-	SECTION("Test CanSensorOrionBms::update temp data -- test all different values") {
+	SECTION("CanSensorOrionBms::update temp data -- test all different values") {
 		// set up pack message with battery voltage value
 		packTempData(-1, -2, 3, 4, msg.data);
 		canBusMock.setCanMessage(msg);
@@ -445,7 +434,7 @@ TEST_CASE("Test CanSensorOrionBms::update CAN_ORIONBMS_TEMP", "[CanSensorOrionBm
 		REQUIRE ( orion.getTempBms() == 4 );
 	}
 
-	SECTION("Test CanSensorOrionBms::update temp data -- test full int8_t range for all values") {
+	SECTION("CanSensorOrionBms::update temp data -- test full int8_t range for all values") {
 		// test different values
 		for (int i = -128; i < 128; i+=64) {
 			srand(i);

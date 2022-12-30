@@ -27,7 +27,6 @@ const uint8_t VALIDATION_IDS[] {
 
 const uint8_t* CanSensorTinyBms::ParamIds = PARAM_IDS;
 
-
 const std::unordered_map<uint8_t, BmsFault::Code> CanSensorTinyBms::FaultCodeMap = {
     { TINYBMS_FAULT_UNDER_VOLTAGE, BmsFault::VOLTAGE_LOW },
     { TINYBMS_FAULT_OVER_VOLTAGE, BmsFault::VOLTAGE_HIGH },

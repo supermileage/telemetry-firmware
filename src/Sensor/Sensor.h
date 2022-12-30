@@ -9,6 +9,10 @@
 
 class Sensor : public Handleable {
     public:
+        /**
+         * @brief represents an on-off status for a sensor device
+         */
+        enum Status { Off = 0, On = 1, Unknown = 2 };
 	
         /**
          * INTERFACE
