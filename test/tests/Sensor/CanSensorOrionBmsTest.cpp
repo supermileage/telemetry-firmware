@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "test_config.h"
+#include "TestHelpers.h"
 
 #include "CanInterface.h"
 #include "CanControllerMock.h"
@@ -11,18 +12,6 @@ void packBatteryData(float voltage, float current, float soc, uint8_t* buf);
 void packCellData(float cellVoltageLow, float cellVoltageHigh, float cellVoltageAvg, uint8_t* buf);
 void packTempData(int8_t packTempLow, int8_t packTempHigh, int8_t packTempAvg, int8_t bmsTemp, uint8_t* buf);
 void packInt16(int16_t val, uint8_t* buf);
-
-template <typename T>
-void testValidation(CanSensorOrionBms& orion, T (CanSensorOrionBms::*getter)(bool&)) {
-	bool statusIsValid = false;
-	setMillis(DEFAULT_STALE_TIME_MILLIS - 1);
-	(orion.*getter)(statusIsValid);
-	REQUIRE ( statusIsValid );
-
-	setMillis(DEFAULT_STALE_TIME_MILLIS);
-	(orion.*getter)(statusIsValid);
-	REQUIRE_FALSE ( statusIsValid );
-}
 
 // orion faults ordered byte 1 - 3, from least to most significant bit
 // ie. data[1], data[2], data[3], each byte right to left

@@ -26,11 +26,6 @@ class CanSensorAccessories : public CanListener {
 		static const uint8_t StatusIdWipers;
 
 		/**
-		 * @brief return values for getStatus methods
-		 */
-		enum Status { Off = 0, On = 1, Unknown = 2 };
-
-		/**
 		 * @brief Constructor for CanSensorAccessories
 		 * 
 		 * @param canInterface the can interface which will be reading data from Can buffer

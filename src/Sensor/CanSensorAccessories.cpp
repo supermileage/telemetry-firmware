@@ -25,7 +25,7 @@ void CanSensorAccessories::begin() {
 	CanListener::begin();
 
 	for (uint8_t id : statusIds)
-		_statuses[id] = CanSensorAccessories::StatusProperty { 0, Unknown };
+		_statuses[id] = CanSensorAccessories::StatusProperty { 0, Sensor::Status::Unknown };
 }
 
 String CanSensorAccessories::getHumanName() {

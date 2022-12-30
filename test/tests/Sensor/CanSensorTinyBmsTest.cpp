@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "test_config.h"
+#include "TestHelpers.h"
 
 #include "CanInterface.h"
 #include "CanControllerMock.h"
@@ -22,18 +23,6 @@ void packFloatMessageTiny(CanMessage& msg, float val, uint8_t id);
 void packCellDataTiny(float cellVoltageLow, float cellVoltageHigh, float cellVoltageAvg, uint8_t* buf);
 void packInt16Tiny(int16_t val, uint8_t* buf);
 void packInt32Tiny(int32_t val, uint8_t* buf);
-
-template <typename T>
-void testValidation(CanSensorTinyBms& tiny, T (CanSensorTinyBms::*getter)(bool&)) {
-	bool statusIsValid = false;
-	setMillis(DEFAULT_STALE_TIME_MILLIS - 1);
-	(tiny.*getter)(statusIsValid);
-	REQUIRE ( statusIsValid );
-
-	setMillis(DEFAULT_STALE_TIME_MILLIS);
-	(tiny.*getter)(statusIsValid);
-	REQUIRE_FALSE ( statusIsValid );
-}
 
 /* Ordered Statuses */
 const array<int, 6> Statuses {
