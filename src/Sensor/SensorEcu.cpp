@@ -4,7 +4,7 @@
 #include <cmath>
 
 const int32_t SensorEcu::PacketSize = 27;
-const int32_t SensorEcu::Baud = 115200;
+const unsigned SensorEcu::Baud = 115200;
 const uint8_t SensorEcu::Header1 = 0x80;
 const uint8_t SensorEcu::Header2 = 0x8F;
 const uint8_t SensorEcu::Header3 = 0xEA;

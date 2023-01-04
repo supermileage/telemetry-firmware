@@ -7,7 +7,7 @@
 class SensorEcu : public Sensor {
     public:
 		static const int32_t PacketSize;
-        static const int32_t Baud;
+        static const unsigned Baud;
 		static const uint8_t Header1;
 		static const uint8_t Header2;
 		static const uint8_t Header3;
