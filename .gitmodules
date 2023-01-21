@@ -47,3 +47,6 @@
 [submodule "lib/Adafruit_SH110x"]
 	path = lib/Adafruit_SH110x
 	url = git@github.com:adafruit/Adafruit_SH110x.git
+[submodule "lib/Adafruit-GFX-Library"]
+	path = lib/Adafruit-GFX-Library
+	url = git@github.com:supermileage/Adafruit-GFX-Library-Particle.git
