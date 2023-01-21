@@ -109,11 +109,14 @@ class SensorGps : public Sensor {
          **/
         void toggleOverride();
 
+		String getInitStatus();
+
     private:
         SFE_UBLOX_GNSS* _gps;
         uint8_t _updateFrequency;
 
         bool _valid = false;
+		bool _initialized = false;
 
         uint64_t _lastUpdateMicros = 0;
 

@@ -3,12 +3,23 @@
 // Sandbox vehicle for testing new sensors
 #ifdef SANDBOX
 
+// #define TEST_ACCELEROMETER
+#define TEST_I2C
+
+#include "Adafruit_SH110X.h"
 #include "Lsm6dsoAccelerometerWrapper.h"
 #include "SensorAccelerometer.h"
 #include "SensorThermo.h"
 
+#ifdef TEST_ACCELEROMETER
 Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 SensorAccelerometer accel(&lsm6);
+#endif
+
+#ifdef TEST_I2C
+SensorGps gps(new SFE_UBLOX_GNSS());
+Adafruit_SH1107 sh1107(20, 20);
+#endif
 
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
@@ -17,6 +28,7 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 
 void CurrentVehicle::debugSensorData() {
     // Diagnostic
+	#ifdef TEST_ACCELEROMETER
     DEBUG_SERIAL_LN(" -- Accelerometer -- ");
     DEBUG_SERIAL_LN("Status: " + accel.getInitStatus());
     DEBUG_SERIAL_LN("Gyro:  < " + String(accel.getGyro().x) + ", " + String(accel.getGyro().y) + ", " + String(accel.getGyro().x) + " >");
@@ -24,6 +36,10 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Horizontal Accel: " + accel.getHorizontalAcceleration());
     DEBUG_SERIAL_LN("Verical Accel: " + accel.getVerticalAcceleration());
     DEBUG_SERIAL_LN("Pitch: " + accel.getIncline() + "rad");
+	#endif
+	#ifdef TEST_I2C
+	DEBUG_SERIAL_LN("Gps Init Status: " + gps.getInitStatus());
+	#endif
 }
 
 bool CurrentVehicle::getTimeValid() {
