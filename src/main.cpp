@@ -258,5 +258,6 @@ void loop() {
         debugSensors();
     }
 
+    CurrentVehicle::loop();
 }
 

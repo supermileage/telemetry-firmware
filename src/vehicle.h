@@ -23,6 +23,8 @@ namespace CurrentVehicle {
     **/
     LoggingDispatcher* buildLoggingDispatcher();
 
+    void loop();
+
     /**
      *  Output latest sensor data for debugging
     **/
