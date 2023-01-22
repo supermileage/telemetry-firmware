@@ -39,7 +39,7 @@ class SensorEcu : public Sensor {
 
         /**
          * @return Engine Speed, RPM
-         * */
+         **/
         int getRPM(bool &valid = Sensor::dummy);
 
         /**
