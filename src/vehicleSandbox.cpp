@@ -17,12 +17,19 @@ SensorAccelerometer accel(&lsm6);
 #endif
 
 #ifdef TEST_I2C
-SensorGps gps(new SFE_UBLOX_GNSS());
-Adafruit_SH1107 sh1107(20, 20);
+// SensorGps gps(new SFE_UBLOX_GNSS());
+Adafruit_SH1107 sh1107(128, 64);
+bool g_sh1107Initialized = false;
 #endif
 
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+	#ifdef TEST_I2C
+	g_sh1107Initialized = sh1107.begin();
+	if (g_sh1107Initialized) {
+		sh1107.clearDisplay();
+	}
+	#endif
     return nullptr;
 }
 
@@ -37,8 +44,10 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Verical Accel: " + accel.getVerticalAcceleration());
     DEBUG_SERIAL_LN("Pitch: " + accel.getIncline() + "rad");
 	#endif
+
 	#ifdef TEST_I2C
-	DEBUG_SERIAL_LN("Gps Init Status: " + gps.getInitStatus());
+	// DEBUG_SERIAL_LN("Gps Init Status: " + gps.getInitStatus());
+	DEBUG_SERIAL_LN("SH1107 Status: " + (String)(g_sh1107Initialized ? "Success" : "Failed"));
 	#endif
 }
 
