@@ -31,7 +31,6 @@ class DriverDisplay : public Handleable {
 
 class DisplayElement {
     public:
-        DisplayElement() { }
         virtual ~DisplayElement() { }
         virtual void draw(Adafruit_SH1107& display) = 0;
         virtual void setPosition(int16_t x, int16_t y) = 0;
@@ -61,6 +60,13 @@ class TextElement : public DisplayElement {
             bool dummy;
             String displayString = String((_obj->*_getter)(dummy));
             display.setTextSize(_textSize);
+
+            // add padding
+            if (displayString.length() < _minTextLength) {
+                for (uint16_t i = 0; i < _minTextLength - displayString.length(); i++) {
+                    display.write((uint8_t)_paddingCharacter);
+                }
+            }
             for (uint16_t i = 0; i < displayString.length(); i++) {
                 display.write((uint8_t)displayString[i]);
             }
@@ -71,12 +77,22 @@ class TextElement : public DisplayElement {
             _y = y;
         }
 
+        void setMinTextLength(uint8_t len) {
+            _minTextLength = len;
+        }
+
+        void setPaddingCharacter(char c) {
+            _paddingCharacter = c;
+        }
+
     private:
         T* _obj = nullptr;
         R (T::*_getter)(bool&);
         int16_t _x = 0;
         int16_t _y = 0;
         uint8_t _textSize = 0;
+        uint8_t _minTextLength = 0;
+        char _paddingCharacter = '0';
         String _label;
         uint8_t _labelSize = 0;
 };

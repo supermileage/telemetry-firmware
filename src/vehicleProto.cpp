@@ -65,6 +65,8 @@ String publishName = "BQIngestion";
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     speedElement.setPosition(2, 2);
     rpmElement.setPosition(2, 38);
+    speedElement.setMinTextLength(5); // 00.00
+    rpmElement.setMinTextLength(4);   // 00000
     display.addDisplayElement(&speedElement);
     display.addDisplayElement(&rpmElement);
     
