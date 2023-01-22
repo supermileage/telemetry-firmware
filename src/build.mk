@@ -8,9 +8,8 @@ APPSOURCES+=$(call target_files,$(USRSRC_SLASH),*.c)
  
 # Custom stuff can be added here
 # Include all directories in /lib/
-INCLUDE_DIRS_LIB := $(wildcard $(APPDIR)/lib/*)
+INCLUDE_DIRS_LIB = $(wildcard $(APPDIR)/lib/*)
 INCLUDE_DIRS += $(INCLUDE_DIRS_LIB)
-
 # Add all src files in root of each library folder in /lib/
 CPPSRC += $(patsubst $(APPDIR)/%,%,$(foreach %,$(INCLUDE_DIRS_LIB),$(wildcard $(%)/*.cpp)))
 # Include all directories in /src/
