@@ -257,7 +257,5 @@ void loop() {
         lastDebugSensor = millis();
         debugSensors();
     }
-
-    CurrentVehicle::loop();
 }
 

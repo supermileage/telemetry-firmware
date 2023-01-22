@@ -35,10 +35,6 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     return nullptr;
 }
 
-void CurrentVehicle::loop() {
-
-}
-
 void CurrentVehicle::debugSensorData() {
     // Diagnostic
 	#ifdef TEST_ACCELEROMETER

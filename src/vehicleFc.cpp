@@ -5,6 +5,7 @@
 #include "USARTSerialWrapper.h"
 #include "Lsm6dsoAccelerometerWrapper.h"
 #include "SensorFcpControl.h"
+#include "DriverDisplay.h"
 
 USARTSerialWrapper serial(&Serial1);
 Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
@@ -17,6 +18,11 @@ SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
 SensorFcpControl cellStack(&serial);
+
+// driver display
+Adafruit_SH1107 ssh1107(64, 128);
+DriverDisplay display(ssh1107);
+TextElement<SensorGps, String> speedElement(&gps, &SensorGps::getHorizontalSpeed, 3, String("spd "), 1);
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
@@ -60,6 +66,9 @@ String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+    speedElement.setPosition(2, 2);
+    display.addDisplayElement(&speedElement);
+
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
 }
