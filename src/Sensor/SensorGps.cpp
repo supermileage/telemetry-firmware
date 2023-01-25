@@ -25,7 +25,7 @@ String SensorGps::getHumanName() {
 }
 
 void SensorGps::begin() {
-    _gps->begin();
+    _initialized = _gps->begin();
 
     // Output NMEA and UBX messages over i2c
     _gps->setI2COutput(COM_TYPE_UBX);
@@ -201,6 +201,10 @@ void SensorGps::setSpeedCallback(void (*speed)(float)){
 
 void SensorGps::toggleOverride() {
     _override = !_override;
+}
+
+String SensorGps::getInitStatus() {
+	return _initialized ? "Success" : "Failure";
 }
 
 
