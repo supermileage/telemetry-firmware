@@ -232,7 +232,7 @@ TEST_CASE( "SensorEcu::handle -- validation test", "[SensorEcu][Sensor]" ) {
 
 	// Edge Cases
 	// SensorEcu data is still valid
-	setMillis(DEFAULT_STALE_TIME_MILLIS - 1);
+	setMillis(DEFAULT_START_TIME_MILLIS + ECU_ON_OFF_INTERVAL - 1);
 	serialMock.setAvailable([]() { return 0; });
 
 	ecu.handle();
@@ -241,7 +241,7 @@ TEST_CASE( "SensorEcu::handle -- validation test", "[SensorEcu][Sensor]" ) {
 	REQUIRE( ecu.getOn() );
 
 	//SensorEcu data is no longer valid
-	setMillis(DEFAULT_STALE_TIME_MILLIS);
+	setMillis(DEFAULT_START_TIME_MILLIS + ECU_ON_OFF_INTERVAL);
 
 	ecu.handle();
 

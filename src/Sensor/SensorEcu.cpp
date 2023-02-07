@@ -34,6 +34,10 @@ void SensorEcu::handle() {
     } else {
         _valid = false;
     }
+
+    if (millis() >= _lastUpdate + ECU_ON_OFF_INTERVAL) {
+        _isOn = false;
+    }
     
     if (_serial->available() < SensorEcu::PacketSize) {
         return;
@@ -72,6 +76,7 @@ void SensorEcu::handle() {
                 _fuelPW1 = _interpretValue(buffer[20], buffer[21], 0.001, 0.0);
                 _fuelPW2 = _interpretValue(buffer[22], buffer[23], 0.001, 0.0);
                 _ubAdc = _interpretValue(buffer[24], buffer[25], 0.00625, 0.0);
+                _isOn = true;
 
             } else {
                 DEBUG_SERIAL_LN("ERROR: ECU Packet Checksum Invalid");
@@ -136,7 +141,7 @@ String SensorEcu::getUbAdc(bool &valid) {
 
 int SensorEcu::getOn(bool &valid) {
     valid = true;
-    return _valid;
+    return _isOn;
 }
 
 float SensorEcu::_interpretValue(uint8_t high, uint8_t low, float factor, float offset, bool isInt) {

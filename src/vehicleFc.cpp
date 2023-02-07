@@ -22,7 +22,7 @@ SensorFcpControl cellStack(&serial);
 // driver display
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
-TextElement<SensorGps, String> speedElement(&gps, &SensorGps::getHorizontalSpeed, 3, String("spd "), 1);
+TextElement<String> speedElement([]() { return gps.getHorizontalSpeed(); }, 3, String("spd "), 1);
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);

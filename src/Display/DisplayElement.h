@@ -2,6 +2,7 @@
 #define _DISPLAY_ELEMENT_H_
 
 #include "Adafruit_GFX.h"
+#include <functional>
 
 class DisplayElement {
     public:
@@ -11,11 +12,11 @@ class DisplayElement {
 };
 
 /* Text element which writes itself to Adafruit_GFX display */
-template <typename T, typename R>
+template <typename T>
 class TextElement : public DisplayElement {
     public:
-        TextElement(T* obj, R (T::*getter)(bool&), uint8_t textSize, String label = "", uint8_t labelSize = 0) :
-            _obj(obj), _getter(getter), _textSize(textSize), _label(label), _labelSize(labelSize) { }
+        TextElement(std::function<T()> func, uint8_t textSize, String label = "", uint8_t labelSize = 0) :
+            _displayFunc(func), _textSize(textSize), _label(label), _labelSize(labelSize) { }
 
         ~TextElement() { }
 
@@ -31,8 +32,7 @@ class TextElement : public DisplayElement {
                 }
             }
             
-            bool dummy;
-            String displayString = String((_obj->*_getter)(dummy));
+            String displayString = String(_displayFunc());
             display.setTextSize(_textSize);
 
             // add padding
@@ -60,8 +60,7 @@ class TextElement : public DisplayElement {
         }
 
     private:
-        T* _obj = nullptr;
-        R (T::*_getter)(bool&);
+        std::function<T()> _displayFunc;
         int16_t _x = 0;
         int16_t _y = 0;
         uint8_t _textSize = 0;

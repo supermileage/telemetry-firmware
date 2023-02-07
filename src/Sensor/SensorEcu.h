@@ -4,6 +4,8 @@
 #include "Sensor.h"
 #include  "TelemetrySerial.h"
 
+#define ECU_ON_OFF_INTERVAL 250
+
 class SensorEcu : public Sensor {
     public:
 		static const int32_t PacketSize;
@@ -108,6 +110,7 @@ class SensorEcu : public Sensor {
         float _fuelPW1 = 0;
         float _fuelPW2 = 0;
         float _ubAdc = 0;
+        bool _isOn = false;
 
         /**
          * Helper for interpreting raw values from ECU
