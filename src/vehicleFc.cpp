@@ -23,6 +23,7 @@ SensorFcpControl cellStack(&serial);
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
 TextElement<String> speedElement([]() { return gps.getHorizontalSpeed(); }, 3, String("spd "), 1);
+TextElement<String> stackElement([]() { return cellStack.getStackVoltage(); }, 3, String("stk "), 1);
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
@@ -67,8 +68,11 @@ String publishName = "BQIngestion";
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
     speedElement.setPosition(2, 2);
-    speedElement.setMinTextLength(5);
+    stackElement.setPosition(2, 38);
+    speedElement.setMinTextLength(5); // 00.00
+    stackElement.setMinTextLength(5); // 00.00
     display.addDisplayElement(&speedElement);
+    display.addDisplayElement(&stackElement);
 
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();

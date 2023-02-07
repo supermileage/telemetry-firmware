@@ -2,7 +2,6 @@
 #define _DISPLAY_ELEMENT_H_
 
 #include "Adafruit_GFX.h"
-#include <functional>
 
 class DisplayElement {
     public:
@@ -15,7 +14,7 @@ class DisplayElement {
 template <typename T>
 class TextElement : public DisplayElement {
     public:
-        TextElement(std::function<T()> func, uint8_t textSize, String label = "", uint8_t labelSize = 0) :
+        TextElement(T (*func)(), uint8_t textSize, String label = "", uint8_t labelSize = 0) :
             _displayFunc(func), _textSize(textSize), _label(label), _labelSize(labelSize) { }
 
         ~TextElement() { }
@@ -60,7 +59,7 @@ class TextElement : public DisplayElement {
         }
 
     private:
-        std::function<T()> _displayFunc;
+        T (*_displayFunc)();
         int16_t _x = 0;
         int16_t _y = 0;
         uint8_t _textSize = 0;

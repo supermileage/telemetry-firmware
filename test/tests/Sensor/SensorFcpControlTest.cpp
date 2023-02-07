@@ -182,11 +182,12 @@ TEST_CASE( "SensorFcpControl::handle -- message parsing test", "[SensorFcpContro
 	fcp.begin();
 	setMillis(DEFAULT_START_TIME_MILLIS);
 	
-	SECTION("should pass -- correctly parses a range of cell values") {
+	SECTION("should pass -- correctly parses full range of cell values") {
 		const float cellValues[] = { 0, 0.01, -0.01, 0.125, -0.125, 0.7, -0.7, 0.88, -0.88, 1, -1, 2.55, -2.55, 13.33, -13.33, 25.5, -25.5 };
 
 		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );
 
+        float sum = 0;
 		for (int i = 0; i < FC_NUM_CELLS; i++) {
 			int16_t toPack = (int16_t)(cellValues[i] * 1000);
 			buf[FC_NUM_HEADERS + i * 2] = toPack >> 8;
@@ -197,13 +198,53 @@ TEST_CASE( "SensorFcpControl::handle -- message parsing test", "[SensorFcpContro
 
 		fcp.handle();
 
+        bool isValid;
 		for (int i = 0; i < FC_NUM_CELLS; i++) {
-			bool isValid = false;
+			isValid = false;
 			float val = fcp.getCellVoltageByIndex(i, isValid);
 
 			REQUIRE( isValid );
 			REQUIRE( cellValues[i] == Approx(val).margin(0.01) );
 		}
+
+        isValid = false;
+        String stackVal = fcp.getStackVoltage(isValid);
+
+        REQUIRE( isValid );
+        REQUIRE( sum == Approx(stackVal.toFloat()).margin(0.01) );
+	}
+
+    SECTION("should pass -- get stack voltage") {
+		const float cellValues[] = { 1.1, 2.2, 3.3, 5.5, 7.7, 11.11, 13.13, 17.17, 19.19, 23.23, 19.19, 17.17, 13.13, 11.11, 7.7, 5.5, 3.33 };
+
+		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );
+
+        float sum = 0;
+		for (int i = 0; i < FC_NUM_CELLS; i++) {
+			int16_t toPack = (int16_t)(cellValues[i] * 1000);
+			buf[FC_NUM_HEADERS + i * 2] = toPack >> 8;
+			buf[FC_NUM_HEADERS + i * 2 + 1] = toPack & 0xFF;
+            sum += cellValues[i];
+		}
+
+		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
+
+		fcp.handle();
+
+        bool isValid;
+		for (int i = 0; i < FC_NUM_CELLS; i++) {
+            isValid = false;
+			float val = fcp.getCellVoltageByIndex(i, isValid);
+
+			REQUIRE( isValid );
+			REQUIRE( cellValues[i] == Approx(val).margin(0.01) );
+		}
+
+        isValid = false;
+        String stackVal = fcp.getStackVoltage(isValid);
+
+        REQUIRE( isValid );
+        REQUIRE( sum == Approx(stackVal.toFloat()).margin(0.01) );
 	}
 	delete[] buf;
 }
