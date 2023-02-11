@@ -7,6 +7,9 @@
 #include "SensorEcu.h"
 #include "DriverDisplay.h"
 
+// forward declarations
+String computeHorizontalSpeed();
+
 USARTSerialWrapper usartSerial(&Serial1);
 Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
@@ -22,8 +25,8 @@ SensorVoltage inVoltage;
 // driver display
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
-TextElement<SensorGps, String> speedElement(&gps, &SensorGps::getHorizontalSpeed, 3, String("spd "), 1);
-TextElement<SensorEcu, int> rpmElement(&ecu, &SensorEcu::getRPM, 3, String("rpm "), 1);
+TextElement<String> speedElement(&computeHorizontalSpeed, 3, String("spd "), 1);
+TextElement<int> rpmElement([]() { return ecu.getOn() ? ecu.getRPM() : 0; }, 3, String("rpm "), 1);
 
 // commands
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -123,6 +126,14 @@ void CurrentVehicle::toggleGpsOverride() {
 
 void CurrentVehicle::restartTinyBms() {
     
+}
+
+String computeHorizontalSpeed() {
+    if (ecu.getOn())
+        // 9.7 : 1 gear ratio -- 21" diameter wheels -- 39370.1 inches per kilometer
+        return FLOAT_TO_STRING((float)ecu.getRPM() / 9.7 * 3.14 * 21 * 60 / 39370.1, 2);
+    else
+        return gps.getHorizontalSpeed();
 }
 
 #endif

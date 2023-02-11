@@ -20,6 +20,7 @@ class SensorFcpControl: public Sensor {
         void handle() override;
 		int getNumFuelCells();
         String getNextCellVoltage(bool& valid = Sensor::dummy);
+        String getStackVoltage(bool& valid = Sensor::dummy);
         float getCellVoltageByIndex(int index, bool& valid = Sensor::dummy);
 
     private:

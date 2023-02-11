@@ -62,6 +62,15 @@ float SensorFcpControl::getCellVoltageByIndex(int index, bool& valid) {
 		return 0.0f;
 }
 
+String SensorFcpControl::getStackVoltage(bool& valid) {
+    valid = _valid;
+    float sum = 0;
+    for (float cell : _cellVoltages) {
+        sum += cell;
+    }
+    return FLOAT_TO_STRING(sum, 2);
+}
+
 void SensorFcpControl::_unpackCellVoltages(uint8_t* buf) {
 	int j = 0;
 	for (int i = FC_NUM_HEADERS; i < FC_PACKET_LENGTH; i+=2) {
