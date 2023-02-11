@@ -131,7 +131,7 @@ void CurrentVehicle::restartTinyBms() {
 String computeHorizontalSpeed() {
     if (ecu.getOn())
         // 9.7 : 1 gear ratio -- 21" diameter wheels -- 39370.1 inches per kilometer
-        return String((float)ecu.getRPM() / 9.7 * (3.14 * 21) * 60 / 39370.1);
+        return FLOAT_TO_STRING((float)ecu.getRPM() / 9.7 * 3.14 * 21 * 60 / 39370.1, 2);
     else
         return gps.getHorizontalSpeed();
 }
