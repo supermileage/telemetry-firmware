@@ -26,7 +26,7 @@ SensorVoltage inVoltage;
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
 TextElement<String> speedElement(&computeHorizontalSpeed, 3, String("spd "), 1);
-TextElement<int> rpmElement([]() { return ecu.getRPM(); }, 3, String("rpm "), 1);
+TextElement<int> rpmElement([]() { return ecu.getOn() ? ecu.getRPM() : 0; }, 3, String("rpm "), 1);
 
 // commands
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
