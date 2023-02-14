@@ -81,10 +81,13 @@
 		"typeindex": "cpp",
 		"variant": "cpp",
 <<<<<<< HEAD
+<<<<<<< HEAD
 		"queue": "cpp"
 	},
     "C_Cpp.default.configurationProvider": "particle.particle-vscode-core"
 =======
+=======
+>>>>>>> master
 		"future": "cpp",
 		"regex": "cpp",
 		"numeric": "cpp",
@@ -115,5 +118,8 @@
 		}
 	],
 	"cmake.sourceDirectory": "${workspaceFolder}/lib/ArduinoJson"
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 }
