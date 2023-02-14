@@ -2,14 +2,25 @@
 #define _SENSOR_ECU_H_
 
 #include "Sensor.h"
+#include  "TelemetrySerial.h"
+
+#define ECU_ON_OFF_INTERVAL 250
 
 class SensorEcu : public Sensor {
     public:
+		static const int32_t PacketSize;
+        static const unsigned Baud;
+		static const uint8_t Header1;
+		static const uint8_t Header2;
+		static const uint8_t Header3;
+		static const uint8_t DataFieldLength;
+		static const uint8_t ServiceId;
+		
         /**
          * Constructor 
          * @param *serial bus receiving ECU data
          **/
-        SensorEcu(USARTSerial *serial);
+        SensorEcu(TelemetrySerial *serial);
 
         /**
          * Begins ECU receive
@@ -78,8 +89,13 @@ class SensorEcu : public Sensor {
         * */
         String getUbAdc(bool &valid = Sensor::dummy);
 
+        /**
+        * @return Whether or not the ECU is corrently on and connected to Telemetry
+        * */
+        int getOn(bool &valid = Sensor::dummy);
+
     private:
-        USARTSerial * _serial;
+        TelemetrySerial* _serial;
 
         uint32_t _lastUpdate = 0;
         bool _valid = false;
@@ -94,6 +110,7 @@ class SensorEcu : public Sensor {
         float _fuelPW1 = 0;
         float _fuelPW2 = 0;
         float _ubAdc = 0;
+        bool _isOn = false;
 
         /**
          * Helper for interpreting raw values from ECU
@@ -103,7 +120,7 @@ class SensorEcu : public Sensor {
          * @param offset 
          * @return Intepreted value
          * */
-        float _interpretValue(uint8_t high, uint8_t low, float factor, float offset);
+        float _interpretValue(uint8_t high, uint8_t low, float factor, float offset, bool isInt = false);
 };
 
 #endif

@@ -1,12 +1,11 @@
 #ifndef _CAN_INTERFACE_H_
 #define _CAN_INTERFACE_H_
 
-#include <map>
+#include <unordered_map>
 
 #include "can.h"
 #include "Sensor.h"
-#include "mcp2515_can.h"
-#include "can_common.h"
+#include "CanController.h"
 #include "Command.h"
 
 using namespace can;
@@ -19,7 +18,7 @@ class CanInterface : public Handleable {
          * @param csPin chip select pin to use for this CAN module
          * @param intPin interrupt pin to use for this CAN module
          **/
-        CanInterface(SPIClass *spi, uint8_t csPin, uint8_t intPin);
+        CanInterface(CanController* can);
 
         // look into virtual desctructors in c++
         ~CanInterface();
@@ -51,9 +50,8 @@ class CanInterface : public Handleable {
         void sendMessage(CanMessage message);
 
     private:
-        std::map<uint16_t, Command*> _delegates;
-        uint8_t _intPin;
-        mcp2515_can* _CAN;
+        CanController* _CAN;
+        std::unordered_map<uint16_t, Command*> _delegates;
 
 };
 

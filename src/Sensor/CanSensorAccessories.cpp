@@ -1,10 +1,31 @@
 #include "CanSensorAccessories.h"
 
-CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids)
-	: CanListener(canInterface, id) {
-	
-	for (uint8_t id : ids)
-		_statuses[id] = CanSensorAccessories::StatusProperty { 0, Unknown };
+const uint8_t CanSensorAccessories::StatusIdHeadlights = 0x0;
+const uint8_t CanSensorAccessories::StatusIdBrakelights = 0x1;
+const uint8_t CanSensorAccessories::StatusIdHorn = 0x2;
+const uint8_t CanSensorAccessories::StatusIdHazards = 0x3;
+const uint8_t CanSensorAccessories::StatusIdRightSignal = 0x4;
+const uint8_t CanSensorAccessories::StatusIdLeftSignal = 0x5;
+const uint8_t CanSensorAccessories::StatusIdWipers = 0x6;
+
+const uint8_t statusIds[] {
+    CanSensorAccessories::StatusIdHeadlights,
+    CanSensorAccessories::StatusIdBrakelights,
+    CanSensorAccessories::StatusIdHorn,
+    CanSensorAccessories::StatusIdHazards,
+    CanSensorAccessories::StatusIdRightSignal,
+    CanSensorAccessories::StatusIdLeftSignal,
+	CanSensorAccessories::StatusIdWipers
+};
+
+CanSensorAccessories::CanSensorAccessories(CanInterface &canInterface, uint16_t id)
+	: CanListener(canInterface, id) { }
+
+void CanSensorAccessories::begin() {
+	CanListener::begin();
+
+	for (uint8_t id : statusIds)
+		_statuses[id] = CanSensorAccessories::StatusProperty { 0, Sensor::Status::Unknown };
 }
 
 String CanSensorAccessories::getHumanName() {
@@ -12,31 +33,31 @@ String CanSensorAccessories::getHumanName() {
 }
 
 int CanSensorAccessories::getStatusHeadlights(bool& valid) {
-	return _getStatus(STATUS_HEADLIGHTS, valid);
+	return _getStatus(CanSensorAccessories::StatusIdHeadlights, valid);
 }
 
 int CanSensorAccessories::getStatusBrakelights(bool& valid) {
-	return _getStatus(STATUS_BRAKELIGHTS, valid);
+	return _getStatus(CanSensorAccessories::StatusIdBrakelights, valid);
 }
 
 int CanSensorAccessories::getStatusHorn(bool& valid) {
-	return _getStatus(STATUS_HORN, valid);
+	return _getStatus(CanSensorAccessories::StatusIdHorn, valid);
 }
 
 int CanSensorAccessories::getStatusHazards(bool& valid) {
-	return _getStatus(STATUS_HAZARDS, valid);
+	return _getStatus(CanSensorAccessories::StatusIdHazards, valid);
 }
 
 int CanSensorAccessories::getStatusRightSignal(bool& valid) {
-	return _getStatus(STATUS_RIGHT_SIGNAL, valid);
+	return _getStatus(CanSensorAccessories::StatusIdRightSignal, valid);
 }
 
 int CanSensorAccessories::getStatusLeftSignal(bool& valid) {
-	return _getStatus(STATUS_LEFT_SIGNAL, valid);
+	return _getStatus(CanSensorAccessories::StatusIdLeftSignal, valid);
 }
 
 int CanSensorAccessories::getStatusWipers(bool& valid) {
-	return _getStatus(STATUS_WIPERS, valid);
+	return _getStatus(CanSensorAccessories::StatusIdWipers, valid);
 }
 
 void CanSensorAccessories::update(CanMessage message) {

@@ -66,10 +66,11 @@ void CanAccessoriesMidiPlayer::_buildNextCanMessage() {
 
 	for (uint8_t i = 0; i < _nextMessage.dataLength; i++) {
 		DEBUG_SERIAL("0x" + String(_nextMessage.data[i]));
-		if (i != (_nextMessage.dataLength - 1))
+		if (i != (_nextMessage.dataLength - 1)) {
 			DEBUG_SERIAL(", ");
-		else
+        } else  {
 			DEBUG_SERIAL(" } }\n");
+        }
 	}
 
 	DEBUG_SERIAL_LN("Queue has " + String(_midiEvents.size()) + " events");

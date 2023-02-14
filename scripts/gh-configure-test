@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo 'Verifying unit test workflow dependencies'
+
+# verify make is installed
+if ! command -v make &> /dev/null ; then
+    echo "GNU make not installed.  Installing"
+	sudo apt install make -y
+    exit 0
+fi
+
+make --version
+
+# verify gcc is installed
+if ! command -v gcc &> /dev/null ; then
+    echo "gcc not installed.  Installing"
+	sudo apt install gcc -y
+    exit 0
+fi
+
+gcc --version

@@ -1,5 +1,6 @@
+.vscode/*
+!.vscode/*.json
 **c_cpp_properties.json
-**launch.json
 demo/
 *.code-workspace
 target/
@@ -8,3 +9,6 @@ access-link.txt
 *.pdf
 .DS_STORE
 output/
+test/obj
+test/dep
+test/bin

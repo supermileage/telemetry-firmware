@@ -72,3 +72,6 @@ This will flash the firmware onto the board.
 
 Particle Workbench has all this functionality built-in, so it abstracts away a lot of the hassle of learning the CLI. Use that if you're unsure.
 
+## Tests
+
+This project contains a set of unit tests.  For information on building and writing tests, see the README.md in the test folder.

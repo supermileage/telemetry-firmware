@@ -22,7 +22,7 @@ class Handleable {
          * 
          * Removes this object from the handler's list of handleables
          * */
-        ~Handleable();
+        virtual ~Handleable();
 
         /**
          * Begin Handleable Object
@@ -33,6 +33,13 @@ class Handleable {
          * Run Handleable object every loop
          * */
         virtual void handle() = 0;
+
+		bool isActive();
+
+		void setIsActive(bool active);
+
+	private:
+		bool _isActive = true;
         
 };
 

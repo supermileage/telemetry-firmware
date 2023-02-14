@@ -4,6 +4,7 @@
 #include <queue>
 #include <stdlib.h>
 
+#include "can_common.h"
 #include "midi-parser.h"
 #include "CanInterface.h"
 

@@ -3,6 +3,7 @@
 
 // #define DEBUG_THERMO
 
+
 #define DEBUG_THERMO_INTERVAL 250
 
 SensorThermo::SensorThermo(SPIClass *spi, uint8_t csPin){
@@ -17,7 +18,7 @@ String SensorThermo::getHumanName() {
 
 void SensorThermo::begin() {
     _spi->begin();
-    _probe->begin();
+    _initialized = _probe->begin();
 }
 
 void SensorThermo::handle() {
@@ -25,27 +26,34 @@ void SensorThermo::handle() {
         if(millis() > _lastDebug + DEBUG_THERMO_INTERVAL) {
             _lastDebug = millis();
 
-            Serial.print(getHumanName());
+            DEBUG_SERIAL(getHumanName());
 
             uint8_t error = _probe->readError();
             switch(error) {
                 case 1: 
-                    Serial.println(" ERROR: No Thermocouple Detected");
+                    DEBUG_SERIAL_LN(" ERROR: No Thermocouple Detected");
                     break;
                 case 2:
-                    Serial.println(" ERROR: Thermocouple Shorted To GND");
+                    DEBUG_SERIAL_LN(" ERROR: Thermocouple Shorted To GND");
                     break;
                 case 4:
-                    Serial.println(" ERROR: Thermocouple Shorted To VCC");
+                    DEBUG_SERIAL_LN(" ERROR: Thermocouple Shorted To VCC");
                     break;
                 default:
-                    Serial.println(" " + FLOAT_TO_STRING(_probe->readCelsius(),2) + "°C");
+                    DEBUG_SERIAL_LN(" " + FLOAT_TO_STRING(_probe->readCelsius(),2) + "°C");
                     break;
             }
         
         }
-
     #endif
+}
+
+String SensorThermo::getInitStatus() {
+    if (_initialized) {
+        return "Success";
+    } else {
+        return "Failure";
+    }
 }
 
 int SensorThermo::getProbeTemp(bool &valid) {

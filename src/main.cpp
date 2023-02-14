@@ -6,7 +6,7 @@
 #include "Handler.h"
 #include "Handleable.h"
 
-SYSTEM_MODE(AUTOMATIC);
+SYSTEM_MODE(SEMI_AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 
 // Forward declarations for callback functions
@@ -16,10 +16,14 @@ void publish(String payload, DataQueue::PublishData status);
 void timeValidCallback();
 
 // Construct all Handleables
+#ifdef BOARD_V2
+Button button(A2, false, true, buttonPushed, NULL, buttonHeld);
+#else
+Button button(A2, true, false, buttonPushed, NULL, buttonHeld);
+#endif
 Led ledOrange(A0, 63);
 Led ledBlue(D7, 255);
 Led ledGreen(D8, 40);
-Button button(A2, true, false, buttonPushed, NULL, buttonHeld);
 DataQueue dataQ(VEHICLE_NAME, publish);
 TimeLib timeLib(timeValidCallback);
 LoggingDispatcher *dispatcher;
@@ -200,16 +204,24 @@ int remoteDisableLogging(String command){
 
 }
 
+// Restart BMS Remotely
+int remoteRestartTinyBms(String command) {
+
+    DEBUG_SERIAL_LN("#### REMOTE - Sent TinyBMS Restart Command\n");
+    CurrentVehicle::restartTinyBms();
+    return 1;
+
+}
+
 #pragma endregion
 
 /**
  * SETUP
  * */
 void setup() {
-
-    if(DEBUG_SERIAL_EN){
-        Serial.begin(115200);
-    }
+    #if DEBUG_SERIAL_EN
+    Serial.begin(115200);
+    #endif
 
     // Start i2c with clock speed of 400 KHz
     // This requires the pull-up resistors to be removed on i2c bus
@@ -220,6 +232,7 @@ void setup() {
     Particle.function("remoteReset", remoteReset);
     Particle.function("enableLogging", remoteEnableLogging);
     Particle.function("disableLogging", remoteDisableLogging);
+    Particle.function("restartTinyBms", remoteRestartTinyBms);
 
     Time.zone(TIME_ZONE);
 
@@ -228,15 +241,13 @@ void setup() {
     // Begin all handleables
     Handler::instance().begin();
 
-    DEBUG_SERIAL_LN("---- TELEMETRY ONLINE - " + String(VEHICLE_NAME) + " ----\n");
-
+	Particle.connect();
 }
 
 /**
  * LOOP
  * */
 void loop() {
-
     // Run all handleables
     Handler::instance().handle();
 

@@ -9,6 +9,7 @@
 
 #include "Sensor.h"
 #include "SensorGps.h"
+#include "SensorAccelerometer.h"
 #include "SensorThermo.h"
 #include "SensorSigStrength.h"
 #include "SensorVoltage.h"
@@ -41,6 +42,12 @@ namespace CurrentVehicle {
      * @brief Toggle override for GPS position greenlist
     **/
     void toggleGpsOverride();
+
+    /**
+     * @brief Send Restart message to TinyBMS
+    **/
+    void restartTinyBms();
+
 }
 
 #endif

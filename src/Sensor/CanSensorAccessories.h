@@ -1,7 +1,7 @@
 #ifndef CAN_ACCESSORIES_LISTENER
 #define CAN_ACCESSORIES_LISTENER
 
-#include <map>
+#include <unordered_map>
 #include <array>
 
 #include "can.h"
@@ -17,10 +17,13 @@ using namespace can;
  */
 class CanSensorAccessories : public CanListener {
 	public:
-		/**
-		 * @brief return values for getStatus methods
-		 */
-		enum Status { Off = 0, On = 1, Unknown = 2 };
+		static const uint8_t StatusIdHeadlights;
+		static const uint8_t StatusIdBrakelights;
+		static const uint8_t StatusIdHorn;
+		static const uint8_t StatusIdHazards;
+		static const uint8_t StatusIdRightSignal;
+		static const uint8_t StatusIdLeftSignal;
+		static const uint8_t StatusIdWipers;
 
 		/**
 		 * @brief Constructor for CanSensorAccessories
@@ -30,8 +33,7 @@ class CanSensorAccessories : public CanListener {
 		 * @param ids the individual ids of the Can accessories whose status we want (0xFF == unused)
 		 * @note size of ids array can be increased if we need to listen for more Can status messages
 		 */
-		typedef std::array<uint8_t, 7> StatusIds;
-		CanSensorAccessories(CanInterface &canInterface, uint16_t id, StatusIds ids);
+		CanSensorAccessories(CanInterface &canInterface, uint16_t id);
 
 		/**
 		 * @brief Nothing to handle here
@@ -39,9 +41,14 @@ class CanSensorAccessories : public CanListener {
 		void handle() override { }
 
 		/**
+		 * @brief Calls CanListener::begin and initializes status map
+		 */
+		void begin() override;
+
+		/**
 		 * @brief Get the string name of this object
 		 */
-		String getHumanName();
+		String getHumanName() override;
 		
 		/**
 		 * @brief Get the status of headlights
@@ -84,7 +91,7 @@ class CanSensorAccessories : public CanListener {
             unsigned long lastUpdated;
             int value;
         };
-		std::map<uint8_t, StatusProperty> _statuses;
+		std::unordered_map<uint8_t, StatusProperty> _statuses;
 
 		/**
 		 * @brief adds data to appropriate byte of _data's data buffer

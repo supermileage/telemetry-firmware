@@ -1,6 +1,10 @@
+#include <cmath>
+
 #include "SensorGps.h"
 #include "settings.h"
 #include "gpsGreenlist.h"
+
+// #define DEBUG_GPS
 
 // GPS Update Frequency in Hz (1-10)
 #define UPDATE_FREQ 4
@@ -21,41 +25,40 @@ String SensorGps::getHumanName() {
 }
 
 void SensorGps::begin() {
- 
-    _gps->begin();
+    _initialized = _gps->begin();
 
     // Output NMEA and UBX messages over i2c
     _gps->setI2COutput(COM_TYPE_UBX);
     // GPS polls are non-blocking
     _gps->setAutoPVT(true);
-    // Set the update frequency
+    // Set the update frequency.  The Sparkfun GNSS library will automatically limit checks to UPDATE_FREQ times per second
     _gps->setNavigationFrequency(UPDATE_FREQ);
-
 }
 
 void SensorGps::handle() {
-    // The Sparkfun GNSS library automatically rate-limits the checks to _updateFrequency * 4
     _gps->checkUblox();
 
     // Calculate the current microsecond
     uint64_t thisUpdateMicros = (_gps->getUnixEpoch() * MICROSECONDS_IN_SECOND) + (_gps->getNanosecond() / NANOSECONDS_IN_MICROSECOND);
 
-    // Check to see if there has been an update
+    // Check to see if there has been an update (gps data is updated UPDATE_FREQ times per second, so this returns true at that rate)
     if(thisUpdateMicros != _lastUpdateMicros){
-
+		
         uint64_t elapsedMicroseconds = thisUpdateMicros - _lastUpdateMicros;
 
         // Calculate XY Acceleration
         float horizontalSpeed = _gps->getGroundSpeed() / MILIMETERS_IN_METERS;
-        if(_speedCallback){
+        if (_speedCallback) {
             _speedCallback(horizontalSpeed); 
-            }       
+        }
         _horizontalAcceleration = ((horizontalSpeed - _lastHorizontalSpeed) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
         _lastHorizontalSpeed = horizontalSpeed;
+        _horizontalDistance = horizontalSpeed * elapsedMicroseconds / MICROSECONDS_IN_SECOND;
 
         // Calculate Z Speed
         float altitude = _gps->getAltitudeMSL() / MILIMETERS_IN_METERS;
         _verticalSpeed = ((altitude - _lastAltitude) * MICROSECONDS_IN_SECOND) / elapsedMicroseconds;
+        _verticalDistance = altitude - _lastAltitude;
         _lastAltitude = altitude;
 
         // Calculate Z Acceleration
@@ -63,6 +66,16 @@ void SensorGps::handle() {
         _lastVerticalSpeed = _verticalSpeed;
 
         _lastUpdateMicros = thisUpdateMicros;
+
+        #ifdef DEBUG_GPS
+            DEBUG_SERIAL("SIV: ");
+            DEBUG_SERIAL(_gps->getSIV());
+            DEBUG_SERIAL(" - Accuracy X: ");
+            DEBUG_SERIAL(_gps->getHorizontalAccEst() / MILIMETERS_IN_METERS);
+            DEBUG_SERIAL("m - Accuracy Y: ");
+            DEBUG_SERIAL(_gps->getVerticalAccEst() / MILIMETERS_IN_METERS);
+            DEBUG_SERIAL_LN("m");
+        #endif
     }
 
     float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
@@ -70,8 +83,7 @@ void SensorGps::handle() {
         _valid = true;
     } else{
         _valid = false;
-    }
-        
+    }        
 }
 
 bool SensorGps::getTimeValid() {
@@ -137,9 +149,11 @@ String SensorGps::getHorizontalAcceleration(bool &valid) {
 }
 
 String SensorGps::getHorizontalAccuracy(bool &valid) {
-    valid = true;
+    valid = _valid;
     float value = _gps->getHorizontalAccEst() / MILIMETERS_IN_METERS;
-    if (value < 0.0001 || value > 1000.0) value = 1000.0;
+    if (value > 1000.0){
+        return "1000.00";
+    }
     return FLOAT_TO_STRING(value, 2);  
 }
 
@@ -159,23 +173,37 @@ String SensorGps::getVerticalAcceleration(bool &valid) {
 }
 
 String SensorGps::getVerticalAccuracy(bool &valid) {
-    valid = true;
-        float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
-    if (value < 0.0001 || value > 1000.0) value = 1000.0;
+    valid = _valid;
+    float value = _gps->getVerticalAccEst() / MILIMETERS_IN_METERS;
+    if (value > 1000.0){
+        return "1000.00";
+    }
     return FLOAT_TO_STRING(value, 2);  
+}
+
+String SensorGps::getIncline(bool &valid) {
+    valid = true;
+    double inclineInRadians = atan(_verticalDistance / _horizontalDistance);
+    _verticalDistance = 0;
+	_horizontalDistance = 0;
+    return FLOAT_TO_STRING(degrees(inclineInRadians), 2);
 }
 
 int SensorGps::getSatellitesInView(bool &valid) {
     valid = true;
-    return _gps->getSIV();  
+    return _gps->getSIV();
 }
 
-void SensorGps::updateSpeedCallback(void (*speed)(float)){
+void SensorGps::setSpeedCallback(void (*speed)(float)){
    _speedCallback  = speed;
 }
 
 void SensorGps::toggleOverride() {
     _override = !_override;
+}
+
+String SensorGps::getInitStatus() {
+	return _initialized ? "Success" : "Failure";
 }
 
 

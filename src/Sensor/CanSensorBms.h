@@ -1,151 +1,153 @@
-#ifndef _SENSOR_BMS_H_
-#define _SENSOR_BMS_H_
+#ifndef _CAN_SENSOR_BMS_H_
+#define _CAN_SENSOR_BMS_H_
 
 #include <map>
 #include "CanListener.h"
+#include "CanInterface.h"
+#include "BmsFault.h"
 
-#define NUM_PARAMS                  7
+#define SOC_UPDATE_INTERVAL 497 // slighty off to avoid overlapping with other can write intervals
 
-#define PARAM_ID_BATTERY_VOLTAGE    0x14
-#define PARAM_ID_BATTERY_CURRENT    0x15
-#define PARAM_ID_MAX_CELL_VOLTAGE   0x16
-#define PARAM_ID_MIN_CELL_VOLTAGE   0x17
-#define PARAM_ID_STATUS             0x18
-#define PARAM_ID_SOC                0x1A
-#define PARAM_ID_TEMP               0x1B
+using namespace BmsFault;
 
-#define STATUS_CHARGING             0x91
-#define STATUS_CHARGED              0x92
-#define STATUS_DISCHARGING          0x93
-#define STATUS_REGENERATION         0x96
-#define STATUS_IDLE                 0x97
-#define STATUS_FAULT_ERROR          0x9B
-
-#define TEMP_ID_INTERNAL    0x00
-#define TEMP_ID_BATTERY_1   0x01
-#define TEMP_ID_BATTERY_2   0x02
-
-#define REQ_DATA_LENGTH     8
-
-#define RSP_STATUS_BYTE     0x0
-#define RSP_PARAM_ID_BYTE   0x1
-#define RSP_DATA_BYTE       0x2
-
-using namespace can;
-
+/**
+ * @brief Base bms class with abstract definitions of common bms properties and methods
+ * 
+ */
 class CanSensorBms : public CanListener {
-    public:
-        enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, Unknown };
-    
-        /**
-         * @brief Constructor for CanSensorBms
-         * 
-         * @param canInterface - the can interface which will be reading data from Can buffer
-         * @param requestIntervalMs - frequency to request Bms data
-         */
-        CanSensorBms(CanInterface &canInterface, uint16_t requestIntervalMs);
+	public:
+        enum BmsStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, ChargeEnabled, DischargeEnabled, Unknown };
 
-        /**
-         * @brief Repeatedly requests and stores bms data on interval
-         */
+		// Constructors
+		CanSensorBms(CanInterface& caninterface);
+
+		CanSensorBms(CanInterface& caninterface, uint16_t id);
+
+		~CanSensorBms();
+
+		/**
+		 * @brief Checks if any messages have been receieved within TIME_BEFORE_SLEEP
+		 * sets _isAsleep to true if no messages have been received within time frame
+		 * 
+		 */
         void handle() override;
-        
-        /**
-         * @brief Get the string name of this object
-         */
-        String getHumanName() override;
 
-        /**
+		/**
+		 * @brief returns time (in ms) at which this bms was last updated
+		 */
+		uint64_t getLastUpdateTime();
+
+		/**
+		 * @brief if true, this bms will stop sending out can messages
+		 */
+		void setIsAsleep(bool value);
+
+		/**
+		 * @brief returns whether or not this sensor is sending out can update messages
+		 */
+		bool getIsAsleep();
+		
+		/**
          * @brief Get the battery voltage
          */
-        String getBatteryVolt(bool& valid = Sensor::dummy);
+        virtual String getBatteryVolt(bool& valid = Sensor::dummy) = 0;
 
         /**
          * @brief Get the battery current
          */
-        String getBatteryCurrent(bool& valid = Sensor::dummy);
-
-        /**
-         * @brief Get the cell maximum voltage
-         */
-        String getMaxVolt(bool& valid = Sensor::dummy);
+        virtual String getBatteryCurrent(bool& valid = Sensor::dummy) = 0;
 
         /**
          * @brief Get the cell minimum voltage
          */
-        String getMinVolt(bool& valid = Sensor::dummy);
+        virtual String getMinVolt(bool& valid = Sensor::dummy) = 0;
+
+		/**
+         * @brief Get the cell maximum voltage
+         */
+        virtual String getMaxVolt(bool& valid = Sensor::dummy) = 0;
+
+		/**
+         * @brief Get the cells' average voltage
+         */
+		virtual String getAvgVolt(bool& valid = Sensor::dummy) = 0;
 
         /**
          * @brief Get the battery state of charge
          */
-        String getSoc(bool& valid = Sensor::dummy);
+        virtual String getSoc(bool& valid = Sensor::dummy) = 0;
+
+		/**
+         * @brief Get the Bms internal temperature
+         */
+        virtual int getTempBms(bool& valid = Sensor::dummy) = 0;
 
         /**
+         * @brief Get the max temp of all battery packs
+         */
+        virtual int getMinBatteryTemp(bool& valid = Sensor::dummy) = 0;
+
+        /**
+         * @brief Get the min temp of all battery packs
+         */
+        virtual int getMaxBatteryTemp(bool& valid = Sensor::dummy) = 0;
+
+		/**
+		 * @brief Get the average battery temperation of all packs
+		 */
+		virtual int getAvgBatteryTemp(bool& valid = Sensor::dummy) = 0;
+
+		/**
          * @brief Get the current Bms status
          */
-        int getStatusBms(bool& valid = Sensor::dummy);
+        virtual int getStatusBms(bool& valid = Sensor::dummy) = 0;
 
         /**
          * @brief Get current Bms status as string
          */
-        String getStatusBmsString(bool& valid = Sensor::dummy);
+        virtual String getStatusBmsString(bool& valid = Sensor::dummy) = 0;
+
+		/**
+         * @brief Get the universal BMS fault code (if any)
+         */
+        virtual int getFault(bool& valid = Sensor::dummy) = 0;
 
         /**
-         * @brief Get the Bms internal temperature
+         * @brief Send a restart message to the BMS
          */
-        int getTempBms(bool& valid = Sensor::dummy);
+        virtual void restart() = 0;
 
-        /**
-         * @brief Get the Bank 1 battery temperature
-         */
-        int getBatteryTemp1(bool& valid = Sensor::dummy);
+	protected:
+		const char* BMS_STATUS_STRINGS[9] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Charge Enabled", "Discharge Enabled", "Unknown" };
 
-        /**
-         * @brief Get the Bank 2 battery temperature
-         */
-        int getBatteryTemp2(bool& valid = Sensor::dummy);
-
-    private:
-        const uint16_t _requestIntervalMs;
-        const uint8_t _paramIds[NUM_PARAMS] =  {
-            PARAM_ID_BATTERY_VOLTAGE,
-            PARAM_ID_BATTERY_CURRENT,
-            PARAM_ID_MAX_CELL_VOLTAGE,
-            PARAM_ID_MIN_CELL_VOLTAGE,
-            PARAM_ID_STATUS,
-            PARAM_ID_SOC,
-            PARAM_ID_TEMP
-        };
-        const char* bmsStatuses[7] = { "Charging...", "Charged!", "Discharging...", "Regeneration", "Idle", "Fault Error", "Unknown" };
-        std::map<uint8_t, uint64_t> _validationMap;
-        unsigned long _lastValidTime = 0;
-        uint8_t _currentParam = 0;
-
-        // Data
-        float _batteryVoltage = 0.0f;
+		// Data
+		float _batteryVoltage = 0.0f;
         float _batteryCurrent = 0.0f;
         float _cellVoltageMax = 0.0f;
         float _cellVoltageMin = 0.0f;
-        float _soc = 0.0f;  
+        float _soc = 0.0f;
         int _tempBms = 0;
-        int _batteryTemp1 = 0;
-        int _batteryTemp2 = 0;
+        int _fault = NONE;
         BmsStatus _bmsStatus = Unknown;
 
-        float parseFloat(uint8_t* dataPtr);
+		// Mangagement
+		uint64_t _lastUpdateTime = 0;
+		uint64_t _lastSocUpdate = 0;
+		bool _isAsleep = false;
+		std::unordered_map<uint16_t, uint64_t> _validationMap;
 
-        uint16_t parseInt16(uint8_t* dataPtr);
+		/**
+		 * @brief Validate current value based on value id
+		 * 
+		 * @param id numeric id of property to be validated
+		 * @returns true if property is valid
+		 */
+        bool _validate(uint16_t id);
 
-        uint32_t parseInt32(uint8_t* dataPtr);
-
-        bool _validate(uint8_t id);
-
-        /**
-         * @brief Determines type of bms data and stores respectively
-         * 
-         * @param message data byte to be added to internal can message
-         */
-        void update(CanMessage message) override;
+		/**
+		 * @brief sends soc update out over can network on SOC_UPDATE_INTERVAL
+		 */
+		void _sendSocUpdate();
 };
 
 #endif

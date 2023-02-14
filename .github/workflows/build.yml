@@ -1,4 +1,4 @@
-name: Build Firmware
+name: Verify Firmware
 on: [push, pull_request]
 
 jobs:
@@ -55,3 +55,17 @@ jobs:
         with:
           name: fc-${{ github.sha }}
           path: output
+
+  run-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 5
+
+      - name: Verify Dependencies
+        run: ./scripts/gh-configure-test
+
+      - name: Build and Run Tests
+        run: make run-tests

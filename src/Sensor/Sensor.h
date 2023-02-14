@@ -9,17 +9,11 @@
 
 class Sensor : public Handleable {
     public:
-
         /**
-         * Initialize sensor
-         * */
-        virtual void begin() = 0;
-
-        /**
-         * Sensor update handler, run as frequently as possible
-         * */
-        virtual void handle() = 0;
-
+         * @brief represents an on-off status for a sensor device
+         */
+        enum Status { Off = 0, On = 1, Unknown = 2 };
+	
         /**
          * INTERFACE
          * @return Human name for this sensor type

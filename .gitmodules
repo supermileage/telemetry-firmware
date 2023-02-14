@@ -31,3 +31,26 @@
 [submodule "lib/midi-parser"]
 	path = lib/midi-parser
 	url = https://github.com/abique/midi-parser.git
+[submodule "test/external/UnitTestLib"]
+	path = test/external/UnitTestLib
+	url = https://github.com/supermileage/Particle-UnitTestLib
+[submodule "test/external/Catch2"]
+	path = test/external/Catch2
+	url = https://github.com/catchorg/Catch2.git
+	branch = v2.x
+[submodule "lib/fcp-common"]
+	path = lib/fcp-common
+	url = git@github.com:supermileage/fcp-common.git
+[submodule "lib/Adafruit_LSM6DS"]
+	path = lib/Adafruit_LSM6DS
+	url = git@github.com:adafruit/Adafruit_LSM6DS.git
+[submodule "lib/Adafruit_Sensor"]
+	path = lib/Adafruit_Sensor
+	url = git@github.com:adafruit/Adafruit_Sensor.git
+[submodule "lib/Adafruit_SH110x"]
+	path = lib/Adafruit_SH110x
+	url = git@github.com:adafruit/Adafruit_SH110x.git
+[submodule "lib/Adafruit-GFX-Library"]
+	path = lib/Adafruit-GFX-Library
+	url = git@github.com:supermileage/Adafruit-GFX-Library-Particle.git
+	branch = master
