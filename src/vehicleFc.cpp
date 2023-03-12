@@ -59,6 +59,10 @@ LoggingCommand<SensorFcpControl, String> cellVoltage14(&cellStack, "cv14", &Sens
 LoggingCommand<SensorFcpControl, String> cellVoltage15(&cellStack, "cv15", &SensorFcpControl::getNextCellVoltage, 1);
 LoggingCommand<SensorFcpControl, String> cellVoltage16(&cellStack, "cv16", &SensorFcpControl::getNextCellVoltage, 1);
 LoggingCommand<SensorFcpControl, String> cellVoltage17(&cellStack, "cv17", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage18(&cellStack, "cv18", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage19(&cellStack, "cv19", &SensorFcpControl::getNextCellVoltage, 1);
+
+LoggingCommand<SensorFcpControl, String> cellStackVoltage(&cellStack, "stv", &SensorFcpControl::getStackVoltage, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);
