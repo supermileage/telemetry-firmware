@@ -183,7 +183,7 @@ TEST_CASE( "SensorFcpControl::handle -- message parsing test", "[SensorFcpContro
 	setMillis(DEFAULT_START_TIME_MILLIS);
 	
 	SECTION("should pass -- correctly parses full range of cell values") {
-		const float cellValues[] = { 0, 0.01, -0.01, 0.125, -0.125, 0.7, -0.7, 0.88, -0.88, 1, -1, 2.55, -2.55, 13.33, -13.33, 25.5, -25.5 };
+		const float cellValues[] = { 0, 0.01, -0.01, 0.125, -0.125, 0.7, -0.7, 0.88, -0.88, 1, -1, 2.55, -2.55, 13.33, -13.33, 18.89, -18.89, 25.5, -25.5 };
 
 		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );
 
@@ -215,7 +215,7 @@ TEST_CASE( "SensorFcpControl::handle -- message parsing test", "[SensorFcpContro
 	}
 
     SECTION("should pass -- get stack voltage") {
-		const float cellValues[] = { 1.1, 2.2, 3.3, 5.5, 7.7, 11.11, 13.13, 17.17, 19.19, 23.23, 19.19, 17.17, 13.13, 11.11, 7.7, 5.5, 3.33 };
+		const float cellValues[] = { 1.1, 2.2, 3.3, 5.5, 7.7, 11.11, 13.13, 17.17, 19.19, 23.23, 19.19, 17.17, 13.13, 11.11, 7.7, 5.5, 3.33, 2.2, 1.1 };
 
 		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );
 
