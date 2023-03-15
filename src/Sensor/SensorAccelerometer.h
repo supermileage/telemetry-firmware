@@ -15,8 +15,7 @@
  */
 class SensorAccelerometer : public Sensor {
     public:
-        enum Direction { PositiveX, NegativeX, PositiveY, NegativeY, PositiveZ, NegativeZ };
-        SensorAccelerometer(AccelerometerController *controller, Direction forward, Direction up);
+        SensorAccelerometer(AccelerometerController *controller);
         ~SensorAccelerometer();
         String getHumanName() override;
         void begin() override;
@@ -39,9 +38,6 @@ class SensorAccelerometer : public Sensor {
         float _gravityY = 0;
         float _gravityZ = 0;
         bool _initialized = false;
-
-        Direction _forward;
-        Direction _up;
 
         void _setGravityY();
         void _setGravityZ();

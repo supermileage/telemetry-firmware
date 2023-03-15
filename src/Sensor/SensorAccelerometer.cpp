@@ -8,8 +8,7 @@
 #define READ_INTERVAL               10      // keep in mind that default data rate for LSM6DOX is 104Hz
 #define MEGA                        1000000
 
-SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, Direction forward, Direction up) :
-    _controller(controller), _forward(forward), _up(up) { }
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller) : _controller(controller) { }
 
 SensorAccelerometer::~SensorAccelerometer() { }
 
@@ -22,7 +21,6 @@ void SensorAccelerometer::begin() {
 
     // assign method-pointers
     
-
     // get initial reading of pitch and gravitational acceleration on z and y axes.
     // assumes that the vehicle is not moving when this method is called
     if (_initialized) {
