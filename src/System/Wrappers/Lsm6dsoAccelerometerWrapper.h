@@ -25,18 +25,12 @@ class Lsm6dsoAccelerometerWrapper : public AccelerometerController {
         Adafruit_LSM6DS *_lsm6;
         SPIClass *_spi;
         int _csPin;
-        static sensors_event_t s_accel;
-        static sensors_event_t s_gyro;
-        static sensors_event_t s_temp;
+        Matrix3d _translationMatrix;
+        sensors_event_t _accel;
+        sensors_event_t _gyro;
+        sensors_event_t _temp;
 
-        float (*_getGlobalAccelX)();
-        float (*_getGlobalAccelY)();
-        float (*_getGlobalAccelZ)();
-        float (*_getGlobalGyroX)();
-        float (*_getGlobalGyroY)();
-        float (*_getGlobalGyroZ)();
-
-        void _setGlobalTransform(uint16_t orientation);
+        void _setTranslationMatrix(uint16_t orientation);
 };
 
 #endif
