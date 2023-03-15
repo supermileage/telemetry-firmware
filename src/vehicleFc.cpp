@@ -78,8 +78,8 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 void CurrentVehicle::setup() {
     speedElement.setPosition(2, 2);
     stackElement.setPosition(2, 38);
-    speedElement.setMinTextLength(5); // 00.00 == length 5
-    stackElement.setMinTextLength(5); // 00.00 == length 5
+    speedElement.setMinTextLength(5); // 00.00
+    stackElement.setMinTextLength(5); // 00.00
     display.addDisplayElement(&speedElement);
     display.addDisplayElement(&stackElement);
 }
