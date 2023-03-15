@@ -19,6 +19,11 @@ extern DataQueue dataQ;
 namespace CurrentVehicle {
 
     /**
+     * @brief vehicle-specific setup
+    */
+    void setup();
+
+    /**
      *  Returns dispatcher with current vehicle's set of commands
     **/
     LoggingDispatcher* buildLoggingDispatcher();
@@ -47,7 +52,6 @@ namespace CurrentVehicle {
      * @brief Send Restart message to TinyBMS
     **/
     void restartTinyBms();
-
 }
 
 #endif

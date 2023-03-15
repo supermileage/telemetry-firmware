@@ -116,11 +116,12 @@ int remoteSetBms(String command){
 }
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-    // added here because because this function is called on startup
-    gps.setSpeedCallback(speedCallbackGps);
-	
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
+}
+
+void CurrentVehicle::setup() {
+    gps.setSpeedCallback(speedCallbackGps);
 }
 
 void CurrentVehicle::debugSensorData() {
