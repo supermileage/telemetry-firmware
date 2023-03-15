@@ -19,8 +19,6 @@ String SensorAccelerometer::getHumanName() {
 void SensorAccelerometer::begin() {
     _initialized = _controller->init();
 
-    // assign method-pointers
-    
     // get initial reading of pitch and gravitational acceleration on z and y axes.
     // assumes that the vehicle is not moving when this method is called
     if (_initialized) {

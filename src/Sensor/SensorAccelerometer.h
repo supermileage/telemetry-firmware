@@ -7,8 +7,6 @@
 
 #define GRAVITY 9.81
 
-
-
 /*
  * Defines a vehicle accelerometer sensor positioned such that z-axis
  * is forward/backward and y-axis is up/down
