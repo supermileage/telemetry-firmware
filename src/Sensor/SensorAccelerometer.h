@@ -7,13 +7,16 @@
 
 #define GRAVITY 9.81
 
+
+
 /*
  * Defines a vehicle accelerometer sensor positioned such that z-axis
  * is forward/backward and y-axis is up/down
  */
 class SensorAccelerometer : public Sensor {
     public:
-        SensorAccelerometer(AccelerometerController *controller);
+        enum Direction { PositiveX, NegativeX, PositiveY, NegativeY, PositiveZ, NegativeZ };
+        SensorAccelerometer(AccelerometerController *controller, Direction forward, Direction up);
         ~SensorAccelerometer();
         String getHumanName() override;
         void begin() override;
@@ -36,6 +39,9 @@ class SensorAccelerometer : public Sensor {
         float _gravityY = 0;
         float _gravityZ = 0;
         bool _initialized = false;
+
+        Direction _forward;
+        Direction _up;
 
         void _setGravityY();
         void _setGravityZ();

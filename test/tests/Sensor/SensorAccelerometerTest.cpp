@@ -10,14 +10,14 @@
 
 /* Tests */
 TEST_CASE( "SensorAccelerometer::getHumanName test", "[SensorAccelerometer][Sensor]" ) {
-    SensorAccelerometer accel(nullptr);
+    SensorAccelerometer accel(nullptr, SensorAccelerometer::PositiveZ, SensorAccelerometer::NegativeY);
     
     REQUIRE( accel.getHumanName() == "Accelerometer" );
 }
 
 TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor][begin]" ) {
     AccelerometerControllerMock mock;
-    SensorAccelerometer accel(&mock);
+    SensorAccelerometer accel(&mock, SensorAccelerometer::PositiveZ, SensorAccelerometer::NegativeY);
 
     SECTION("AccelerometerController fails to inititialize") {
         mock.setInit([]() { return false; });
