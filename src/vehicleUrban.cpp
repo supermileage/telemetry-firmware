@@ -21,7 +21,7 @@ Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, SensorAccelerometer::PositiveZ, SensorAccelerometer::NegativeY);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
