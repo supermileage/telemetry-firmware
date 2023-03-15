@@ -64,12 +64,20 @@ void Lsm6dsoAccelerometerWrapper::_setTranslationMatrix(uint16_t orientation) {
         case LSM6DSO_FORWARD_Z_DOWN_Y:
             _translationMatrix.setMatrix({{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}});
             break;
+        case LSM6DSO_BACKWARD_Z_UP_Y:
+            _translationMatrix.setMatrix({{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}});
+            break;
+        case LSM6DSO_BACKWARD_Z_DOWN_Y:
+            _translationMatrix.setMatrix({{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}});
+            break;
         case LSM6DSO_FORWARD_X_UP_Z:
             _translationMatrix.setMatrix({{{0, 0, 1}, {0, 0, 1}, {0, 1, 0}}});
             break;
         case LSM6DSO_FORWARD_X_DOWN_Z:
             _translationMatrix.setMatrix({{{0, 0, 1}, {0, 0, 1}, {0, -1, 0}}});
             break;
+        case LSM6DSO_FORWARD_Y_UP_Z:
+            _translationMatrix.setMatrix({{{1, 0, 0}, {0, 0, 1}, {0, 1, 0}}});
         default:
             break;
     }

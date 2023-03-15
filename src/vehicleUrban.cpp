@@ -17,7 +17,7 @@
 
 Mcp2515CanWrapper canBus(&SPI1, D5, D6);
 CanInterface canInterface((CanController*)&canBus);
-Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3, LSM6DSO_POSITIVE_Z, LSM6DSO_POSITIVE_Y);
+Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3, LSM6DSO_NEGATIVE_Z, LSM6DSO_NEGATIVE_Y);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
