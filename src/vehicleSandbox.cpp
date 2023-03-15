@@ -26,13 +26,16 @@ TextElement<SensorGps, String> speedElement2(&gps, &SensorGps::getHorizontalSpee
 
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-	#ifdef TEST_DRIVER_DISPLAY
+    return nullptr;
+}
+
+void CurrentVehicle::setup() {
+    #ifdef TEST_DRIVER_DISPLAY
 	speedElement1.setPosition(4, 2);
     speedElement2.setPosition(4, 38);
     display.addDisplayElement(&speedElement1);
     display.addDisplayElement(&speedElement2);
 	#endif
-    return nullptr;
 }
 
 void CurrentVehicle::debugSensorData() {

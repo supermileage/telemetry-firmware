@@ -66,15 +66,17 @@ String publishName = "BQIngestion";
 
 // CurrrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
+    return builder.build();
+}
+
+void CurrentVehicle::setup() {
     speedElement.setPosition(2, 2);
     rpmElement.setPosition(2, 38);
     speedElement.setMinTextLength(5); // 00.00
     rpmElement.setMinTextLength(4);   // 00000
     display.addDisplayElement(&speedElement);
     display.addDisplayElement(&rpmElement);
-    
-    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
-    return builder.build();
 }
 
 void CurrentVehicle::debugSensorData() {
