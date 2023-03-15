@@ -39,7 +39,7 @@ bool Lsm6dsoAccelerometerWrapper::init() {
 }
 
 bool Lsm6dsoAccelerometerWrapper::tryGetReading() { 
-    return _lsm6->getEvent(&s_accel, &s_gyro, &s_temp);
+    return _lsm6->getEvent(&_accel, &_gyro, &_temp);
 }
 
 Vec3 Lsm6dsoAccelerometerWrapper::getAccel() { 
@@ -51,7 +51,7 @@ Vec3 Lsm6dsoAccelerometerWrapper::getGyro() {
 }
 
 float Lsm6dsoAccelerometerWrapper::getTemp() { 
-    return s_temp.temperature;
+    return _temp.temperature;
 }
 
 // NOTE: there are so many configurations to consider that I've only added the ones we
