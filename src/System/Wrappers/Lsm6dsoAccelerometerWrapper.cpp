@@ -30,7 +30,7 @@
 Lsm6dsoAccelerometerWrapper::Lsm6dsoAccelerometerWrapper(SPIClass *spi, int csPin, uint16_t forward, uint16_t up) :
     _spi(spi), _csPin(csPin) {
         _lsm6 = new Adafruit_LSM6DSOX();
-        _setTranslationMatrix(((forward << 8) & up));
+        _setTransformationMatrix(((forward << 8) & up));
 }
 
 bool Lsm6dsoAccelerometerWrapper::init() { 
@@ -43,11 +43,11 @@ bool Lsm6dsoAccelerometerWrapper::tryGetReading() {
 }
 
 Vec3 Lsm6dsoAccelerometerWrapper::getAccel() { 
-    return _translationMatrix.multiply(Vec3 { _accel.acceleration.x, _accel.acceleration.y, _accel.acceleration.z });
+    return _transformationMatrix.multiply(Vec3 { _accel.acceleration.x, _accel.acceleration.y, _accel.acceleration.z });
 }
 
 Vec3 Lsm6dsoAccelerometerWrapper::getGyro() {
-    return _translationMatrix.multiply(Vec3 { _gyro.gyro.x, _gyro.gyro.y, _gyro.gyro.z });
+    return _transformationMatrix.multiply(Vec3 { _gyro.gyro.x, _gyro.gyro.y, _gyro.gyro.z });
 }
 
 float Lsm6dsoAccelerometerWrapper::getTemp() { 
@@ -56,28 +56,28 @@ float Lsm6dsoAccelerometerWrapper::getTemp() {
 
 // NOTE: there are so many configurations to consider that I've only added the ones we
 //       currently need.  This can be fleshed out later
-void Lsm6dsoAccelerometerWrapper::_setTranslationMatrix(uint16_t orientation) {
+void Lsm6dsoAccelerometerWrapper::_setTransformationMatrix(uint16_t orientation) {
     switch (orientation) {
         case LSM6DSO_FORWARD_Z_UP_Y:
-            _translationMatrix.setMatrix({{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}});
+            _transformationMatrix.setMatrix({{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}});
             break;
         case LSM6DSO_FORWARD_Z_DOWN_Y:
-            _translationMatrix.setMatrix({{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}});
+            _transformationMatrix.setMatrix({{{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}});
             break;
         case LSM6DSO_BACKWARD_Z_UP_Y:
-            _translationMatrix.setMatrix({{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}});
+            _transformationMatrix.setMatrix({{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}});
             break;
         case LSM6DSO_BACKWARD_Z_DOWN_Y:
-            _translationMatrix.setMatrix({{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}});
+            _transformationMatrix.setMatrix({{{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}});
             break;
         case LSM6DSO_FORWARD_X_UP_Z:
-            _translationMatrix.setMatrix({{{0, 0, 1}, {0, 0, 1}, {0, 1, 0}}});
+            _transformationMatrix.setMatrix({{{0, 0, 1}, {0, 0, 1}, {0, 1, 0}}});
             break;
         case LSM6DSO_FORWARD_X_DOWN_Z:
-            _translationMatrix.setMatrix({{{0, 0, 1}, {0, 0, 1}, {0, -1, 0}}});
+            _transformationMatrix.setMatrix({{{0, 0, 1}, {0, 0, 1}, {0, -1, 0}}});
             break;
         case LSM6DSO_FORWARD_Y_UP_Z:
-            _translationMatrix.setMatrix({{{1, 0, 0}, {0, 0, 1}, {0, 1, 0}}});
+            _transformationMatrix.setMatrix({{{1, 0, 0}, {0, 0, 1}, {0, 1, 0}}});
         default:
             break;
     }
