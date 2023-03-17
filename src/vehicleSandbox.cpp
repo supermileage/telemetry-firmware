@@ -3,8 +3,8 @@
 // Sandbox vehicle for testing new sensors
 #ifdef SANDBOX
 
-// #define TEST_ACCELEROMETER
-#define TEST_DRIVER_DISPLAY
+#define TEST_ACCELEROMETER
+// #define TEST_DRIVER_DISPLAY
 
 #include "Lsm6dsoAccelerometerWrapper.h"
 #include "SensorAccelerometer.h"
