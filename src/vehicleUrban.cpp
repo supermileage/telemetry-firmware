@@ -17,11 +17,11 @@
 
 Mcp2515CanWrapper canBus(&SPI1, D5, D6);
 CanInterface canInterface((CanController*)&canBus);
-Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3, LSM6DSO_NEGATIVE_Z, LSM6DSO_NEGATIVE_Y);
+Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, ACCEL_NEGATIVE_Z, ACCEL_NEGATIVE_Y);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;

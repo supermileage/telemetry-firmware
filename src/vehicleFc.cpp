@@ -8,11 +8,11 @@
 #include "DriverDisplay.h"
 
 USARTSerialWrapper serial(&Serial1);
-Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3, LSM6DSO_POSITIVE_Y, LSM6DSO_POSITIVE_Z);
+Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
 // sensors
 SensorGps gps(new SFE_UBLOX_GNSS());
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, ACCEL_NEGATIVE_Y, ACCEL_NEGATIVE_Z);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;

@@ -12,8 +12,8 @@
 #include "DriverDisplay.h"
 
 #ifdef TEST_ACCELEROMETER
-Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3, LSM6DSO_POSITIVE_Z, LSM6DSO_POSITIVE_Y);
-SensorAccelerometer accel(&lsm6);
+Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
+SensorAccelerometer accel(&lsm6, ACCEL_NEGATIVE_Y, ACCEL_NEGATIVE_Z);
 #endif
 
 #ifdef TEST_DRIVER_DISPLAY
@@ -46,7 +46,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Gyro:  < " + String(accel.getGyro().x) + ", " + String(accel.getGyro().y) + ", " + String(accel.getGyro().x) + " >");
     DEBUG_SERIAL_LN("Accel: < " + String(accel.getAccel().x) + ", "+ String(accel.getAccel().y) + ", " + String(accel.getAccel().z) + " >");
     DEBUG_SERIAL_LN("Horizontal Accel: " + accel.getHorizontalAcceleration());
-    DEBUG_SERIAL_LN("Verical Accel: " + accel.getVerticalAcceleration());
+    DEBUG_SERIAL_LN("Vertical Accel: " + accel.getVerticalAcceleration());
     DEBUG_SERIAL_LN("Pitch: " + accel.getIncline() + "rad");
 	#endif
 

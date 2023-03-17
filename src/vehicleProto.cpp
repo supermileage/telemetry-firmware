@@ -11,12 +11,12 @@
 String computeHorizontalSpeed();
 
 USARTSerialWrapper usartSerial(&Serial1);
-Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3, LSM6DSO_POSITIVE_Z, LSM6DSO_POSITIVE_Y);
+Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
 // sensors
 SensorEcu ecu(&usartSerial);
 SensorGps gps(new SFE_UBLOX_GNSS());
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, ACCEL_POSITIVE_Z, ACCEL_POSITIVE_Y);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
