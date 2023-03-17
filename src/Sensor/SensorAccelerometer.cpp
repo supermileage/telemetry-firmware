@@ -5,9 +5,10 @@
 #define READ_INTERVAL               10      // keep in mind that default data rate for LSM6DOX is 104Hz
 #define MEGA                        1000000
 
-// Debug Settings
+/* Debug Settings */
 // #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
 #define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
+
 #if !defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO) or !defined(DEBUG_ACCELEROMETER_OUTPUT_ACCEL)
 int displayCount = 0;
 #endif
@@ -49,9 +50,11 @@ void SensorAccelerometer::handle() {
         if (fabs(lastX - _controller->getAccel().x) > 0.1 ||
             fabs(lastY - _controller->getAccel().y) > 0.1 ||
             fabs(lastZ - _controller->getAccel().z) > 0.1) {
-                DEBUG_SERIAL_LN("< " + String(_controller->getAccel().x) + ", " +
-                    String(_controller->getAccel().y - _gravityY) + ", " +
-                    String(_controller->getAccel().z - _gravityZ) + " >");
+                if (displayCount++ % 10 == 0) {
+                    DEBUG_SERIAL_LN("< " + String(_controller->getAccel().x) + ", " +
+                        String(_controller->getAccel().y - _gravityY) + ", " +
+                        String(_controller->getAccel().z - _gravityZ) + " >");
+                }
         }
     }
     #elif defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO)
@@ -65,9 +68,11 @@ void SensorAccelerometer::handle() {
         if (fabs(lastX - _controller->getGyro().x) > 0.1 ||
             fabs(lastY - _controller->getGyro().y) > 0.1 ||
             fabs(lastZ - _controller->getGyro().z) > 0.1) {
-                DEBUG_SERIAL_LN("< " + String(_controller->getGyro().x) + ", " +
-                    String(_controller->getGyro().y) + ", " +
-                    String(_controller->getGyro().z) + " >");
+                if (displayCount++ % 10 == 0) {
+                    DEBUG_SERIAL_LN("< " + String(_controller->getGyro().x) + ", " +
+                        String(_controller->getGyro().y) + ", " +
+                        String(_controller->getGyro().z) + " >");
+                }
         }
     }
     #endif
