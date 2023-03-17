@@ -1,12 +1,16 @@
 #include <math.h>
 #include "SensorAccelerometer.h"
 
-// #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
-// #define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
-
 #define GYRO_RECALIBRATION_MARGIN   0.01    // if accelerometer |<y,z>| == 9.81, recalibrate gyroscope
 #define READ_INTERVAL               10      // keep in mind that default data rate for LSM6DOX is 104Hz
 #define MEGA                        1000000
+
+// #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
+#define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
+
+#if !defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO) or !defined(DEBUG_ACCELEROMETER_OUTPUT_ACCEL)
+int displayCount = 0;
+#endif
 
 SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller) : _controller(controller) { }
 
@@ -36,34 +40,38 @@ void SensorAccelerometer::handle() {
     #ifdef DEBUG_ACCELEROMETER_OUTPUT_ACCEL
     if (_lastReadMillis + READ_INTERVAL < millis()) {
         _lastReadMillis = millis();
-        float lastX = _controller.getAccel().x;
-        float lastY = _controller.getAccel().y;
-        float lastZ = _controller.getAccel().z;
+        float lastX = _controller->getAccel().x;
+        float lastY = _controller->getAccel().y;
+        float lastZ = _controller->getAccel().z;
         success = _controller->tryGetReading();
         _lastReadMillis = millis();
 
-        if (fabs(lastX - _controller.getAccel().x) > 0.1 ||
-            fabs(lastY - _controller.getAccel().y) > 0.1 ||
-            fabs(lastZ - _controller.getAccel().z) > 0.1) {
-                DEBUG_SERIAL_LN("< " + String(_controller.getAccel().x - OFFSET_X) + ", " +
-                    String(_controller.getAccel().y - OFFSET_Y) + ", " +
-                    String(_controller.getAccel().z - OFFSET_Z) + " >");
+        if (fabs(lastX - _controller->getAccel().x) > 0.1 ||
+            fabs(lastY - _controller->getAccel().y) > 0.1 ||
+            fabs(lastZ - _controller->getAccel().z) > 0.1) {
+                if (displayCount++ % 10 == 0) {
+                    DEBUG_SERIAL_LN("< " + String(_controller->getAccel().x) + ", " +
+                        String(_controller->getAccel().y - _gravityY) + ", " +
+                        String(_controller->getAccel().z - _gravityZ) + " >");
+                }
         }
     }
     #elif defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO)
     if (_lastReadMillis + READ_INTERVAL < millis()) {
         _lastReadMillis = millis();
-        float lastX = _controller.getGyro().x;
-        float lastY = _controller.getGyro().y;
-        float lastZ = _controller.getGyro().z;
+        float lastX = _controller->getGyro().x;
+        float lastY = _controller->getGyro().y;
+        float lastZ = _controller->getGyro().z;
         success = _controller->tryGetReading();
 
-        if (fabs(lastX - _controller.getGyro().x) > 0.1 ||
-            fabs(lastY - _controller.getGyro().y) > 0.1 ||
-            fabs(lastZ - _controller.getGyro().z) > 0.1) {
-                DEBUG_SERIAL_LN("< " + String(_controller.getGyro().x) + ", " +
-                    String(_controller.getGyro().y) + ", " +
-                    String(_controller.getGyro().z) + " >");
+        if (fabs(lastX - _controller->getGyro().x) > 0.1 ||
+            fabs(lastY - _controller->getGyro().y) > 0.1 ||
+            fabs(lastZ - _controller->getGyro().z) > 0.1) {
+                if (displayCount++ % 10 == 0) {
+                    DEBUG_SERIAL_LN("< " + String(_controller->getGyro().x) + ", " +
+                        String(_controller->getGyro().y) + ", " +
+                        String(_controller->getGyro().z) + " >");
+                }
         }
     }
     #endif

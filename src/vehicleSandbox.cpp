@@ -3,8 +3,8 @@
 // Sandbox vehicle for testing new sensors
 #ifdef SANDBOX
 
-// #define TEST_ACCELEROMETER
-#define TEST_DRIVER_DISPLAY
+#define TEST_ACCELEROMETER
+// #define TEST_DRIVER_DISPLAY
 
 #include "Lsm6dsoAccelerometerWrapper.h"
 #include "SensorAccelerometer.h"
@@ -20,8 +20,8 @@ SensorAccelerometer accel(&lsm6);
 SensorGps gps(new SFE_UBLOX_GNSS());
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
-TextElement<SensorGps, String> speedElement1(&gps, &SensorGps::getHorizontalSpeed, 3, String("speed: "), 1);
-TextElement<SensorGps, String> speedElement2(&gps, &SensorGps::getHorizontalSpeed, 3, String("  rpm: "), 1);
+TextElement<String> speedElement1([]() { return gps.getHorizontalSpeed(); }, 3, String("  spd: "), 1);
+TextElement<String> speedElement2([]() { return gps.getHorizontalSpeed(); }, 3, String("  rpm: "), 1);
 #endif
 
 // CurrentVehicle namespace definitions
