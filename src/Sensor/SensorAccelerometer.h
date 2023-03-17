@@ -7,9 +7,12 @@
 
 #define GRAVITY 9.81
 
-/*
- * Defines a vehicle accelerometer sensor positioned such that z-axis
- * is forward/backward and y-axis is up/down
+/**
+ * @brief Defines a vehicle accelerometer sensor positioned such that z-axis is forward/backward
+ * and y-axis is up/down
+ * 
+ * @note extra documentation here: https://www.notion.so/Accelerometer-3aa7452fe9784e0f9762a47d624e0669 
+ *
  */
 class SensorAccelerometer : public Sensor {
     public:
