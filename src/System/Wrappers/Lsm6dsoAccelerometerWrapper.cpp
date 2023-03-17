@@ -3,7 +3,7 @@
 Lsm6dsoAccelerometerWrapper::Lsm6dsoAccelerometerWrapper(SPIClass *spi, int csPin) :
     _spi(spi), _csPin(csPin) {
         _lsm6 = new Adafruit_LSM6DSOX();
-}
+    }
 
 bool Lsm6dsoAccelerometerWrapper::init() { 
     _spi->begin();

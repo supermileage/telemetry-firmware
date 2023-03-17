@@ -1,5 +1,5 @@
-#ifndef _LSM6DSOX_LSM6DSOEROMETER_WRAPPER_H_
-#define _LSM6DSOX_LSM6DSOEROMETER_WRAPPER_H_
+#ifndef _LSM6DSOX_ACCELEROMETER_WRAPPER_H_
+#define _LSM6DSOX_ACCELEROMETER_WRAPPER_H_
 
 #include "settings.h"
 #include "Adafruit_LSM6DSOX.h"
@@ -7,9 +7,6 @@
 
 class Lsm6dsoAccelerometerWrapper : public AccelerometerController {
     public:
-        /**
-         * @brief instantiates Lsm6dsoAccelerometerWrapper spi class and chip select pin number
-        */
         Lsm6dsoAccelerometerWrapper(SPIClass *spi, int csPin);
         bool init() override;
         bool tryGetReading() override;
@@ -24,6 +21,7 @@ class Lsm6dsoAccelerometerWrapper : public AccelerometerController {
         sensors_event_t _accel;
         sensors_event_t _gyro;
         sensors_event_t _temp;
+
 };
 
 #endif
