@@ -25,12 +25,12 @@ class Lsm6dsoAccelerometerWrapper : public AccelerometerController {
         Adafruit_LSM6DS *_lsm6;
         SPIClass *_spi;
         int _csPin;
-        Matrix3d _translationMatrix;
+        Matrix3d _transformationMatrix;
         sensors_event_t _accel;
         sensors_event_t _gyro;
         sensors_event_t _temp;
 
-        void _setTranslationMatrix(uint16_t orientation);
+        void _setTransformationMatrix(uint16_t orientation);
 };
 
 #endif
