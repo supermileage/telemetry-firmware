@@ -13,6 +13,7 @@
 #define ACCEL_FORWARD_X_DOWN_Z 0x2001
 #define ACCEL_FORWARD_Y_UP_X 0x820
 #define ACCEL_BACKWARD_Y_DOWN_Z 0x401
+#define ACCEL_FORWARD_Z_UP_X 0x220
 
 /* currently unused */
 #define ACCEL_FORWARD_Z_UP_X 0x220
@@ -231,6 +232,9 @@ void SensorAccelerometer::_setTransformationMatrix(uint16_t orientation) {
         case ACCEL_BACKWARD_Y_DOWN_Z:
             _transformationMatrix.setMatrix({{{1, 0, 0}, {0, 0, -1}, {0, -1, 0}}});
             break;
+		case ACCEL_FORWARD_Z_UP_X:
+			_transformationMatrix.setMatrix({{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}});
+			break;
         default:
             break;
     }

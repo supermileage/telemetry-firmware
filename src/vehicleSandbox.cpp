@@ -13,7 +13,7 @@
 
 #ifdef TEST_ACCELEROMETER
 Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
-SensorAccelerometer accel(&lsm6, ACCEL_NEGATIVE_Y, ACCEL_NEGATIVE_Z);
+SensorAccelerometer accel(&lsm6, ACCEL_POSITIVE_Z, ACCEL_POSITIVE_X);
 #endif
 
 #ifdef TEST_DRIVER_DISPLAY
