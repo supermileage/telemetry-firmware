@@ -6,7 +6,7 @@ DEP_DIR = $(TEST_DIR)dep/
 BIN_DIR = $(TEST_DIR)bin/
 
 # SRC TEST FILES -- Only these files will be compiled for tests
-SENSOR := System/Handleable.cpp System/Handler.cpp Sensor/Sensor.cpp
+SYSTEM := System/Handleable.cpp System/Handler.cpp Sensor/Sensor.cpp System/DebugSerial.cpp
 CAN := System/CanInterface.cpp Sensor/CanListener.cpp
 BMS := Sensor/CanSensorBms.cpp
 # Orion Bms Test Files
@@ -23,14 +23,13 @@ BMS_MANAGER := Sensor/BmsManager.cpp
 ECU := Sensor/SensorEcu.cpp
 # Sensor ECU Test FIles
 FCP := Sensor/SensorFcpControl.cpp
-
 # Sensor ECU Test FIles
 ACCELEROMETER := Sensor/SensorAccelerometer.cpp
 
 # All files to compile for tests
 TEST_DIRS := $(dir $(wildcard $(TEST_DIR)tests/*/))
 TEST_CPP_TEMP := $(patsubst $(TEST_DIR)%,%,$(foreach %,$(TEST_DIRS),$(wildcard $(%)*.cpp)))
-SRC_CPP_TEMP := $(SENSOR) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER) $(ECU) $(FCP) $(ACCELEROMETER)
+SRC_CPP_TEMP := $(SYSTEM) $(CAN) $(BMS) $(TINY) $(ORION) $(STEERING) $(ACCESSORIES) $(BMS_MANAGER) $(ECU) $(FCP) $(ACCELEROMETER)
 
 # ALL TEST FILES
 CPP_TO_OBJ := $(SRC_CPP_TEMP) $(TEST_CPP_TEMP) test.cpp

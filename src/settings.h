@@ -2,7 +2,7 @@
 #define _SETTINGS_H_
 
 #include "Particle.h"
-#include "DebugSerialOutput.h"
+#include "DebugSerial.h"
 
 /**
  *  SETTINGS

@@ -1,5 +1,5 @@
 #include "settings.h"
-#include "DebugSerialOutput.h"
+#include "DebugSerial.h"
 
 DebugSerial* DebugSerial::_instance = nullptr;
 bool DebugSerial::_silent = !DEBUG_SERIAL_EN;
@@ -23,21 +23,26 @@ void DebugSerial::setSilent(bool silent) {
     _silent = silent;
 }
 
-void DebugSerial::println(const char* s) { 
-    Serial.println(s);
+void DebugSerial::println(const char* s) {
+    if (!_silent)
+        Serial.println(s);
 }
 
-void DebugSerial::println() { 
-    Serial.println();
+void DebugSerial::println() {
+    if (!_silent)
+        Serial.println();
 }
 
-void DebugSerial::print(const char* s) { 
-    Serial.print(s);
+void DebugSerial::print(const char* s) {
+    if (!_silent)
+        Serial.print(s);
 }
 
 void DebugSerial::printf(const char* format, ...) {
-    va_list args;
-    Serial.printf(format, args);
+    if (!_silent) {
+        va_list args;
+        Serial.printf(format, args);
+    }
 }
 
 DebugSerial::DebugSerial() { }
