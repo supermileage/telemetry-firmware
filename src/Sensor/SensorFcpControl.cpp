@@ -2,6 +2,8 @@
 #include "fcp-common.h"
 #include "settings.h"
 
+#define DEBUG_FCP_CONTROL 1
+
 #define FC_PACKET_LENGTH FC_NUM_HEADERS + FC_NUM_CELLS * 2
 
 const int32_t SensorFcpControl::PacketSize = FC_PACKET_LENGTH;
@@ -28,6 +30,10 @@ void SensorFcpControl::handle() {
     
     int bytesAvail = _serial->available();
     if (bytesAvail < FC_PACKET_LENGTH) {
+		#if DEBUG_FCP_CONTROL
+		if (_serial->available())
+			DEBUG_SERIAL_F("Received %d bytes from FcpControl", _serial->available());
+		#endif
         return;
     }
     

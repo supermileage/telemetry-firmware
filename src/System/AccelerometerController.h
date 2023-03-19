@@ -1,11 +1,7 @@
 #ifndef _ACCELEROMETER_CONTROLLER_H_
 #define _ACCELEROMETER_CONTROLLER_H_
 
-struct Vec3 {
-    float x;
-    float y;
-    float z;
-};
+#include "Math3d.h"
 
 class AccelerometerController {
     public:

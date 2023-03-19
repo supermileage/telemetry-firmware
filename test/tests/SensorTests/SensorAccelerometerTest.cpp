@@ -27,7 +27,7 @@ TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor]
     }
 
     SECTION("Accelerometer is perfectly level -- pitch is 0") {
-        mock.setReturnValues(Vec3 { 0, -GRAVITY, 0 }, Vec3 { 0, 0, 0}, true);
+        mock.setReturnValues(Vec3 { 0, GRAVITY, 0 }, Vec3 { 0, 0, 0}, true);
         accel.begin();
         
         REQUIRE( accel.getIncline().toFloat() == 0 );
@@ -48,14 +48,14 @@ TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor]
     }
 
     SECTION("Accelerometer is tilted back 45 degrees over x") {
-        mock.setReturnValues(Vec3 { 0, (float)((-GRAVITY)/sqrt(2)), (float)((GRAVITY)/sqrt(2)) }, Vec3 { 0, 0, 0 }, true);
+        mock.setReturnValues(Vec3 { 0, (float)((GRAVITY)/sqrt(2)), (float)((GRAVITY)/sqrt(2)) }, Vec3 { 0, 0, 0 }, true);
         accel.begin();
         
         REQUIRE( accel.getIncline().toFloat() == Approx(3.14 / 4).margin(0.01));
     }
 
     SECTION("Accelerometer is tilted forward 45 degrees over x") {
-        mock.setReturnValues(Vec3 { 0, (float)((-GRAVITY)/sqrt(2)), (float)((-GRAVITY)/sqrt(2)) }, Vec3 { 0, 0, 0 }, true);
+        mock.setReturnValues(Vec3 { 0, (float)((GRAVITY)/sqrt(2)), (float)((-GRAVITY)/sqrt(2)) }, Vec3 { 0, 0, 0 }, true);
         accel.begin();
         
         REQUIRE( accel.getIncline().toFloat() == Approx(-3.14 / 4).margin(0.01));
