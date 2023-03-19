@@ -2,7 +2,7 @@
 #include "DebugSerialOutput.h"
 
 DebugSerial* DebugSerial::_instance = nullptr;
-bool DebugSerial::_silent = DEBUG_SERIAL_EN;
+bool DebugSerial::_silent = !DEBUG_SERIAL_EN;
 
 DebugSerial::~DebugSerial() {
 
@@ -15,7 +15,7 @@ DebugSerial& DebugSerial::instance() {
     return *_instance;
 }
 
-void DebugSerial::getSilent() {
+bool DebugSerial::getSilent() {
     return _silent;
 }
 

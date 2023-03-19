@@ -214,8 +214,11 @@ int remoteRestartTinyBms(String command) {
 }
 
 // Enable printing of serial debug data
-void remoteToggleSerialDebug() {
+int remoteToggleSerialDebug(String command) {
+
+    DEBUG_SERIAL_LN("#### REMOTE - Toggle Debug Serial Command\n");
     DebugSerial::instance().setSilent(!DebugSerial::instance().getSilent());
+    return 1;
 }
 
 #pragma endregion
