@@ -4,9 +4,7 @@
 DebugSerial* DebugSerial::_instance = nullptr;
 bool DebugSerial::_silent = !DEBUG_SERIAL_EN;
 
-DebugSerial::~DebugSerial() {
-
-}
+DebugSerial::~DebugSerial() { }
 
 DebugSerial& DebugSerial::instance() {
     if (_instance == nullptr) {
