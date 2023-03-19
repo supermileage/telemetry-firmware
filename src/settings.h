@@ -2,6 +2,7 @@
 #define _SETTINGS_H_
 
 #include "Particle.h"
+#include "DebugSerialOutput.h"
 
 /**
  *  SETTINGS
@@ -21,7 +22,7 @@
 // Publish to Cloud
 #define PUBLISH_EN              1
 // Output Serial messages (disable for production)
-#define DEBUG_SERIAL_EN         0
+#define DEBUG_SERIAL_EN         false
 // Sensor Debug Interval in s, 0 for off
 #define DEBUG_SENSOR_INT        5
 // LED Flash interval in ms
@@ -32,15 +33,9 @@
 /**
  *  MACROS
 **/
-#if DEBUG_SERIAL_EN
-    #define DEBUG_SERIAL_LN(x) Serial.println(x)
-    #define DEBUG_SERIAL(x) Serial.print(x)
-    #define DEBUG_SERIAL_F(x, ...) Serial.printf(x, __VA_ARGS__)
-#else
-    #define DEBUG_SERIAL_LN(x) { }
-    #define DEBUG_SERIAL(x) { }
-    #define DEBUG_SERIAL_F(x, ...) { }
-#endif
+#define DEBUG_SERIAL_LN(x) DebugSerial::instance().println(x)
+#define DEBUG_SERIAL(x) DebugSerial::instance().print(x)
+#define DEBUG_SERIAL_F(x, ...) DebugSerial::instance().printf(x, __VA_ARGS__)
 
 #ifdef  PROTO
     #define VEHICLE_NAME "PROTO"

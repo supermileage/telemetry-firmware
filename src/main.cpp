@@ -213,6 +213,11 @@ int remoteRestartTinyBms(String command) {
 
 }
 
+// Enable printing of serial debug data
+void remoteToggleSerialDebug() {
+    DebugSerial::instance().setSilent(!DebugSerial::instance().getSilent());
+}
+
 #pragma endregion
 
 /**
@@ -233,6 +238,7 @@ void setup() {
     Particle.function("enableLogging", remoteEnableLogging);
     Particle.function("disableLogging", remoteDisableLogging);
     Particle.function("restartTinyBms", remoteRestartTinyBms);
+    Particle.function("toggleSerialDebug", remoteToggleSerialDebug);
 
     Time.zone(TIME_ZONE);
 

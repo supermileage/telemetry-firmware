@@ -172,7 +172,6 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Right Signal: " + BOOL_TO_STRING(canSensorAccessories.getStatusRightSignal()) + " - ");
     DEBUG_SERIAL("Left Signal: " + BOOL_TO_STRING(canSensorAccessories.getStatusLeftSignal()) + " - ");
     DEBUG_SERIAL_LN("Wipers: " + BOOL_TO_STRING(canSensorAccessories.getStatusWipers()));
-
     DEBUG_SERIAL_LN();
 }
 
