@@ -3,8 +3,8 @@
 // Sandbox vehicle for testing new sensors
 #ifdef SANDBOX
 
-// #define TEST_ACCELEROMETER
-#define TEST_DRIVER_DISPLAY
+#define TEST_ACCELEROMETER
+// #define TEST_DRIVER_DISPLAY
 
 #include "Lsm6dsoAccelerometerWrapper.h"
 #include "SensorAccelerometer.h"
@@ -13,26 +13,29 @@
 
 #ifdef TEST_ACCELEROMETER
 Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, ACCEL_POSITIVE_Z, ACCEL_POSITIVE_X);
 #endif
 
 #ifdef TEST_DRIVER_DISPLAY
 SensorGps gps(new SFE_UBLOX_GNSS());
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
-TextElement<SensorGps, String> speedElement1(&gps, &SensorGps::getHorizontalSpeed, 3, String("speed: "), 1);
-TextElement<SensorGps, String> speedElement2(&gps, &SensorGps::getHorizontalSpeed, 3, String("  rpm: "), 1);
+TextElement<String> speedElement1([]() { return gps.getHorizontalSpeed(); }, 3, String("  spd: "), 1);
+TextElement<String> speedElement2([]() { return gps.getHorizontalSpeed(); }, 3, String("  rpm: "), 1);
 #endif
 
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-	#ifdef TEST_DRIVER_DISPLAY
+    return nullptr;
+}
+
+void CurrentVehicle::setup() {
+    #ifdef TEST_DRIVER_DISPLAY
 	speedElement1.setPosition(4, 2);
     speedElement2.setPosition(4, 38);
     display.addDisplayElement(&speedElement1);
     display.addDisplayElement(&speedElement2);
 	#endif
-    return nullptr;
 }
 
 void CurrentVehicle::debugSensorData() {
@@ -43,7 +46,7 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Gyro:  < " + String(accel.getGyro().x) + ", " + String(accel.getGyro().y) + ", " + String(accel.getGyro().x) + " >");
     DEBUG_SERIAL_LN("Accel: < " + String(accel.getAccel().x) + ", "+ String(accel.getAccel().y) + ", " + String(accel.getAccel().z) + " >");
     DEBUG_SERIAL_LN("Horizontal Accel: " + accel.getHorizontalAcceleration());
-    DEBUG_SERIAL_LN("Verical Accel: " + accel.getVerticalAcceleration());
+    DEBUG_SERIAL_LN("Vertical Accel: " + accel.getVerticalAcceleration());
     DEBUG_SERIAL_LN("Pitch: " + accel.getIncline() + "rad");
 	#endif
 

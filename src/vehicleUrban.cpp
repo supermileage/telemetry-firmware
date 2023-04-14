@@ -22,7 +22,7 @@ Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
 // Sensor definitions
 SensorGps gps(new SFE_UBLOX_GNSS());
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, ACCEL_POSITIVE_Z, ACCEL_POSITIVE_X);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
@@ -131,12 +131,13 @@ int shoutOutToMyHomeBoys(String command) {
 }
 
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
-    // added here because because this function is called on startup
-	Particle.function("shoutOut", shoutOutToMyHomeBoys);
-    gps.setSpeedCallback(speedCallbackGps);
-	
     LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
     return builder.build();
+}
+
+void CurrentVehicle::setup() {
+    Particle.function("shoutOut", shoutOutToMyHomeBoys);
+    gps.setSpeedCallback(speedCallbackGps);
 }
 
 void CurrentVehicle::debugSensorData() {

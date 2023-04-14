@@ -12,7 +12,7 @@ Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 
 // sensors
 SensorGps gps(new SFE_UBLOX_GNSS());
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, ACCEL_NEGATIVE_Y, ACCEL_NEGATIVE_Z);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
@@ -59,6 +59,10 @@ LoggingCommand<SensorFcpControl, String> cellVoltage14(&cellStack, "cv14", &Sens
 LoggingCommand<SensorFcpControl, String> cellVoltage15(&cellStack, "cv15", &SensorFcpControl::getNextCellVoltage, 1);
 LoggingCommand<SensorFcpControl, String> cellVoltage16(&cellStack, "cv16", &SensorFcpControl::getNextCellVoltage, 1);
 LoggingCommand<SensorFcpControl, String> cellVoltage17(&cellStack, "cv17", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage18(&cellStack, "cv18", &SensorFcpControl::getNextCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> cellVoltage19(&cellStack, "cv19", &SensorFcpControl::getNextCellVoltage, 1);
+
+LoggingCommand<SensorFcpControl, String> cellStackVoltage(&cellStack, "stv", &SensorFcpControl::getStackVoltage, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);
@@ -67,15 +71,17 @@ String publishName = "BQIngestion";
 
 // CurrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
+    return builder.build();
+}
+
+void CurrentVehicle::setup() {
     speedElement.setPosition(2, 2);
     stackElement.setPosition(2, 38);
     speedElement.setMinTextLength(5); // 00.00
     stackElement.setMinTextLength(5); // 00.00
     display.addDisplayElement(&speedElement);
     display.addDisplayElement(&stackElement);
-
-    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
-    return builder.build();
 }
 
 void CurrentVehicle::debugSensorData() {

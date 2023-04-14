@@ -16,7 +16,7 @@ Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
 // sensors
 SensorEcu ecu(&usartSerial);
 SensorGps gps(new SFE_UBLOX_GNSS());
-SensorAccelerometer accel(&lsm6);
+SensorAccelerometer accel(&lsm6, ACCEL_POSITIVE_Z, ACCEL_POSITIVE_Y);
 SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
@@ -66,15 +66,17 @@ String publishName = "BQIngestion";
 
 // CurrrentVehicle namespace definitions
 LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
+    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
+    return builder.build();
+}
+
+void CurrentVehicle::setup() {
     speedElement.setPosition(2, 2);
     rpmElement.setPosition(2, 38);
     speedElement.setMinTextLength(5); // 00.00
     rpmElement.setMinTextLength(4);   // 00000
     display.addDisplayElement(&speedElement);
     display.addDisplayElement(&rpmElement);
-    
-    LoggingDispatcherBuilder builder(&dataQ, publishName, IntervalCommand::getCommands());
-    return builder.build();
 }
 
 void CurrentVehicle::debugSensorData() {

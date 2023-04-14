@@ -236,8 +236,9 @@ void setup() {
 
     Time.zone(TIME_ZONE);
 
+    CurrentVehicle::setup();
     dispatcher = CurrentVehicle::buildLoggingDispatcher();
-
+    
     // Begin all handleables
     Handler::instance().begin();
 
