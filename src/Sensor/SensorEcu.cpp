@@ -56,18 +56,18 @@ void SensorEcu::handle() {
     _serial->readBytes((char*)buffer, SensorEcu::PacketSize);
 
 	#ifdef DEBUG_SENSOR_ECU
-		Serial.println("-----------------------------");
-		Serial.print("ECU Received Message - Header: ");
-		Serial.printf("0x%x 0x%x 0x%x\n", buffer[0], buffer[1], buffer[2]);
-		Serial.printf("Data Field Length: 0x%x\n", buffer[3]);
-		Serial.printf("Service Id: 0x%x\n", buffer[4]);
+		DEBUG_SERIAL_LN("-----------------------------");
+		DEBUG_SERIAL("ECU Received Message - Header: ");
+		DEBUG_SERIAL_F("0x%x 0x%x 0x%x\n", buffer[0], buffer[1], buffer[2]);
+		DEBUG_SERIAL_F("Data Field Length: 0x%x\n", buffer[3]);
+		DEBUG_SERIAL_F("Service Id: 0x%x\n", buffer[4]);
 
 		for (int i = 5; i < SensorEcu::PacketSize - 1; i++) { // print the data
-			Serial.print("0x");
-			Serial.print(buffer[i], HEX);
-			Serial.print("\t");
+			DEBUG_SERIAL("0x");
+			DEBUG_SERIAL(buffer[i], HEX);
+			DEBUG_SERIAL("\t");
 		}
-		Serial.println();
+		DEBUG_SERIAL_LN();
 	#endif
 
     // Check if the header is correct
