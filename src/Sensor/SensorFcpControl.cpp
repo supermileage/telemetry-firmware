@@ -4,6 +4,11 @@
 
 // #define DEBUG_FCP_CONTROL
 
+#ifdef DEBUG_FCP_CONTROL
+#define FC_DEBUG_INTERVAL 100
+uint32_t sensor_fcp_last_debug_output = 0;
+#endif
+
 #define FC_PACKET_LENGTH FC_NUM_HEADERS + FC_NUM_CELLS * 2
 
 const int32_t SensorFcpControl::PacketSize = FC_PACKET_LENGTH;
@@ -31,8 +36,9 @@ void SensorFcpControl::handle() {
     int bytesAvail = _serial->available();
     if (bytesAvail < FC_PACKET_LENGTH) {
 		#ifdef DEBUG_FCP_CONTROL
-		if (bytesAvail > 0) {
-			DEBUG_SERIAL_F("Received %d bytes from FcpControl\n", _serial->available());
+		if (bytesAvail > 0 && millis() >= sensor_fcp_last_debug_output + FC_DEBUG_INTERVAL) {
+			sensor_fcp_last_debug_output = millis();
+			DEBUG_SERIAL_F("Received %d bytes from Fcp Control\n", _serial->available());
 		}
 		#endif
         return;
@@ -41,11 +47,24 @@ void SensorFcpControl::handle() {
     uint8_t buf[FC_PACKET_LENGTH] = { 0 };
 	_serial->readBytes((char*)buf, FC_PACKET_LENGTH);
 
+	#ifdef DEBUG_FCP_CONTROL
+		DEBUG_SERIAL_LN("-----------------------------");
+		DEBUG_SERIAL("SensorFcpControl Received Message - Header:");
+		for (int i = 0; i < FC_NUM_HEADERS; i++) {
+			DEBUG_SERIAL_F(" 0x%x", buf[i]);
+		}
+		DEBUG_SERIAL("\n");
+		DEBUG_SERIAL("Data: ");
+		for (int i = FC_NUM_HEADERS; i < FC_PACKET_LENGTH; i++) { // print the data
+			DEBUG_SERIAL_F("0x%x ", buf[i]);
+		}
+		DEBUG_SERIAL_LN();
+	#endif
+
 	if (buf[0] != FC_HEADER_0 || buf[1] != FC_HEADER_1 || buf[2] != FC_HEADER_2 ||
 		buf[3] != FC_HEADER_3 || buf[4] != FC_HEADER_4 || buf[5] != FC_HEADER_5) {
 			#ifdef DEBUG_FCP_CONTROL
-			buf[FC_PACKET_LENGTH-1] = 0;
-			DEBUG_SERIAL_F("FcpControl Header Incorrect -- flushing data:\n%s", buf);
+			DEBUG_SERIAL_LN("FcpControl Header Incorrect -- flushing data");
 			#endif
 			_flushSerial();
 			return;

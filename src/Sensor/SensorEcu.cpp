@@ -3,9 +3,16 @@
 
 #include <cmath>
 
-#define DEBUG_SENSOR_ECU
+// #define DEBUG_SENSOR_ECU
 
-const int32_t SensorEcu::PacketSize = 27;
+#ifdef DEBUG_SENSOR_ECU
+#define DEBUG_INTERVAL 100
+uint32_t sensor_ecu_last_debug_output = 0;
+#endif
+
+#define SENSOR_ECU_PACKET_SIZE 27
+
+const int32_t SensorEcu::PacketSize = SENSOR_ECU_PACKET_SIZE;
 const unsigned SensorEcu::Baud = 115200;
 const uint8_t SensorEcu::Header1 = 0x80;
 const uint8_t SensorEcu::Header2 = 0x8F;
@@ -44,28 +51,27 @@ void SensorEcu::handle() {
 	int bytesAvail = _serial->available();
     if (bytesAvail < SensorEcu::PacketSize) {
 		#ifdef DEBUG_SENSOR_ECU
-		// if (bytesAvail > 0) {
-		// 	DEBUG_SERIAL_F("Received %d bytes from ECU\n", _serial->available());
-		// }
+		if (bytesAvail > 0 && millis() >= sensor_ecu_last_debug_output + DEBUG_INTERVAL) {
+			sensor_ecu_last_debug_output = millis();
+			DEBUG_SERIAL_F("Received %d bytes from ECU\n", _serial->available());
+		}
 		#endif
         return;
     }
 
-    uint8_t buffer[27] = { };
+    uint8_t buffer[SENSOR_ECU_PACKET_SIZE] = { };
 
     _serial->readBytes((char*)buffer, SensorEcu::PacketSize);
 
 	#ifdef DEBUG_SENSOR_ECU
 		DEBUG_SERIAL_LN("-----------------------------");
-		DEBUG_SERIAL("ECU Received Message - Header: ");
+		DEBUG_SERIAL("SensorEcu Received Message - Header: ");
 		DEBUG_SERIAL_F("0x%x 0x%x 0x%x\n", buffer[0], buffer[1], buffer[2]);
 		DEBUG_SERIAL_F("Data Field Length: 0x%x\n", buffer[3]);
 		DEBUG_SERIAL_F("Service Id: 0x%x\n", buffer[4]);
 
 		for (int i = 5; i < SensorEcu::PacketSize - 1; i++) { // print the data
-			DEBUG_SERIAL("0x");
-			DEBUG_SERIAL(buffer[i], HEX);
-			DEBUG_SERIAL("\t");
+			DEBUG_SERIAL_F("0x%x\t", buffer[i]);
 		}
 		DEBUG_SERIAL_LN();
 	#endif
