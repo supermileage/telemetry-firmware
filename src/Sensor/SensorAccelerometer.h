@@ -61,6 +61,7 @@ class SensorAccelerometer : public Sensor {
         uint64_t _lastReadMillis = 0;
         uint64_t _lastPitchUpdateMicros = 0;
         Matrix3d _transformationMatrix;
+		Vec3 _prevAccel = { 0, 0, 0 };
         Vec3 _accel;
         Vec3 _gyro;
 

@@ -6,6 +6,7 @@
 #include "Lsm6dsoAccelerometerWrapper.h"
 #include "SensorFcpControl.h"
 #include "DriverDisplay.h"
+#include "Adafruit_SH110X.h"
 
 USARTSerialWrapper serial(&Serial1);
 Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
@@ -22,8 +23,9 @@ SensorFcpControl cellStack(&serial);
 // driver display
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
-TextElement<String> speedElement([]() { return gps.getHorizontalSpeed(); }, 3, String("spd "), 1);
-TextElement<String> stackElement([]() { return cellStack.getStackVoltage(); }, 3, String("stk "), 1);
+// TextElement constructor params: displayFunc, textSize, textColour, labelSize, labelString
+TextElement<String> speedElement([]() { return gps.getHorizontalSpeed(); }, 3, SH110X_WHITE, 1, String("spd "));
+TextElement<String> stackElement([]() { return cellStack.getStackVoltage(); }, 3, SH110X_WHITE, 1, String("stk "));
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
