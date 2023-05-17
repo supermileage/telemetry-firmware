@@ -3,8 +3,6 @@
 
 #include <cmath>
 
-#define DEBUG_SENSOR_ECU
-
 const int32_t SensorEcu::PacketSize = 27;
 const unsigned SensorEcu::Baud = 115200;
 const uint8_t SensorEcu::Header1 = 0x80;
@@ -40,14 +38,8 @@ void SensorEcu::handle() {
     if (millis() >= _lastUpdate + ECU_ON_OFF_INTERVAL) {
         _isOn = false;
     }
-	
-	int bytesAvail = _serial->available();
-    if (bytesAvail < SensorEcu::PacketSize) {
-		#ifdef DEBUG_SENSOR_ECU
-		// if (bytesAvail > 0) {
-		// 	DEBUG_SERIAL_F("Received %d bytes from ECU\n", _serial->available());
-		// }
-		#endif
+    
+    if (_serial->available() < SensorEcu::PacketSize) {
         return;
     }
 
@@ -55,26 +47,11 @@ void SensorEcu::handle() {
 
     _serial->readBytes((char*)buffer, SensorEcu::PacketSize);
 
-	#ifdef DEBUG_SENSOR_ECU
-		Serial.println("-----------------------------");
-		Serial.print("ECU Received Message - Header: ");
-		Serial.printf("0x%x 0x%x 0x%x\n", buffer[0], buffer[1], buffer[2]);
-		Serial.printf("Data Field Length: 0x%x\n", buffer[3]);
-		Serial.printf("Service Id: 0x%x\n", buffer[4]);
-
-		for (int i = 5; i < SensorEcu::PacketSize - 1; i++) { // print the data
-			Serial.print("0x");
-			Serial.print(buffer[i], HEX);
-			Serial.print("\t");
-		}
-		Serial.println();
-	#endif
-
     // Check if the header is correct
     if (buffer[0] == SensorEcu::Header1 && 
         buffer[1] == SensorEcu::Header2 && 
         buffer[2] == SensorEcu::Header3 && 
-        buffer[3] == SensorEcu::DataFieldLength &&
+        buffer[3] == SensorEcu::DataFieldLength && 
         buffer[4] == SensorEcu::ServiceId) {
 
 			uint8_t checkSum = 0;
@@ -107,7 +84,6 @@ void SensorEcu::handle() {
 
     }else{
         // The header is not correct, flush the serial buffer
-		DEBUG_SERIAL_LN("ERROR: ECU Packet header incorrect");
         flush();
     }
 

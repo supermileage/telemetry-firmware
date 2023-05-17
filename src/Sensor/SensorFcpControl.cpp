@@ -31,9 +31,8 @@ void SensorFcpControl::handle() {
     int bytesAvail = _serial->available();
     if (bytesAvail < FC_PACKET_LENGTH) {
 		#ifdef DEBUG_FCP_CONTROL
-		if (bytesAvail > 0) {
+		if (millis() % 1000 == 0 && _serial->available())
 			DEBUG_SERIAL_F("Received %d bytes from FcpControl\n", _serial->available());
-		}
 		#endif
         return;
     }

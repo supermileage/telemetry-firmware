@@ -4,7 +4,6 @@
 #define GYRO_RECALIBRATION_MARGIN   0.1     // if accelerometer |<y,z> - 9.81^2| < margin, recalibrate gyro readings
 #define READ_INTERVAL               10      // keep in mind that default data rate for LSM6DOX is 104Hz
 #define MEGA                        1000000
-#define ALPHA						0.125
 
 #define ACCEL_FORWARD_Z_UP_Y 0x208
 #define ACCEL_FORWARD_Z_DOWN_Y 0x204
@@ -63,13 +62,7 @@ void SensorAccelerometer::begin() {
     // assumes that the vehicle is not moving when this method is called
     if (_initialized) {
         if (_controller->tryGetReading()) {
-			// compute exponential moving average with ALPHA
-            Vec3 curAccel = _transformationMatrix.multiply(_controller->getAccel());
-			_accel.x = (1-ALPHA) * _accel.x + ALPHA * curAccel.x;
-			_accel.y = (1-ALPHA) * _accel.y + ALPHA * curAccel.y;
-			_accel.z = (1-ALPHA) * _accel.z + ALPHA * curAccel.z;
-
-			// gyro is quite accurate without smoothing
+            _accel = _transformationMatrix.multiply(_controller->getAccel());
             _gyro = _transformationMatrix.multiply(_controller->getGyro());
             _setPitch();
             _setGravityY();
