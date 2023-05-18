@@ -14,13 +14,13 @@ class DisplayElement {
 template <typename T>
 class TextElement : public DisplayElement {
     public:
-        TextElement(T (*func)(), uint8_t textSize, String label = "", uint8_t labelSize = 0) :
-            _displayFunc(func), _textSize(textSize), _label(label), _labelSize(labelSize) { }
+        TextElement(T (*func)(), uint8_t textSize, uint16_t textColour, uint8_t labelSize = 0, String label = "") :
+            _displayFunc(func), _textSize(textSize), _textColour(textColour), _labelSize(labelSize), _label(label) { }
 
         ~TextElement() { }
 
         void draw(Adafruit_GFX& display) override {
-            display.setTextColor(SH110X_WHITE);
+            display.setTextColor(_textColour);
             display.setCursor(_x, _y);
             
             if (_labelSize != 0) {
@@ -62,11 +62,12 @@ class TextElement : public DisplayElement {
         T (*_displayFunc)();
         int16_t _x = 0;
         int16_t _y = 0;
-        uint8_t _textSize = 0;
+        uint8_t _textSize;
         uint8_t _minTextLength = 0;
-        char _paddingCharacter = '0';
-        String _label;
+		uint16_t _textColour;
         uint8_t _labelSize = 0;
+		char _paddingCharacter = '0';
+		String _label;
 };
 
 #endif
