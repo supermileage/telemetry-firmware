@@ -85,7 +85,7 @@ TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]
         std::function<float(float)> normalZ = [](float x) {
             float median = 9;
             float variance = 2;
-            return 0.2f * ACCEL_GRAVITY * pow(EULERS, (-0.5f * pow((x - median) / variance, 2)));
+            return ACCEL_GRAVITY * pow(EULERS, (-0.5f * pow((x - median) / variance, 2)));
         };
 
         // simulate accelerating forward while going over a bump
