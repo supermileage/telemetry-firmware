@@ -5,33 +5,33 @@
 #define MEGA                        1000000
 #define ALPHA                        0.25f
 
-#define ACCEL_FORWARD_Z_UP_Y 0x208
-#define ACCEL_FORWARD_Z_DOWN_Y 0x204
-#define ACCEL_BACKWARD_Z_UP_Y 0x108
-#define ACCEL_BACKWARD_Z_DOWN_Y 0x104
-#define ACCEL_FORWARD_X_UP_Z 0x2002
-#define ACCEL_FORWARD_X_DOWN_Z 0x2001
-#define ACCEL_FORWARD_Y_UP_X 0x820
-#define ACCEL_BACKWARD_Y_DOWN_Z 0x401
-#define ACCEL_FORWARD_Z_UP_X 0x220
+#define ACCEL_FORWARD_Z_UP_Y        0x208
+#define ACCEL_FORWARD_Z_DOWN_Y      0x204
+#define ACCEL_BACKWARD_Z_UP_Y       0x108
+#define ACCEL_BACKWARD_Z_DOWN_Y     0x104
+#define ACCEL_FORWARD_X_UP_Z        0x2002
+#define ACCEL_FORWARD_X_DOWN_Z      0x2001
+#define ACCEL_FORWARD_Y_UP_X        0x820
+#define ACCEL_BACKWARD_Y_DOWN_Z     0x401
+#define ACCEL_FORWARD_Z_UP_X        0x220
+#define ACCEL_FORWARD_Y_DOWN_Z      0x801
 
 /* currently unused */
-#define ACCEL_FORWARD_Z_UP_X 0x220
-#define ACCEL_FORWARD_Z_DOWN_X 0x210
-#define ACCEL_BACKWARD_Z_UP_X 0x120
-#define ACCEL_BACKWARD_Z_DOWN_X 0x110
-#define ACCEL_FORWARD_Y_DOWN_X 0x810
-#define ACCEL_FORWARD_Y_UP_Z 0x802
-#define ACCEL_FORWARD_Y_DOWN_Z 0x801
-#define ACCEL_BACKWARD_Y_UP_X 0x420
-#define ACCEL_BACKWARD_Y_DOWN_X 0x410
-#define ACCEL_BACKWARD_Y_UP_Z 0x402
-#define ACCEL_FORWARD_X_UP_Y 0x2008
-#define ACCEL_FORWARD_X_DOWN_Y 0x2004
-#define ACCEL_BACKWARD_X_UP_Y 0x1008
-#define ACCEL_BACKWARD_X_DOWN_Y 0x1004
-#define ACCEL_BACKWARD_X_UP_Z 0x1002
-#define ACCEL_BACKWARD_X_DOWN_Z 0x1001
+#define ACCEL_FORWARD_Z_UP_X        0x220
+#define ACCEL_FORWARD_Z_DOWN_X      0x210
+#define ACCEL_BACKWARD_Z_UP_X       0x120
+#define ACCEL_BACKWARD_Z_DOWN_X     0x110
+#define ACCEL_FORWARD_Y_DOWN_X      0x810
+#define ACCEL_FORWARD_Y_UP_Z        0x802
+#define ACCEL_BACKWARD_Y_UP_X       0x420
+#define ACCEL_BACKWARD_Y_DOWN_X     0x410
+#define ACCEL_BACKWARD_Y_UP_Z       0x402
+#define ACCEL_FORWARD_X_UP_Y        0x2008
+#define ACCEL_FORWARD_X_DOWN_Y      0x2004
+#define ACCEL_BACKWARD_X_UP_Y       0x1008
+#define ACCEL_BACKWARD_X_DOWN_Y     0x1004
+#define ACCEL_BACKWARD_X_UP_Z       0x1002
+#define ACCEL_BACKWARD_X_DOWN_Z     0x1001
 
 /* Debug Settings */
 // #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
@@ -246,6 +246,9 @@ void SensorAccelerometer::_setTransformationMatrix(uint16_t orientation) {
             break;
         case ACCEL_BACKWARD_Y_DOWN_Z:
             _transformationMatrix.setMatrix({{{1, 0, 0}, {0, 0, -1}, {0, -1, 0}}});
+            break;
+        case ACCEL_FORWARD_Y_DOWN_Z:
+            _transformationMatrix.setMatrix({{{1, 0, 0}, {0, 0, 1}, {0, -1, 0}}});
             break;
         case ACCEL_FORWARD_Z_UP_X:
             _transformationMatrix.setMatrix({{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}});
