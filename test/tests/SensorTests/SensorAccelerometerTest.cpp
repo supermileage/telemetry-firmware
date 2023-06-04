@@ -74,14 +74,14 @@ TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]
         mock.setReturnValues(Vec3 { x,y,z }, Vec3 { 0,0,0 }, true);
         accel.begin();
 
-        // bump -- sharp normal curve from ~0 to 9.81 to ~0 -- peaks at 6 seconds
+        // bump -- sharp normal curve from ~0 to 1G to ~0 -- peaks at 6 seconds
         std::function<float(float)> normalY = [](float x) {
             float median = 6;
             float variance = 0.5;
             return ACCEL_GRAVITY * pow(EULERS, (-0.5f * pow((x - median) / variance, 2)));
         };
 
-        // forward -- smooth normal curve from ~0G to 0.2G to ~0G over 18 seconds
+        // forward -- smooth normal curve from ~0 to 1G to ~0 -- peaks at 9 seconds
         std::function<float(float)> normalZ = [](float x) {
             float median = 9;
             float variance = 2;
