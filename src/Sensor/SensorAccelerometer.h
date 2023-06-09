@@ -11,14 +11,15 @@
  * If you are unsure of which flags to choose, please refer to the telemetry accelerometer
  * documentation on notion: 
 */
-#define ACCEL_POSITIVE_X 0x20
-#define ACCEL_NEGATIVE_X 0x10
-#define ACCEL_POSITIVE_Y 0x8
-#define ACCEL_NEGATIVE_Y 0x4
-#define ACCEL_POSITIVE_Z 0x2
-#define ACCEL_NEGATIVE_Z 0x1
+#define ACCEL_POSITIVE_X    0x20
+#define ACCEL_NEGATIVE_X    0x10
+#define ACCEL_POSITIVE_Y    0x8
+#define ACCEL_NEGATIVE_Y    0x4
+#define ACCEL_POSITIVE_Z    0x2
+#define ACCEL_NEGATIVE_Z    0x1
 
-#define GRAVITY 9.81
+#define ACCEL_GRAVITY       9.8067F
+#define ACCEL_READ_INTERVAL 10      // keep in mind that default data rate for LSM6DOX is 104Hz
 
 /**
  * @brief Defines a vehicle accelerometer sensor positioned such that z-axis is forward/backward
@@ -61,10 +62,10 @@ class SensorAccelerometer : public Sensor {
         uint64_t _lastReadMillis = 0;
         uint64_t _lastPitchUpdateMicros = 0;
         Matrix3d _transformationMatrix;
-        Vec3 _accel;
-        Vec3 _gyro;
+        Vec3 _accel = Vec3 { 0, 0, 0 };
+        Vec3 _gyro = Vec3 { 0, 0, 0 };
 
-        int32_t _pitch = 0;
+        int32_t _pitch = 0;     // rad * 1000
         float _gravityY = 0;
         float _gravityZ = 0;
         bool _initialized = false;
