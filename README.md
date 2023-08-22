@@ -1,6 +1,6 @@
 # Telemetry Firmware
 
-![Telemetry 2.0 System](https://github.com/supermileage/telemetry-firmware/blob/master/media/telemetry.png)
+![Telemetry 2.0 System](https://github.com/supermileage/telemetry-firmware/blob/master/media/telemetry.png?raw=true)
 
 Firmware for the Supermileage Telemetry module. The Telemetry system is an LTE-connected data-collection module that records data from multiple sensors on each of the three Supermileage vehicles, logs the data, and uploads it to the cloud. The data gets processed and stored on [Google Cloud](https://github.com/supermileage/telemetry-gcp-deployment) and can be accessed using [Grafana](https://github.com/supermileage/telemetry-grafana). There is also a [custom PCB design](https://github.com/supermileage/telemetry-pcb) available. 
 
