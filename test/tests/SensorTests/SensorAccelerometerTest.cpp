@@ -76,7 +76,7 @@ TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]
         size_t idx = currentPath.find("/bin");
         std::cout << "current file system path: " << currentPath << std::endl;
         std::string path = currentPath.substr(0, idx) + "/tests/data/";
-        std::string inputPath = path + "/noisy_accelerometer_data.csv";
+        std::string inputPath = path + "noisy_accelerometer_data.csv";
         std::cout << inputPath << std::endl;
 
         std::ifstream inputFile(inputPath);
