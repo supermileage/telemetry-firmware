@@ -89,3 +89,56 @@ TEST_CASE("Matrix multiply tests", "[System][Math]") {
         REQUIRE( result.z == -vec.x );
     }
 }
+
+TEST_CASE("Vec3 tests", "[System][Math]") {
+    Vec3 vec1 = Vec3 { 0.5f, 0.5f, 0.5f };
+    Vec3 vec2 = Vec3 { 1.f, 2.f, 3.f };
+
+    SECTION("overloaded + operator") {
+        Vec3 result =  vec1 + vec2;
+
+        REQUIRE( result.x == 1.5f );
+        REQUIRE( result.y == 2.5f );
+        REQUIRE( result.z == 3.5f );
+    }
+
+    SECTION("overloaded += operator") {
+        vec1 += vec2;
+
+        REQUIRE( vec1.x == 1.5f );
+        REQUIRE( vec1.y == 2.5f );
+        REQUIRE( vec1.z == 3.5f );
+    }
+
+    SECTION("overloaded - operator") {
+        Vec3 result =  vec1 - vec2;
+
+        REQUIRE( result.x == -0.5f );
+        REQUIRE( result.y == -1.5f );
+        REQUIRE( result.z == -2.5f );
+    }
+
+    SECTION("overloaded -= operator") {
+        vec1 -= vec2;
+
+        REQUIRE( vec1.x == -0.5f );
+        REQUIRE( vec1.y == -1.5f );
+        REQUIRE( vec1.z == -2.5f );
+    }
+
+    SECTION("overloaded * operator") {
+        Vec3 result = vec2 * 0.5f;
+        
+        REQUIRE( result.x == 0.5f );
+        REQUIRE( result.y == 1.f );
+        REQUIRE( result.z == 1.5f );
+    }
+
+    SECTION("overloaded / operator") {
+        Vec3 result = vec2 / 2.f;
+        
+        REQUIRE( result.x == 0.5f );
+        REQUIRE( result.y == 1.f );
+        REQUIRE( result.z == 1.5f );
+    }
+}

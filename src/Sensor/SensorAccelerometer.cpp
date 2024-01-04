@@ -3,7 +3,7 @@
 
 #define GYRO_RECALIBRATION_MARGIN   0.1f     // if accelerometer |<y,z> - 9.81^2| <= margin, recalibrate gyro readings
 #define MEGA                        1000000
-#define ALPHA                        0.25f
+#define ALPHA                        0.01f
 
 #define ACCEL_FORWARD_Z_UP_Y        0x208
 #define ACCEL_FORWARD_Z_DOWN_Y      0x204
@@ -41,12 +41,15 @@
 int displayCount = 0;
 #endif
 
-SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller) : _controller(controller) {
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval) : _controller(controller) {
     _setTransformationMatrix(ACCEL_FORWARD_Z_UP_Y);
+    _samples = std::vector<Vec3>(interval / 9.6f, Vec3 {0.f, 0.f, 0.f});
+    _sampleScale = 1.f / _samples.size();
 }
 
-SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint16_t forward, uint16_t up) : _controller(controller) {
-    _setTransformationMatrix((forward << 8) | up);
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval, uint16_t forward, uint16_t up) :
+    _controller(controller) {
+        _setTransformationMatrix((forward << 8) | up);
 }
 
 SensorAccelerometer::~SensorAccelerometer() { }
@@ -59,14 +62,11 @@ void SensorAccelerometer::begin() {
     _initialized = _controller->init();
 
     // get initial reading of pitch and gravitational acceleration on z and y axes.
-    // assumes that the vehicle is not moving when this method is called
     if (_initialized) {
         if (_controller->tryGetReading()) {
             _accel = _transformationMatrix.multiply(_controller->getAccel());
             _gyro = _transformationMatrix.multiply(_controller->getGyro());
             _setPitch();
-            _setGravityY();
-            _setGravityZ();
         }
     }
 }
@@ -121,11 +121,21 @@ void SensorAccelerometer::handle() {
     #endif
 
     if (success) {
-        // apply moving exponential average
-        Vec3 curAccel = _transformationMatrix.multiply(_controller->getAccel());
-        _accel.x = (1-ALPHA) * _accel.x + ALPHA * curAccel.x;
-        _accel.y = (1-ALPHA) * _accel.y + ALPHA * curAccel.y;
-        _accel.z = (1-ALPHA) * _accel.z + ALPHA * curAccel.z;
+        // apply moving average convolutional filter
+        _samples[_head] = _transformationMatrix.multiply(_controller->getAccel());
+        uint16_t next = (_head + 1) % static_cast<uint16_t>(_samples.size());
+        
+        Vec3 tail;
+        if (_numSamples != _samples.size()) {
+            // if vector still isn't fully populated, subtract padding
+            ++_numSamples;
+            tail = _samples[0];
+        } else {
+            // otherwise, subtract tail entry
+            tail = _samples[next];
+        }
+        _accel = _accel + (_samples[_head] - tail) * _sampleScale;
+        _head = next;
 
         // gyro is quite accurate without smoothing
         _gyro = _transformationMatrix.multiply(_controller->getGyro());
@@ -136,10 +146,6 @@ void SensorAccelerometer::handle() {
             _lastPitchUpdateMicros = currentTime;
             _pitch = (_gyro.x * deltaT) + _pitch;
         }
-        
-        // update expected gravitational acceleration on y, z based on new pitch
-        _setGravityY();
-        _setGravityZ();
     }
 }
 
@@ -153,13 +159,12 @@ Vec3 SensorAccelerometer::getAccel() {
 
 String SensorAccelerometer::getHorizontalAcceleration(bool& valid) {
     valid = _initialized;
-    float val = roundf((_accel.z - _gravityZ) * 100) / 100;
-    return FLOAT_TO_STRING(val, 2);
+    return FLOAT_TO_STRING(_accel.z, 2);
 }
 
 String SensorAccelerometer::getVerticalAcceleration(bool& valid) {
     valid = _initialized;
-    return FLOAT_TO_STRING(roundf((_accel.y - _gravityY) * 100) / 100, 2);
+    return FLOAT_TO_STRING(_accel.y, 2);
 }
 
 String SensorAccelerometer::getIncline(bool& valid) {
@@ -177,14 +182,6 @@ String SensorAccelerometer::getInitStatus() {
     } else {
         return "Failure";
     }
-}
-
-void SensorAccelerometer::_setGravityY() {
-    _gravityY = (ACCEL_GRAVITY * cos((float)_pitch / MEGA));
-}
-
-void SensorAccelerometer::_setGravityZ() {
-    _gravityZ = ACCEL_GRAVITY * sin((float)_pitch / MEGA);
 }
 
 void SensorAccelerometer::_setPitch() {

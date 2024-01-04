@@ -12,3 +12,4 @@ output/
 test/obj
 test/dep
 test/bin
+test/tests/data/out
