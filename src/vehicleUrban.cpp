@@ -30,7 +30,7 @@ CanSensorSteering steering(canInterface);
 
 // Bms
 CanSensorOrionBms orionBms(canInterface);
-CanSensorBms* bms = DEFAULT_BMS;
+CanSensorBms* bms = (CanSensorBms*)(&orionBms);
 BmsManager bmsManager(&bms, &orionBms, DEFAULT_BMS);
 
 // Command definitions
