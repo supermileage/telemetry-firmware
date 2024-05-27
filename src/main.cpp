@@ -204,15 +204,6 @@ int remoteDisableLogging(String command){
 
 }
 
-// Restart BMS Remotely
-int remoteRestartTinyBms(String command) {
-
-    DEBUG_SERIAL_LN("#### REMOTE - Sent TinyBMS Restart Command\n");
-    CurrentVehicle::restartTinyBms();
-    return 1;
-
-}
-
 #pragma endregion
 
 /**
@@ -232,7 +223,6 @@ void setup() {
     Particle.function("remoteReset", remoteReset);
     Particle.function("enableLogging", remoteEnableLogging);
     Particle.function("disableLogging", remoteDisableLogging);
-    Particle.function("restartTinyBms", remoteRestartTinyBms);
 
     Time.zone(TIME_ZONE);
 
