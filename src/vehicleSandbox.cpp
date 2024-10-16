@@ -75,9 +75,5 @@ uint32_t CurrentVehicle::getUnixTime() {
 void CurrentVehicle::toggleGpsOverride() {
     
 }
-
-void CurrentVehicle::restartTinyBms() {
-
-}
  
 #endif

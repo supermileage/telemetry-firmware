@@ -2,7 +2,6 @@
 
 #include "CanInterface.h"
 #include "CanControllerMock.h"
-#include "CanSensorTinyBms.h"
 #include "CanSensorOrionBms.h"
 #include "BmsManager.h"
 
@@ -12,15 +11,14 @@ TEST_CASE( "BmsManager::setCurrentBms", "[BmsManager]" ) {
 	CanControllerMock canBusMock(FAKE_MESSAGE_AVAIL);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
-	CanSensorTinyBms tiny(interface, 500);
 	CanSensorBms* bms;
-	BmsManager manager(&bms, &orion, &tiny, BmsManager::Tiny);
+	BmsManager manager(&bms, &orion, BmsManager::None);
 
 	setMillis(0);
 
-	REQUIRE(bms == &tiny);
-	REQUIRE(manager.getCurrentBms() == BmsManager::Tiny);
-	REQUIRE(manager.getCurrentBmsName().equals(tiny.getHumanName()));
+	REQUIRE(bms != &orion);
+	REQUIRE(manager.getCurrentBms() == BmsManager::None);
+	REQUIRE(manager.getCurrentBmsName().equals("None"));
 
 	manager.setBms(BmsManager::Orion);
 
@@ -33,9 +31,8 @@ TEST_CASE( "BmsManager::getCurrentBms", "[BmsManager]" ) {
 	CanControllerMock canBusMock(FAKE_MESSAGE_AVAIL);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
-	CanSensorTinyBms tiny(interface, 500);
 	CanSensorBms* bms;
-	BmsManager manager(&bms, &orion, &tiny, BmsManager::Orion);
+	BmsManager manager(&bms, &orion, BmsManager::Orion);
 
 	// begin all handleable objects
 	Handler::instance().begin();
@@ -43,7 +40,6 @@ TEST_CASE( "BmsManager::getCurrentBms", "[BmsManager]" ) {
 	SECTION( "BmsManager returns correct bms type before deselect timeout" ) {
 		setMillis(0);
 		CHECK( orion.getLastUpdateTime() == 0 );
-		REQUIRE( tiny.getLastUpdateTime() == 0 );
 		REQUIRE ( manager.getCurrentBms() == BmsManager::Orion );
 
 		setMillis( BmsManager::MillisecondsBeforeDeselect - 1 );
@@ -60,54 +56,24 @@ TEST_CASE( "BmsManager::handle", "[BmsManager][Handle]" ) {
 	CanControllerMock canBusMock(FAKE_MESSAGE_AVAIL);
 	CanInterface interface(&canBusMock);
 	CanSensorOrionBms orion(interface);
-	CanSensorTinyBms tiny(interface, 500);
 	CanSensorBms* bms;
-	BmsManager manager(&bms, &orion, &tiny, BmsManager::Orion);
+	BmsManager manager(&bms, &orion, BmsManager::Orion);
 
 	CanMessage msg = CAN_MESSAGE_NULL;
-	msg.id = CAN_TINYBMS_RESPONSE;
-	msg.dataLength = 1;
+	msg.id = CAN_ORIONBMS_CELL;
+	msg.dataLength = 8;
 
 	// begin all handleable objects
 	Handler::instance().begin();
 
-	SECTION( "1-off test case: BmsManager won't update current bms" ) {
-		// set up canBusMock to update TinyBms
-		canBusMock.setCanMessage(msg);
-		setMillis( BmsManager::UpdateInterval );
-
-		// handle all handleables so they update
-		Handler::instance().handle();
-		
-		REQUIRE( tiny.getLastUpdateTime() == BmsManager::UpdateInterval );
-		REQUIRE( orion.getLastUpdateTime() == 0 );
-		REQUIRE( manager.getCurrentBms() == BmsManager::Orion );
-	}
-
-	SECTION( "BmsManager changes selection to TinyBms if it has been updated more recently" ) {
-		// set up canBusMock to update TinyBms
-		canBusMock.setCanMessage(msg);
-		setMillis( BmsManager::UpdateInterval + 1 );
-
-		// handle all handleables so they update
-		Handler::instance().handle();
-		
-		REQUIRE( tiny.getLastUpdateTime() == BmsManager::UpdateInterval + 1 );
-		REQUIRE( orion.getLastUpdateTime() == 0 );
-		REQUIRE( manager.getCurrentBms() == BmsManager::Tiny );
-	}
-
 	SECTION( "BmsManager changes selection to OrionBms if it has been updated more recently" ) {
-		// set up canBusMock to update TinyBms
-		msg.id = CAN_ORIONBMS_CELL;
-		msg.dataLength = 8;
+		// set up canBusMock to update OrionBms
 		canBusMock.setCanMessage(msg);
 		setMillis( BmsManager::UpdateInterval + 1 );
 
 		// handle all handleables so they update
 		Handler::instance().handle();
 		
-		REQUIRE( tiny.getLastUpdateTime() == 0 );
 		REQUIRE( orion.getLastUpdateTime() == BmsManager::UpdateInterval + 1 );
 		REQUIRE( manager.getCurrentBms() == BmsManager::Orion );
 	}
