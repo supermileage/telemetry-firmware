@@ -38,8 +38,14 @@ class Handleable {
 
 		void setIsActive(bool active);
 
+        /**
+         * Get the initialization status
+         */
+        bool getInitStatus() const;
+
 	private:
 		bool _isActive = true;
+        bool _initialized = true;
         
 };
 

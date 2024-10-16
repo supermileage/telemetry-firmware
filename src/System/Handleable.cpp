@@ -15,3 +15,7 @@ bool Handleable::isActive() {
 void Handleable::setIsActive(bool active) {
 	_isActive = active;
 }
+
+bool Handleable::getInitStatus() const {
+    return _initialized;
+}
