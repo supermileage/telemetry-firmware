@@ -38,15 +38,13 @@ class Handleable {
 
 		void setIsActive(bool active);
 
-        /**
-         * Get the initialization status
-         */
-        bool getInitStatus() const;
+        String getInitStatus();
 
 	private:
 		bool _isActive = true;
-        bool _initialized = true;
-        
+    
+    protected:
+        bool _initialized = false;    
 };
 
 #endif

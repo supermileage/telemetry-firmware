@@ -6,7 +6,9 @@ TimeLib::TimeLib(void (*timeValidCallback)()) {
 
 TimeLib::~TimeLib(){}
 
-void TimeLib::begin() {}
+void TimeLib::begin() {
+    _initialized = true;
+}
 
 void TimeLib:: handle() {
 

@@ -16,6 +16,6 @@ void Handleable::setIsActive(bool active) {
 	_isActive = active;
 }
 
-bool Handleable::getInitStatus() const {
-    return _initialized;
+String Handleable::getInitStatus() {
+	return _initialized ? "Success" : "Failure";
 }

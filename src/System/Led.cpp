@@ -11,7 +11,9 @@ Led::Led(uint16_t pin, uint8_t brightness) {
 
 Led::~Led(){}
 
-void Led::begin(){}
+void Led::begin(){
+    _initialized = true;
+}
 
 void Led::handle(){
     uint16_t current_time_in_interval = (millis() - _interval_time_start) % _interval;

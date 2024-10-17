@@ -25,7 +25,9 @@ Button::Button(uint16_t pin, bool activeHigh, bool normallyOpen, void (*callback
 
 Button::~Button(){}
 
-void Button::begin(){}
+void Button::begin(){
+    _initialized = true;
+}
 
 void Button::handle(){
 

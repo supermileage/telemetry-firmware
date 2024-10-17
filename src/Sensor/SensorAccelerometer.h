@@ -68,7 +68,6 @@ class SensorAccelerometer : public Sensor {
         int32_t _pitch = 0;     // rad * 1000
         float _gravityY = 0;
         float _gravityZ = 0;
-        bool _initialized = false;
 
         void _setTransformationMatrix(uint16_t orientation);
         void _setGravityY();

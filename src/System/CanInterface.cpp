@@ -16,6 +16,7 @@ CanInterface::~CanInterface() {
 
 void CanInterface::begin() {
     _CAN->begin();
+    _initialized = true;
 }
 
 void CanInterface::handle() {

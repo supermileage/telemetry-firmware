@@ -13,6 +13,7 @@ void DataQueue::begin() {
 	_publishQueue->setup();
 	_publishQueue->withRamQueueSize(RAM_QUEUE_EVENT_COUNT);
 	_jsonDocumentInit();
+	_initialized = true;
 }
 
 void DataQueue::handle() {
