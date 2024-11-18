@@ -1,0 +1,28 @@
+[
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/catch",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/catch.dir/includes_CXX.rsp -g -std=gnu++98 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -Wno-psabi -o CMakeFiles\\catch.dir\\catch.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\catch\\catch.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/catch/catch.cpp",
+  "output": "extras/tests/catch/CMakeFiles/catch.dir/catch.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp11Tests.dir\\nullptr.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp11\\nullptr.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp11/nullptr.cpp",
+  "output": "extras/tests/Cpp11/CMakeFiles/Cpp11Tests.dir/nullptr.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp11Tests.dir\\issue1120.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp11\\issue1120.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp11/issue1120.cpp",
+  "output": "extras/tests/Cpp11/CMakeFiles/Cpp11Tests.dir/issue1120.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp11Tests.dir\\use_long_long_0.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp11\\use_long_long_0.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp11/use_long_long_0.cpp",
+  "output": "extras/tests/Cpp11/CMakeFiles/Cpp11Tests.dir/use_long_long_0.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimi

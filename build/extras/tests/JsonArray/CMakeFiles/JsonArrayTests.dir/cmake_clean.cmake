@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/JsonArrayTests.dir/add.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/add.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/clear.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/clear.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/copyArray.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/copyArray.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/createNested.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/createNested.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/equals.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/equals.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/get.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/get.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/isNull.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/isNull.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/iterator.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/iterator.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/memoryUsage.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/memoryUsage.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/nesting.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/nesting.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/remove.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/remove.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/size.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/size.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/std_string.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/std_string.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/subscript.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/subscript.cpp.obj.d"
+  "CMakeFiles/JsonArrayTests.dir/undefined.cpp.obj"
+  "CMakeFiles/JsonArrayTests.dir/undefined.cpp.obj.d"
+  "JsonArrayTests.exe"
+  "JsonArrayTests.exe.manifest"
+  "JsonArrayTests.pdb"
+  "libJsonArrayTests.dll.a"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/JsonArrayTests.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

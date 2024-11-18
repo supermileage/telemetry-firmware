@@ -1,0 +1,77 @@
+[
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/catch",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/catch.dir/includes_CXX.rsp -g -std=gnu++98 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -Wno-psabi -o CMakeFiles\\catch.dir\\catch.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\catch\\catch.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/catch/catch.cpp",
+  "output": "extras/tests/catch/CMakeFiles/catch.dir/catch.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp11Tests.dir\\nullptr.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp11\\nullptr.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp11/nullptr.cpp",
+  "output": "extras/tests/Cpp11/CMakeFiles/Cpp11Tests.dir/nullptr.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp11Tests.dir\\issue1120.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp11\\issue1120.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp11/issue1120.cpp",
+  "output": "extras/tests/Cpp11/CMakeFiles/Cpp11Tests.dir/issue1120.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp11Tests.dir\\use_long_long_0.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp11\\use_long_long_0.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp11/use_long_long_0.cpp",
+  "output": "extras/tests/Cpp11/CMakeFiles/Cpp11Tests.dir/use_long_long_0.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp11",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DARDUINOJSON_HAS_NULLPTR=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp11Tests.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp11Tests.dir\\use_long_long_1.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp11\\use_long_long_1.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp11/use_long_long_1.cpp",
+  "output": "extras/tests/Cpp11/CMakeFiles/Cpp11Tests.dir/use_long_long_1.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp17",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp17Tests.dir/includes_CXX.rsp -g -std=gnu++17 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp17Tests.dir\\string_view.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp17\\string_view.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp17/string_view.cpp",
+  "output": "extras/tests/Cpp17/CMakeFiles/Cpp17Tests.dir/string_view.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/Cpp20",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Cpp20Tests.dir/includes_CXX.rsp -g -std=gnu++20 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Cpp20Tests.dir\\smoke_test.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\Cpp20\\smoke_test.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/Cpp20/smoke_test.cpp",
+  "output": "extras/tests/Cpp20/CMakeFiles/Cpp20Tests.dir/smoke_test.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/FailingBuilds",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Issue978.dir/includes_CXX.rsp -g -std=gnu++98 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Issue978.dir\\Issue978.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\FailingBuilds\\Issue978.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/FailingBuilds/Issue978.cpp",
+  "output": "extras/tests/FailingBuilds/CMakeFiles/Issue978.dir/Issue978.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/FailingBuilds",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/Issue1189.dir/includes_CXX.rsp -g -std=gnu++98 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\Issue1189.dir\\Issue1189.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\FailingBuilds\\Issue1189.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/FailingBuilds/Issue1189.cpp",
+  "output": "extras/tests/FailingBuilds/CMakeFiles/Issue1189.dir/Issue1189.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/FailingBuilds",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/read_long_long.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\read_long_long.dir\\read_long_long.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\FailingBuilds\\read_long_long.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/FailingBuilds/read_long_long.cpp",
+  "output": "extras/tests/FailingBuilds/CMakeFiles/read_long_long.dir/read_long_long.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/FailingBuilds",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/write_long_long.dir/includes_CXX.rsp -g -std=gnu++11 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\write_long_long.dir\\write_long_long.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\FailingBuilds\\write_long_long.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/FailingBuilds/write_long_long.cpp",
+  "output": "extras/tests/FailingBuilds/CMakeFiles/write_long_long.dir/write_long_long.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/FailingBuilds",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/delete_jsondocument.dir/includes_CXX.rsp -g -std=gnu++98 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\delete_jsondocument.dir\\delete_jsondocument.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\FailingBuilds\\delete_jsondocument.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJson/extras/tests/FailingBuilds/delete_jsondocument.cpp",
+  "output": "extras/tests/FailingBuilds/CMakeFiles/delete_jsondocument.dir/delete_jsondocument.cpp.obj"
+},
+{
+  "directory": "C:/Supermileage/telemetry-firmware/build/extras/tests/FailingBuilds",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DARDUINOJSON_DEBUG=1 -DHAS_VARIABLE_LENGTH_ARRAY @CMakeFiles/variant_as_char.dir/includes_CXX.rsp -g -std=gnu++98 -pedantic -Wall -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wdisabled-optimization -Werror -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wparentheses -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-aliasing -Wundef -g -O0 -Wstrict-null-sentinel -Wno-vla -Wlogical-op -Wnoexcept -o CMakeFiles\\variant_as_char.dir\\variant_as_char.cpp.obj -c C:\\Supermileage\\telemetry-firmware\\lib\\ArduinoJson\\extras\\tests\\FailingBuilds\\variant_as_char.cpp",
+  "file": "C:/Supermileage/telemetry-firmware/lib/ArduinoJ

@@ -1,9 +1,11 @@
 #include <math.h>
 #include "SensorAccelerometer.h"
+#include "CircularBuffer.h"
+#include "Filters.h"
 
 #define GYRO_RECALIBRATION_MARGIN   0.1f     // if accelerometer |<y,z> - 9.81^2| <= margin, recalibrate gyro readings
 #define MEGA                        1000000
-#define ALPHA                        0.01f
+//#define ALPHA                       0.25f
 
 #define ACCEL_FORWARD_Z_UP_Y        0x208
 #define ACCEL_FORWARD_Z_DOWN_Y      0x204
@@ -33,6 +35,7 @@
 #define ACCEL_BACKWARD_X_UP_Z       0x1002
 #define ACCEL_BACKWARD_X_DOWN_Z     0x1001
 
+
 /* Debug Settings */
 // #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
 // #define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
@@ -41,14 +44,13 @@
 int displayCount = 0;
 #endif
 
-SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval) : _controller(controller) {
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval) 
+    : _controller(controller), _interval(interval), _circularBuffer(_windowSize), _sgFilter(_coefficients, _normalization, _circularBuffer) {
     _setTransformationMatrix(ACCEL_FORWARD_Z_UP_Y);
-    _samples = std::vector<Vec3>(interval / 9.6f, Vec3 {0.f, 0.f, 0.f});
-    _sampleScale = 1.f / _samples.size();
 }
 
 SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval, uint16_t forward, uint16_t up) :
-    _controller(controller) {
+    _controller(controller), _interval(interval), _circularBuffer(_windowSize), _sgFilter(_coefficients, _normalization, _circularBuffer) {
         _setTransformationMatrix((forward << 8) | up);
 }
 
@@ -121,21 +123,15 @@ void SensorAccelerometer::handle() {
     #endif
 
     if (success) {
-        // apply moving average convolutional filter
-        _samples[_head] = _transformationMatrix.multiply(_controller->getAccel());
-        uint16_t next = (_head + 1) % static_cast<uint16_t>(_samples.size());
-        
-        Vec3 tail;
-        if (_numSamples != _samples.size()) {
-            // if vector still isn't fully populated, subtract padding
-            ++_numSamples;
-            tail = _samples[0];
-        } else {
-            // otherwise, subtract tail entry
-            tail = _samples[next];
+        // Savitzky-Golay Filter is used to smooth the acceleration data
+        _circularBuffer.add (_transformationMatrix.multiply(_controller->getAccel()));
+
+        if (_circularBuffer.isFull()) {
+            _accel = _sgFilter.filter();
         }
-        _accel = _accel + (_samples[_head] - tail) * _sampleScale;
-        _head = next;
+
+        // The Alpha-Beta filter
+        // _accel = (1-ALPHA) * _accel + ALPHA * curAccel;
 
         // gyro is quite accurate without smoothing
         _gyro = _transformationMatrix.multiply(_controller->getGyro());

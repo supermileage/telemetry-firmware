@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Adafruit-BusIO" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Adafruit-GFX-Library" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Adafruit-MAX31855" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Adafruit_LSM6DS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Adafruit_SH110x" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Adafruit_Sensor" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/ArduinoJson" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/BackgroundPublishRK" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/PublishQueuePosixRK" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Seeed_Arduino_CAN" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/SequentialFileRK" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/SparkFun_GNSS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/can-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/fcp-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/test/external/Catch2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/test/external/UnitTestLib" vcs="Git" />
+  </component>
+</project>

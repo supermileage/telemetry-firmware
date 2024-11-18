@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/MixedConfigurationTests.dir/decode_unicode_0.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/decode_unicode_0.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/decode_unicode_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/decode_unicode_1.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_alignment_0.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_alignment_0.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_alignment_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_alignment_1.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_comments_0.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_comments_0.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_comments_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_comments_1.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_infinity_0.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_infinity_0.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_infinity_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_infinity_1.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_nan_0.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_nan_0.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_nan_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_nan_1.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_progmem_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_progmem_1.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_string_deduplication_0.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_string_deduplication_0.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_string_deduplication_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/enable_string_deduplication_1.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/use_double_0.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/use_double_0.cpp.obj.d"
+  "CMakeFiles/MixedConfigurationTests.dir/use_double_1.cpp.obj"
+  "CMakeFiles/MixedConfigurationTests.dir/use_double_1.cpp.obj.d"
+  "MixedConfigurationTests.exe"
+  "MixedConfigurationTests.exe.manifest"
+  "MixedConfigurationTests.pdb"
+  "libMixedConfigurationTests.dll.a"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/MixedConfigurationTests.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()
