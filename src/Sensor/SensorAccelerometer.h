@@ -4,9 +4,6 @@
 #include "settings.h"
 #include "Sensor.h"
 #include "AccelerometerController.h"
-#include "CircularBuffer.h"
-#include "Filters.h"
-#include "Math3d.h"
 
 /**
  * @brief directional flags for accelerometer
@@ -26,7 +23,7 @@
 
 /**
  * @brief Defines a vehicle accelerometer sensor positioned such that z-axis is forward/backward
- * and y-axis is up/down -- uses SG convolutional filter to denoise acceleration data
+ * and y-axis is up/down -- uses running mean convolution to denoise acceleration data
  * 
  * @note extra documentation here: https://www.notion.so/Accelerometer-3aa7452fe9784e0f9762a47d624e0669 
  *
@@ -44,7 +41,7 @@ class SensorAccelerometer : public Sensor {
         /**
          * @brief instantiates SensorAccelerometer with coordinate system defined direction flags
          * @param controller Accelerometer controller class
-         * @param interval interval along which convolutional filter will be computed (in ms)
+         * @param interval interval along which moving average will be computed
          * @param forward the forward direction of the vehicle with respect to the accelerometer's coordinate system
          * @param up the up direction of the vehicle with respect to the accelerometer's coordinate system
         */
@@ -64,22 +61,16 @@ class SensorAccelerometer : public Sensor {
 
     private:
         AccelerometerController *_controller;
+        std::vector<Vec3> _samples;
+        uint16_t _head = 0;
+        uint16_t _numSamples = 0;
+        float _sampleScale;
+
         uint64_t _lastReadMillis = 0;
         uint64_t _lastPitchUpdateMicros = 0;
         Matrix3d _transformationMatrix;
         Vec3 _accel = Vec3 { 0, 0, 0 };
         Vec3 _gyro = Vec3 { 0, 0, 0 };
-
-        uint32_t _interval{};
-        CircularBuffer<Vec3> _circularBuffer;
-        SgFilter _sgFilter;
-
-        // SG filter parameters, large window size and small polynomial degree are used to provides a stable smoothing effect
-        // @note extra documentation here: https://medium.com/pythoneers/introduction-to-the-savitzky-golay-filter-a-comprehensive-guide-using-python-b2dd07a8e2ce
-        // m = 11, polynomial degree = 3
-        const size_t _windowSize = 11;
-        const std::vector<int32_t> _coefficients = { -36, 9, 44, 69, 84, 89, 84, 69, 44, 9, -36 }; // source: http://www.statistics4u.info/fundstat_eng/cc_savgol_coeff.html
-        const int32_t _normalization = 429; // normalization factor
 
         int32_t _pitch = 0;     // rad * 1000
         bool _initialized = false;

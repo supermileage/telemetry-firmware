@@ -94,31 +94,14 @@
 		"semaphore": "cpp",
 		"stop_token": "cpp",
 		"cinttypes": "cpp",
-		"__bits": "cpp",
-		"charconv": "cpp",
-		"format": "cpp",
-		"xhash": "cpp",
-		"xstring": "cpp",
-		"xtree": "cpp",
-		"forward_list": "cpp",
-		"ranges": "cpp",
-		"span": "cpp",
-		"xfacet": "cpp",
-		"xiosbase": "cpp",
-		"xlocale": "cpp",
-		"xlocbuf": "cpp",
-		"xlocinfo": "cpp",
-		"xlocmes": "cpp",
-		"xlocmon": "cpp",
-		"xlocnum": "cpp",
-		"xloctime": "cpp"
+		"__bits": "cpp"
 	},
 	"C_Cpp.default.configurationProvider": "particle.particle-vscode-core",
 	"particle.disableDeviceOSOutdatedCheck": true,
 	"C_Cpp.errorSquiggles": "Disabled",
 	"testMate.cpp.test.advancedExecutables": [
 		{
-		  "pattern": "${workspaceFolder}\\test\\bin\\*",
+		  "pattern": "${workspaceFolder}/test/bin/*",
 		  "runTask": {
 			"before":[
 				"build tests"
@@ -126,5 +109,5 @@
 		  }
 		}
 	],
-	"C_Cpp.dimInactiveRegions": false,
+	"cmake.sourceDirectory": "${workspaceFolder}/lib/ArduinoJson"
 }

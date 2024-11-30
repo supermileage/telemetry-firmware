@@ -1,3 +1,0 @@
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E rm -f CMakeFiles\msgpack_reproducer.dir/objects.a
-C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\msgpack_reproducer.dir/objects.a @CMakeFiles\msgpack_reproducer.dir\objects1.rsp
-C:\msys64\ucrt64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\msgpack_reproducer.dir/objects.a -Wl,--no-whole-archive -o msgpack_reproducer.exe -Wl,--out-implib,libmsgpack_reproducer.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\msgpack_reproducer.dir\linkLibs.rsp

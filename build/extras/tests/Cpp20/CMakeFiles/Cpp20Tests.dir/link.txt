@@ -1,3 +1,0 @@
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E rm -f CMakeFiles\Cpp20Tests.dir/objects.a
-C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\Cpp20Tests.dir/objects.a @CMakeFiles\Cpp20Tests.dir\objects1.rsp
-C:\msys64\ucrt64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\Cpp20Tests.dir/objects.a -Wl,--no-whole-archive -o Cpp20Tests.exe -Wl,--out-implib,libCpp20Tests.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Cpp20Tests.dir\linkLibs.rsp
