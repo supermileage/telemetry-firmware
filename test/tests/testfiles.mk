@@ -23,9 +23,8 @@ BMS_MANAGER := Sensor/BmsManager.cpp
 ECU := Sensor/SensorEcu.cpp
 # Sensor ECU Test FIles
 FCP := Sensor/SensorFcpControl.cpp
-
-# Sensor ECU Test FIles
-ACCELEROMETER := Sensor/SensorAccelerometer.cpp
+# Sensor Accelerometer Test Files
+ACCELEROMETER := Sensor/SensorAccelerometer.cpp System/CircularBuffer.cpp System/Filters.cpp
 
 # All files to compile for tests
 TEST_DIRS := $(dir $(wildcard $(TEST_DIR)tests/*/))

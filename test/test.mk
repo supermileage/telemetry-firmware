@@ -28,10 +28,6 @@ endif
 # Create flags to include all directories (so we don't have to use paths in #include)
 INCLUDE_FLAGS := $(foreach %,$(INCLUDE_DIRS),$(INCLUDE_PREFIX)$(wildcard $(%)))
 
-# Define CPPSRC and add specific source files for tests
-CPPSRC += $(SRC_DIR)/CircularBuffer.cpp
-CPPSRC += $(SRC_DIR)/Filters.cpp
-
 # generate dependency file paths for test object files
 DEPENDENCIES := $(patsubst $(OBJ_DIR)%.o,$(DEP_DIR)%.d,$(TEST_OBJ))
 
