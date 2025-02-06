@@ -4,20 +4,20 @@
 #include "CanSensorBms.h"
 
 /**
- * @brief Class whose sole purpose is to automatically switch between tiny and orion bms systems when they are swapped out
+ * @brief Class whose sole purpose is to automatically switch between orion [and possibly new] bms systems when they are swapped out
  */
 class BmsManager : public Sensor {
 	public:
 		static const uint32_t UpdateInterval;
 		static const uint32_t MillisecondsBeforeDeselect;
-		enum BmsOption { Orion, Tiny, None };
+		enum BmsOption { Orion, None };
 		
         /**
          * Constructor
          * 
          * Consumes pointer reference to main bms pointer, and addresses of each of two bms instances in project
          * */
-        BmsManager(CanSensorBms** bmsPtr, CanSensorBms* orion, CanSensorBms* tiny, BmsOption option);
+        BmsManager(CanSensorBms** bmsPtr, CanSensorBms* orion, BmsOption option);
 
         ~BmsManager();
 
@@ -59,7 +59,6 @@ class BmsManager : public Sensor {
 	private:
 		CanSensorBms** _mainBmsPtr;
 		CanSensorBms* _orion;
-		CanSensorBms* _tiny;
 		BmsOption _currentOption = None;
 		uint64_t _lastTime = 0;
 };

@@ -8,7 +8,6 @@
 #include "CanListener.h"
 #include "CanSensorAccessories.h"
 #include "CanSensorSteering.h"
-#include "CanSensorTinyBms.h"
 #include "CanSensorOrionBms.h"
 #include "BmsManager.h"
 
@@ -30,10 +29,9 @@ CanSensorAccessories canSensorAccessories(canInterface, CAN_ACC_STATUS);
 CanSensorSteering steering(canInterface);
 
 // Bms
-CanSensorTinyBms tinyBms(canInterface, 25);
 CanSensorOrionBms orionBms(canInterface);
-CanSensorBms* bms = DEFAULT_BMS == BmsManager::BmsOption::Orion ? (CanSensorBms*)(&orionBms) : (CanSensorBms*)(&tinyBms);
-BmsManager bmsManager(&bms, &orionBms, &tinyBms, DEFAULT_BMS);
+CanSensorBms* bms = (CanSensorBms*)(&orionBms);
+BmsManager bmsManager(&bms, &orionBms, DEFAULT_BMS);
 
 // Command definitions
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -104,9 +102,7 @@ void speedCallbackGps(float speed) {
 int remoteSetBms(String command){
 	DEBUG_SERIAL("#### REMOTE - Attempting to set BMS to " + command + "BMS module");
 
-	if (command.equalsIgnoreCase("tiny")) {
-		bmsManager.setBms(BmsManager::BmsOption::Tiny);
-	} else if (command.equalsIgnoreCase("orion")) {
+	if (command.equalsIgnoreCase("orion")) {
 		bmsManager.setBms(BmsManager::BmsOption::Orion);
 	} else {
 		return -1;
@@ -188,10 +184,6 @@ uint32_t CurrentVehicle::getUnixTime() {
 
 void CurrentVehicle::toggleGpsOverride() {
     gps.toggleOverride();
-}
-
-void CurrentVehicle::restartTinyBms() {
-    bms->restart();
 }
 
 #endif

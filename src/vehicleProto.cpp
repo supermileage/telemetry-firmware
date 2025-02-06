@@ -128,10 +128,6 @@ void CurrentVehicle::toggleGpsOverride() {
     gps.toggleOverride();
 }
 
-void CurrentVehicle::restartTinyBms() {
-    
-}
-
 String computeHorizontalSpeed() {
     if (ecu.getOn())
         // 9.7 : 1 gear ratio -- 21" diameter wheels -- 39370.1 inches per kilometer
