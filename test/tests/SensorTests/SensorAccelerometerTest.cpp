@@ -67,74 +67,74 @@ TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor]
     }
 }
 
-// TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]") {
-//     AccelerometerControllerMock mock;
-//     SensorAccelerometer accel(&mock, 1000);
+TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]") {
+    AccelerometerControllerMock mock;
+    SensorAccelerometer accel(&mock, 1000);
 
-//     SECTION("Mock sensor test: smooth over artificial noisy accelerometer data") {
-//         std::string currentPath = std::filesystem::current_path();
-//         size_t idx = currentPath.find("/test/bin");
-//         std::cout << "current file system path: " << currentPath << std::endl;
-//         std::string path = currentPath.substr(0, idx) + "/test/tests/data/";
-//         std::string inputPath = path + "mock_accelerometer_data.csv";
-//         std::cout << inputPath << std::endl;
+    SECTION("Mock sensor test: smooth over artificial noisy accelerometer data") {
+        std::string currentPath = std::filesystem::current_path();
+        size_t idx = currentPath.find("/test/bin");
+        std::cout << "current file system path: " << currentPath << std::endl;
+        std::string path = currentPath.substr(0, idx) + "/test/tests/data/";
+        std::string inputPath = path + "mock_accelerometer_data.csv";
+        std::cout << inputPath << std::endl;
 
-//         std::ifstream inputFile(inputPath);
-//         if (!inputFile.is_open()) {
-//             std::cerr << "Error opening the file.\n";
-//             REQUIRE(false);
-//         }
+        std::ifstream inputFile(inputPath);
+        if (!inputFile.is_open()) {
+            std::cerr << "Error opening the file.\n";
+            REQUIRE(false);
+        }
 
-//         std::string line;
-//         std::vector<Vec3> samples;
-//         while (std::getline(inputFile, line)) {
-//             std::istringstream iss(line);
-//             std::string token;
+        std::string line;
+        std::vector<Vec3> samples;
+        while (std::getline(inputFile, line)) {
+            std::istringstream iss(line);
+            std::string token;
 
-//             Vec3 vec;
-//             std::getline(iss, token, ',');
-//             vec.x = std::stof(token);
-//             std::getline(iss, token, ',');
-//             vec.y = std::stof(token);
-//             std::getline(iss, token, ',');
-//             vec.z = std::stof(token);
-//             samples.push_back(vec);
-//         }
-//         std::cout << samples.size() << std::endl;
+            Vec3 vec;
+            std::getline(iss, token, ',');
+            vec.x = std::stof(token);
+            std::getline(iss, token, ',');
+            vec.y = std::stof(token);
+            std::getline(iss, token, ',');
+            vec.z = std::stof(token);
+            samples.push_back(vec);
+        }
+        std::cout << samples.size() << std::endl;
     
 
-//         std::string outputFolderPath = path + "out/";
-//         std::cout << outputFolderPath << std::endl;
-//         std::filesystem::create_directories(outputFolderPath);
-//         std::string outputPath = outputFolderPath + "output.csv"; 
-//         std::cout << outputPath << std::endl;
-//         std::ofstream outputFile(outputPath);
+        std::string outputFolderPath = path + "out/";
+        std::cout << outputFolderPath << std::endl;
+        std::filesystem::create_directories(outputFolderPath);
+        std::string outputPath = outputFolderPath + "output.csv"; 
+        std::cout << outputPath << std::endl;
+        std::ofstream outputFile(outputPath);
 
-//         if (!outputFile.is_open()) {
-//             REQUIRE(false);
-//         }
+        if (!outputFile.is_open()) {
+            REQUIRE(false);
+        }
 
-//         setMillis(0);
-//         mock.setReturnValues(samples[0], Vec3 { 0,0,0 }, true);
-//         accel.begin();
+        setMillis(0);
+        mock.setReturnValues(samples[0], Vec3 { 0,0,0 }, true);
+        accel.begin();
 
-//         float haccel = accel.getHorizontalAcceleration().toFloat();
-//         float vaccel = accel.getVerticalAcceleration().toFloat();
+        float haccel = accel.getHorizontalAcceleration().toFloat();
+        float vaccel = accel.getVerticalAcceleration().toFloat();
 
-//         outputFile << haccel << "," << vaccel << std::endl;
-//         for (unsigned i = 1; i < samples.size(); i++) {
-//             Vec3 sample = samples[i];
-//             setMillis(i * ACCEL_READ_INTERVAL);
-//             mock.setReturnValues(Vec3 { sample.x, sample.y, sample.z }, Vec3 { 0, 0, 0 }, true);
+        outputFile << haccel << "," << vaccel << std::endl;
+        for (unsigned i = 1; i < samples.size(); i++) {
+            Vec3 sample = samples[i];
+            setMillis(i * ACCEL_READ_INTERVAL);
+            mock.setReturnValues(Vec3 { sample.x, sample.y, sample.z }, Vec3 { 0, 0, 0 }, true);
 
-//             accel.handle();
+            accel.handle();
 
-//             haccel = accel.getHorizontalAcceleration().toFloat();
-//             vaccel = accel.getVerticalAcceleration().toFloat();
-//             outputFile << haccel << "," << vaccel << std::endl;
-//         }
-//         outputFile.close();
+            haccel = accel.getHorizontalAcceleration().toFloat();
+            vaccel = accel.getVerticalAcceleration().toFloat();
+            outputFile << haccel << "," << vaccel << std::endl;
+        }
+        outputFile.close();
 
-//         REQUIRE(true);
-//     }
-// }
+        REQUIRE(true);
+    }
+}

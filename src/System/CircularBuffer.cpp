@@ -2,7 +2,7 @@
 
 // Constructor for CircularBuffer of generic type
 template <typename T>
-CircularBuffer<T>::CircularBuffer(size_t size) 
+CircularBuffer<T>::CircularBuffer(uint32_t size) 
     : buffer(size)
     , head(0)
     , tail(0)
@@ -30,7 +30,7 @@ T CircularBuffer<T>::get(int32_t index) const {
 
 // Get the size of the buffer
 template <typename T>
-size_t CircularBuffer<T>::size() const {
+uint32_t CircularBuffer<T>::size() const {
     if (full) {
         return maxSize;
     }

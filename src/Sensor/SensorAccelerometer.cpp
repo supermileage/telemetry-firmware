@@ -37,24 +37,29 @@
 
 
 /* Debug Settings */
-// #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
-// #define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
+// Remember to comment out later
+#define DEBUG_ACCELEROMETER_OUTPUT_GYRO
+#define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
 
 #if defined(DEBUG_ACCELEROMETER_OUTPUT_GYRO) or defined(DEBUG_ACCELEROMETER_OUTPUT_ACCEL)
 int displayCount = 0;
 #endif
 
-SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval) 
-    : _controller(controller), _interval(interval), _circularBuffer(_windowSize), _sgFilter(_coefficients, _normalization, _circularBuffer) {
+// Constructor with specified orientation
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval, uint16_t forward, uint16_t up)
+    : _controller(controller), _interval(interval), _lastReadMillis(0), _lastPitchUpdateMicros(0),
+      _circularBuffer(std::make_unique<CircularBuffer<Vec3>>(_windowSize)), _sgFilter(_coefficients, _normalization, *_circularBuffer) {
+    _setTransformationMatrix((forward << 8) | up);
+}
+
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval)
+    : _controller(controller), _interval(interval), _lastReadMillis(0), _lastPitchUpdateMicros(0),
+      _circularBuffer(std::make_unique<CircularBuffer<Vec3>>(_windowSize)), _sgFilter(_coefficients, _normalization, *_circularBuffer) {
     _setTransformationMatrix(ACCEL_FORWARD_Z_UP_Y);
 }
 
-SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval, uint16_t forward, uint16_t up) :
-    _controller(controller), _interval(interval), _circularBuffer(_windowSize), _sgFilter(_coefficients, _normalization, _circularBuffer) {
-        _setTransformationMatrix((forward << 8) | up);
-}
-
-SensorAccelerometer::~SensorAccelerometer() { }
+// Destructor
+SensorAccelerometer::~SensorAccelerometer() {}
 
 String SensorAccelerometer::getHumanName() {
     return "Accelerometer";
@@ -124,9 +129,9 @@ void SensorAccelerometer::handle() {
 
     if (success) {
         // Savitzky-Golay Filter is used to smooth the acceleration data
-        _circularBuffer.add (_transformationMatrix.multiply(_controller->getAccel()));
+        _circularBuffer->add (_transformationMatrix.multiply(_controller->getAccel()));
 
-        if (_circularBuffer.isFull()) {
+        if (_circularBuffer->isFull()) {
             _accel = _sgFilter.filter();
         }
 

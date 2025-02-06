@@ -2,6 +2,10 @@
 IMAGE := ghcr.io/supermileage/particle-v3.0.0:latest
 OUTPUT_DIR := output
 
+# Add the Eigen include directory
+EIGEN_DIR := $(shell pwd)/lib/eigen-3.4.0
+CPPFLAGS += -I$(EIGEN_DIR)
+
 include src/build.mk
 include test/test.mk
 
