@@ -64,14 +64,14 @@ class SensorAccelerometer : public Sensor {
 
     private:
         AccelerometerController *_controller;
-        uint32_t _interval{};
         uint64_t _lastReadMillis = 0;
         uint64_t _lastPitchUpdateMicros = 0;
         Matrix3d _transformationMatrix;
         Vec3 _accel = Vec3 { 0, 0, 0 };
         Vec3 _gyro = Vec3 { 0, 0, 0 };
 
-        std::unique_ptr<CircularBuffer<Vec3>> _circularBuffer;
+        uint32_t _interval{};
+        CircularBuffer<Vec3> _circularBuffer;
         SgFilter _sgFilter;
 
         // SG filter parameters, large window size and small polynomial degree are used to provides a stable smoothing effect

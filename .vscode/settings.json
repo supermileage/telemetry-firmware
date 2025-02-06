@@ -94,12 +94,11 @@
 		"semaphore": "cpp",
 		"stop_token": "cpp",
 		"cinttypes": "cpp",
-		"__bits": "cpp",
-		"dense": "cpp"
+		"__bits": "cpp"
 	},
 	"C_Cpp.default.configurationProvider": "particle.particle-vscode-core",
 	"particle.disableDeviceOSOutdatedCheck": true,
-	"C_Cpp.errorSquiggles": "enabled",
+	"C_Cpp.errorSquiggles": "Disabled",
 	"testMate.cpp.test.advancedExecutables": [
 		{
 		  "pattern": "${workspaceFolder}/test/bin/*",

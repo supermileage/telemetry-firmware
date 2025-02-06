@@ -8,10 +8,10 @@
 template <typename T>
 class CircularBuffer {
     public:
-        CircularBuffer(uint32_t size);
+        CircularBuffer(size_t size);
         void add(T item);
         T get(int32_t index) const;
-        uint32_t size() const;
+        size_t size() const;
         bool isFull() const;
         bool isEmpty() const;
 
@@ -19,7 +19,7 @@ class CircularBuffer {
         std::vector<T> buffer;
         int32_t head;
         int32_t tail;
-        uint32_t maxSize;
+        size_t maxSize;
         bool full;
 };
 
