@@ -1,5 +1,5 @@
 {
-	"particle.targetDevice": "",
+	"particle.targetDevice": "FCP",
     "particle.targetPlatform": "boron",
     "particle.firmwareVersion": "3.0.0",
     "files.associations": {
