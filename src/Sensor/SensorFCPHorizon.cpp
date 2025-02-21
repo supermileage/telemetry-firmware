@@ -20,16 +20,16 @@ uint32_t sensor_fcp_horizon_last_debug_output = 0;
 #define BATTERY_VOLTAGE_UNIT 0.1      // Volts
 
 // Constructor for Debug Configuration
-SensoryFCPHorizon::SensoryFCPHorizon(TelemetrySerial* serial) : _serial(serial) { }
+SensorFcpHorizon::SensorFcpHorizon(TelemetrySerial* serial) : _serial(serial) { }
 
 // Default constructor
-SensoryFCPHorizon::SensoryFCPHorizon() {}
+SensorFcpHorizon::SensorFcpHorizon() {}
 
 // Destructor
-SensoryFCPHorizon::~SensoryFCPHorizon() { }
+SensorFcpHorizon::~SensorFcpHorizon() { }
 
 // Get Human Name
-SensorFcpHorizon::getHumanName() {
+String SensorFcpHorizon::getHumanName() {
     return "FCP Horizon Control";
 }
 
@@ -63,14 +63,14 @@ void SensorFcpHorizon::handle() {
 
     // Read the data packets from serial buffer
     uint8_t dataBuffer[FC_PACKET_LENGTH] = { 0 };
-    _serial->readBytes((char*)dataBuffer, FC_PACKET_LENGTH);
+    _serial->readBytes((char*)dataBuffer, FC_PACKET_LENGTH); // Cast to char *
 
     #ifdef DEBUG_FCP_Horizon
     // Debug output for the data packets received
     DEBUG_SERIAL_LN("-----------------------------");
     DEBUG_SERIAL("SensorFcpHorizon Received Message:");
     for (int i = 0; i < FC_PACKET_LENGTH; i++) {
-        DEBUG_SERIAL(" %02X", dataBuffer[i]);
+        DEBUG_SERIAL_F("0x%x ", dataBuffer[i]);
     }
     DEBUG_SERIAL_LN();
     #endif
@@ -106,7 +106,7 @@ void SensorFcpHorizon::_unpackData(uint8_t* buf) {
 }
 
 // Flush the serial buffer
-void SensorFcpControl::_flushSerial() {
+void SensorFcpHorizon::_flushSerial() {
 	while (_serial->available()) {
 		_serial->read();
 	}

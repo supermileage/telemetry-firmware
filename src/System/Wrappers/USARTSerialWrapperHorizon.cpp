@@ -1,6 +1,6 @@
 #include "USARTSerialWrapperHorizon.h"
 
-USARTSerialWrapperHorizon::USARTSerialWrapperHorizon(USARTSerialHorizon *serial) : _usartSerial(serial) { }
+USARTSerialWrapperHorizon::USARTSerialWrapperHorizon(USARTSerial *serial) : _usartSerial(serial) { }
 
 USARTSerialWrapperHorizon::~USARTSerialWrapperHorizon() { }
 
