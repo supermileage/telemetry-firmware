@@ -1,3 +1,4 @@
+// Header guard
 #ifndef _SENSOR_FCP_HORIZON_H_
 #define _SENSOR_FCP_HORIZON_H_
 
@@ -29,6 +30,13 @@ class SensoryFCPHorizon: public Sensor {
         
         uint64_t _lastUpdate = 0;
         bool _valid = false;
+
+        float _ambientTemperature = 0.0;
+        float _fuelCellVoltage = 0.0;
+        float _h2LeakVoltage = 0.0;
+        float _fuelCellTemperature = 0.0;
+        float _fuelCellCurrent = 0.0;
+        float _batteryVoltage = 0.0;
 
         void _unpackData(uint8_t *buf);
         void _flushSerial();
