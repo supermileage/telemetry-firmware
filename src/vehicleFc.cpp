@@ -25,7 +25,7 @@ Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
 // TextElement constructor params: displayFunc, textSize, textColour, labelSize, labelString
 TextElement<String> speedElement([]() { return gps.getHorizontalSpeed(); }, 3, SH110X_WHITE, 1, String("spd "));
-TextElement<String> stackElement([]() { return cellStack.getStackVoltage(); }, 3, SH110X_WHITE, 1, String("stk "));
+TextElement<String> stackElement([]() { return cellStack.getFuelCellVoltage(); }, 3, SH110X_WHITE, 1, String("fcv"));
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
@@ -44,27 +44,13 @@ LoggingCommand<SensorAccelerometer, String> accelerometerHorAccel(&accel, "hacce
 LoggingCommand<SensorAccelerometer, String> accelerometerVertAccel(&accel, "vacce", &SensorAccelerometer::getVerticalAcceleration, 1);
 LoggingCommand<SensorAccelerometer, String> accelerometerIncline(&accel, "incl", &SensorAccelerometer::getIncline, 1);
 
-LoggingCommand<SensorFcpControl, String> cellVoltage1(&cellStack, "cv1", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage2(&cellStack, "cv2", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage3(&cellStack, "cv3", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage4(&cellStack, "cv4", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage5(&cellStack, "cv5", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage6(&cellStack, "cv6", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage7(&cellStack, "cv7", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage8(&cellStack, "cv8", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage9(&cellStack, "cv9", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage10(&cellStack, "cv10", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage11(&cellStack, "cv11", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage12(&cellStack, "cv12", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage13(&cellStack, "cv13", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage14(&cellStack, "cv14", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage15(&cellStack, "cv15", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage16(&cellStack, "cv16", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage17(&cellStack, "cv17", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage18(&cellStack, "cv18", &SensorFcpControl::getNextCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> cellVoltage19(&cellStack, "cv19", &SensorFcpControl::getNextCellVoltage, 1);
-
-LoggingCommand<SensorFcpControl, String> cellStackVoltage(&cellStack, "stv", &SensorFcpControl::getStackVoltage, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellVoltage(&cellStack, "fcv", &SensorFcpControl::getFuelCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellCurrent(&cellStack, "fcc", &SensorFcpControl::getFuelCellCurrent, 1);
+LoggingCommand<SensorFcpControl, String> batteryVoltage(&cellStack, "fcbv", &SensorFcpControl::getBatteryVoltage, 1);
+LoggingCommand<SensorFcpControl, String> ambientTemperature(&cellStack, "fcat", &SensorFcpControl::getAmbientTemperature, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellTemperature(&cellStack, "fctemp", &SensorFcpControl::getFuelCellTemperature, 1);
+LoggingCommand<SensorFcpControl, String> h2LeakVoltage(&cellStack, "fcleak", &SensorFcpControl::getH2LeakVoltage, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellError(&cellStack, "fcerr", &SensorFcpControl::getErrorFlag, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);
@@ -108,13 +94,14 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Motor Temp: " + String(thermo1.getProbeTemp()) + "°C - ");
     DEBUG_SERIAL_LN("Fuel Cell Temp: " + String(thermo2.getProbeTemp()) + "°C");
 	// Fuel Cell voltages
-	DEBUG_SERIAL_LN("Fuel Cell Voltages:");
-	for (int i = 0; i < cellStack.getNumFuelCells(); i++) {
-		if (i != 0 && i % (cellStack.getNumFuelCells() / 2) == 0) {
-			DEBUG_SERIAL("\n");
-		}
-		DEBUG_SERIAL("Cell " + String(i + 1) + ": " + FLOAT_TO_STRING(cellStack.getCellVoltageByIndex(i), 2) + "V\t");
-	}
+	DEBUG_SERIAL_LN("Horizon Fuel Cell Data:");
+    DEBUG_SERIAL("Fuel Cell Voltage: " + cellStack.getFuelCellVoltage() + "V - ");
+    DEBUG_SERIAL("Fuel Cell Current: " + cellStack.getFuelCellCurrent() + "A - ");
+    DEBUG_SERIAL("Battery Voltage: " + cellStack.getBatteryVoltage() + "V - ");
+    DEBUG_SERIAL("Ambient Temperature: " + cellStack.getAmbientTemperature() + "°C - ");
+    DEBUG_SERIAL("Fuel Cell Temperature: " + cellStack.getFuelCellTemperature() + "°C - ");
+    DEBUG_SERIAL("H2 Leak Voltage: " + cellStack.getH2LeakVoltage() + "V - ");
+    DEBUG_SERIAL_LN("Error Status: " + cellStack.getErrorFlag());
 	DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN();
 }

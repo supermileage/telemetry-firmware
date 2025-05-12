@@ -54,5 +54,6 @@
 
 #define FLOAT_TO_STRING(x,y) String(x,y)
 #define BOOL_TO_STRING(x) String((x < 2) ? ((x == 1) ? "ON" : "OFF") : "N/A")
+#define INT_TO_STRING(x) String(x)
 
 #endif
