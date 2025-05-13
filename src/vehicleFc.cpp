@@ -18,14 +18,14 @@ SensorThermo thermo1(&SPI, A5);
 SensorThermo thermo2(&SPI, A4);
 SensorSigStrength sigStrength;
 SensorVoltage inVoltage;
-SensorFcpControl cellStack(&serial);
+SensorFcpControl fcpControl(&serial);
 
 // driver display
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
 // TextElement constructor params: displayFunc, textSize, textColour, labelSize, labelString
 TextElement<String> speedElement([]() { return gps.getHorizontalSpeed(); }, 3, SH110X_WHITE, 1, String("spd "));
-TextElement<String> stackElement([]() { return cellStack.getFuelCellVoltage(); }, 3, SH110X_WHITE, 1, String("fcv"));
+TextElement<String> stackElement([]() { return fcpControl.getFuelCellVoltage(); }, 3, SH110X_WHITE, 1, String("fcv"));
 
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
 LoggingCommand<SensorSigStrength, int> signalQuality(&sigStrength, "sigql", &SensorSigStrength::getQuality, 10);
@@ -44,13 +44,13 @@ LoggingCommand<SensorAccelerometer, String> accelerometerHorAccel(&accel, "hacce
 LoggingCommand<SensorAccelerometer, String> accelerometerVertAccel(&accel, "vacce", &SensorAccelerometer::getVerticalAcceleration, 1);
 LoggingCommand<SensorAccelerometer, String> accelerometerIncline(&accel, "incl", &SensorAccelerometer::getIncline, 1);
 
-LoggingCommand<SensorFcpControl, String> fuelCellVoltage(&cellStack, "fcv", &SensorFcpControl::getFuelCellVoltage, 1);
-LoggingCommand<SensorFcpControl, String> fuelCellCurrent(&cellStack, "fcc", &SensorFcpControl::getFuelCellCurrent, 1);
-LoggingCommand<SensorFcpControl, String> batteryVoltage(&cellStack, "fcbv", &SensorFcpControl::getBatteryVoltage, 1);
-LoggingCommand<SensorFcpControl, String> ambientTemperature(&cellStack, "fcat", &SensorFcpControl::getAmbientTemperature, 1);
-LoggingCommand<SensorFcpControl, String> fuelCellTemperature(&cellStack, "fctemp", &SensorFcpControl::getFuelCellTemperature, 1);
-LoggingCommand<SensorFcpControl, String> h2LeakVoltage(&cellStack, "fcleak", &SensorFcpControl::getH2LeakVoltage, 1);
-LoggingCommand<SensorFcpControl, String> fuelCellError(&cellStack, "fcerr", &SensorFcpControl::getErrorFlag, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellVoltage(&fcpControl, "fcv", &SensorFcpControl::getFuelCellVoltage, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellCurrent(&fcpControl, "fcc", &SensorFcpControl::getFuelCellCurrent, 1);
+LoggingCommand<SensorFcpControl, String> batteryVoltage(&fcpControl, "fcbv", &SensorFcpControl::getBatteryVoltage, 1);
+LoggingCommand<SensorFcpControl, String> ambientTemperature(&fcpControl, "fcat", &SensorFcpControl::getAmbientTemperature, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellTemperature(&fcpControl, "fctemp", &SensorFcpControl::getFuelCellTemperature, 1);
+LoggingCommand<SensorFcpControl, String> h2LeakVoltage(&fcpControl, "fcleak", &SensorFcpControl::getH2LeakVoltage, 1);
+LoggingCommand<SensorFcpControl, String> fuelCellError(&fcpControl, "fcerr", &SensorFcpControl::getErrorFlag, 1);
 
 LoggingCommand<SensorThermo, int> thermoMotor(&thermo1, "tmpmot", &SensorThermo::getProbeTemp, 5);
 LoggingCommand<SensorThermo, int> thermoFuelCell(&thermo2, "tmpfcs", &SensorThermo::getProbeTemp, 5);
@@ -95,13 +95,13 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL_LN("Fuel Cell Temp: " + String(thermo2.getProbeTemp()) + "°C");
 	// Fuel Cell voltages
 	DEBUG_SERIAL_LN("Horizon Fuel Cell Data:");
-    DEBUG_SERIAL("Fuel Cell Voltage: " + cellStack.getFuelCellVoltage() + "V - ");
-    DEBUG_SERIAL("Fuel Cell Current: " + cellStack.getFuelCellCurrent() + "A - ");
-    DEBUG_SERIAL("Battery Voltage: " + cellStack.getBatteryVoltage() + "V - ");
-    DEBUG_SERIAL("Ambient Temperature: " + cellStack.getAmbientTemperature() + "°C - ");
-    DEBUG_SERIAL("Fuel Cell Temperature: " + cellStack.getFuelCellTemperature() + "°C - ");
-    DEBUG_SERIAL("H2 Leak Voltage: " + cellStack.getH2LeakVoltage() + "V - ");
-    DEBUG_SERIAL_LN("Error Status: " + cellStack.getErrorFlag());
+    DEBUG_SERIAL("Fuel Cell Voltage: " + fcpControl.getFuelCellVoltage() + "V - ");
+    DEBUG_SERIAL("Fuel Cell Current: " + fcpControl.getFuelCellCurrent() + "A - ");
+    DEBUG_SERIAL("Battery Voltage: " + fcpControl.getBatteryVoltage() + "V - ");
+    DEBUG_SERIAL("Ambient Temperature: " + fcpControl.getAmbientTemperature() + "°C - ");
+    DEBUG_SERIAL("Fuel Cell Temperature: " + fcpControl.getFuelCellTemperature() + "°C - ");
+    DEBUG_SERIAL("H2 Leak Voltage: " + fcpControl.getH2LeakVoltage() + "V - ");
+    DEBUG_SERIAL_LN("Error Status: " + fcpControl.getErrorFlag());
 	DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN();
 }

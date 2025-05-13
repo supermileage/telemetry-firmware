@@ -1,7 +1,7 @@
 {
 	"particle.targetDevice": "FCP",
     "particle.targetPlatform": "boron",
-    "particle.firmwareVersion": "4.1.0",
+    "particle.firmwareVersion": "3.0.0",
     "files.associations": {
 		"__bit_reference": "cpp",
 		"__hash_table": "cpp",

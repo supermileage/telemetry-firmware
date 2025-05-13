@@ -40,10 +40,12 @@ class SensorFcpControl: public Sensor {
         float _fuelCellTemperature = 0.0;
         float _fuelCellCurrentHigh = 0.0;
         float _fuelCellCurrentLow = 0.0;
+        float _fuelCellCurrent = 0.0;
         float _batteryVoltage = 0.0;
 
         void _unpackData(uint8_t *buf);
         void _flushSerial();
+        bool isConnected();
 };
 
 

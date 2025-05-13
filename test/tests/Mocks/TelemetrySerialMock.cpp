@@ -1,11 +1,14 @@
 #include "TelemetrySerialMock.h"
 #include <string.h>
 
+#define DEFAULT_TIMEOUT 1000
+
 TelemetrySerialMock::TelemetrySerialMock() {
 	_begin = [](unsigned long baud, uint32_t flags) { };
 	_available = []() { return 0; };
 	_read = []() { return 0; };
 	_readBytes = [](char* buf, size_t len) { return 0; };
+	setTimeout(DEFAULT_TIMEOUT);
 }
 
 TelemetrySerialMock::~TelemetrySerialMock() { }
@@ -59,4 +62,8 @@ void TelemetrySerialMock::setRead(std::function<int(void)> func) {
 
 void TelemetrySerialMock::setReadBytes(std::function<size_t(char*,size_t)> func) {
 	_readBytes = func;
+}
+
+void TelemetrySerialMock::setTimeout(unsigned long timeout) {
+	_timeout = timeout;
 }

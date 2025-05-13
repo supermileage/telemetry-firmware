@@ -20,6 +20,7 @@ class TelemetrySerialMock : public TelemetrySerial {
 		void setAvailable(std::function<int(void)> func);
 		void setRead(std::function<int(void)> func);
 		void setReadBytes(std::function<size_t(char*,size_t)> func);
+		void setTimeout(unsigned long timeout) override;
 
 	private:
 		std::function<void(unsigned long, uint32_t)> _begin;
@@ -27,7 +28,6 @@ class TelemetrySerialMock : public TelemetrySerial {
 		std::function<int(void)> _read;
 		std::function<size_t(char*,size_t)> _readBytes;
 		bool _availableCalled = false;
-
+		unsigned long _timeout; // Default timeout
 };
-
 #endif

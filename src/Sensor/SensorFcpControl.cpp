@@ -12,22 +12,6 @@ uint32_t last_debug_output = 0;
 
 #define FC_PACKET_LENGTH 8 // Horizon Fuel Cell packet length is 8 bytes
 
-// See Notion for Horizon Fuel Cell Controller documentation
-#define AMBIENT_TEMP_UNIT 0.5         // Degrees Celcius
-#define FUEL_CELL_VOLTAGE_UNIT 0.333  // Volts
-#define H2_LEAK_VOLTAGE_UNIT 0.1      // Volts
-#define FUEL_CELL_TEMP_UNIT 0.5       // Degrees Celcius
-#define FUEL_CELL_CURRENT_UNIT 0.2    // Amps
-#define BATTERY_VOLTAGE_UNIT 0.1      // Volts
-
-// Error Flags
-#define ERROR_MANUAL_SHUTDOWN 20
-#define ERROR_VOLTAGE_LOW 2
-#define ERROR_H2_LEAK 3
-#define ERROR_CURRENT_HIGH 4
-#define ERROR_TEMP_HIGH 5
-#define ERROR_VOLTAGE_LOW_CURRENT_HIGH 6
-
 
 // Constructor for Debug Configuration
 SensorFcpControl::SensorFcpControl(TelemetrySerial* serial) : _serial(serial) { }
@@ -36,23 +20,25 @@ SensorFcpControl::SensorFcpControl(TelemetrySerial* serial) : _serial(serial) { 
 SensorFcpControl::SensorFcpControl() {}
 
 // Destructor
-SensorFcpControl::~SensorFcpControl() { }
+SensorFcpControl::~SensorFcpControl() {
+    // Clean up buffer
+    if (_serial) {
+        _flushSerial();
+    }
+}
 
 // Get Human Name
 String SensorFcpControl::getHumanName() {
-    return "FCP Horizon Control";
+    return "FCP Control";
 }
 
 void SensorFcpControl::begin() {
-    // Horizon Usart baud rate: 9600
-    // Horizon Data frame format: SERIAL_8N1, 8 data bits, 1 stop bit, no flow control
-    // Usart is asychronous, must have same baud rate as Horizon controller
     _serial->begin(FC_BAUD, SERIAL_8N1);
     _serial->setTimeout(FC_TIMEOUT);
-    _flushSerial(); // Flush the serial buffer to clean slate
+    _flushSerial(); // Flush the serial buffer to clean state
 
     #ifdef DEBUG_FCP_CONTROL
-    DEBUG_SERIAL_F("FCP: Serial port initialized. Baud rate: %d", FC_BAUD);
+    DEBUG_SERIAL_F("FCP: Serial port initialized. Baud rate: %d", FC_BAUD); // Flow control disable by default
     #endif
 }
 
@@ -105,7 +91,7 @@ void SensorFcpControl::handle() {
     for (int i = 0; i < FC_PACKET_LENGTH; i++) {
         DEBUG_SERIAL_F("0x%x ", dataBuffer[i]);
     }
-    DEBUG_SERIAL_LN();
+    DEBUG_SERIAL_LN("");
     #endif
 
     // Unpack the data packets
@@ -121,6 +107,7 @@ void SensorFcpControl::_unpackData(uint8_t* buf) {
     _fuelCellTemperature = buf[4] * FUEL_CELL_TEMP_UNIT;
     _fuelCellCurrentHigh = buf[5];
     _fuelCellCurrentLow = buf[6];
+    _fuelCellCurrent = (_fuelCellCurrentHigh * 256 + _fuelCellCurrentLow) * FUEL_CELL_CURRENT_UNIT;
     _batteryVoltage = buf[7] * BATTERY_VOLTAGE_UNIT;
 
     // Mark the data as valid and update the last update timestamp
@@ -134,8 +121,7 @@ void SensorFcpControl::_unpackData(uint8_t* buf) {
     DEBUG_SERIAL_F("Fuel Cell Voltage from buffer: %.3f V\n", _fuelCellVoltage);
     DEBUG_SERIAL_F("H2 Leak Voltage from buffer: %.1f V\n", _h2LeakVoltage);
     DEBUG_SERIAL_F("Fuel Cell Temperature from buffer: %.1f C\n", _fuelCellTemperature);
-    float fullCurrent = (_fuelCellCurrentHigh * 256 + _fuelCellCurrentLow) * FUEL_CELL_CURRENT_UNIT;
-    DEBUG_SERIAL_F("Fuel Cell Current (combined): %.1f A\n", fullCurrent);
+    DEBUG_SERIAL_F("Fuel Cell Current (combined): %.1f A\n", _fuelCellCurrent);
     DEBUG_SERIAL_F("Battery Voltage from buffer: %.1f V\n", _batteryVoltage);
     #endif
 }
@@ -195,4 +181,8 @@ void SensorFcpControl::_flushSerial() {
         DEBUG_SERIAL_F("FCP: Flushed %d bytes from buffer\n", bytesCleared);
     }
     #endif
+}
+
+bool SensorFcpControl::isConnected() {
+    return (millis() - _lastUpdate) < FC_TIMEOUT;
 }
