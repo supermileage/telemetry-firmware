@@ -6,7 +6,7 @@
 
 #include "fcp-common.h"
 #include "SensorFcpControl.h"
-#include "TelemetrySerialMock.h"
+#include "../Mocks/TelemetrySerialMock.h"
 
 /* Helper Functions */
 void packHeaderFc(uint8_t* buf);
