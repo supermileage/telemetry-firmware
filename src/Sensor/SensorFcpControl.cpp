@@ -186,3 +186,4 @@ void SensorFcpControl::_flushSerial() {
 bool SensorFcpControl::isConnected() {
     return (millis() - _lastUpdate) < FC_TIMEOUT;
 }
+
