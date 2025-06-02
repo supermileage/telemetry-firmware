@@ -7,6 +7,34 @@ struct Vec3 {
     float x;
     float y;
     float z;
+
+    Vec3 operator+(const Vec3& other) {
+        return Vec3 { x + other.x, y + other.y, z + other.z };
+    }
+
+    void operator+=(const Vec3& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+    }
+
+    Vec3 operator-(const Vec3& other) {
+        return Vec3 { x - other.x, y - other.y, z - other.z };
+    }
+
+    void operator-=(const Vec3& other) {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+    }
+
+    Vec3 operator/(float d) {
+        return Vec3 { x / d, y / d, z / d };
+    }
+
+    Vec3 operator*(float c) {
+        return Vec3 { x * c, y * c, z * c };
+    }
 };
 
 typedef std::array<std::array<float, 3>, 3> Matrix3x3;

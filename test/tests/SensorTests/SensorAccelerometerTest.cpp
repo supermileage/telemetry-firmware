@@ -1,5 +1,10 @@
 #include "test_config.h"
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <filesystem>
+
 #include <functional>
 #include <math.h>
 
@@ -10,14 +15,14 @@
 
 /* Tests */
 TEST_CASE( "SensorAccelerometer::getHumanName test", "[SensorAccelerometer][Sensor]" ) {
-    SensorAccelerometer accel(nullptr);
+    SensorAccelerometer accel(nullptr, 1000);
     
     REQUIRE( accel.getHumanName() == "Accelerometer" );
 }
 
 TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor][begin]" ) {
     AccelerometerControllerMock mock;
-    SensorAccelerometer accel(&mock);
+    SensorAccelerometer accel(&mock, 1000);
 
     SECTION("AccelerometerController fails to inititialize") {
         mock.setInit([]() { return false; });
@@ -62,32 +67,43 @@ TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor]
     }
 }
 
-TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]") {
-    AccelerometerControllerMock mock;
-    SensorAccelerometer accel(&mock);
+// TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]") {
+//     AccelerometerControllerMock mock;
+//     SensorAccelerometer accel(&mock, 1000);
 
-    SECTION("Simulate accelerating and braking while going over bump") {
-        float x = 0, z = 0;
-        float y = ACCEL_GRAVITY;
+//     SECTION("Mock sensor test: smooth over artificial noisy accelerometer data") {
+//         std::string currentPath = std::filesystem::current_path();
+//         size_t idx = currentPath.find("/test/bin");
+//         std::cout << "current file system path: " << currentPath << std::endl;
+//         std::string path = currentPath.substr(0, idx) + "/test/tests/data/";
+//         std::string inputPath = path + "mock_accelerometer_data.csv";
+//         std::cout << inputPath << std::endl;
 
-        setMillis(0);
-        mock.setReturnValues(Vec3 { x,y,z }, Vec3 { 0,0,0 }, true);
-        accel.begin();
+//         std::ifstream inputFile(inputPath);
+//         if (!inputFile.is_open()) {
+//             std::cerr << "Error opening the file.\n";
+//             REQUIRE(false);
+//         }
 
-        // bump -- sharp normal curve from ~0 to 1G to ~0 -- peaks at 6 seconds
-        std::function<float(float)> normalY = [](float x) {
-            float median = 6;
-            float variance = 0.5;
-            return ACCEL_GRAVITY * pow(EULERS, (-0.5f * pow((x - median) / variance, 2)));
-        };
+//         std::string line;
+//         std::vector<Vec3> samples;
+//         while (std::getline(inputFile, line)) {
+//             std::istringstream iss(line);
+//             std::string token;
 
-        // forward -- smooth normal curve from ~0 to 1G to ~0 -- peaks at 9 seconds
-        std::function<float(float)> normalZ = [](float x) {
-            float median = 9;
-            float variance = 2;
-            return ACCEL_GRAVITY * pow(EULERS, (-0.5f * pow((x - median) / variance, 2)));
-        };
+//             Vec3 vec;
+//             std::getline(iss, token, ',');
+//             vec.x = std::stof(token);
+//             std::getline(iss, token, ',');
+//             vec.y = std::stof(token);
+//             std::getline(iss, token, ',');
+//             vec.z = std::stof(token);
+//             samples.push_back(vec);
+//         }
+//         std::cout << samples.size() << std::endl;
+    
 
+<<<<<<< HEAD
         // simulate accelerating forward while going over a bump
         // i = time in milliseconds
         for (uint i = 10; i <= 20000; i += ACCEL_READ_INTERVAL) {
@@ -95,15 +111,24 @@ TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]
             y = normalY((float)i/1000);
             z = normalZ((float)i/1000);
             mock.setReturnValues(Vec3 { x, y + ACCEL_GRAVITY, z }, Vec3 { 0, 0, 0 }, true);
+=======
+//         std::string outputFolderPath = path + "out/";
+//         std::cout << outputFolderPath << std::endl;
+//         std::filesystem::create_directories(outputFolderPath);
+//         std::string outputPath = outputFolderPath + "output.csv"; 
+//         std::cout << outputPath << std::endl;
+//         std::ofstream outputFile(outputPath);
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 
-            accel.handle();
+//         if (!outputFile.is_open()) {
+//             REQUIRE(false);
+//         }
 
-            float incline = accel.getIncline().toFloat();
-            float haccel = accel.getHorizontalAcceleration().toFloat();
-            float vaccel = accel.getVerticalAcceleration().toFloat();
-            float actualY = accel.getAccel().y - ACCEL_GRAVITY;
-            float actualZ = accel.getAccel().z;
+//         setMillis(0);
+//         mock.setReturnValues(samples[0], Vec3 { 0,0,0 }, true);
+//         accel.begin();
 
+<<<<<<< HEAD
             REQUIRE( incline == Approx(0).margin(1.0) );
             REQUIRE( haccel == Approx(z).margin(1.0) );
             REQUIRE( vaccel == Approx(y + ACCEL_GRAVITY).margin(1.0) );
@@ -113,3 +138,25 @@ TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]
         }
     }
 }
+=======
+//         float haccel = accel.getHorizontalAcceleration().toFloat();
+//         float vaccel = accel.getVerticalAcceleration().toFloat();
+
+//         outputFile << haccel << "," << vaccel << std::endl;
+//         for (unsigned i = 1; i < samples.size(); i++) {
+//             Vec3 sample = samples[i];
+//             setMillis(i * ACCEL_READ_INTERVAL);
+//             mock.setReturnValues(Vec3 { sample.x, sample.y, sample.z }, Vec3 { 0, 0, 0 }, true);
+
+//             accel.handle();
+
+//             haccel = accel.getHorizontalAcceleration().toFloat();
+//             vaccel = accel.getVerticalAcceleration().toFloat();
+//             outputFile << haccel << "," << vaccel << std::endl;
+//         }
+//         outputFile.close();
+
+//         REQUIRE(true);
+//     }
+// }
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5

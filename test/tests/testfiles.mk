@@ -23,9 +23,14 @@ BMS_MANAGER := Sensor/BmsManager.cpp
 ECU := Sensor/SensorEcu.cpp
 # Sensor ECU Test Files
 FCP := Sensor/SensorFcpControl.cpp
+<<<<<<< HEAD
 
 # Sensor ECU Test Files
 ACCELEROMETER := Sensor/SensorAccelerometer.cpp
+=======
+# Sensor Accelerometer Test Files
+ACCELEROMETER := Sensor/SensorAccelerometer.cpp System/CircularBuffer.cpp System/Filters.cpp
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 
 FILTERS := Sensor/Filters/Filters.cpp
 

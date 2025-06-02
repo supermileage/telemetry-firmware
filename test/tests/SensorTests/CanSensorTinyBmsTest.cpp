@@ -13,8 +13,6 @@
 
 #define TEST_REQUEST_INTERVAL 500
 
-using namespace std;
-
 /* Helper Functions */
 void packBatteryDataTiny(float voltage, float current, float soc, uint8_t* buf);
 void packCanMessageTiny(CanMessage& msg, uint8_t status, uint8_t id, uint8_t len);
@@ -25,7 +23,7 @@ void packInt16Tiny(int16_t val, uint8_t* buf);
 void packInt32Tiny(int32_t val, uint8_t* buf);
 
 /* Ordered Statuses */
-const array<int, 6> Statuses {
+const std::array<int, 6> Statuses {
 	TINYBMS_STATUS_CHARGING, TINYBMS_STATUS_CHARGED, TINYBMS_STATUS_DISCHARGING,
 	TINYBMS_STATUS_REGENERATION, TINYBMS_STATUS_IDLE, TINYBMS_STATUS_FAULT_ERROR
 };
@@ -130,7 +128,7 @@ TEST_CASE( "CanSensorTinyBms::update", "[CanSensorTinyBms][Sensor][CanSensor]" )
 	}
 
 	SECTION( "update can tinybms battery voltage" ) {
-		srand(chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count());
+		srand(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 
 		for (int i = 0; i < 20; i++) {
 			float testVoltage = (float)(rand() % 1000 - 500) / 100.0f;
@@ -151,7 +149,7 @@ TEST_CASE( "CanSensorTinyBms::update", "[CanSensorTinyBms][Sensor][CanSensor]" )
 	}
 
 	SECTION( "update can tinybms battery current" ) {
-		srand(chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count());
+		srand(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 
 		for (int i = 0; i < 20; i++) {
 			float testCurrent = (float)(rand() % 1000 - 500) / 100.0f;
@@ -172,7 +170,7 @@ TEST_CASE( "CanSensorTinyBms::update", "[CanSensorTinyBms][Sensor][CanSensor]" )
 	}
 
 	SECTION( "update can tinybms battery cell voltages" ) {
-		srand(chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count());
+		srand(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 
 		for (int i = 0; i < 20; i++) {
 			float testCellVoltage1 = (float)(rand() % 200 - 100) / 100.0f;
@@ -223,7 +221,7 @@ TEST_CASE( "CanSensorTinyBms::update", "[CanSensorTinyBms][Sensor][CanSensor]" )
 	}
 
 	SECTION( "update can tinybms soc" ) {
-		srand(chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count());
+		srand(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 
 		for (int i = 0; i < 20; i++) {
 			int32_t testSoc = (int32_t)fabs(rand()) % 100000000;

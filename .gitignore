@@ -12,4 +12,8 @@ output/
 test/obj
 test/dep
 test/bin
+<<<<<<< HEAD
+=======
+test/tests/data/out
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 build/

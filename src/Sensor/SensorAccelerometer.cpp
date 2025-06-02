@@ -1,8 +1,17 @@
 #include "SensorAccelerometer.h"
+<<<<<<< HEAD
 #include <vector>
 #include <cmath>
 
 typedef float radians_t;
+=======
+#include "CircularBuffer.h"
+#include "Filters.h"
+
+#define GYRO_RECALIBRATION_MARGIN   0.1f     // if accelerometer |<y,z> - 9.81^2| <= margin, recalibrate gyro readings
+#define MEGA                        1000000
+//#define ALPHA                       0.25f
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 
 #define GYRO_RECALIBRATION_MARGIN                                              \
     0.1f // if accelerometer |<y,z> - 9.81^2| <= margin, recalibrate gyro
@@ -37,6 +46,7 @@ typedef float radians_t;
 #define ACCEL_BACKWARD_X_UP_Z 0x1002
 #define ACCEL_BACKWARD_X_DOWN_Z 0x1001
 
+
 /* Debug Settings */
 #define DEBUG_ACCELEROMETER_OUTPUT_GYRO
 #define DEBUG_ACCELEROMETER_OUTPUT_ACCEL
@@ -55,14 +65,20 @@ constexpr size_t WINDOW_SIZE = 11;
 int displayCount = 0;
 #endif
 
+<<<<<<< HEAD
 SensorAccelerometer::SensorAccelerometer(AccelerometerController *controller)
     : _controller(controller) {
+=======
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval) 
+    : _controller(controller), _interval(interval), _circularBuffer(_windowSize), _sgFilter(_coefficients, _normalization, _circularBuffer) {
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
     _setTransformationMatrix(ACCEL_FORWARD_Z_UP_Y);
     //setAccelFilter(std::make_unique<SavGolFilter>(COEFF, NORM, WINDOW_SIZE));
     setAccelFilter(std::make_unique<LowPassFilter>(ALPHA));
     //setAccelFilter(std::make_unique<RawFilter>());
 }
 
+<<<<<<< HEAD
 SensorAccelerometer::SensorAccelerometer(AccelerometerController *controller,
                                          uint16_t forward, uint16_t up)
     : _controller(controller) {
@@ -70,6 +86,11 @@ SensorAccelerometer::SensorAccelerometer(AccelerometerController *controller,
     //setAccelFilter(std::make_unique<SavGolFilter>(COEFF, NORM, WINDOW_SIZE));
     setAccelFilter(std::make_unique<LowPassFilter>(ALPHA));
     //setAccelFilter(std::make_unique<RawFilter>());
+=======
+SensorAccelerometer::SensorAccelerometer(AccelerometerController* controller, uint32_t interval, uint16_t forward, uint16_t up) :
+    _controller(controller), _interval(interval), _circularBuffer(_windowSize), _sgFilter(_coefficients, _normalization, _circularBuffer) {
+        _setTransformationMatrix((forward << 8) | up);
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 }
 
 SensorAccelerometer::~SensorAccelerometer() {}
@@ -79,15 +100,17 @@ String SensorAccelerometer::getHumanName() { return "Accelerometer"; }
 void SensorAccelerometer::begin() {
     _initialized = _controller->init();
 
+<<<<<<< HEAD
     // get initial reading of pitch and gravitational acceleration on z and y
     // axes. assumes that the vehicle is not moving when this method is called
+=======
+    // get initial reading of pitch and gravitational acceleration on z and y axes.
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
     if (_initialized) {
         if (_controller->tryGetReading()) {
             _accel = _transformationMatrix.multiply(_controller->getAccel());
             _gyro = _transformationMatrix.multiply(_controller->getGyro());
             _setPitch();
-            _setGravityY();
-            _setGravityZ();
         }
     }
 }
@@ -144,6 +167,7 @@ void SensorAccelerometer::handle() {
 #endif
 
     if (success) {
+<<<<<<< HEAD
         Vec3 currAccel =
             _transformationMatrix.multiply(_controller->getAccel());
         if (_accel_filter) {
@@ -151,6 +175,17 @@ void SensorAccelerometer::handle() {
         } else {
             _accel = currAccel;
         }
+=======
+        // Savitzky-Golay Filter is used to smooth the acceleration data
+        _circularBuffer.add (_transformationMatrix.multiply(_controller->getAccel()));
+
+        if (_circularBuffer.isFull()) {
+            _accel = _sgFilter.filter();
+        }
+
+        // The Alpha-Beta filter
+        // _accel = (1-ALPHA) * _accel + ALPHA * curAccel;
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 
         // gyro is quite accurate without smoothing
         _gyro = _transformationMatrix.multiply(_controller->getGyro());
@@ -161,10 +196,13 @@ void SensorAccelerometer::handle() {
             _lastPitchUpdateMicros = currentTime;
             _pitch = (_gyro.x * deltaT) + _pitch;
         }
+<<<<<<< HEAD
 
         // update expected gravitational acceleration on y, z based on new pitch
         _setGravityY();
         _setGravityZ();
+=======
+>>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
     }
 }
 
@@ -205,14 +243,6 @@ String SensorAccelerometer::getInitStatus() {
     } else {
         return "Failure";
     }
-}
-
-void SensorAccelerometer::_setGravityY() {
-    _gravityY = (ACCEL_GRAVITY * cos((float)_pitch / MEGA));
-}
-
-void SensorAccelerometer::_setGravityZ() {
-    _gravityZ = ACCEL_GRAVITY * sin((float)_pitch / MEGA);
 }
 
 void SensorAccelerometer::_setPitch() {
