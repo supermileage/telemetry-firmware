@@ -1,9 +1,11 @@
 #ifndef _SENSOR_ACCELEROMETER_H_
 #define _SENSOR_ACCELEROMETER_H_
 
+#include <stdint.h>
 #include "settings.h"
 #include "Sensor.h"
 #include "AccelerometerController.h"
+#include "Filters/Filters.h"
 
 /**
  * @brief directional flags for accelerometer
@@ -57,6 +59,8 @@ class SensorAccelerometer : public Sensor {
         float getAccelMagnitude();
         String getInitStatus();
 
+        void setAccelFilter(std::unique_ptr<Filters> filter);
+
     private:
         AccelerometerController *_controller;
         uint64_t _lastReadMillis = 0;
@@ -75,6 +79,15 @@ class SensorAccelerometer : public Sensor {
         void _setGravityZ();
         void _setPitch();
         bool _tryRecalibrateGyroscope();
+
+        std::unique_ptr<Filters> _accel_filter;
 };
 
 #endif
+
+/*
+Notes: 
+- The cutoff value of the LPF1 for accelerometer output is ODR/2.
+- ODR defaults to 104 Hz, see Adafruit_LSM6DS init()
+- BW = ODR / 2 (Nyquist theorem)
+*/

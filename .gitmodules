@@ -51,3 +51,6 @@
 	path = lib/Adafruit-GFX-Library
 	url = git@github.com:supermileage/Adafruit-GFX-Library-Particle.git
 	branch = master
+[submodule "lib/eigen"]
+	path = lib/eigen
+	url = https://gitlab.com/libeigen/eigen.git

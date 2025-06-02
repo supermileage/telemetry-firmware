@@ -107,16 +107,21 @@ void SensorEcu::handle() {
                 _ubAdc = _interpretValue(buffer[24], buffer[25], 0.00625, 0.0);
                 _isOn = true;
 
-            } else {
+            } 
+            #ifdef DEBUG_SENSOR_ECU
+            else {
                 DEBUG_SERIAL_LN("ERROR: ECU Packet Checksum Invalid");
             }
+            #endif
 
-    }else{
+    }
+    else{
+        #ifdef DEBUG_SENSOR_ECU
         // The header is not correct, flush the serial buffer
 		DEBUG_SERIAL_LN("ERROR: ECU Packet header incorrect");
+        #endif
         flush();
     }
-
 }
 
 int SensorEcu::getRPM(bool &valid) {

@@ -9,7 +9,7 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define FC
+    #define URBAN
 #endif
 
 // Important: Board version number
@@ -21,7 +21,7 @@
 // Publish to Cloud
 #define PUBLISH_EN              1
 // Output Serial messages (disable for production)
-#define DEBUG_SERIAL_EN         0
+#define DEBUG_SERIAL_EN         1
 // Sensor Debug Interval in s, 0 for off
 #define DEBUG_SENSOR_INT        5
 // LED Flash interval in ms

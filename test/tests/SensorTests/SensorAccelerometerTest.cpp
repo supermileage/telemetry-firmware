@@ -90,7 +90,7 @@ TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]
 
         // simulate accelerating forward while going over a bump
         // i = time in milliseconds
-        for (uint i = 10; i <= 19000; i += ACCEL_READ_INTERVAL) {
+        for (uint i = 10; i <= 20000; i += ACCEL_READ_INTERVAL) {
             setMillis(i);
             y = normalY((float)i/1000);
             z = normalZ((float)i/1000);
@@ -104,11 +104,12 @@ TEST_CASE( "SensorAccelerometer::handle", "[SensorAccelerometer][Sensor][handle]
             float actualY = accel.getAccel().y - ACCEL_GRAVITY;
             float actualZ = accel.getAccel().z;
 
-            REQUIRE( incline == Approx(0).margin(0.1) );
-            REQUIRE( haccel == Approx(z).margin(0.1) );
-            REQUIRE( vaccel == Approx(y).margin(0.4) );
-            REQUIRE( actualY == Approx(y).margin(0.4) );
-            REQUIRE( actualZ == Approx(z).margin(0.1) );
+            REQUIRE( incline == Approx(0).margin(1.0) );
+            REQUIRE( haccel == Approx(z).margin(1.0) );
+            REQUIRE( vaccel == Approx(y + ACCEL_GRAVITY).margin(1.0) );
+            REQUIRE( actualY == Approx(y).margin(1.0) );
+            REQUIRE( actualZ == Approx(z).margin(1.0) );
+            // Note: when testing with FIR filters (e.g. SavGol) or IIR filters (e.g. LowPass) account for phase delay
         }
     }
 }

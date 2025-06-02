@@ -1,6 +1,8 @@
 #include "CanSensorTinyBms.h"
 #include "settings.h"
 
+// #define DEBUG_CAN_SENSOR_TINY_BMS
+
 const uint8_t PARAM_IDS[] =  {
 	TINYBMS_PARAM_ID_BATTERY_VOLTAGE,
 	TINYBMS_PARAM_ID_BATTERY_CURRENT,
@@ -162,7 +164,9 @@ void CanSensorTinyBms::update(CanMessage message) {
 	_lastUpdateTime = millis();
 	
     if(message.data[TINYBMS_RSP_STATUS_BYTE] != TRUE) {
+        #ifdef DEBUG_CAN_SENSOR_TINY_BMS
         DEBUG_SERIAL_LN("Poor BMS Data Received");
+        #endif
     }
     else {
         uint8_t id = message.data[TINYBMS_RSP_PARAM_ID_BYTE];
