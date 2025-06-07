@@ -3,7 +3,7 @@
 #include "settings.h"
 #include "Particle.h"
 
-#define DEBUG_FCP_CONTROL   // For debugging FCP Horizon Sensor, comment out in production plz
+//#define DEBUG_FCP_CONTROL   // For debugging FCP Horizon Sensor, comment out in production plz
 
 #ifdef DEBUG_FCP_CONTROL
 #define FC_DEBUG_INTERVAL 100
@@ -11,7 +11,8 @@ uint32_t last_debug_output = 0;
 #endif
 
 #define FC_PACKET_LENGTH 8 // Horizon Fuel Cell packet length is 8 bytes
-
+#define MAX_ERROR_FLAG 20
+#define MAX_NUM_SYNC
 
 // Constructor for Debug Configuration
 SensorFcpControl::SensorFcpControl(TelemetrySerial* serial) : _serial(serial) { }
@@ -54,17 +55,28 @@ void SensorFcpControl::handle() {
 
     #ifdef DEBUG_FCP_CONTROL
     static uint32_t lastBytesDebug = 0;
-    if (bytesAvailable == 0 && millis() - lastBytesDebug >= 1000) {
+    if (millis() - lastBytesDebug >= 1000) {
         lastBytesDebug = millis();
-        DEBUG_SERIAL_LN("FCP: No bytes available");
-    } else if (bytesAvailable > 0 && bytesAvailable < FC_PACKET_LENGTH) {
-        if (millis() - lastBytesDebug >= FC_DEBUG_INTERVAL) {
-            lastBytesDebug = millis();
+        if (bytesAvailable == 0) {
+            DEBUG_SERIAL_LN("FCP: No bytes available");
+        } else if (bytesAvailable > 0 && bytesAvailable < FC_PACKET_LENGTH) {
             DEBUG_SERIAL_F("FCP: Incomplete packet (%d bytes available)\n", bytesAvailable);
         }
     }
     #endif
 
+    int bytesPeeked = 0;
+    while (_serial->available() > 0 && !_checkErrHeader(_serial->peek())) {
+        #ifdef DEBUG_FCP_CONTROL
+        DEBUG_SERIAL_F("FCP: Invalid error flag detected: %d, skipping byte\n", peekValue);
+        #endif
+        _serial->read();
+        bytesPeeked++;
+
+        if (bytesPeeked > 8) {
+            break;
+        }
+    }
 
     // Not enough bytes for a complete packet
     if (bytesAvailable < FC_PACKET_LENGTH) {
@@ -105,13 +117,11 @@ void SensorFcpControl::_unpackData(uint8_t* buf) {
     _fuelCellVoltage = buf[2] * FUEL_CELL_VOLTAGE_UNIT;
     _h2LeakVoltage = buf[3] * H2_LEAK_VOLTAGE_UNIT;
     _fuelCellTemperature = buf[4] * FUEL_CELL_TEMP_UNIT;
-    _fuelCellCurrentHigh = buf[5];
-    _fuelCellCurrentLow = buf[6];
-    _fuelCellCurrent = (_fuelCellCurrentHigh * 256 + _fuelCellCurrentLow) * FUEL_CELL_CURRENT_UNIT;
+    uint8_t fuelCellCurrentHigh = buf[5];
+    uint8_t fuelCellCurrentLow = buf[6];
+    _fuelCellCurrent = (fuelCellCurrentHigh * 0x100 + fuelCellCurrentLow) * FUEL_CELL_CURRENT_UNIT;
     _batteryVoltage = buf[7] * BATTERY_VOLTAGE_UNIT;
-
-    // Mark the data as valid and update the last update timestamp
-    _valid = true;
+    
     _lastUpdate = millis();
 
     #ifdef DEBUG_FCP_CONTROL
@@ -148,9 +158,7 @@ String SensorFcpControl::getFuelCellTemperature(bool& valid) {
 
 String SensorFcpControl::getFuelCellCurrent(bool& valid) {
     valid = _valid;
-    // Combine high and low bytes of current bytes
-    float combinedCurrent = (_fuelCellCurrentHigh * 256 + _fuelCellCurrentLow) * FUEL_CELL_CURRENT_UNIT;
-    return FLOAT_TO_STRING(combinedCurrent, 1);
+    return FLOAT_TO_STRING(_fuelCellCurrent, 1);
 }
 
 String SensorFcpControl::getBatteryVoltage(bool& valid) {
@@ -187,3 +195,12 @@ bool SensorFcpControl::isConnected() {
     return (millis() - _lastUpdate) < FC_TIMEOUT;
 }
 
+bool SensorFcpControl::_checkErrHeader(uint8_t errorFlag) {
+    if (errorFlag > MAX_ERROR_FLAG) {
+        #ifdef DEBUG_FCP_CONTROL
+        DEBUG_SERIAL_F("FCP: Invalid error flag: %d\n", errorFlag);
+        #endif
+        return false;
+    }
+    return true;
+}

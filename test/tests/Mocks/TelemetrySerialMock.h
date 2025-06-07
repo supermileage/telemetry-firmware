@@ -4,6 +4,7 @@
 #include <functional>
 #include <stdint.h>
 #include <stddef.h>
+#include <vector>
 
 #include "TelemetrySerial.h"
 
@@ -21,6 +22,10 @@ class TelemetrySerialMock : public TelemetrySerial {
 		void setRead(std::function<int(void)> func);
 		void setReadBytes(std::function<size_t(char*,size_t)> func);
 		void setTimeout(unsigned long timeout) override;
+		int peek() override;
+		void setPeek(std::function<int(void)> func);
+		size_t peekBytes(char* buffer, size_t length);
+		void setBuffer(const std::vector<uint8_t>& data);
 
 	private:
 		std::function<void(unsigned long, uint32_t)> _begin;
@@ -29,5 +34,8 @@ class TelemetrySerialMock : public TelemetrySerial {
 		std::function<size_t(char*,size_t)> _readBytes;
 		bool _availableCalled = false;
 		unsigned long _timeout; // Default timeout
+		std::function<int(void)> _peek;
+		std::function<size_t(char*,size_t)> _peekBytes;
+		std::vector<uint8_t> _buffer;
 };
 #endif

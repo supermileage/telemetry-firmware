@@ -35,6 +35,9 @@
 	path = test/external/Catch2
 	url = https://github.com/catchorg/Catch2.git
 	branch = v2.x
+[submodule "lib/fcp-common"]
+	path = lib/fcp-common
+	url = git@github.com:supermileage/fcp-common.git
 [submodule "lib/Adafruit_LSM6DS"]
 	path = lib/Adafruit_LSM6DS
 	url = git@github.com:adafruit/Adafruit_LSM6DS.git

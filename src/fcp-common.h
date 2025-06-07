@@ -1,6 +1,6 @@
 /* Telemetry Macros */
-#define FC_BAUD 9600
-#define FC_TIMEOUT 200
+#define FC_BAUD 9600    // Bd
+#define FC_TIMEOUT 1000 // ms
 
 #define CELL_ARRAY_SIZE 20
 #define LEADING_ZEROES 0

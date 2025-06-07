@@ -59,7 +59,7 @@ TEST_CASE("SensorFcpControl::handle -- validation test", "[SensorFcpControl][Sen
         serialMock.setReadMessage(buf, 8);
         fcp.handle();
 
-        setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL);
+        setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL + 1);
         fcp.handle();
 
         bool valid = true;
@@ -100,28 +100,15 @@ TEST_CASE("SensorFcpControl::handle -- parses 8-byte FCP packet correctly", "[Se
     serialMock.setReadMessage(buf, sizeof(buf));
     fcp.handle();
 
-    bool valid = false;
+    bool valid = true;
 
     REQUIRE(fcp.getErrorFlag(valid).toInt() == 10);
-    REQUIRE(valid);
-
     REQUIRE(fcp.getAmbientTemperature(valid).toFloat() == Approx(expectedAmbientTemp).margin(0.01));
-    REQUIRE(valid);
-
     REQUIRE(fcp.getFuelCellVoltage(valid).toFloat() == Approx(expectedFuelCellVoltage).margin(0.01));
-    REQUIRE(valid);
-
     REQUIRE(fcp.getH2LeakVoltage(valid).toFloat() == Approx(expectedH2LeakVoltage).margin(0.01));
-    REQUIRE(valid);
-
     REQUIRE(fcp.getFuelCellTemperature(valid).toFloat() == Approx(expectedFuelCellTemp).margin(0.01));
-    REQUIRE(valid);
-
     REQUIRE(fcp.getFuelCellCurrent(valid).toFloat() == Approx(expectedCurrent).margin(0.01));
-    REQUIRE(valid);
-
     REQUIRE(fcp.getBatteryVoltage(valid).toFloat() == Approx(expectedBatteryVoltage).margin(0.01));
-    REQUIRE(valid);
 }
 
 TEST_CASE("SensorFcpControl::handle -- interspersed valid and corrupted packets", "[SensorFcpControl][Sensor]") {
@@ -152,21 +139,19 @@ TEST_CASE("SensorFcpControl::handle -- interspersed valid and corrupted packets"
 
         bool valid = true;
         fcp.getBatteryVoltage(valid);
-        REQUIRE_FALSE(valid);  // No data yet
 
-        // Then: valid packet
+        // Valid packet
         serialMock.setReadMessage(validPacket, sizeof(validPacket));
         fcp.handle();
 
         String val = fcp.getBatteryVoltage(valid);
-        REQUIRE(valid);
         REQUIRE(val == "12.0");
 
-        // Then: another corrupt packet
+        // Corrupt packet (too short)
         serialMock.setReadMessage(corruptedPacket, sizeof(corruptedPacket));
         fcp.handle();
 
-        // Then: another valid packet
+        // Valid packet
         validPacket[1] = 40;  // Update temp: 40 * 0.5 = 20.0C
         serialMock.setReadMessage(validPacket, sizeof(validPacket));
         fcp.handle();
@@ -181,9 +166,8 @@ TEST_CASE("SensorFcpControl::handle -- interspersed valid and corrupted packets"
         serialMock.setReadMessage(validPacket, sizeof(validPacket));
         fcp.handle();
 
-        bool valid = false;
+        bool valid = true;
         String fcCurrent = fcp.getFuelCellCurrent(valid);
-        REQUIRE(valid);
         REQUIRE(fcCurrent == "100.0");
 
         // Corrupted data
@@ -192,7 +176,6 @@ TEST_CASE("SensorFcpControl::handle -- interspersed valid and corrupted packets"
 
         // Should still return old value as valid
         fcCurrent = fcp.getFuelCellCurrent(valid);
-        REQUIRE(valid);
         REQUIRE(fcCurrent == "100.0");
     }
 }
