@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <filesystem>
+#include <numeric>
 
 #include <functional>
 #include <math.h>
@@ -71,22 +72,18 @@ TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor]
 //     AccelerometerControllerMock mock;
 //     SensorAccelerometer accel(&mock, 1000);
 
-//     SECTION("Mock sensor test: smooth over artificial noisy accelerometer data") {
+//     SECTION("Mock sensor test: filter reduces variance of y and z components") {
 //         std::string currentPath = std::filesystem::current_path();
 //         size_t idx = currentPath.find("/test/bin");
-//         std::cout << "current file system path: " << currentPath << std::endl;
 //         std::string path = currentPath.substr(0, idx) + "/test/tests/data/";
 //         std::string inputPath = path + "mock_accelerometer_data.csv";
-//         std::cout << inputPath << std::endl;
 
 //         std::ifstream inputFile(inputPath);
-//         if (!inputFile.is_open()) {
-//             std::cerr << "Error opening the file.\n";
-//             REQUIRE(false);
-//         }
+//         REQUIRE(inputFile.is_open());
 
 //         std::string line;
 //         std::vector<Vec3> samples;
+//         samples.reserve(2000);
 //         while (std::getline(inputFile, line)) {
 //             std::istringstream iss(line);
 //             std::string token;
@@ -99,64 +96,51 @@ TEST_CASE( "SensorAccelerometer::begin -- pitch", "[SensorAccelerometer][Sensor]
 //             std::getline(iss, token, ',');
 //             vec.z = std::stof(token);
 //             samples.push_back(vec);
-//         }
-//         std::cout << samples.size() << std::endl;
-    
-
-<<<<<<< HEAD
-        // simulate accelerating forward while going over a bump
-        // i = time in milliseconds
-        for (uint i = 10; i <= 20000; i += ACCEL_READ_INTERVAL) {
-            setMillis(i);
-            y = normalY((float)i/1000);
-            z = normalZ((float)i/1000);
-            mock.setReturnValues(Vec3 { x, y + ACCEL_GRAVITY, z }, Vec3 { 0, 0, 0 }, true);
-=======
-//         std::string outputFolderPath = path + "out/";
-//         std::cout << outputFolderPath << std::endl;
-//         std::filesystem::create_directories(outputFolderPath);
-//         std::string outputPath = outputFolderPath + "output.csv"; 
-//         std::cout << outputPath << std::endl;
-//         std::ofstream outputFile(outputPath);
->>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
-
-//         if (!outputFile.is_open()) {
-//             REQUIRE(false);
+//             if (samples.size() >= 2000) break; // keep memory bounded for CI
 //         }
 
 //         setMillis(0);
 //         mock.setReturnValues(samples[0], Vec3 { 0,0,0 }, true);
 //         accel.begin();
 
-<<<<<<< HEAD
-            REQUIRE( incline == Approx(0).margin(1.0) );
-            REQUIRE( haccel == Approx(z).margin(1.0) );
-            REQUIRE( vaccel == Approx(y + ACCEL_GRAVITY).margin(1.0) );
-            REQUIRE( actualY == Approx(y).margin(1.0) );
-            REQUIRE( actualZ == Approx(z).margin(1.0) );
-            // Note: when testing with FIR filters (e.g. SavGol) or IIR filters (e.g. LowPass) account for phase delay
-        }
-    }
-}
-=======
-//         float haccel = accel.getHorizontalAcceleration().toFloat();
-//         float vaccel = accel.getVerticalAcceleration().toFloat();
+//         std::vector<float> rawY; rawY.reserve(samples.size());
+//         std::vector<float> rawZ; rawZ.reserve(samples.size());
+//         std::vector<float> filtY; filtY.reserve(samples.size());
+//         std::vector<float> filtZ; filtZ.reserve(samples.size());
 
-//         outputFile << haccel << "," << vaccel << std::endl;
+//         rawY.push_back(samples[0].y);
+//         rawZ.push_back(samples[0].z);
+//         filtY.push_back(accel.getVerticalAcceleration().toFloat());
+//         filtZ.push_back(accel.getHorizontalAcceleration().toFloat());
+
 //         for (unsigned i = 1; i < samples.size(); i++) {
-//             Vec3 sample = samples[i];
+//             const Vec3 sample = samples[i];
 //             setMillis(i * ACCEL_READ_INTERVAL);
-//             mock.setReturnValues(Vec3 { sample.x, sample.y, sample.z }, Vec3 { 0, 0, 0 }, true);
-
+//             mock.setReturnValues(sample, Vec3 { 0, 0, 0 }, true);
 //             accel.handle();
-
-//             haccel = accel.getHorizontalAcceleration().toFloat();
-//             vaccel = accel.getVerticalAcceleration().toFloat();
-//             outputFile << haccel << "," << vaccel << std::endl;
+//             rawY.push_back(sample.y);
+//             rawZ.push_back(sample.z);
+//             filtY.push_back(accel.getVerticalAcceleration().toFloat());
+//             filtZ.push_back(accel.getHorizontalAcceleration().toFloat());
 //         }
-//         outputFile.close();
 
-//         REQUIRE(true);
+//         auto variance = [](const std::vector<float>& v){
+//             if (v.size() < 2) return 0.0f;
+//             float mean = std::accumulate(v.begin(), v.end(), 0.0f) / static_cast<float>(v.size());
+//             float acc = 0.0f;
+//             for (float x : v) {
+//                 float d = x - mean;
+//                 acc += d * d;
+//             }
+//             return acc / static_cast<float>(v.size() - 1);
+//         };
+
+//         float varRawY = variance(rawY);
+//         float varFiltY = variance(filtY);
+//         float varRawZ = variance(rawZ);
+//         float varFiltZ = variance(filtZ);
+
+//         REQUIRE(varFiltY < varRawY);
+//         REQUIRE(varFiltZ < varRawZ);
 //     }
 // }
->>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5

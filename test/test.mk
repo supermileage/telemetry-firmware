@@ -8,11 +8,7 @@ else
 endif
 
 CC = g++
-<<<<<<< HEAD
-VERSION = -std=c++14
-=======
 VERSION = -std=c++17
->>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)$*.d
 CFLAGS = $(VERSION) $(DEPFLAGS) -Wall -Wno-psabi -g
 LFLAGS = $(VERSION) $(LIBS)

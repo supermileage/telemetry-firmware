@@ -2,16 +2,14 @@
 #define _SENSOR_ACCELEROMETER_H_
 
 #include <stdint.h>
+#include <memory>
+#include <vector>
 #include "settings.h"
 #include "Sensor.h"
 #include "AccelerometerController.h"
-<<<<<<< HEAD
+#include "Filters/CircularBuffer.h"
 #include "Filters/Filters.h"
-=======
-#include "CircularBuffer.h"
-#include "Filters.h"
 #include "Math3d.h"
->>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
 
 /**
  * @brief directional flags for accelerometer
@@ -79,7 +77,6 @@ class SensorAccelerometer : public Sensor {
 
         uint32_t _interval{};
         CircularBuffer<Vec3> _circularBuffer;
-        SgFilter _sgFilter;
 
         // SG filter parameters, large window size and small polynomial degree are used to provides a stable smoothing effect
         // @note extra documentation here: https://medium.com/pythoneers/introduction-to-the-savitzky-golay-filter-a-comprehensive-guide-using-python-b2dd07a8e2ce
@@ -99,13 +96,3 @@ class SensorAccelerometer : public Sensor {
 };
 
 #endif
-<<<<<<< HEAD
-
-/*
-Notes: 
-- The cutoff value of the LPF1 for accelerometer output is ODR/2.
-- ODR defaults to 104 Hz, see Adafruit_LSM6DS init()
-- BW = ODR / 2 (Nyquist theorem)
-*/
-=======
->>>>>>> 04037f68d61def7684e5df400b9376bc12bbd7b5
