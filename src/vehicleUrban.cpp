@@ -190,6 +190,10 @@ void CurrentVehicle::toggleGpsOverride() {
     gps.toggleOverride();
 }
 
+bool CurrentVehicle::getGpsOverride() {
+    return gps.isOverrideEnabled();
+}
+
 void CurrentVehicle::restartTinyBms() {
     bms->restart();
 }

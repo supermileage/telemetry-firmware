@@ -30,7 +30,6 @@ LoggingDispatcher *dispatcher;
 
 bool loggingEnabled = LOGGING_EN_AT_BOOT;
 bool loggingError = false;
-bool gpsOverride = false;
 long unsigned int lastDebugSensor = 0;
 unsigned long lastPublish = 0;
 
@@ -75,7 +74,7 @@ void debugSensors(){
     DEBUG_SERIAL_LN("---- SENSOR DATA ----");
     DEBUG_SERIAL_LN(String(VEHICLE_NAME) + " - " + timeLib.getTimeString());
     CurrentVehicle::debugSensorData();
-    if(gpsOverride) {
+    if(CurrentVehicle::getGpsOverride()) {
         DEBUG_SERIAL_LN("!!WARNING!! GPS GREENLIST OVERRIDE IS ENABLED");
     }
     DEBUG_SERIAL_LN("Free Memory: " + String(System.freeMemory()/1000) + "kB / 128kB");
@@ -134,9 +133,8 @@ void buttonPushed(){
 // Action to take when button held for 2s
 void buttonHeld() {
     CurrentVehicle::toggleGpsOverride();
-    gpsOverride = !gpsOverride;
     DEBUG_SERIAL("#### BUTTON HELD - ");
-    if(gpsOverride) {
+    if(CurrentVehicle::getGpsOverride()) {
         DEBUG_SERIAL_LN("GPS GREENLIST OVERRIDE ENABLED - !!WARNING!! YOUR GPS POSITION COULD BE RECORDED OUTSIDE OF A DESIGNATED ZONE");
     } else {
         DEBUG_SERIAL_LN("GPS GREENLIST OVERRIDE DISABLED");
@@ -165,7 +163,7 @@ void handleUI(){
     }
 
     // Orange LED Behaviour
-    if(loggingError || gpsOverride){
+    if(loggingError || CurrentVehicle::getGpsOverride()){
         ledOrange.flashRepeat(LED_FLASH_INT);
     }else{
         ledOrange.off();

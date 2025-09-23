@@ -80,4 +80,9 @@ void CurrentVehicle::restartTinyBms() {
 
 }
  
+bool CurrentVehicle::getGpsOverride() {
+    // No GPS in Sandbox by default
+    return false;
+}
+ 
 #endif
