@@ -164,12 +164,13 @@ class SensorGps : public Sensor {
         float _horizontalDistance = 0.0;
         float _verticalDistance = 0.0;
         void (*_speedCallback)(float) = NULL;
-        // NOTE: PLEASE RESTORE TO FALSE IN PRODUCTION !!! Unless you want to get doxxed I guess.
-        bool _override = true;
+        bool _override = false;
 
         // UBX-NAV-ODO cache
-        static void navOdoCallback(UBX_NAV_ODO_data_t data);
+    static void navOdoCallback(UBX_NAV_ODO_data_t *data);
+    static void odometerCallbackStatic(UBX_NAV_ODO_data_t *ubxDataStruct);
         static SensorGps* _instance; // Simple singleton pointer for callback wiring
+        uint32_t _odo_iTOW = 0;
         uint32_t _odoDistance = 0;      // meters since last reset
         uint32_t _odoTotalDistance = 0; // meters since cold start
         uint32_t _odoDistanceStd = 0;   // meters, 1-sigma

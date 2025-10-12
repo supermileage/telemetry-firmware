@@ -18,13 +18,14 @@
 
 SensorGps::SensorGps(SFE_UBLOX_GNSS *gps) {
     _gps = gps;
+    _instance = this;
 }
 
 // Lets the NAV-ODO callback access this SensorGps
 SensorGps* SensorGps::_instance = nullptr;
 
 #if defined(DEBUG_GPS)
-static int gpsDisplayCount = 0;
+static int gpsDebugCounter = 0;
 #endif
 
 String SensorGps::getHumanName() {
@@ -34,10 +35,13 @@ String SensorGps::getHumanName() {
 void SensorGps::begin() {
     // Initialize GNSS over I2C
     _initialized = _gps->begin();
+    _instance = this; // for NAV-ODO callback
     if (!_initialized) return;
 
     // Use UBX over I2C
     _gps->setI2COutput(COM_TYPE_UBX);
+
+    _gps->saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
 
     // Enable automatic NAV-PVT (driver caches latest PVT)
     _gps->setAutoPVT(true);
@@ -45,43 +49,16 @@ void SensorGps::begin() {
     // Set measurement/update rate
     _gps->setNavigationFrequency(UPDATE_FREQ);
 
-    // Odometer (NAV-ODO) setup
-    _instance = this; // for NAV-ODO callback
     _odoEnabled = enableOdometer(true, VAL_LAYER_ALL, defaultMaxWait);
-    // Vehicle profile (1 = car by default) when supported
-    (void)_gps->setVal16(UBLOX_CFG_ODO_PROFILE, 1, VAL_LAYER_ALL, defaultMaxWait);
-    // Enable auto NAV-ODO and register callback
-    _gps->setAutoNAVODOcallback(navOdoCallback);
-    _gps->setAutoNAVODO(true);
-    _odoAvailable = false;
 
     #ifdef DEBUG_GPS
     DEBUG_SERIAL_LN("GPS init: Success");
-    DEBUG_SERIAL("GPS ODO: ");
-    DEBUG_SERIAL_LN(_odoEnabled ? "enabled" : "disabled (will poll)" );
     #endif
 }
 
 void SensorGps::handle() {
     _gps->checkUblox();
-
-    // If ODO not enabled or data isn't available, keep polling periodicaly
-    if (!_odoAvailable) {
-        unsigned long now = millis();
-        if (!_odoEnabled) {
-            // poll ODO occasionally
-            if (now - _lastOdoPoll >= 1000UL) {
-                _odoEnabled = enableOdometer(true, VAL_LAYER_ALL, defaultMaxWait);
-                (void)_gps->getNAVODO();
-                _lastOdoPoll = now;
-            }
-        } else {
-            if (now - _lastOdoPoll >= 1000UL) {
-                (void)_gps->getNAVODO();
-                _lastOdoPoll = now;
-            }
-        }
-    }
+    _gps->checkCallbacks();
 
     // Calculate the current microsecond
     uint64_t thisUpdateMicros = (_gps->getUnixEpoch() * MICROSECONDS_IN_SECOND) + (_gps->getNanosecond() / NANOSECONDS_IN_MICROSECOND);
@@ -113,7 +90,7 @@ void SensorGps::handle() {
         _lastUpdateMicros = thisUpdateMicros;
 
         #ifdef DEBUG_GPS
-        if (gpsDisplayCount++ % 10 == 0) {
+        if (gpsDebugCounter++ % 10 == 0) {
             double lon = _gps->getLongitude() / TEN_POWER_SEVEN;
             double lat = _gps->getLatitude() / TEN_POWER_SEVEN;
             DEBUG_SERIAL("GPS: ");
@@ -256,26 +233,38 @@ int SensorGps::getSatellitesInView(bool &valid) {
 }
 
 // NAV-ODO callback: cache latest values
-void SensorGps::navOdoCallback(UBX_NAV_ODO_data_t data) {
+void SensorGps::navOdoCallback(UBX_NAV_ODO_data_t *ubxDataStruct) {
     if (_instance != nullptr) {
-        _instance->_odoDistance = data.distance;
-        _instance->_odoTotalDistance = data.totalDistance;
-        _instance->_odoDistanceStd = data.distanceStd;
-        bool wasAvailable = _instance->_odoAvailable;
+        _instance->_odo_iTOW = ubxDataStruct->iTOW;
+        _instance->_odoDistance = ubxDataStruct->distance;
+        _instance->_odoTotalDistance = ubxDataStruct->totalDistance;
+        _instance->_odoDistanceStd = ubxDataStruct->distanceStd;
         _instance->_odoAvailable = true;
-        #ifdef DEBUG_GPS
-        if (!wasAvailable) {
-            DEBUG_SERIAL_LN("GPS ODO: first data received");
-        }
-        #endif
     }
+    #ifdef DEBUG_GPS
+    DEBUG_SERIAL("NAV-ODO callback: iTOW=");
+    DEBUG_SERIAL(String(ubxDataStruct->iTOW));
+    DEBUG_SERIAL(", distance=");
+    DEBUG_SERIAL(String(ubxDataStruct->distance));
+    DEBUG_SERIAL(", totalDistance=");
+    DEBUG_SERIAL(String(ubxDataStruct->totalDistance));
+    DEBUG_SERIAL(", distanceStd=");
+    DEBUG_SERIAL(String(ubxDataStruct->distanceStd));
+    DEBUG_SERIAL_LN("");
+    #endif
 }
 
 bool SensorGps::enableOdometer(bool enable, uint8_t layer, uint16_t maxWait) {
-    // Write UBLOX_CFG_ODO_USE_ODO
-    uint8_t val = enable ? 1 : 0;
-    uint8_t status = _gps->setVal8(UBLOX_CFG_ODO_USE_ODO, val, layer, maxWait);
-    return (status == SFE_UBLOX_STATUS_SUCCESS) || (status == SFE_UBLOX_STATUS_DATA_SENT);
+    // Set odometer profile and flags (car profile, enable odometer)
+    int statusProfile = _gps->setVal8(UBLOX_CFG_ODO_PROFILE, 1, layer, maxWait); // 1 = car profile
+    int statusEnable = _gps->setVal8(UBLOX_CFG_ODO_USE_ODO, (uint8_t)enable, layer, maxWait);
+
+    // Register callback and enable automatic NAV-ODO messages
+    _gps->setAutoNAVODOcallbackPtr(&SensorGps::navOdoCallback);
+    _gps->setAutoNAVODO(true);
+
+    return ((statusProfile == SFE_UBLOX_STATUS_SUCCESS) || (statusProfile == SFE_UBLOX_STATUS_DATA_SENT)) &&
+           ((statusEnable == SFE_UBLOX_STATUS_SUCCESS) || (statusEnable == SFE_UBLOX_STATUS_DATA_SENT));
 }
 
 String SensorGps::getOdoDistance(bool &valid) {
@@ -295,13 +284,10 @@ String SensorGps::getOdoDistanceStd(bool &valid) {
 
 bool SensorGps::resetOdometer() {
     // Reset distance on the receiver; clear local cache
-    bool ok = _gps->resetOdometer();
-    if (ok) {
-        _odoDistance = 0;
-        _odoDistanceStd = 0;
-        _odoAvailable = false; // repopulates on next NAV-ODO
-    }
-    return ok;
+    _odoDistance = 0;
+    _odoDistanceStd = 0;
+    _odoAvailable = false; // repopulates on next NAV-ODO
+    return true; //FIX this later
 }
 
 void SensorGps::setSpeedCallback(void (*speed)(float)){
