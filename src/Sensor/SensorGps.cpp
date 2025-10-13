@@ -6,9 +6,6 @@
 
 #define DEBUG_GPS
 
-// GPS Update Frequency in Hz (1-10)
-#define UPDATE_FREQ 4
-
 // Math Constants
 #define MICROSECONDS_IN_SECOND      1000000
 #define NANOSECONDS_IN_MICROSECOND  1000
@@ -47,9 +44,9 @@ void SensorGps::begin() {
     _gps->setAutoPVT(true);
 
     // Set measurement/update rate
-    _gps->setNavigationFrequency(UPDATE_FREQ);
+    _gps->setNavigationFrequency(NAV_FREQ);
 
-    _odoEnabled = enableOdometer(true, VAL_LAYER_ALL, defaultMaxWait);
+    _odoEnabled = enableOdometer(true, VAL_LAYER_ALL, MAX_WAIT);
 
     #ifdef DEBUG_GPS
     DEBUG_SERIAL_LN("GPS init: Success");
@@ -62,8 +59,7 @@ void SensorGps::handle() {
 
     // Calculate the current microsecond
     uint64_t thisUpdateMicros = (_gps->getUnixEpoch() * MICROSECONDS_IN_SECOND) + (_gps->getNanosecond() / NANOSECONDS_IN_MICROSECOND);
-
-    // Check to see if there has been an update (gps data is updated UPDATE_FREQ times per second, so this returns true at that rate)
+    // Check to see if there has been an update
     if(thisUpdateMicros != _lastUpdateMicros){
 		
         uint64_t elapsedMicroseconds = thisUpdateMicros - _lastUpdateMicros;
@@ -97,11 +93,10 @@ void SensorGps::handle() {
             DEBUG_SERIAL(FLOAT_TO_STRING(lat, 6));
             DEBUG_SERIAL(",");
             DEBUG_SERIAL(FLOAT_TO_STRING(lon, 6));
-            DEBUG_SERIAL(" | ODO_CFG:");
+            DEBUG_SERIAL(" | ODO:");
             DEBUG_SERIAL(_odoEnabled ? "ok" : "fail");
-            DEBUG_SERIAL(" | ODO: ");
             if (_odoAvailable) {
-                DEBUG_SERIAL("Trip=");
+                DEBUG_SERIAL(", Trip=");
                 DEBUG_SERIAL(String(_odoDistance));
                 DEBUG_SERIAL("m, Total=");
                 DEBUG_SERIAL(String(_odoTotalDistance));
@@ -121,7 +116,46 @@ void SensorGps::handle() {
     } else{
         _valid = false;
     }
-        
+
+    // Retry odometer enabled 
+    if (!_odoEnabled && _initialized) {
+        uint64_t now = millis();
+
+        // Initialize first retry delay if not set
+        if (odoRetryNextMs == 0) {
+            odoRetryNextMs = now + ODO_BASE_BACKOFF_MS;
+        }
+
+        if (odoRetryCount < ODO_MAX_RETRIES && now >= odoRetryNextMs) {
+            #ifdef DEBUG_GPS
+            DEBUG_SERIAL("Attempting odometer enable retry #");
+            DEBUG_SERIAL_LN((int)odoRetryCount + 1);
+            #endif
+
+            bool success = enableOdometer(true, VAL_LAYER_ALL, defaultMaxWait);
+            if (success) {
+                _odoEnabled = true;
+
+                #ifdef DEBUG_GPS
+                DEBUG_SERIAL_LN("ODO enable retry succeeded!");
+                #endif
+            } else {
+                scheduleNextOdoRetry(now);
+            }
+        }
+    }
+}
+
+void SensorGps::scheduleNextOdoRetry(uint64_t now) {
+    odoRetryCount++;
+    uint64_t backoff = ODO_BASE_BACKOFF_MS * (1UL << (odoRetryCount - 1)); // Exponential backoff
+    backoff += (now & 255); // Add jitter
+    odoRetryNextMs = now + backoff;
+
+    #ifdef DEBUG_GPS
+    DEBUG_SERIAL("Scheduled next ODO retry in ms=");
+    DEBUG_SERIAL_LN((unsigned long)backoff);
+    #endif
 }
 
 bool SensorGps::getTimeValid() {
@@ -241,30 +275,48 @@ void SensorGps::navOdoCallback(UBX_NAV_ODO_data_t *ubxDataStruct) {
         _instance->_odoDistanceStd = ubxDataStruct->distanceStd;
         _instance->_odoAvailable = true;
     }
-    #ifdef DEBUG_GPS
-    DEBUG_SERIAL("NAV-ODO callback: iTOW=");
-    DEBUG_SERIAL(String(ubxDataStruct->iTOW));
-    DEBUG_SERIAL(", distance=");
-    DEBUG_SERIAL(String(ubxDataStruct->distance));
-    DEBUG_SERIAL(", totalDistance=");
-    DEBUG_SERIAL(String(ubxDataStruct->totalDistance));
-    DEBUG_SERIAL(", distanceStd=");
-    DEBUG_SERIAL(String(ubxDataStruct->distanceStd));
-    DEBUG_SERIAL_LN("");
-    #endif
+    // #ifdef DEBUG_GPS
+    // DEBUG_SERIAL("NAV-ODO callback: iTOW=");
+    // DEBUG_SERIAL(String(ubxDataStruct->iTOW));
+    // DEBUG_SERIAL(", distance=");
+    // DEBUG_SERIAL(String(ubxDataStruct->distance));
+    // DEBUG_SERIAL(", totalDistance=");
+    // DEBUG_SERIAL(String(ubxDataStruct->totalDistance));
+    // DEBUG_SERIAL(", distanceStd=");
+    // DEBUG_SERIAL(String(ubxDataStruct->distanceStd));
+    // DEBUG_SERIAL_LN("");
+    // #endif
 }
 
 bool SensorGps::enableOdometer(bool enable, uint8_t layer, uint16_t maxWait) {
     // Set odometer profile and flags (car profile, enable odometer)
-    int statusProfile = _gps->setVal8(UBLOX_CFG_ODO_PROFILE, 1, layer, maxWait); // 1 = car profile
-    int statusEnable = _gps->setVal8(UBLOX_CFG_ODO_USE_ODO, (uint8_t)enable, layer, maxWait);
+    uint8_t statusEnable = _gps->setVal(UBLOX_CFG_ODO_USE_ODO, (uint8_t)enable, layer, maxWait);
+    //uint8_t statusProfile = _gps->setVal8(UBLOX_CFG_ODO_PROFILE, VEHICLE_PROFILE, layer, maxWait);
 
-    // Register callback and enable automatic NAV-ODO messages
-    _gps->setAutoNAVODOcallbackPtr(&SensorGps::navOdoCallback);
-    _gps->setAutoNAVODO(true);
+    // Register callback and enable automatic NAV-ODO messages only when enabling.
+    // When disabling, turn off automatic NAV-ODO reports and clear local cache.
+    if (enable) {
+        _gps->setAutoNAVODOcallbackPtr(&SensorGps::navOdoCallback);
+        //_gps->setAutoNAVODO(true);
+    } else {
+        // Disable automatic NAV-ODO messages from the GNSS. Use the library call to stop auto reports.
+        //_gps->setAutoNAVODO(false);
+        // Attempt to clear any registered callback pointer (library supports setting pointer to NULL).
+        _gps->setAutoNAVODOcallbackPtr(nullptr);
+        // Clear cached odometer data locally so stale callback data isn't used.
+        _odoAvailable = false;
+        _odoDistance = 0;
+        _odoTotalDistance = 0;
+        _odoDistanceStd = 0;
+    }
 
-    return ((statusProfile == SFE_UBLOX_STATUS_SUCCESS) || (statusProfile == SFE_UBLOX_STATUS_DATA_SENT)) &&
-           ((statusEnable == SFE_UBLOX_STATUS_SUCCESS) || (statusEnable == SFE_UBLOX_STATUS_DATA_SENT));
+    DEBUG_SERIAL("odoEnabled: ");
+    DEBUG_SERIAL_LN(statusEnable);
+    DEBUG_SERIAL("odoProfile: ");
+    // DEBUG_SERIAL_LN(statusProfile);
+
+    return (bool)statusEnable;
+    // && (bool)statusProfile;
 }
 
 String SensorGps::getOdoDistance(bool &valid) {

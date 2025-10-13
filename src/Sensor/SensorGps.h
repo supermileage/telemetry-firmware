@@ -1,7 +1,8 @@
 #ifndef _SENSOR_GPS_H_
 #define _SENSOR_GPS_H_
 
-#include "SparkFun_u-blox_GNSS_Arduino_Library.h"
+// #include "SparkFun_u-blox_GNSS_Arduino_Library.h"
+#include <SparkFun_u-blox_GNSS_v3.h>
 #include "u-blox_config_keys.h"
 #include "Sensor.h"
 
@@ -111,7 +112,7 @@ class SensorGps : public Sensor {
          * When a NAV-ODO arrives, our callback stores the latest distances
          * We write to all config layers (RAM/BBR/FLASH) so our GPS remembers our configuration settings if it supports this feature (maybe not on M8Q)
          */
-        bool enableOdometer(bool enable = true, uint8_t layer = VAL_LAYER_ALL, uint16_t maxWait = defaultMaxWait);
+        bool enableOdometer(bool enable = true, uint8_t layer = VAL_LAYER_ALL, uint16_t maxWait = MAX_WAIT);
         
         /**
          * @brief Ground distance since last reset (m)
@@ -166,9 +167,15 @@ class SensorGps : public Sensor {
         void (*_speedCallback)(float) = NULL;
         bool _override = false;
 
+        // Used in retry logic for odometer enable
+        uint8_t odoRetryCount = 0;
+        uint64_t odoRetryNextMs = 0;
+
         // UBX-NAV-ODO cache
-    static void navOdoCallback(UBX_NAV_ODO_data_t *data);
-    static void odometerCallbackStatic(UBX_NAV_ODO_data_t *ubxDataStruct);
+        static void navOdoCallback(UBX_NAV_ODO_data_t *data);
+        static void odometerCallbackStatic(UBX_NAV_ODO_data_t *ubxDataStruct);
+        void scheduleNextOdoRetry(uint64_t now);
+
         static SensorGps* _instance; // Simple singleton pointer for callback wiring
         uint32_t _odo_iTOW = 0;
         uint32_t _odoDistance = 0;      // meters since last reset
@@ -176,7 +183,14 @@ class SensorGps : public Sensor {
         uint32_t _odoDistanceStd = 0;   // meters, 1-sigma
         bool _odoAvailable = false;
         bool _odoEnabled = false;       // last known result of enabling ODO
-        unsigned long _lastOdoPoll = 0; // ms since last NAV-ODO poll while waiting for first data
+        uint64_t _lastOdoPoll = 0; // ms since last NAV-ODO poll while waiting for first data
+
+        // Constants
+        static const uint8_t VEHICLE_PROFILE = 0; // 0 = running, 1 = automobile
+        static const uint8_t NAV_FREQ = 1;  // GPS update frequency (Hz)
+        static const uint16_t ODO_BASE_BACKOFF_MS = 500; // base backoff time for odometer enable retries 
+        static const uint16_t ODO_MAX_RETRIES = 10; // maximum number of retries to enable odometer
+        static const uint16_t MAX_WAIT = 1000; // max wait time for config set/get
 };
 
 #endif
