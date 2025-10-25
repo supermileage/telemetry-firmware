@@ -8,7 +8,14 @@
 #include "DriverDisplay.h"
 
 // forward declarations
+
+//Change: MAX_RPM
+const int MAX_RPM = 3000;
 String computeHorizontalSpeed();
+
+//new functions
+String computeAccelerationMagnitude();
+String computeRpmWarning();
 
 USARTSerialWrapper usartSerial(&Serial1);
 Lsm6dsoAccelerometerWrapper lsm6(&SPI, A3);
@@ -26,8 +33,12 @@ SensorVoltage inVoltage;
 Adafruit_SH1107 ssh1107(64, 128);
 DriverDisplay display(ssh1107);
 // TextElement constructor params: displayFunc, textSize, textColour, labelSize, labelString
-TextElement<String> speedElement(&computeHorizontalSpeed, 3, SH110X_WHITE, 1, String("spd "));
-TextElement<int> rpmElement([]() { return ecu.getOn() ? ecu.getRPM() : 0; }, 3, 1, SH110X_WHITE, String("rpm "));
+TextElement<String> speedElement(&computeHorizontalSpeed, 2, SH110X_WHITE, 1, String("spd "));
+TextElement<int> rpmElement([]() { return ecu.getOn() ? ecu.getRPM() : 0; }, 2, 1, SH110X_WHITE, String("rpm "));
+
+// Changes: accelElement and  warningElement
+TextElement<String> accelElement(&computeAccelerationMagnitude, 2, SH110X_WHITE, 1, String("acc "));
+TextElement<String> warningElement(&computeRpmWarning, 4, SH110X_WHITE, 1, String(""));
 
 // commands
 LoggingCommand<SensorSigStrength, int> signalStrength(&sigStrength, "sigstr", &SensorSigStrength::getStrength, 10);
@@ -73,11 +84,21 @@ LoggingDispatcher* CurrentVehicle::buildLoggingDispatcher() {
 
 void CurrentVehicle::setup() {
     speedElement.setPosition(2, 2);
-    rpmElement.setPosition(2, 38);
+    rpmElement.setPosition(2, 22);
     speedElement.setMinTextLength(5); // 00.00
     rpmElement.setMinTextLength(4);   // 00000
     display.addDisplayElement(&speedElement);
     display.addDisplayElement(&rpmElement);
+    
+    //changes: accelElement
+    accelElement.setPosition(2, 42);
+    accelElement.setMinTextLength(5); // 00.00
+    display.addDisplayElement(&accelElement);
+    
+    //rpm limit warning
+    warningElement.setPosition(100, 10);
+    warningElement.setMinTextLength(1); // *
+    display.addDisplayElement(&warningElement);          
 }
 
 void CurrentVehicle::debugSensorData() {
@@ -138,6 +159,22 @@ String computeHorizontalSpeed() {
         return FLOAT_TO_STRING((float)ecu.getRPM() / 9.7 * 3.14 * 21 * 60 / 39370.1, 2);
     else
         return gps.getHorizontalSpeed();
+}
+
+//Changes: computeAccelerationMagnitude() andc computeRpmWarning()
+String computeAccelerationMagnitude() {
+    if (accel.getInitStatus() == "Success") 
+        return FLOAT_TO_STRING(accel.getHorizontalAcceleration(), 5); 
+    else
+        return gps.getHorizontalAcceleration();
+}
+
+String computeRpmWarning() {
+    if ([]() { return ecu.getOn() ? ecu.getRPM() : 0; }() >= MAX_RPM) 
+        return String("*"); //warning activated
+    
+    else 
+        return String(" "); //no warning
 }
 
 #endif
