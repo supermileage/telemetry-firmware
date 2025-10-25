@@ -161,7 +161,7 @@ String computeHorizontalSpeed() {
         return gps.getHorizontalSpeed();
 }
 
-//Changes: computeAccelerationMagnitude() andc computeRpmWarning().
+//Changes: computeAccelerationMagnitude() andc computeRpmWarning()
 String computeAccelerationMagnitude() {
     if (accel.getInitStatus() == "Success") 
         return FLOAT_TO_STRING(accel.getHorizontalAcceleration(), 5); 
