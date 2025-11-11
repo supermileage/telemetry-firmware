@@ -102,7 +102,7 @@ TEST_CASE("SensorFcpControl::handle -- parses 8-byte FCP packet correctly", "[Se
 
     bool valid = true;
 
-    REQUIRE(fcp.getErrorFlag(valid).toInt() == 10);
+    REQUIRE(fcp.getError(valid).toInt() == 10);
     REQUIRE(fcp.getAmbientTemperature(valid).toFloat() == Approx(expectedAmbientTemp).margin(0.01));
     REQUIRE(fcp.getFuelCellVoltage(valid).toFloat() == Approx(expectedFuelCellVoltage).margin(0.01));
     REQUIRE(fcp.getH2LeakVoltage(valid).toFloat() == Approx(expectedH2LeakVoltage).margin(0.01));

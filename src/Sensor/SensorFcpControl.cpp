@@ -3,7 +3,7 @@
 #include "settings.h"
 #include "Particle.h"
 
-//#define DEBUG_FCP_CONTROL   // For debugging FCP Horizon Sensor, comment out in production plz
+#define DEBUG_FCP_CONTROL   // For debugging FCP Horizon Sensor, comment out in production plz
 
 #ifdef DEBUG_FCP_CONTROL
 #define FC_DEBUG_INTERVAL 100
@@ -47,9 +47,10 @@ void SensorFcpControl::handle() {
     // Check if the data is stale
     if (millis() < _lastUpdate + STALE_INTERVAL) {
         _valid = true;
-    } else {
-        _valid = false;
-    }
+    } 
+    // else {
+    //     _valid = false;
+    // }
 
     int bytesAvailable = _serial->available();
 
@@ -66,10 +67,8 @@ void SensorFcpControl::handle() {
     #endif
 
     int bytesPeeked = 0;
-    while (_serial->available() > 0 && !_checkErrHeader(_serial->peek())) {
-        #ifdef DEBUG_FCP_CONTROL
-        DEBUG_SERIAL_F("FCP: Invalid error flag detected: %d, skipping byte\n", peekValue);
-        #endif
+    while (_serial->available() > 0) {
+        // && !_checkErrHeader(_serial->peek())
         _serial->read();
         bytesPeeked++;
 
