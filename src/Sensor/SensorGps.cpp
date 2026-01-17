@@ -275,17 +275,18 @@ void SensorGps::navOdoCallback(UBX_NAV_ODO_data_t *ubxDataStruct) {
         _instance->_odoDistanceStd = ubxDataStruct->distanceStd;
         _instance->_odoAvailable = true;
     }
-    // #ifdef DEBUG_GPS
-    // DEBUG_SERIAL("NAV-ODO callback: iTOW=");
-    // DEBUG_SERIAL(String(ubxDataStruct->iTOW));
-    // DEBUG_SERIAL(", distance=");
-    // DEBUG_SERIAL(String(ubxDataStruct->distance));
-    // DEBUG_SERIAL(", totalDistance=");
-    // DEBUG_SERIAL(String(ubxDataStruct->totalDistance));
-    // DEBUG_SERIAL(", distanceStd=");
-    // DEBUG_SERIAL(String(ubxDataStruct->distanceStd));
-    // DEBUG_SERIAL_LN("");
-    // #endif
+
+#ifdef DEBUG_GPS
+    DEBUG_SERIAL("NAV-ODO callback: iTOW=");
+    DEBUG_SERIAL(String(ubxDataStruct->iTOW));
+    DEBUG_SERIAL(", distance=");
+    DEBUG_SERIAL(String(ubxDataStruct->distance));
+    DEBUG_SERIAL(", totalDistance=");
+    DEBUG_SERIAL(String(ubxDataStruct->totalDistance));
+    DEBUG_SERIAL(", distanceStd=");
+    DEBUG_SERIAL(String(ubxDataStruct->distanceStd));
+    DEBUG_SERIAL_LN("");
+#endif
 }
 
 bool SensorGps::enableOdometer(bool enable, uint8_t layer, uint16_t maxWait) {
@@ -294,13 +295,18 @@ bool SensorGps::enableOdometer(bool enable, uint8_t layer, uint16_t maxWait) {
     //uint8_t statusProfile = _gps->setVal8(UBLOX_CFG_ODO_PROFILE, VEHICLE_PROFILE, layer, maxWait);
 
     // Register callback and enable automatic NAV-ODO messages only when enabling.
-    // When disabling, turn off automatic NAV-ODO reports and clear local cache.
+    bool autoNavRes = true;
     if (enable) {
         _gps->setAutoNAVODOcallbackPtr(&SensorGps::navOdoCallback);
-        //_gps->setAutoNAVODO(true);
+        // Enable automatic NAV-ODO reports as well
+        autoNavRes = _gps->setAutoNAVODO(true, maxWait);
+        #ifdef DEBUG_GPS
+        DEBUG_SERIAL("setAutoNAVODO: ");
+        DEBUG_SERIAL_LN(autoNavRes ? 1 : 0);
+        #endif
     } else {
         // Disable automatic NAV-ODO messages from the GNSS. Use the library call to stop auto reports.
-        //_gps->setAutoNAVODO(false);
+        _gps->setAutoNAVODO(false);
         // Attempt to clear any registered callback pointer (library supports setting pointer to NULL).
         _gps->setAutoNAVODOcallbackPtr(nullptr);
         // Clear cached odometer data locally so stale callback data isn't used.
@@ -315,7 +321,8 @@ bool SensorGps::enableOdometer(bool enable, uint8_t layer, uint16_t maxWait) {
     DEBUG_SERIAL("odoProfile: ");
     // DEBUG_SERIAL_LN(statusProfile);
 
-    return (bool)statusEnable;
+    // Return success only if config write succeeded and auto NAV was enabled
+    return ((bool)statusEnable) && autoNavRes;
     // && (bool)statusProfile;
 }
 

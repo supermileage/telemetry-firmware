@@ -1,8 +1,7 @@
 #ifndef _SENSOR_GPS_H_
 #define _SENSOR_GPS_H_
 
-// #include "SparkFun_u-blox_GNSS_Arduino_Library.h"
-#include <SparkFun_u-blox_GNSS_v3.h>
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 #include "u-blox_config_keys.h"
 #include "Sensor.h"
 
