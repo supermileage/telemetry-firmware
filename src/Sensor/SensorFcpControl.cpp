@@ -165,9 +165,8 @@ String SensorFcpControl::getBatteryVoltage(bool& valid) {
     return FLOAT_TO_STRING(_batteryVoltage, 1);
 }
 
-String SensorFcpControl::getErrorFlag(bool& valid) {
-    valid = _valid;
-    return INT_TO_STRING(_errorFlag);
+String SensorFcpControl::getError(bool& valid) {
+    return getErrorFlag(valid);
 }
 
 // Flush the serial buffer
