@@ -28,7 +28,6 @@ class SensorFcpControl : public Sensor {
         String getFuelCellTemperature(bool &valid = Sensor::dummy);
         String getFuelCellCurrent(bool &valid = Sensor::dummy);
         String getBatteryVoltage(bool &valid = Sensor::dummy);
-        String getError(bool &valid = Sensor::dummy);
 
     private:
         TelemetrySerial *_serial;

@@ -102,7 +102,6 @@ void CurrentVehicle::debugSensorData() {
     DEBUG_SERIAL("Fuel Cell Temperature: " + fcpControl.getFuelCellTemperature() + "°C - ");
     DEBUG_SERIAL("H2 Leak Voltage: " + fcpControl.getH2LeakVoltage() + "V - ");
     DEBUG_SERIAL_LN("Error Status: " + fcpControl.getErrorFlag());
-	DEBUG_SERIAL_LN();
     DEBUG_SERIAL_LN();
 }
 
