@@ -131,7 +131,6 @@ void CanSensorOrionBms::update(CanMessage message) {
 int16_t CanSensorOrionBms::_parseInt16(uint8_t* buf) {
 	return (int16_t)( *buf << 8 | *(buf + 1) );
 }
-
 // Faults are prioritized from left to right, most significant bit to least significant
 // and numbered from 1 (highest) to 19 (lowest).  Please refer to notion for more info
 int CanSensorOrionBms::_parseFault(CanMessage message) {
