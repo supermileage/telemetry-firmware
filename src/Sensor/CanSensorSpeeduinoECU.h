@@ -1,6 +1,7 @@
 #ifndef _CAN_SENSOR_SPEEDUINO_ECU_H_
 #define _CAN_SENSOR_SPEEDUINO_ECU_H_
 #include "CanSensorSpeeduinoECUtemp.h"
+#include "CanInterface.h"
 
 
 class CanSensorSpeeduinoECU : public CanSensorSpeeduinoECUtemp {
@@ -57,6 +58,10 @@ class CanSensorSpeeduinoECU : public CanSensorSpeeduinoECUtemp {
         
         String getcurrentStatus_flex(bool& valid = Sensor::dummy) override;
 
+        uint64_t getLastUpdateTime();
+
+   
+
 	private:
         float _secl = 0;
         float _squirt = 0;
@@ -96,7 +101,7 @@ class CanSensorSpeeduinoECU : public CanSensorSpeeduinoECUtemp {
 
         // ================= CAN 0x3104 =================
         float _rpmDOT = 0;
-        float _flex = 0;
+        float _flex = 1;
 
 		/**
          * @brief Called by delegate in CanInterface when a message with one of Orion's ids is receieved
@@ -107,7 +112,7 @@ class CanSensorSpeeduinoECU : public CanSensorSpeeduinoECUtemp {
 
         //parses states here if needed
 
-
+        
 		/**
 		 * @brief parses a big-endian two byte signed integer from buffer
 		 * 

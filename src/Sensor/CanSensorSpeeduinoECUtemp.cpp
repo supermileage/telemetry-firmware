@@ -10,13 +10,13 @@ void CanSensorSpeeduinoECUtemp::handle() {
 	if (_isAsleep)
 		return;
 	
-	uint64_t currentTime = millis();
+	//uint64_t currentTime = millis();
     /* We won't use SoC update interval
 	if (currentTime > _lastSocUpdate + SOC_UPDATE_INTERVAL) {
 		_sendSocUpdate();
 		_lastSocUpdate = currentTime;
-	}
-    */
+	}*/
+    
 }
 
 uint64_t CanSensorSpeeduinoECUtemp::getLastUpdateTime() {

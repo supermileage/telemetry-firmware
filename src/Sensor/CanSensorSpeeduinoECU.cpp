@@ -1,7 +1,7 @@
 #include "settings.h"
 #include "CanSensorSpeeduinoECU.h"
 
-#define CALIBRATION_TEMPERATURE_OFFSET 100 //ask powertrain
+#define CALIBRATION_TEMPERATURE_OFFSET 25 //ask powertrain
 
 const uint16_t SPEEDUINO_CAN_IDS[] {
 	CAN_ECU_STATUS,
@@ -44,7 +44,7 @@ String CanSensorSpeeduinoECU::getcurrentStatus_engine(bool& valid) {
 
 String CanSensorSpeeduinoECU::getcurrentStatus_dwell(bool& valid) {
 	valid = _validate(CAN_ECU_STATUS);
-	return FLOAT_TO_STRING(_dwell, 1);
+	return FLOAT_TO_STRING(_dwell, 5);
 }
 
 String CanSensorSpeeduinoECU::getcurrentStatus_MAP(bool& valid) {
@@ -103,7 +103,7 @@ String CanSensorSpeeduinoECU::getcurrentStatus_TAEamount(bool& valid) {
 	return FLOAT_TO_STRING(_TAEamount, 1);
 }
 
-// ================= CAN 0x3102 =================
+// ================= CAN 03102 =================
 String CanSensorSpeeduinoECU::getcurrentStatus_barometerCorrection(bool& valid) {
 	valid = _validate(CAN_ECU_STATUS);
 	return FLOAT_TO_STRING(_barometerCorrection, 1);
@@ -126,7 +126,7 @@ String CanSensorSpeeduinoECU::getcurrentStatus_afrTarget(bool& valid) {
 
 String CanSensorSpeeduinoECU::getcurrentStatus_PW(bool& valid) {
 	valid = _validate(CAN_ECU_STATUS);
-	return FLOAT_TO_STRING(_PW, 1);
+	return FLOAT_TO_STRING(_PW, 5);
 }
 
 String CanSensorSpeeduinoECU::getcurrentStatus_tpsDOT(bool& valid) {
@@ -182,54 +182,6 @@ String CanSensorSpeeduinoECU::getcurrentStatus_flex(bool& valid) {
 }
 
 
- //in case of of states pased bytes
-        // enum ECUStatus { Charging, Charged, Discharging, Regeneration, Idle, FaultError, ChargeEnabled, DischargeEnabled, Unknown };  
-        /*   
-				Can address 3100:
-				byte 0 - currentStatus.secl; //secl is simply a counter that increments each second
-                byte 1 - currentStatus.squirt; //Squirt Bitfield
-                byte 2 - currentStatus.engine; //Engine Status Bitfield
-                byte 3 - currentStatus.dwell; //Dwell in ms * 10
-                byte 4 - currentStatus.MAP >> 1; //map value is divided by 2
-                byte 5 - currentStatus.IAT + CALIBRATION_TEMPERATURE_OFFSET; //mat
-                byte 6 - currentStatus.coolant + CALIBRATION_TEMPERATURE_OFFSET; //Coolant ADC
-                byte 7 - currentStatus.tpsADC; //TPS (Raw 0-255)
-                Can address 3101:
-
-                byte 0 - currentStatus.battery10; //battery voltage
-                byte 1 - currentStatus.O2; //O2
-                byte 2 - currentStatus.egoCorrection; //Exhaust gas correction (%)
-                byte 3 - currentStatus.iatCorrection; //Air temperature Correction (%)
-                byte 4 - currentStatus.wueCorrection; //Warmup enrichment (%)
-                byte 5 - lowByte(currentStatus.RPM); //rpm LB
-                byte 6 - highByte(currentStatus.RPM); //rpm HB
-                byte 7 - currentStatus.TAEamount; //acceleration enrichment (%)
-                Can address 3102:
-
-                byte 0 - 0x00; //Barometer correction (%)
-                byte 1 - currentStatus.corrections; //Total GammaE (%)
-                byte 2 - currentStatus.VE; //Current VE 1 (%)
-                byte 3 - currentStatus.afrTarget;
-                byte 4 - currentStatus.PW / 100; //Pulsewidth 1 multiplied by 10 in ms. Have to convert from uS to mS.
-                byte 5 - currentStatus.tpsDOT; //TPS DOT
-                byte 6 - currentStatus.advance;
-                byte 7 - currentStatus.TPS; // TPS (0% to 100%)
-                Can address 3103:
-
-                byte 0 - lowByte(currentStatus.loopsPerSecond);
-                byte 1 - highByte(currentStatus.loopsPerSecond);
-                byte 2 - lowByte(currentStatus.freeRAM);
-                byte 3 - highByte(currentStatus.freeRAM);
-                byte 4 - currentStatus.batCorrection; //Battery voltage correction (%)
-                byte 5 - currentStatus.spark; //Spark related bitfield
-                byte 6 - currentStatus.O2_2; //Second O2
-                byte 7 - unused;
-                Can address 3104:
-
-                byte 1 - lowByte(currentStatus.rpmDOT);
-                byte 2 - highByte(currentStatus.rpmDOT);
-                byte 3 - currentStatus.flex; //Flex sensor value (or 0 if not used)
-        */
 
 void CanSensorSpeeduinoECU::update(CanMessage message) {
 	_lastUpdateTime = millis();
@@ -239,8 +191,8 @@ void CanSensorSpeeduinoECU::update(CanMessage message) {
 			_secl = message.data[0]; //secl is simply a counter that increments each second
 			_squirt = message.data[1]; //Squirt Bitfield
 			_engine = message.data[2]; //Engine Status Bitfield
-			_dwell = message.data[3] / 10; //Dwell in ms * 10
-			_MAP = message.data[4] * 2; //map value is divided by 2
+			_dwell = message.data[3] / 10.0f; //Dwell in ms * 10
+			_MAP = message.data[4] / 2.0f; //map value is divided by 2
 			_IAT = message.data[5] + CALIBRATION_TEMPERATURE_OFFSET; //mat
 			_coolant = message.data[6] + CALIBRATION_TEMPERATURE_OFFSET; //Coolant ADC
 			_tpsADC = message.data[7]; //TPS (Raw 0-255)
@@ -249,7 +201,7 @@ void CanSensorSpeeduinoECU::update(CanMessage message) {
 			break;
 
 		case CAN_ECU_SENSORS:
-		    // ================= CAN 0x3101 =================
+		    // ================= CAN 3101 =================
 			_battery10 = message.data[0]; //battery voltage
 			_O2 = message.data[1]; //O2
 			_egoCorrection = message.data[2]; //Exhaust gas correction (%)
@@ -262,7 +214,7 @@ void CanSensorSpeeduinoECU::update(CanMessage message) {
 			break;
 		    
 		case CAN_ECU_CORRECTION:
-			// ================= CAN 0x3102 =================
+			// ================= CAN 3102 =================
 		    _barometerCorrection = message.data[0]; //Barometer correction (%)
 			_corrections = message.data[1]; //Total GammaE (%)
 			_VE = message.data[2]; //Current VE 1 (%)
@@ -276,7 +228,7 @@ void CanSensorSpeeduinoECU::update(CanMessage message) {
 			break;
 
 		case CAN_ECU_LOOPS:
-			// ================= CAN 0x3103 =================
+			// ================= CAN 3103 =================
 			_loopsPerSecond_3103 = (message.data[1] << 8) | message.data[0]; //LPS HB, LPS LB
 			_freeRAM_3103 = (message.data[3] << 8) | message.data[2]; //freeRam HB, freeRam LB
 			_batCorrection_3103 = message.data[4]; //Battery voltage correction (%)
@@ -288,8 +240,8 @@ void CanSensorSpeeduinoECU::update(CanMessage message) {
 			break;
 
 		case CAN_ECU_RPMDOT:
-		    // ================= CAN 0x3104 =================
-			_rpmDOT = message.data[1] | message.data[0];
+		    // ================= CAN 3104 =================
+			_rpmDOT = (message.data[1] << 8)| message.data[0];
 			_flex = message.data[2]; //Flex sensor value (or 0 if not used)
 
 			_validation_speeduinoMap[CAN_ECU_RPMDOT] = _lastUpdateTime;

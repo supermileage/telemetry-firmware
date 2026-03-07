@@ -114,6 +114,8 @@ class CanSensorSpeeduinoECUtemp : public CanListener {
        
         virtual String getcurrentStatus_flex(bool& valid = Sensor::dummy) = 0;
         //bytes 2-7 is unused
+
+        
     
     protected:
      
@@ -121,6 +123,8 @@ class CanSensorSpeeduinoECUtemp : public CanListener {
 
         // Management
 		uint64_t _lastUpdateTime = 0;
+        uint64_t _lastSocUpdate = 0;
+
 		bool _isAsleep = false;
 
         bool _validate(uint16_t id);
