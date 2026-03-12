@@ -2,6 +2,7 @@
 #define _CAN_SENSOR_SPEEDUINO_ECU_H_
 #include "CanSensorSpeeduinoECUtemp.h"
 #include "CanInterface.h"
+#include "can_common.h"
 
 
 class CanSensorSpeeduinoECU : public CanSensorSpeeduinoECUtemp {
@@ -101,7 +102,7 @@ class CanSensorSpeeduinoECU : public CanSensorSpeeduinoECUtemp {
 
         // ================= CAN 0x3104 =================
         float _rpmDOT = 0;
-        float _flex = 1;
+        float _flex = 0;
 
 		/**
          * @brief Called by delegate in CanInterface when a message with one of Orion's ids is receieved
