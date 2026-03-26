@@ -81,6 +81,11 @@ class CanSensorOrionBms : public CanSensorBms {
         String getStatusBmsString(bool& valid = Sensor::dummy) override;
 
         /**
+         * @brief Get engine rpm
+        */
+        int getEngineRpm(bool& valid) override;
+
+        /**
          * @brief Get the universal BMS fault code (if any)
          */
         int getFault(bool& valid = Sensor::dummy) override;
@@ -95,6 +100,7 @@ class CanSensorOrionBms : public CanSensorBms {
         int _batteryTempMin = 0;
 		int _batteryTempAvg = 0;
 		float _cellVoltageAvg = 0.0f;
+        int _rpm = 0;
 
 		/**
          * @brief Called by delegate in CanInterface when a message with one of Orion's ids is receieved
@@ -108,7 +114,7 @@ class CanSensorOrionBms : public CanSensorBms {
 		 * 
 		 * @param buf pointer to first byte to be read (left to right)
 		 */
-		int16_t _parseInt16(uint8_t* buf);
+		int16_t _parseIntBE16(uint8_t* buf);
 
 		/**
 		 * @brief parses fault codes from can message and returns an int representing the highest priority fault

@@ -74,6 +74,7 @@ LoggingCommand<CanSensorBms, int> bmsCellTempAvg(bms, "tmpavg", &CanSensorBms::g
 LoggingCommand<CanSensorBms, int> bmsFault(bms, "bmsf", &CanSensorBms::getFault, 5);
 LoggingCommand<CanSensorBms, String> bmsSoc(bms, "soc", &CanSensorBms::getSoc, 10);
 LoggingCommand<BmsManager, int> bmsType(&bmsManager, "bmst", &BmsManager::getCurrentBms, 10);
+LoggingCommand<CanSensorBms, int> bmsRPM(bms, "brpm", &CanSensorBms::getEngineRpm, 1);
 
 LoggingCommand<CanSensorAccessories, int> urbanHeadlights(&canSensorAccessories, "lhd", &CanSensorAccessories::getStatusHeadlights, 1);
 LoggingCommand<CanSensorAccessories, int> urbanBrakelights(&canSensorAccessories, "lbk", &CanSensorAccessories::getStatusBrakelights, 1);

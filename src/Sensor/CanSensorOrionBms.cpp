@@ -89,6 +89,12 @@ String CanSensorOrionBms::getStatusBmsString(bool& valid) {
     return String(BMS_STATUS_STRINGS[_bmsStatus]);
 }
 
+int CanSensorOrionBms::getEngineRpm(bool& valid) {
+	valid  = _validate(CAN_ORIONBMS_RPM);
+    return _rpm;
+};
+
+
 void CanSensorOrionBms::restart() { }
 
 void CanSensorOrionBms::update(CanMessage message) {
@@ -104,15 +110,15 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_validationMap[CAN_ORIONBMS_STATUS] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_PACK:
-			_batteryVoltage = (float)_parseInt16(message.data) / 10.0f;
-			_batteryCurrent = (float)_parseInt16(message.data + 2) / 10.0f;
+			_batteryVoltage = (float)_parseIntBE16(message.data) / 10.0f;
+			_batteryCurrent = (float)_parseIntBE16(message.data + 2) / 10.0f;
 			_soc = (float)message.data[4] / 2.0f;
 			_validationMap[CAN_ORIONBMS_PACK] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_CELL:
-			_cellVoltageMin = (float)_parseInt16(message.data) / 1000.0f;
-			_cellVoltageMax = (float)_parseInt16(message.data + 2) / 1000.0f;
-			_cellVoltageAvg = (float)_parseInt16(message.data + 4) / 1000.0f;
+			_cellVoltageMin = (float)_parseIntBE16(message.data) / 1000.0f;
+			_cellVoltageMax = (float)_parseIntBE16(message.data + 2) / 1000.0f;
+			_cellVoltageAvg = (float)_parseIntBE16(message.data + 4) / 1000.0f;
 			_validationMap[CAN_ORIONBMS_CELL] = _lastUpdateTime;
 			break;
 		case CAN_ORIONBMS_TEMP:
@@ -122,13 +128,16 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_tempBms = (int8_t)message.data[3];
 			_validationMap[CAN_ORIONBMS_TEMP] = _lastUpdateTime;
 			break;
+		case CAN_ORIONBMS_RPM:
+			_rpm = (int)_parseIntBE16(message.data);
 		default:
 			// do nothing
 			break;
 	}
 }
 
-int16_t CanSensorOrionBms::_parseInt16(uint8_t* buf) {
+/* Big Endian */
+int16_t CanSensorOrionBms::_parseIntBE16(uint8_t* buf) {
 	return (int16_t)( *buf << 8 | *(buf + 1) );
 }
 

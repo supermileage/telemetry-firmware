@@ -152,6 +152,11 @@ class CanSensorTinyBms : public CanSensorBms {
          */
         void restart() override; 
 
+        /**
+         * @brief Get the engine RPM
+         */
+        int getEngineRpm(bool& valid = Sensor::dummy) override;
+
     private:
 		// Control
         const uint16_t _requestIntervalMs;
