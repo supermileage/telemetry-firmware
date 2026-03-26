@@ -1,122 +1,205 @@
 #include "SensorFcpControl.h"
 #include "fcp-common.h"
 #include "settings.h"
+#include "Particle.h"
 
-// #define DEBUG_FCP_CONTROL
+#define DEBUG_FCP_CONTROL   // For debugging FCP Horizon Sensor, comment out in production plz
 
 #ifdef DEBUG_FCP_CONTROL
 #define FC_DEBUG_INTERVAL 100
-uint32_t sensor_fcp_last_debug_output = 0;
+uint32_t last_debug_output = 0;
 #endif
 
-#define FC_PACKET_LENGTH FC_NUM_HEADERS + FC_NUM_CELLS * 2
+#define FC_PACKET_LENGTH 8 // Horizon Fuel Cell packet length is 8 bytes
+#define MAX_ERROR_FLAG 20
+#define MAX_NUM_SYNC
 
-const int32_t SensorFcpControl::PacketSize = FC_PACKET_LENGTH;
-
+// Constructor for Debug Configuration
 SensorFcpControl::SensorFcpControl(TelemetrySerial* serial) : _serial(serial) { }
 
-SensorFcpControl::~SensorFcpControl() { }
+// Default constructor
+SensorFcpControl::SensorFcpControl() {}
 
+// Destructor
+SensorFcpControl::~SensorFcpControl() {
+    // Clean up buffer
+    if (_serial) {
+        _flushSerial();
+    }
+}
+
+// Get Human Name
 String SensorFcpControl::getHumanName() {
     return "FCP Control";
 }
 
 void SensorFcpControl::begin() {
     _serial->begin(FC_BAUD, SERIAL_8N1);
-    _cellVoltages.resize(FC_NUM_CELLS);
+    _serial->setTimeout(FC_TIMEOUT);
+    _flushSerial(); // Flush the serial buffer to clean state
+
+    #ifdef DEBUG_FCP_CONTROL
+    DEBUG_SERIAL_F("FCP: Serial port initialized. Baud rate: %d", FC_BAUD); // Flow control disable by default
+    #endif
 }
 
 void SensorFcpControl::handle() {
-    if(millis() < _lastUpdate + STALE_INTERVAL) {
+    // Check if the data is stale
+    if (millis() < _lastUpdate + STALE_INTERVAL) {
         _valid = true;
-    } else {
-        _valid = false;
+    } 
+    // else {
+    //     _valid = false;
+    // }
+
+    int bytesAvailable = _serial->available();
+
+    #ifdef DEBUG_FCP_CONTROL
+    static uint32_t lastBytesDebug = 0;
+    if (millis() - lastBytesDebug >= 1000) {
+        lastBytesDebug = millis();
+        if (bytesAvailable == 0) {
+            DEBUG_SERIAL_LN("FCP: No bytes available");
+        } else if (bytesAvailable > 0 && bytesAvailable < FC_PACKET_LENGTH) {
+            DEBUG_SERIAL_F("FCP: Incomplete packet (%d bytes available)\n", bytesAvailable);
+        }
     }
-    
-    int bytesAvail = _serial->available();
-    if (bytesAvail < FC_PACKET_LENGTH) {
-		#ifdef DEBUG_FCP_CONTROL
-		if (bytesAvail > 0 && millis() >= sensor_fcp_last_debug_output + FC_DEBUG_INTERVAL) {
-			sensor_fcp_last_debug_output = millis();
-			DEBUG_SERIAL_F("Received %d bytes from Fcp Control\n", _serial->available());
-		}
-		#endif
+    #endif
+
+    int bytesPeeked = 0;
+    while (_serial->available() > 0) {
+        // && !_checkErrHeader(_serial->peek())
+        _serial->read();
+        bytesPeeked++;
+
+        if (bytesPeeked > 8) {
+            break;
+        }
+    }
+
+    // Not enough bytes for a complete packet
+    if (bytesAvailable < FC_PACKET_LENGTH) {
         return;
     }
-    
-    uint8_t buf[FC_PACKET_LENGTH] = { 0 };
-	_serial->readBytes((char*)buf, FC_PACKET_LENGTH);
 
-	#ifdef DEBUG_FCP_CONTROL
-		DEBUG_SERIAL_LN("-----------------------------");
-		DEBUG_SERIAL("SensorFcpControl Received Message - Header:");
-		for (int i = 0; i < FC_NUM_HEADERS; i++) {
-			DEBUG_SERIAL_F(" 0x%x", buf[i]);
-		}
-		DEBUG_SERIAL("\n");
-		DEBUG_SERIAL("Data: ");
-		for (int i = FC_NUM_HEADERS; i < FC_PACKET_LENGTH; i++) { // print the data
-			DEBUG_SERIAL_F("0x%x ", buf[i]);
-		}
-		DEBUG_SERIAL_LN();
-	#endif
+    // Read the data packets from serial buffer
+    uint8_t dataBuffer[FC_PACKET_LENGTH] = { 0 };
+    size_t bytesRead =_serial->readBytes((char*)dataBuffer, FC_PACKET_LENGTH); // Cast to char *
 
-	if (buf[0] != FC_HEADER_0 || buf[1] != FC_HEADER_1 || buf[2] != FC_HEADER_2 ||
-		buf[3] != FC_HEADER_3 || buf[4] != FC_HEADER_4 || buf[5] != FC_HEADER_5) {
-			#ifdef DEBUG_FCP_CONTROL
-			DEBUG_SERIAL_LN("FcpControl Header Incorrect -- flushing data");
-			#endif
-			_flushSerial();
-			return;
-	}
-	
-	_unpackCellVoltages(buf);
-}
+    if (bytesRead != FC_PACKET_LENGTH) {
+        #ifdef DEBUG_FCP_CONTROL
+        DEBUG_SERIAL_F("FCP: Read error! Got only %d of %d bytes\n", bytesRead, FC_PACKET_LENGTH);
+        #endif
 
-int SensorFcpControl::getNumFuelCells() {
-	return FC_NUM_CELLS;
-}
-
-String SensorFcpControl::getNextCellVoltage(bool& valid) {
-    valid = _valid;
-    _lastCellVoltageIndex++;
-    _lastCellVoltageIndex %= FC_NUM_CELLS;
-    return FLOAT_TO_STRING(_cellVoltages[_lastCellVoltageIndex], 2);
-}
-
-float SensorFcpControl::getCellVoltageByIndex(int index, bool& valid) {
-	valid = _valid;
-	if (index < FC_NUM_CELLS)
-    	return _cellVoltages[index];
-	else
-		return 0.0f;
-}
-
-String SensorFcpControl::getStackVoltage(bool& valid) {
-    valid = _valid;
-    float sum = 0;
-    for (float cell : _cellVoltages) {
-        sum += cell;
+        _flushSerial(); // Clear buffer for resynchronization
+        return;
     }
-    return FLOAT_TO_STRING(sum, 2);
+
+    #ifdef DEBUG_FCP_CONTROL
+    // Debug output for the data packets received
+    DEBUG_SERIAL_LN("-----------------------------");
+    DEBUG_SERIAL("FCP Received Message:");
+    for (int i = 0; i < FC_PACKET_LENGTH; i++) {
+        DEBUG_SERIAL_F("0x%x ", dataBuffer[i]);
+    }
+    DEBUG_SERIAL_LN("");
+    #endif
+
+    // Unpack the data packets
+    _unpackData(dataBuffer);
 }
 
-void SensorFcpControl::_unpackCellVoltages(uint8_t* buf) {
-	int j = 0;
-	for (int i = FC_NUM_HEADERS; i < FC_PACKET_LENGTH; i+=2) {
-		int16_t val = (buf[i] << 8) | buf[i+1];
-		_cellVoltages[j++] = (float)val / 1000.0f;
-
-		#ifdef DEBUG_FCP_CONTROL
-		DEBUG_SERIAL_LN("UNPACKED VALUE: " + FLOAT_TO_STRING(_cellVoltages[j-1], 1));
-		#endif
-	}
-	_valid = true;
+void SensorFcpControl::_unpackData(uint8_t* buf) {
+    // See Notion for Horizon Fuel Cell Controller documentation
+    _errorFlag = buf[0];
+    _ambientTemperature = buf[1] * AMBIENT_TEMP_UNIT;
+    _fuelCellVoltage = buf[2] * FUEL_CELL_VOLTAGE_UNIT;
+    _h2LeakVoltage = buf[3] * H2_LEAK_VOLTAGE_UNIT;
+    _fuelCellTemperature = buf[4] * FUEL_CELL_TEMP_UNIT;
+    uint8_t fuelCellCurrentHigh = buf[5];
+    uint8_t fuelCellCurrentLow = buf[6];
+    _fuelCellCurrent = (fuelCellCurrentHigh * 0x100 + fuelCellCurrentLow) * FUEL_CELL_CURRENT_UNIT;
+    _batteryVoltage = buf[7] * BATTERY_VOLTAGE_UNIT;
+    
     _lastUpdate = millis();
+
+    #ifdef DEBUG_FCP_CONTROL
+    // Debug output for unpacked data
+    DEBUG_SERIAL_F("Error Flag: 0x%x\n", _errorFlag);
+    DEBUG_SERIAL_F("Ambient Temperature from buffer: %.1f C\n", _ambientTemperature);
+    DEBUG_SERIAL_F("Fuel Cell Voltage from buffer: %.3f V\n", _fuelCellVoltage);
+    DEBUG_SERIAL_F("H2 Leak Voltage from buffer: %.1f V\n", _h2LeakVoltage);
+    DEBUG_SERIAL_F("Fuel Cell Temperature from buffer: %.1f C\n", _fuelCellTemperature);
+    DEBUG_SERIAL_F("Fuel Cell Current (combined): %.1f A\n", _fuelCellCurrent);
+    DEBUG_SERIAL_F("Battery Voltage from buffer: %.1f V\n", _batteryVoltage);
+    #endif
 }
 
+String SensorFcpControl::getAmbientTemperature(bool& valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_ambientTemperature, 1);
+}
+
+String SensorFcpControl::getFuelCellVoltage(bool& valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_fuelCellVoltage, 2);
+}
+
+String SensorFcpControl::getH2LeakVoltage(bool& valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_h2LeakVoltage, 1);
+}
+
+String SensorFcpControl::getFuelCellTemperature(bool& valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_fuelCellTemperature, 1);
+}
+
+String SensorFcpControl::getFuelCellCurrent(bool& valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_fuelCellCurrent, 1);
+}
+
+String SensorFcpControl::getBatteryVoltage(bool& valid) {
+    valid = _valid;
+    return FLOAT_TO_STRING(_batteryVoltage, 1);
+}
+
+String SensorFcpControl::getErrorFlag(bool& valid) {
+    valid = _valid;
+    return INT_TO_STRING(_errorFlag);
+}
+
+// Flush the serial buffer
 void SensorFcpControl::_flushSerial() {
-	while (_serial->available()) {
-		_serial->read();
-	}
+	int bytesCleared = 0;
+    while (_serial->available()) {
+        _serial->read();
+        bytesCleared++;
+        
+        // Avoid buffer filling up too much
+        if (bytesCleared > 100) {
+            break;
+        }
+    }
+    
+    #ifdef DEBUG_FCP_CONTROL
+    if (bytesCleared > 0) {
+        DEBUG_SERIAL_F("FCP: Flushed %d bytes from buffer\n", bytesCleared);
+    }
+    #endif
+}
+
+bool SensorFcpControl::isConnected() {
+    return (millis() - _lastUpdate) < FC_TIMEOUT;
+}
+
+bool SensorFcpControl::_checkErrHeader(uint8_t errorFlag) {
+    if (errorFlag > MAX_ERROR_FLAG) {
+        #ifdef DEBUG_FCP_CONTROL
+        DEBUG_SERIAL_F("FCP: Invalid error flag: %d\n", errorFlag);
+        #endif
+        return false;
+    }
+    return true;
 }

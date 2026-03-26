@@ -7,7 +7,6 @@
 #include "Handleable.h"
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
-SYSTEM_THREAD(ENABLED);
 
 // Forward declarations for callback functions
 void buttonPushed();

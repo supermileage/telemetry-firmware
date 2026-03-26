@@ -6,15 +6,10 @@
 
 #include "fcp-common.h"
 #include "SensorFcpControl.h"
-#include "TelemetrySerialMock.h"
+#include "../Mocks/TelemetrySerialMock.h"
 
 /* Helper Functions */
 void packHeaderFc(uint8_t* buf);
-
-// ordered header bytes
-const std::array<uint8_t, 6> HeaderBytes = {
-	FC_HEADER_0, FC_HEADER_1, FC_HEADER_2, FC_HEADER_3, FC_HEADER_4, FC_HEADER_5
-};
 
 /* Tests */
 TEST_CASE( "SensorFcpControl::getHumanName test", "[SensorFcpControl][Sensor]" ) {
@@ -39,217 +34,148 @@ TEST_CASE( "SensorFcpControl::begin -- calls _serial->begin", "[SensorFcpControl
 	REQUIRE( beginCalled );
 }
 
-TEST_CASE( "SensorFcpControl::handle -- buffer header test", "[SensorFcpControl][Sensor]" ) {
-	TelemetrySerialMock serialMock;
-	SensorFcpControl fcp(&serialMock);
-	uint8_t* buf = new uint8_t[SensorFcpControl::PacketSize]();
+TEST_CASE("SensorFcpControl::handle -- validation test", "[SensorFcpControl][Sensor]") {
+    TelemetrySerialMock serialMock;
+    SensorFcpControl fcp(&serialMock);
+    uint8_t* buf = new uint8_t[8]();
 
-	fcp.begin();
-	
-	SECTION( "should fail -- fewer bytes available than message length" ) {
-		bool readCalled = false;
+    fcp.begin();
+    setMillis(DEFAULT_START_TIME_MILLIS);
 
-		serialMock.setAvailable([]() {
-			return SensorFcpControl::PacketSize - 1;
-		});
-		serialMock.setReadBytes([&readCalled](char* buf, int len) {
-			readCalled = true;
-			return len;
-		});
-		serialMock.setRead([&readCalled]() {
-			readCalled = true;
-			return 0;
-		});
+    SECTION("should pass -- calling getter within stale interval") {
+        serialMock.setReadMessage(buf, 8);
+        fcp.handle();
 
-		fcp.handle();
+        setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL - 1);
+        fcp.handle();
 
-		REQUIRE_FALSE( readCalled );
-	}
+        bool valid = false;
+        fcp.getFuelCellVoltage(valid);
 
-	SECTION( "should pass -- message is correct length and has correct header" ) {
-		bool readCalled = false;
-		bool availableCalled = false;
+        REQUIRE(valid);
+    }
 
-		packHeaderFc(buf);
+    SECTION("should fail -- calling getter after stale interval") {
+        serialMock.setReadMessage(buf, 8);
+        fcp.handle();
 
-		serialMock.setAvailable([&availableCalled]() {
-			// prevents infinite loop in case SensorFcpControl::flush is called
-			if (availableCalled)
-				return 0;
-			else
-				availableCalled = true;
+        setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL + 1);
+        fcp.handle();
 
-			return SensorFcpControl::PacketSize;
-		});
-		serialMock.setReadBytes([&buf, &readCalled](char* buffer, int len) {
-			memcpy((void*)buffer, (void*)buf, len);
-			readCalled = true;
-			return len;
-		});
+        bool valid = true;
+        fcp.getFuelCellVoltage(valid);
 
-		fcp.handle();
+        REQUIRE_FALSE(valid);
+    }
 
-		REQUIRE( availableCalled );
-		REQUIRE( readCalled );
-	}
-
-	SECTION( "should fail -- message contains invalid header" ) {
-		bool flushCalled = false;
-		bool readCalled = false;
-		int timesAvailableCalled = 0;
-		
-		packHeaderFc(buf);
-		buf[1] = ~FC_HEADER_1;
-		
-		serialMock.setAvailable([&timesAvailableCalled]() {
-			timesAvailableCalled++;
-			if (timesAvailableCalled > 5) {
-				return 0;
-			}
-			return SensorFcpControl::PacketSize;
-		});
-		serialMock.setReadBytes([&buf, &readCalled](char* buffer, int len) {
-			memcpy((void*)buffer, (void*)buf, len);
-			readCalled = true;
-			return len;
-		});
-		serialMock.setRead([&flushCalled]() {
-			flushCalled = true;
-			return 0;
-		});
-
-		fcp.handle();
-
-		REQUIRE( readCalled );
-		REQUIRE( timesAvailableCalled != 0 );
-		REQUIRE( flushCalled );
-	}
-
-	delete[] buf;
+    delete[] buf;
 }
 
-TEST_CASE( "SensorFcpControl::handle -- validation test", "[SensorFcpControl][Sensor]" ) {
-	TelemetrySerialMock serialMock;
-	SensorFcpControl fcp(&serialMock);
-	uint8_t* buf = new uint8_t[SensorFcpControl::PacketSize]();
-	packHeaderFc(buf);
+TEST_CASE("SensorFcpControl::handle -- parses 8-byte FCP packet correctly", "[SensorFcpControl][Sensor]") {
+    TelemetrySerialMock serialMock;
+    SensorFcpControl fcp(&serialMock);
 
-	fcp.begin();
-	setMillis(DEFAULT_START_TIME_MILLIS);
+    // Construct a test buffer with clear decimal values
+    uint8_t buf[8] = {
+        10,   // error flag		    No error
+        40,   // ambient temp: 		40 * 0.5 = 20.0C
+        50,  // FC voltage: 		50 * 0.333 = 16.65C
+        30,   // H2 leak:			30 * 0.1 = 3.0C
+        50,   // FC temp: 			50 * 0.5 = 25.0C
+        1,    // current high byte  1 * 256 + 244 = 500
+        244,  // current low byte: 	500 * 0.2 = 100A	// Unrealistic value, just for testing
+        120   // battery voltage: 	120 * 0.1 = 12.0V
+    };
 
-	SECTION("should pass -- calling getter within stale interval") {
-		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
-		
-		// receive message
-		fcp.handle();
+    // Expected physical values (post-scaling)
+    const float expectedAmbientTemp     = 20.0;
+    const float expectedFuelCellVoltage = 16.65;
+    const float expectedH2LeakVoltage   = 3.0;
+    const float expectedFuelCellTemp    = 25.0;
+    const float expectedCurrent         = 100.0;
+    const float expectedBatteryVoltage  = 12.0;
 
-		setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL - 1);
+    fcp.begin();
+    setMillis(DEFAULT_START_TIME_MILLIS);
+    serialMock.setReadMessage(buf, sizeof(buf));
+    fcp.handle();
 
-		// set data validity
-		fcp.handle();
+    bool valid = true;
 
-		bool isValid = false;
-		fcp.getCellVoltageByIndex(0, isValid);
-
-		REQUIRE( isValid );
-	}
-
-	SECTION("should fail -- calling getter after stale interval") {
-		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
-		
-		// receive message
-		fcp.handle();
-
-		setMillis(DEFAULT_START_TIME_MILLIS + STALE_INTERVAL);
-
-		// set data validity
-		fcp.handle();
-
-		bool isValid = false;
-		fcp.getCellVoltageByIndex(0, isValid);
-
-		REQUIRE_FALSE( isValid );
-	}
-	delete[] buf;
+    REQUIRE(fcp.getErrorFlag(valid).toInt() == 10);
+    REQUIRE(fcp.getAmbientTemperature(valid).toFloat() == Approx(expectedAmbientTemp).margin(0.01));
+    REQUIRE(fcp.getFuelCellVoltage(valid).toFloat() == Approx(expectedFuelCellVoltage).margin(0.01));
+    REQUIRE(fcp.getH2LeakVoltage(valid).toFloat() == Approx(expectedH2LeakVoltage).margin(0.01));
+    REQUIRE(fcp.getFuelCellTemperature(valid).toFloat() == Approx(expectedFuelCellTemp).margin(0.01));
+    REQUIRE(fcp.getFuelCellCurrent(valid).toFloat() == Approx(expectedCurrent).margin(0.01));
+    REQUIRE(fcp.getBatteryVoltage(valid).toFloat() == Approx(expectedBatteryVoltage).margin(0.01));
 }
 
-TEST_CASE( "SensorFcpControl::handle -- message parsing test", "[SensorFcpControl][Sensor]" ) {
-	TelemetrySerialMock serialMock;
-	SensorFcpControl fcp(&serialMock);
-	uint8_t* buf = new uint8_t[SensorFcpControl::PacketSize]();
-	packHeaderFc(buf);
+TEST_CASE("SensorFcpControl::handle -- interspersed valid and corrupted packets", "[SensorFcpControl][Sensor]") {
+    TelemetrySerialMock serialMock;
+    SensorFcpControl fcp(&serialMock);
+    fcp.begin();
+    setMillis(DEFAULT_START_TIME_MILLIS);
 
-	fcp.begin();
-	setMillis(DEFAULT_START_TIME_MILLIS);
-	
-	SECTION("should pass -- correctly parses full range of cell values") {
-		const float cellValues[] = { 0, 0.01, -0.01, 0.125, -0.125, 0.7, -0.7, 0.88, -0.88, 1, -1, 2.55, -2.55, 13.33, -13.33, 18.89, -18.89, 25.5, -25.5 };
+    // Define a valid packet
+    uint8_t validPacket[8] = {
+        10,   // error flag		    No error
+        40,   // ambient temp: 		40 * 0.5 = 20.0C
+        50,  // FC voltage: 		50 * 0.333 = 16.65C
+        30,   // H2 leak:			30 * 0.1 = 3.0C
+        50,   // FC temp: 			50 * 0.5 = 25.0C
+        1,    // current high byte  1 * 256 + 244 = 500
+        244,  // current low byte: 	500 * 0.2 = 100A	// Unrealistic value, just for testing
+        120   // battery voltage: 	120 * 0.1 = 12.0V
+    };
 
-		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );
+    // Define corrupted packets (too short)
+    uint8_t corruptedPacket[5] = { 1, 2, 3, 4, 5 };
 
-        float sum = 0;
-		for (int i = 0; i < FC_NUM_CELLS; i++) {
-			int16_t toPack = (int16_t)(cellValues[i] * 1000);
-			buf[FC_NUM_HEADERS + i * 2] = toPack >> 8;
-			buf[FC_NUM_HEADERS + i * 2 + 1] = toPack & 0xFF;
-		}
+    SECTION("should only update data on valid packets") {
+        // First: corrupt packet
+        serialMock.setReadMessage(corruptedPacket, sizeof(corruptedPacket));
+        fcp.handle();
 
-		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
+        bool valid = true;
+        fcp.getBatteryVoltage(valid);
 
-		fcp.handle();
+        // Valid packet
+        serialMock.setReadMessage(validPacket, sizeof(validPacket));
+        fcp.handle();
 
-        bool isValid;
-		for (int i = 0; i < FC_NUM_CELLS; i++) {
-			isValid = false;
-			float val = fcp.getCellVoltageByIndex(i, isValid);
+        String val = fcp.getBatteryVoltage(valid);
+        REQUIRE(val == "12.0");
 
-			REQUIRE( isValid );
-			REQUIRE( cellValues[i] == Approx(val).margin(0.01) );
-		}
+        // Corrupt packet (too short)
+        serialMock.setReadMessage(corruptedPacket, sizeof(corruptedPacket));
+        fcp.handle();
 
-        isValid = false;
-        String stackVal = fcp.getStackVoltage(isValid);
+        // Valid packet
+        validPacket[1] = 40;  // Update temp: 40 * 0.5 = 20.0C
+        serialMock.setReadMessage(validPacket, sizeof(validPacket));
+        fcp.handle();
 
-        REQUIRE( isValid );
-        REQUIRE( sum == Approx(stackVal.toFloat()).margin(0.01) );
-	}
+        String ambientTemp = fcp.getAmbientTemperature(valid);
+        REQUIRE(valid);
+        REQUIRE(ambientTemp == "20.0");
+    }
 
-    SECTION("should pass -- get stack voltage") {
-		const float cellValues[] = { 1.1, 2.2, 3.3, 5.5, 7.7, 11.11, 13.13, 17.17, 19.19, 23.23, 19.19, 17.17, 13.13, 11.11, 7.7, 5.5, 3.33, 2.2, 1.1 };
+    SECTION("should preserve last valid data after corrupted packet") {
+        // Load valid packet
+        serialMock.setReadMessage(validPacket, sizeof(validPacket));
+        fcp.handle();
 
-		REQUIRE( sizeof(cellValues) / sizeof(cellValues[0]) == FC_NUM_CELLS );
+        bool valid = true;
+        String fcCurrent = fcp.getFuelCellCurrent(valid);
+        REQUIRE(fcCurrent == "100.0");
 
-        float sum = 0;
-		for (int i = 0; i < FC_NUM_CELLS; i++) {
-			int16_t toPack = (int16_t)(cellValues[i] * 1000);
-			buf[FC_NUM_HEADERS + i * 2] = toPack >> 8;
-			buf[FC_NUM_HEADERS + i * 2 + 1] = toPack & 0xFF;
-            sum += cellValues[i];
-		}
+        // Corrupted data
+        serialMock.setReadMessage(corruptedPacket, sizeof(corruptedPacket));
+        fcp.handle();
 
-		serialMock.setReadMessage(buf, SensorFcpControl::PacketSize);
-
-		fcp.handle();
-
-        bool isValid;
-		for (int i = 0; i < FC_NUM_CELLS; i++) {
-            isValid = false;
-			float val = fcp.getCellVoltageByIndex(i, isValid);
-
-			REQUIRE( isValid );
-			REQUIRE( cellValues[i] == Approx(val).margin(0.01) );
-		}
-
-        isValid = false;
-        String stackVal = fcp.getStackVoltage(isValid);
-
-        REQUIRE( isValid );
-        REQUIRE( sum == Approx(stackVal.toFloat()).margin(0.01) );
-	}
-	delete[] buf;
-}
-
-void packHeaderFc(uint8_t* buf) {
-	for (size_t i = 0; i < HeaderBytes.size(); i++)
-		buf[i] = HeaderBytes[i];
+        // Should still return old value as valid
+        fcCurrent = fcp.getFuelCellCurrent(valid);
+        REQUIRE(fcCurrent == "100.0");
+    }
 }
