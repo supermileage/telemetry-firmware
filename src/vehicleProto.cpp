@@ -88,45 +88,47 @@ LoggingCommand<SensorEcu, int> ecuSpark(&ecu, "spar", &SensorEcu::getSpark, 1);
 LoggingCommand<SensorEcu, String> ecuFuel(&ecu, "pw1", &SensorEcu::getFuelPW1, 1);
 */
 
-//Speedino ECU
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuSecl(speedecu, "SECL", &CanSensorSpeeduinoECUtemp::getcurrentStatus_secl, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuSquirt(speedecu, "Squirt", &CanSensorSpeeduinoECUtemp::getcurrentStatus_squirt, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuEngine(speedecu, "Engine", &CanSensorSpeeduinoECUtemp::getcurrentStatus_engine, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuDwell(speedecu, "Dwell", &CanSensorSpeeduinoECUtemp::getcurrentStatus_dwell, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuMAP(speedecu, "MAP", &CanSensorSpeeduinoECUtemp::getcurrentStatus_MAP, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuIAT(speedecu, "IAT", &CanSensorSpeeduinoECUtemp::getcurrentStatus_IAT, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuCoolant(speedecu, "Coolant", &CanSensorSpeeduinoECUtemp::getcurrentStatus_coolant, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuTpsADC(speedecu, "TPS ADC", &CanSensorSpeeduinoECUtemp::getcurrentStatus_tpsADC, 5);
+/* Speeduino ECU */
+// CAN_ECU_STATUS
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuSecl(speedecu, "secl", &CanSensorSpeeduinoECU::getcurrentStatus_secl, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuSquirt(speedecu, "squirt", &CanSensorSpeeduinoECU::getcurrentStatus_squirt, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuEngine(speedecu, "eng", &CanSensorSpeeduinoECU::getcurrentStatus_engine, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuDwell(speedecu, "dwell", &CanSensorSpeeduinoECU::getcurrentStatus_dwell, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuMAP(speedecu, "map", &CanSensorSpeeduinoECU::getcurrentStatus_MAP, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuIAT(speedecu, "iat", &CanSensorSpeeduinoECU::getcurrentStatus_IAT, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuCoolant(speedecu, "clt", &CanSensorSpeeduinoECU::getcurrentStatus_coolant, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuTpsADC(speedecu, "tpsadc", &CanSensorSpeeduinoECU::getcurrentStatus_tpsADC, 5);
 
-// ================= CAN 3101 =================
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuBattery10(speedecu, "Battery", &CanSensorSpeeduinoECUtemp::getcurrentStatus_battery10, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuO2(speedecu, "O2", &CanSensorSpeeduinoECUtemp::getcurrentStatus_O2, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuEgoCorrection(speedecu, "Ego Correction", &CanSensorSpeeduinoECUtemp::getcurrentStatus_egoCorrection, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuIatCorrection(speedecu, "IAT Correction", &CanSensorSpeeduinoECUtemp::getcurrentStatus_iatCorrection, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuWueCorrection(speedecu, "WUE Correction", &CanSensorSpeeduinoECUtemp::getcurrentStatus_wueCorrection, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuRPM(speedecu, "RPM", &CanSensorSpeeduinoECUtemp::getcurrentStatus_RPM, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuTAEamount(speedecu, "TAE Amount", &CanSensorSpeeduinoECUtemp::getcurrentStatus_TAEamount, 5);
+// CAN_ECU_SENSORS
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuO2(speedecu, "o2", &CanSensorSpeeduinoECU::getcurrentStatus_O2, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuEgoCorrection(speedecu, "ego", &CanSensorSpeeduinoECU::getcurrentStatus_egoCorrection, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuIatCorrection(speedecu, "iatc", &CanSensorSpeeduinoECU::getcurrentStatus_iatCorrection, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuWueCorrection(speedecu, "wue", &CanSensorSpeeduinoECU::getcurrentStatus_wueCorrection, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuBattery10(speedecu, "bat10", &CanSensorSpeeduinoECU::getcurrentStatus_battery10, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuRPM(speedecu, "rpm", &CanSensorSpeeduinoECU::getcurrentStatus_RPM, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuTAEamount(speedecu, "tae", &CanSensorSpeeduinoECU::getcurrentStatus_TAEamount, 5);
 
-// ================= CAN 3102 =================
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuBarometerCorrection(speedecu, "Barometer Correction", &CanSensorSpeeduinoECUtemp::getcurrentStatus_barometerCorrection, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuCorrections(speedecu, "Total GammaE", &CanSensorSpeeduinoECUtemp::getcurrentStatus_corrections, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuVE(speedecu, "CurrentVE", &CanSensorSpeeduinoECUtemp::getcurrentStatus_VE, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuAfrTarget(speedecu, "AFR Target", &CanSensorSpeeduinoECUtemp::getcurrentStatus_afrTarget, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuPW(speedecu, "Pulse Width", &CanSensorSpeeduinoECUtemp::getcurrentStatus_PW, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuTpsDOT(speedecu, "TPS DOT", &CanSensorSpeeduinoECUtemp::getcurrentStatus_tpsDOT, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuAdvance(speedecu, "Advance", &CanSensorSpeeduinoECUtemp::getcurrentStatus_advance, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuTPS(speedecu, "TPS", &CanSensorSpeeduinoECUtemp::getcurrentStatus_TPS, 5);
+// CAN_ECU_CORRECTION
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuBarometerCorrection(speedecu, "baro", &CanSensorSpeeduinoECU::getcurrentStatus_barometerCorrection, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuCorrections(speedecu, "gammae", &CanSensorSpeeduinoECU::getcurrentStatus_corrections, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuVE(speedecu, "ve", &CanSensorSpeeduinoECU::getcurrentStatus_VE, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuAfrTarget(speedecu, "afrt", &CanSensorSpeeduinoECU::getcurrentStatus_afrTarget, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuPW(speedecu, "pw", &CanSensorSpeeduinoECU::getcurrentStatus_PW, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuTpsDOT(speedecu, "tpsdot", &CanSensorSpeeduinoECU::getcurrentStatus_tpsDOT, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuAdvance(speedecu, "adv", &CanSensorSpeeduinoECU::getcurrentStatus_advance, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuAdvance1(speedecu, "adv1", &CanSensorSpeeduinoECU::getcurrentStatus_advance, 5);
+LoggingCommand<CanSensorSpeeduinoECU, String> ecuTPS(speedecu, "tps", &CanSensorSpeeduinoECU::getcurrentStatus_TPS, 5);
 
-// ================= CAN 3103 =================
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuLoopsPerSecond(speedecu, "Loops Per Second", &CanSensorSpeeduinoECUtemp::getcurrentStatus_loopsPerSecond, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuFreeRAM(speedecu, "Free RAM", &CanSensorSpeeduinoECUtemp::getcurrentStatus_freeRAM, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuBatCorrection(speedecu, "Battery Correction", &CanSensorSpeeduinoECUtemp::getcurrentStatus_batCorrection, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuSpark(speedecu, "Spark", &CanSensorSpeeduinoECUtemp::getcurrentStatus_spark, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuO2_2(speedecu, "O2_2", &CanSensorSpeeduinoECUtemp::getcurrentStatus_O2_2, 5);
+// CAN_ECU_LOOPS
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuLoopsPerSecond(speedecu, "lps", &CanSensorSpeeduinoECU::getcurrentStatus_loopsPerSecond, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuFreeRAM(speedecu, "freeram", &CanSensorSpeeduinoECU::getcurrentStatus_freeRAM, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuBatCorrection(speedecu, "batc", &CanSensorSpeeduinoECU::getcurrentStatus_batCorrection, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuSpark(speedecu, "spark", &CanSensorSpeeduinoECU::getcurrentStatus_spark, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuO2_2(speedecu, "o2_2", &CanSensorSpeeduinoECU::getcurrentStatus_O2_2, 5);
 
-// ================= CAN 3104 =================
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuRpmDOT(speedecu, "RPM DOT", &CanSensorSpeeduinoECUtemp::getcurrentStatus_rpmDOT, 5);
-LoggingCommand<CanSensorSpeeduinoECU, String> ecuFlex(speedecu, "Flex Sensor", &CanSensorSpeeduinoECUtemp::getcurrentStatus_flex, 5);
+// CAN_ECU_RPMDOT
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuRpmDOT(speedecu, "rpmdot", &CanSensorSpeeduinoECU::getcurrentStatus_rpmDOT, 5);
+// LoggingCommand<CanSensorSpeeduinoECU, String> ecuFlex(speedecu, "flex", &CanSensorSpeeduinoECU::getcurrentStatus_flex, 5);
 
 
 String publishName = "BQIngestion";
