@@ -83,7 +83,7 @@ class CanSensorOrionBms : public CanSensorBms {
         /**
          * @brief Get engine rpm
         */
-        int getEngineRpm(bool& valid) override;
+        int getEngineRpm(bool& valid = Sensor::dummy) override;
 
         /**
          * @brief Get the universal BMS fault code (if any)

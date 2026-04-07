@@ -6,6 +6,7 @@ const uint16_t VALIDATION_IDS[] {
  	CAN_ORIONBMS_PACK,
 	CAN_ORIONBMS_CELL,
 	CAN_ORIONBMS_TEMP,
+	CAN_URBAN_MC_RPM,
 };
 
 CanSensorOrionBms::CanSensorOrionBms(CanInterface& canInterface) : CanSensorBms(canInterface) { }
@@ -90,9 +91,9 @@ String CanSensorOrionBms::getStatusBmsString(bool& valid) {
 }
 
 int CanSensorOrionBms::getEngineRpm(bool& valid) {
-	valid  = _validate(CAN_URBAN_CON_RPM);
+	valid  = _validate(CAN_URBAN_MC_RPM);
     return _rpm;
-};
+}
 
 
 void CanSensorOrionBms::restart() { }
@@ -105,7 +106,6 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_bmsStatus = message.data[0] & 0x1 ? DischargeEnabled : Unknown;
 			if (_bmsStatus == Unknown)
 				_bmsStatus = message.data[0] & 0x2 ? ChargeEnabled : Unknown;
-			
 			_fault = _parseFault(message);
 			_validationMap[CAN_ORIONBMS_STATUS] = _lastUpdateTime;
 			break;
@@ -128,8 +128,10 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_tempBms = (int8_t)message.data[3];
 			_validationMap[CAN_ORIONBMS_TEMP] = _lastUpdateTime;
 			break;
-		case CAN_URBAN_CON_RPM:
+		case CAN_URBAN_MC_RPM:
 			_rpm = (int)_parseIntBE16(message.data);
+			_validationMap[CAN_URBAN_MC_RPM] = _lastUpdateTime;
+			break;
 		default:
 			// do nothing
 			break;
