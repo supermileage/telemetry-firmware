@@ -90,7 +90,7 @@ String CanSensorOrionBms::getStatusBmsString(bool& valid) {
 }
 
 int CanSensorOrionBms::getEngineRpm(bool& valid) {
-	valid  = _validate(CAN_ORIONBMS_RPM);
+	valid  = _validate(CAN_URBAN_CON_RPM);
     return _rpm;
 };
 
@@ -128,7 +128,7 @@ void CanSensorOrionBms::update(CanMessage message) {
 			_tempBms = (int8_t)message.data[3];
 			_validationMap[CAN_ORIONBMS_TEMP] = _lastUpdateTime;
 			break;
-		case CAN_ORIONBMS_RPM:
+		case CAN_URBAN_CON_RPM:
 			_rpm = (int)_parseIntBE16(message.data);
 		default:
 			// do nothing
