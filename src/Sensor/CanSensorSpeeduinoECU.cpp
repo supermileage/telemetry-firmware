@@ -220,7 +220,8 @@ void CanSensorSpeeduinoECU::update(CanMessage message) {
 			break;
 
 		case CAN_ECU_SENSORS:
-			_battery10 = message.data[0];
+			// Note: battery10 is scaled as volts x 10.
+			_battery10 = message.data[0] / 10.0f;
 			_O2 = message.data[1];
 			_egoCorrection = message.data[2];
 			_iatCorrection = message.data[3];
@@ -236,7 +237,7 @@ void CanSensorSpeeduinoECU::update(CanMessage message) {
 			_corrections = message.data[1];
 			_VE = message.data[2];
 			_afrTarget = message.data[3];
-			_PW = message.data[4] / 10.0f;
+			_PW = message.data[4] / 100.0f;
 			_tpsDOT = message.data[5];
 			_advance = message.data[6];
 			_TPS = message.data[7];
