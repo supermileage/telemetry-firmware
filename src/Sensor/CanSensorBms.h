@@ -106,6 +106,11 @@ class CanSensorBms : public CanListener {
          */
         virtual String getStatusBmsString(bool& valid = Sensor::dummy) = 0;
 
+        /**
+         * @brief Get the engine RPM
+         */
+        virtual int getEngineRpm(bool& valid = Sensor::dummy) = 0;
+
 		/**
          * @brief Get the universal BMS fault code (if any)
          */
