@@ -23,5 +23,4 @@ class Sensor : public Handleable {
     protected:
         static bool dummy;
 };
-
 #endif

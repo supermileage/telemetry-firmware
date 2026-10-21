@@ -19,3 +19,11 @@ int USARTSerialWrapper::read() {
 size_t USARTSerialWrapper::readBytes(char* buffer, size_t length) {
 	return _usartSerial->readBytes(buffer, length);
 }
+
+void USARTSerialWrapper::setTimeout(unsigned long timeout) {
+	_usartSerial->setTimeout(timeout);
+}
+
+int USARTSerialWrapper::peek() {
+	return _usartSerial->peek();
+}

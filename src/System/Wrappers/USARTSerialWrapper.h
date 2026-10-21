@@ -15,6 +15,8 @@ class USARTSerialWrapper : public TelemetrySerial {
 		int available() override;
 		int read() override;
 		size_t readBytes(char* buffer, size_t length) override;
+		void setTimeout(unsigned long timeout) override;
+		int peek() override;
 
 	private:
 		USARTSerial* _usartSerial;

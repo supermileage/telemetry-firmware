@@ -9,8 +9,8 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define PROTO
-    #endif
+    #define URBAN
+#endif
 
 // Important: Board version number
 // TODO: remove when we have fully transitioned to second board
@@ -54,5 +54,6 @@
 
 #define FLOAT_TO_STRING(x,y) String(x,y)
 #define BOOL_TO_STRING(x) String((x < 2) ? ((x == 1) ? "ON" : "OFF") : "N/A")
+#define INT_TO_STRING(x) String(x)
 
 #endif
