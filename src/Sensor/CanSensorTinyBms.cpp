@@ -149,6 +149,11 @@ int CanSensorTinyBms::getFault(bool& valid) {
     return BmsFault::NONE;
 }
 
+int CanSensorTinyBms::getEngineRpm(bool& valid) {
+    valid = false;
+    return 0; /* Deprecate TinyBMS */
+};
+
 void CanSensorTinyBms::restart() {
     CanMessage msg = CAN_MESSAGE_NULL;
     msg.id = CAN_TINYBMS_REQUEST;

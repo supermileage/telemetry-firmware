@@ -9,7 +9,7 @@
 // If no argument is passed to compiler, allow us to manually define a vehicle
 #if !defined(PROTO) && !defined(URBAN) && !defined(FC)
     // SELECT VEHICLE: PROTO URBAN FC 
-    #define FC
+    #define URBAN
 #endif
 
 // Important: Board version number
