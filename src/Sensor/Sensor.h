@@ -4,8 +4,8 @@
 #include "Particle.h"
 #include "Handleable.h"
 
-// Interval (in ms) after which telemetry will consider data to be invalid
-#define STALE_INTERVAL          2000
+// Interval (in ms) after which telemetry will consider sensor data to be invalid.
+#define STALE_INTERVAL          5000
 
 class Sensor : public Handleable {
     public:

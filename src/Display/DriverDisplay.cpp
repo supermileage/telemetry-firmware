@@ -8,7 +8,7 @@ void DriverDisplay::begin() {
     _initialized = _display.begin(0x3C, false);
 
     if (_initialized) {
-        _display.setRotation(1);
+        _display.setRotation(3);
         _display.clearDisplay();
         _display.cp437(true);
     }

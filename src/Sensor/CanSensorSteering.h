@@ -60,6 +60,7 @@ class CanSensorSteering : public CanListener {
          * @param message
          */
         void update(CanMessage message) override;
+        
 
         uint32_t _lastUpdateThrottle = 0;
         uint32_t _lastUpdateReady = 0;
