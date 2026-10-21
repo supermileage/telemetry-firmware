@@ -12,5 +12,4 @@ output/
 test/obj
 test/dep
 test/bin
-build/
 nul

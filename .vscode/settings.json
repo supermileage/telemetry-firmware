@@ -1,6 +1,7 @@
 {
-	"particle.targetPlatform": "boron",
-    "particle.firmwareVersion": "6.3.3",
+	"particle.targetDevice": "",
+    "particle.targetPlatform": "boron",
+    "particle.firmwareVersion": "6.3.4",
     "files.associations": {
 		"__bit_reference": "cpp",
 		"__hash_table": "cpp",
